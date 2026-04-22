@@ -1,19 +1,21 @@
-# Async Process
+(async-process)=
+# 非同步程式
 
 
 ```{important}
-This is considered an advanced topic.
+這被認為是一個高階主題。
 ```
 
-## Synchronous versus Asynchronous
+(synchronous-versus-asynchronous)=
+## 同步與非同步
 
 ```{sidebar}
-This is also explored in the [Command Duration Tutorial](../Howtos/Howto-Command-Duration.md).
+[指令持續時間教學](../Howtos/Howto-Command-Duration.md) 中也對此進行了探討。
 ```
 
-Most program code operates *synchronously*. This means that each statement in your code gets processed and finishes before the next can begin. This makes for easy-to-understand code. It is also a *requirement* in many cases - a subsequent piece of code often depend on something calculated or defined in a previous statement.
+大多數程式碼*同步*執行。這意味著程式碼中的每個語句都會在下一個語句開始之前處理並完成。這使得程式碼易於理解。在許多情況下，這也是一個*要求* - 後續的程式碼通常取決於先前語句中計算或定義的內容。
 
-Consider this piece of code in a traditional Python program:
+考慮傳統 Python 程式中的這段程式碼：
 
 ```python
     print("before call ...")
@@ -21,20 +23,21 @@ Consider this piece of code in a traditional Python program:
     print("after call ...")
 ```
 
-When run, this will print `"before call ..."`, after which the `long_running_function` gets to work
-for however long time. Only once that is done, the system prints `"after call ..."`. Easy and logical to follow. Most of Evennia work in this way and often it's important that commands get
-executed in the same strict order they were coded.
+執行時，將列印 `"before call..."`，之後 `long_running_function` 開始工作
+無論多久。完成後，系統才會列印 `"after call..."`。簡單且合乎邏輯。 Evennia 中的大多數都以這種方式工作，並且通常重要的是指令得到
+按照與編碼相同的嚴格順序執行。
 
-Evennia, via Twisted, is a single-process multi-user server. In simple terms this means that it swiftly switches between dealing with player input so quickly that each player feels like they do things at the same time.  This is a clever illusion however: If one user, say, runs a command containing that `long_running_function`, *all* other players are effectively forced to wait until it finishes.
+Evennia，來自 Twisted，是一個單程式多使用者伺服器。簡單來說，這意味著它在處理玩家輸入之間快速切換，速度如此之快，以至於每個玩家都感覺自己在同時做事。  然而，這是一個聰明的錯覺：如果一個使用者執行一個包含`long_running_function`的指令，*所有*其他玩家實際上被迫等待直到它完成。
 
-Now, it should be said that on a modern computer system this is rarely an issue. Very few commands run so long that other users notice it.  And as mentioned, most of the time you *want* to enforce all commands to occur in strict sequence. 
+現在，應該說在現代電腦系統上這很少是一個問題。很少有指令執行時間長到其他使用者註意到的程度。  如前所述，大多數時候您「希望」強制所有指令按嚴格的順序發生。
 
+(utilsdelay)=
 ## `utils.delay`
 
-```{sidebar} delay() vs time.sleep()
-This is equivalent to something like `time.sleep()` except `delay` is asynchronous while `sleep` would lock the entire server for the duration of the sleep.
+```{sidebar} 延遲（）與time.sleep（）
+這相當於 `time.sleep()` ，除了 `delay` 是非同步的，而 `sleep` 會在睡眠期間 lock 整個伺服器。
 ```
-The `delay` function is a much simpler sibling to `run_async`. It is in fact just a way to delay the execution of a command until a future time. 
+`delay` 函式是 `run_async` 的同級函式，要簡單得多。事實上，這只是將指令的執行延遲到未來某個時間的一種方法。
 
 ```python
      from evennia.utils import delay
@@ -46,18 +49,19 @@ The `delay` function is a much simpler sibling to `run_async`. It is in fact jus
      delay(10, callback, self.caller)
 ```
 
-This will delay the execution of the callback for 10 seconds. Provide `persistent=True` to make the delay survive a server `reload`. While waiting, you can input commands normally.
+這會將回呼的執行延遲 10 秒。提供 `persistent=True` 以使延遲在伺服器 `reload` 中倖存。等待期間可以正常輸入指令。
 
-You can also try the following snippet just see how it works:
+您也可以嘗試以下程式碼片段，看看它是如何運作的：
 
     py from evennia.utils import delay; delay(10, lambda who: who.msg("Test!"), self)
 
-Wait 10 seconds and 'Test!' should be echoed back to you.
+等待 10 秒鐘，然後「測試！」應該會回覆給你。
 
 
-## `@utils.interactive` decorator 
+(utilsinteractive-decorator)=
+## `@utils.interactive` 裝飾器
 
-The `@interactive` [decorator](https://realpython.com/primer-on-python- decorators/) makes any function or method possible to 'pause' and/or await player input in an interactive way.
+`@interactive` [裝飾器](https://realpython.com/primer-on-python- decorators/) 使任何函式或方法都可以以互動方式「暫停」和/或等待玩家輸入。
 
 ```python
     from evennia.utils import interactive
@@ -76,15 +80,15 @@ The `@interactive` [decorator](https://realpython.com/primer-on-python- decorato
               break 
 ```
 
-The `@interactive` decorator gives the function the ability to pause. The use of `yield(seconds)` will do just that - it will asynchronously pause for the number of seconds given before continuing. This is technically equivalent to using `call_async` with a callback that continues after 5 secs. But the code with `@interactive` is a little easier to follow. 
+`@interactive` 裝飾器賦予函式暫停的能力。使用 `yield(seconds)` 就可以做到這一點 - 它將非同步暫停指定的秒數，然後再繼續。從技術上講，這相當於使用 `call_async` 和 5 秒後繼續的回撥。但是帶有 `@interactive` 的程式碼更容易理解一些。
 
-Within the `@interactive` function, the `response = yield("question")` question allows you to ask the user for input. You can then process the input, just like you would if you used the Python `input` function. 
+在 `@interactive` 函式中，`response = yield("question")` 問題允許您要求使用者輸入。然後，您可以處理輸入，就像使用 Python `input` 函式一樣。
 
-All of this makes the `@interactive` decorator very useful. But it comes with a few caveats. 
+所有這些使得 `@interactive` 裝飾器非常有用。但它有一些警告。
 
-- The decorated function/method/callable must have an argument named exactly `caller`. Evennia will look for an argument with this name and treat it as the source of input.
-- Decorating a function this way turns it turns it into a Python [generator](https://wiki.python.org/moin/Generators). This means 
-    - You can't use  `return <value>` from a generator (just an empty `return` works). To return a value from a function/method you have decorated with `@interactive`, you must instead use a special Twisted function  `twisted.internet.defer.returnValue`. Evennia also makes this function  conveniently available from `evennia.utils`:
+- 修飾函式/方法/可呼叫函式必須有一個名為 `caller` 的引數。 Evennia 將尋找具有此名稱的引數並將其視為輸入來源。
+- 以這種方式裝飾函式會將其變成 Python [生成器](https://wiki.python.org/moin/Generators)。這意味著
+    - 您不能使用生成器中的 `return <value>`（只需使用空的 `return` 即可）。要從 `@interactive` 修飾的函式/方法傳回值，您必須使用特殊的 Twisted 函式 `twisted.internet.defer.returnValue`。 Evennia 還可以從 `evennia.utils` 方便使用此功能：
     
     ```python
     from evennia.utils import interactive, returnValue
@@ -100,19 +104,20 @@ All of this makes the `@interactive` decorator very useful. But it comes with a 
     ```
 
 
+(utilsrun_async)=
 ## `utils.run_async`
 
 ```{warning}
-Unless you have a very clear purpose in mind, you are unlikely to get an expected result from `run_async`. Notably, it will still run your long-running function _in the same thread_ as the rest of the server. So while it does run async, a very heavy and CPU-heavy operation will still block the server. So don't consider this as a way to offload heavy operations without affecting the rest of the server.
+除非你心裡有一個非常明確的目的，否則你不太可能從`run_async`得到預期的結果。值得注意的是，它仍然會與伺服器的其餘部分在同一個執行緒中執行長時間執行的函式。因此，雖然它確實執行非同步，但非常繁重和 CPU- 繁重的操作仍然會阻塞伺服器。因此，不要認為這是一種在不影響伺服器其餘部分的情況下解除安裝繁重操作的方法。
 ```
 
-When you don't care in which order the command actually completes, you can run it *asynchronously*. This makes use of the `run_async()` function in `src/utils/utils.py`:
+當您不關心指令實際完成的順序時，您可以「非同步」執行它。這利用了 `src/utils/utils.py` 中的 `run_async()` 函式：
 
 ```python
     run_async(function, *args, **kwargs)
 ```
 
-Where `function` will be called asynchronously with `*args` and `**kwargs`. Example:
+其中`function`將與`*args`和`**kwargs`非同步呼叫。例子：
 
 ```python
     from evennia import utils
@@ -121,40 +126,40 @@ Where `function` will be called asynchronously with `*args` and `**kwargs`. Exam
     print("after call ...")
 ```
 
-Now, when running this you will find that the program will not wait around for `long_running_function` to finish. In fact you will see `"before call ..."` and `"after call ..."` printed out right away. The long-running function will run in the background and you (and other users) can go on as normal. 
+現在，執行此程式時，您會發現程式不會等待 `long_running_function` 完成。事實上，您會立即看到 `"before call..."` 和 `"after call..."` 列印出來。長時間執行的函式將在背景執行，您（和其他使用者）可以正常執行。
 
-A complication with using asynchronous calls is what to do with the result from that call. What if
-`long_running_function` returns a value that you need? It makes no real sense to put any lines of
-code after the call to try to deal with the result from `long_running_function` above - as we saw
-the `"after call ..."` got printed long before `long_running_function` was finished, making that
-line quite pointless for processing any data from the function. Instead one has to use *callbacks*.
+使用非同步呼叫的一個複雜問題是如何處理該呼叫的結果。如果
+`long_running_function` 傳回您需要的值？放置任何行都沒有任何實際意義
+呼叫後的程式碼嘗試處理上面 `long_running_function` 的結果 - 正如我們所看到的
+`"after call..."` 早在 `long_running_function` 完成之前就已經列印出來了，使得
+行對於處理函式中的任何資料毫無意義。相反，人們必須使用*回撥*。
 
-`utils.run_async` takes reserved kwargs that won't be passed into the long-running function:
+`utils.run_async` 採用不會傳遞到長時間執行的函式中的保留 kwargs：
 
-- `at_return(r)` (the *callback*) is called when the asynchronous function (`long_running_function`
-  above) finishes successfully. The argument `r` will then be the return value of that function (or
-  `None`).
+- `at_return(r)`（*回呼*）在非同步函式（`long_running_function`
+上）成功完成。引數 `r` 將是該函式的回傳值（或
+  `None`）。
 
     ```python
         def at_return(r):
             print(r)
     ```
 
-- `at_return_kwargs` - an optional dictionary that will be fed as keyword arguments to the `at_return` callback.
-- `at_err(e)` (the *errback*) is called if the asynchronous function fails and raises an exception.
-  This exception is passed to the errback wrapped in a *Failure* object `e`. If you do not supply an
-  errback of your own, Evennia will automatically add one that silently writes errors to the evennia
-  log. An example of an errback is found below:
+- `at_return_kwargs` - 一個可選字典，將作為關鍵字引數提供給 `at_return` 回呼。
+- 如果非同步函式失敗並引發異常，則呼叫 `at_err(e)`（*errback*）。
+此異常會傳遞到包裝在 *Failure* 物件 `e` 中的 errback。如果您不提供
+  您自己的 errback，Evennia 會自動新增一個，默默地將錯誤寫入 evennia
+  日誌。下面是一個 errback 的範例：
 
 ```python
         def at_err(e):
             print("There was an error:", str(e))
 ```
 
-- `at_err_kwargs` - an optional dictionary that will be fed as keyword arguments to the `at_err`
-  errback.
+- `at_err_kwargs` - 一個可選字典，將作為關鍵字引數提供給 `at_err`
+出錯了。
 
-An example of making an asynchronous call from inside a [Command](../Components/Commands.md) definition:
+從 [Command](../Components/Commands.md) 定義內部進行非同步呼叫的範例：
 
 ```python
     from evennia import utils, Command
@@ -180,6 +185,6 @@ An example of making an asynchronous call from inside a [Command](../Components/
 at_err=at_err_function)
 ```
 
-That's it - from here on we can forget about `long_running_function` and go on with what else need to be done. *Whenever* it finishes, the `at_return_function` function will be called and the final value will pop up for us to see. If not we will see an error message. 
+就是這樣 - 從這裡開始我們可以忘記 `long_running_function` 並繼續做其他需要做的事情。 *每當*完成時，`at_return_function` 函式將被呼叫，最終值將彈出供我們檢視。如果沒有，我們將看到一條錯誤訊息。
 
-> Technically, `run_async` is just a very thin and simplified wrapper around a [Twisted Deferred](https://twistedmatrix.com/documents/9.0.0/core/howto/defer.html) object; the wrapper sets up a default errback also if none is supplied. If you know what you are doing there is nothing stopping you from bypassing the utility function, building a more sophisticated callback chain after your own liking.
+> 從技術上講，`run_async` 只是一個圍繞 [Twisted Deferred](https://twistedmatrix.com/documents/9.0.0/core/howto/defer.html) 物件的非常薄且簡化的包裝器；如果沒有提供，包裝器也會設定預設的錯誤回傳。如果您知道自己在做什麼，就沒有什麼可以阻止您繞過實用函式，根據自己的喜好建立更複雜的回撥鏈。

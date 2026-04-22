@@ -1,67 +1,71 @@
-# Rules and dice rolling
+(rules-and-dice-rolling)=
+# 規則和骰子滾動
 
-In _EvAdventure_ we have decided to use the [Knave](https://www.drivethrurpg.com/product/250888/Knave) 
-RPG ruleset. This is commercial, but released under Creative Commons 4.0, meaning it's okay to share and 
-adapt _Knave_ for any purpose, even commercially. If you don't want to buy it but still follow 
-along, you can find a [free fan-version here](http://abominablefancy.blogspot.com/2018/10/knaves-fancypants.html).
+在_EvAdventure_中我們決定使用[Knave](https://www.drivethrurpg.com/product/250888/Knave)
+RPG 規則集。這是商業性的，但在 Creative Commons 4.0 下發布，這意味著可以分享和
+使_Knave_適應任何目的，甚至商業用途。如果你不想買但仍關注
+另外，您可以在這裡找到[免費粉絲版本](http://abominablefancy.blogspot.com/2018/10/knaves-fancypants.html)。
 
-## Summary of _Knave_ rules
+(summary-of-_knave_-rules)=
+## _Knave_ 規則摘要
 
-Knave, being inspired by early Dungeons & Dragons, is very simple. 
+Knave 受到早期龍與地下城的啟發，非常簡單。
 
-- It uses six Ability bonuses
-_Strength_ (STR), _Dexterity_ (DEX), _Constitution_ (CON), _Intelligence_ (INT), _Wisdom_ (WIS)
-and _Charisma_ (CHA). These are rated from `+1` to `+10`.
-- Rolls are made with a twenty-sided die (`1d20`), usually adding a suitable Ability bonus to the roll.
-- If you roll _with advantage_, you roll `2d20` and pick the 
-_highest_ value, If you roll _with disadvantage_, you roll `2d20` and pick the _lowest_. 
-- Rolling a natural `1` is a _critical failure_. A natural `20` is a _critical success_. Rolling such
-in combat means your weapon or armor loses quality, which will eventually destroy it.
-- A _saving throw_ (trying to succeed against the environment) means making a roll to beat `15` (always).
-So if you are lifting a heavy stone and have `STR +2`, you'd roll `1d20 + 2` and hope the result
-is higher than `15`. 
-- An _opposed saving throw_ means beating the enemy's suitable Ability 'defense', which is always their 
-`Ability bonus + 10`. So if you have `STR +1` and are arm wrestling someone with `STR +2`, you roll
-`1d20 + 1` and hope to roll higher than `2 + 10 = 12`. 
-- A special bonus is `Armor`, `+1` is unarmored, additional armor is given by equipment. Melee attacks 
-test `STR` versus the `Armor` defense value while ranged attacks uses `WIS` vs `Armor`.
-- _Knave_ has no skills or classes. Everyone can use all items and using magic means having a special 
-'rune stone' in your hands; one spell per stone and day.
-- A character has `CON + 10` carry 'slots'. Most normal items uses one slot, armor and large weapons uses
-two or three.
-- Healing is random, `1d8 + CON` health healed after food and sleep.
-- Monster difficulty is listed by hy many 1d8 HP they have; this is called their "hit die" or HD. If
-needing to test Abilities, monsters have HD bonus in every Ability.
-- Monsters have a _morale rating_. When things go bad, they have a chance to panic and flee if 
-rolling `2d6` over their morale rating.
-- All Characters in _Knave_ are mostly randomly generated. HP is `<level>d8` but we give every 
-new character max HP to start. 
-- _Knave_ also have random tables, such as for starting equipment and to see if dying when 
-hitting 0. Death, if it happens, is permanent.
+- 它使用六種能力獎勵
+_力量_ (STR)、_敏捷_ (DEX)、_體質_ (CON)、_智力_ (INT)、_智慧_ (WIS)
+和_魅力_ (CHA)。這些評級從 `+1` 到 `+10`。
+- 骰子是用二十面骰子（`1d20`）製成的，通常會為骰子新增適當的能力加值。
+- 如果你投_有優勢_，你投 `2d20` 並選擇
+_最高_值，如果你投擲_有劣勢_，你投擲`2d20`並選擇_最低_。
+- 滾動自然的 `1` 是_嚴重失敗_。自然的 `20` 是_關鍵的成功_。滾動這樣的
+在戰鬥中意味著你的武器或盔甲失去質量，最終會摧毀它。
+- _saving throw_（試圖在環境中取得成功）意味著進行一次擲骰以擊敗`15`（總是）。
+因此，如果您舉起一塊重石並且有 `STR +2`，您會滾動 `1d20 + 2` 並希望結果
+高於`15`。
+- _對抗豁免_意味著擊敗敵人合適的能力“防禦”，這始終是他們的
+`Ability bonus + 10`。因此，如果你有 `STR +1` 並且正在和有 `STR +2` 的人扳手腕，你會擲骰子
+`1d20 + 1`並希望滾動高於`2 + 10 = 12`。
+- 特殊加成是`Armor`，`+1`是無甲的，額外的甲值是由裝備賦予的。近戰攻擊
+測試 `STR` 與 `Armor` 防禦值，而遠端攻擊使用 `WIS` 與 `Armor`。
+- _Knave_沒有技能或職業。每個人都可以使用所有物品，並且使用魔法意味著擁有特殊的
+你手中的『符文石』；每石頭一天一個咒語。
+- 一個字元有 `CON + 10` 帶有“槽”。大多數普通物品使用一個插槽，盔甲和大型武器使用
+兩個或三個。
+- 治療是隨機的，食物和睡眠後`1d8 + CON`的健康得到治癒。
+- 怪物難度按他們擁有的眾多1d8 HP列出；這被稱為「擊中骰子」或HD。如果
+需要測試能力，怪物每項能力都有HD加成。
+- 怪物有_士氣等級_。當事情變壞時，他們有機會驚慌並逃跑，如果
+士氣評級滾動`2d6`。
+- _Knave_ 中的所有角色大多是隨機產生的。 HP 是 `<level>d8` 但我們給每一個
+新角色最多 HP 開始。
+- _Knave_也有隨機表，例如用於啟動裝置以及檢視何時死亡
+擊中 0。死亡，如果發生，是永久性的。
 
 
-## Making a rule module 
+(making-a-rule-module)=
+## 製作規則模組
 
-> Create a new module mygame/evadventure/rules.py 
+> 建立一個新模組mygame/evadventure/rules.py
 
 ```{sidebar}
-A complete version of the rule module is found in 
-[evennia/contrib/tutorials/evadventure/rules.py](../../../api/evennia.contrib.tutorials.evadventure.rules.md).
+規則模組的完整版本位於
+[evennia/contrib/tutorials/evadventure/rules.py](../../../api/evennia.contrib.tutorials.evadventure.rules.md)。
 ```
-There are three broad sets of rules for most RPGS:
+對於大多數 RPGS 來說，有三組廣泛的規則：
 
-- Character generation rules, often only used during character creation
-- Regular gameplay rules - rolling dice and resolving game situations
-- Character improvement - getting and spending experience to improve the character
+- 角色生成規則，通常僅在角色建立過程中使用
+- 常規遊戲規則 - 擲骰子並解決遊戲狀況
+- 角色提升 - 獲取並花費經驗來提升角色
 
-We want our `rules` module to cover as many aspeects of what we'd otherwise would have to look up 
-in a rulebook. 
+我們希望我們的 `rules` 模組能夠涵蓋我們原本必須查詢的盡可能多的方面
+在規則手冊中。
 
 
-## Rolling dice 
+(rolling-dice)=
+## 擲骰子
 
-We will start by making a dice roller. Let's group all of our dice rolling into a structure like this
-(not functional code yet): 
+我們將從製作一個骰子開始。讓我們將所有骰子組合成這樣的結構
+（還不是功能程式碼）：
 
 ```python 
 class EvAdventureRollEngine:
@@ -95,14 +99,14 @@ dice = EvAdventureRollEngine()
        
 ```
 ```{sidebar}
-This groups all dice-related code into one 'container' that is easy to import. But it's mostly a matter 
-of taste. You _could_ also break up the class' methods into normal functions at the top-level of the 
-module if you wanted.
+這會將所有與骰子相關的程式碼分組到一個易於匯入的「容器」中。但這主要是一個問題
+的味道。您也_可以_將類別的方法分解為頂層的普通函式
+模組，如果你想要的話。
 ```
 
-This structure (called a _singleton_) means we group all dice rolls into one class that we then initiate 
-into a variable `dice` at the end of the module. This means that we can do the following from other 
-modules: 
+這種結構（稱為 _singleton_）意味著我們將所有骰子分為一個類，然後啟動該類
+到模組末尾的變數 `dice` 中。這意味著我們可以從其他地方做以下事情
+模組：
 
 ```python
     from .rules import dice 
@@ -110,9 +114,10 @@ modules:
     dice.roll("1d8")
 ```
 
-### Generic dice roller 
+(generic-dice-roller)=
+### 通用骰子滾輪
 
-We want to be able to do `roll("1d20")` and get a random result back from the roll. 
+我們希望能夠執行 `roll("1d20")` 並從擲骰中獲得隨機結果。
 
 ```python
 # in mygame/evadventure/rules.py 
@@ -145,24 +150,24 @@ class EvAdventureRollEngine:
 ```
 
 ```{sidebar}
-For this tutorial we have opted to not use any contribs, so we create 
-our own dice roller. But normally you could instead use the [dice](../../../Contribs/Contrib-Dice.md) contrib for this. 
-We'll point out possible helpful contribs in sidebars as we proceed.
+對於本教學，我們選擇不使用任何 contribs，因此我們建立
+我們自己的骰子滾輪。但通常你可以用[骰子](../../../Contribs/Contrib-Dice.md)contrib來代替。 
+當我們繼續進行時，我們將在側邊欄中指出可能有幫助的contribs。
 ```
 
-The `randint` standard Python library module produces a random integer  
-in a specific range. The line 
+`randint` 標準 Python 函式庫模組產生一個隨機整數
+在特定範圍內。線路
 
 ```python 
 sum(randint(1, diesize) for _ in range(number))
 ```
-works like this: 
+工作原理如下：
 
-- For a certain `number` of times ... 
-- ... create a random integer between `1` and `diesize` ...
-- ... and `sum` all those integers together.
+- 對於特定的 `number` 次...
+- ....建立 `1` 和 `diesize` 之間的隨機整數...
+- ...和 ​​`sum` 所有這些整數在一起。
 
-You could write the same thing less compactly like this:
+您可以像這樣不那麼緊湊地編寫相同的內容：
 
 ```python 
 rolls = []
@@ -173,18 +178,19 @@ return sum(rolls)
 ```
 
 ```{sidebar}
-Note that `range` generates a value `0...number-1`. We use `_` in the `for` loop to 
-indicate we don't really care what this value is - we just want to repeat the loop 
-a certain amount of times.
+請注意，`range` 產生值 `0...number-1`。我們在 `for` 迴圈中使用 `_` 來
+表明我們並不真正關心這個值是什麼 - 我們只是想重複迴圈
+一定次數。
 ```
 
-We don't ever expect end users to call this method; if we did, we would have to validate the inputs 
-much more - We would have to make sure that `number` or `diesize` are valid inputs and not 
-crazy big so the loop takes forever!
+我們不希望終端使用者呼叫此方法；如果我們這樣做，我們將必須驗證輸入
+更多 - 我們必須確保 `number` 或 `diesize` 是有效輸入，而不是
+太瘋狂了，所以迴圈需要永遠！
 
-### Rolling with advantage 
+(rolling-with-advantage)=
+### 滾動優勢
 
-Now that we have the generic roller, we can start using it to do a more complex roll. 
+現在我們有了通用滾筒，我們可以開始使用它來進行更複雜的滾動。
 
 ```python
 # in mygame/evadventure/rules.py 
@@ -210,35 +216,36 @@ class EvAdventureRollEngine:
              return min(self.roll("1d20"), self.roll("1d20"))
 ```
 
-The `min()` and `max()` functions are standard Python fare for getting the biggest/smallest
-of two arguments.
+`min()` 和 `max()` 函式是取得最大/最小的標準 Python 函式
+兩個引數。
 
-### Saving throws 
+(saving-throws)=
+### 豁免檢定
 
-We want the saving throw to itself figure out if it succeeded or not. This means it needs to know 
-the Ability bonus (like STR `+1`). It would be convenient if we could just pass the entity 
-doing the saving throw to this method, tell it what type of save was needed, and then 
-have it figure things out: 
+我們希望豁免檢定本身能夠確定它是否成功。這意味著它需要知道
+能力加值（如STR `+1`）。如果我們可以直接傳遞實體的話會很方便
+對此方法進行儲存丟擲，告訴它需要什麼型別的儲存，然後
+讓它弄清楚事情：
 
 ```python 
 result, quality = dice.saving_throw(character, Ability.STR)
 ```
-The return will be a boolean `True/False` if they pass, as well as a `quality` that tells us if 
-a perfect fail/success was rolled or not.
+如果透過，返回值將是布林值 `True/False`，以及告訴我們是否透過的 `quality`
+是否有完美的失敗/成功。
 
-To make the saving throw method this clever, we need to think some more about how we want to store our 
-data on the character. 
+為了使儲存方法變得如此聰明，我們需要更多地考慮如何儲存我們的
+有關角色的資料。
 
-For our purposes it sounds reasonable that we will be using [Attributes](../../../Components/Attributes.md) for storing 
-the Ability scores. To make it easy, we will name them the same as the 
-[Enum values](./Beginner-Tutorial-Utilities.md#enums) we set up in the previous lesson. So if we have 
-an enum `STR = "strength"`, we want to store the Ability on the character as an Attribute `strength`.
+就我們的目的而言，我們將使用 [屬性](../../../Components/Attributes.md) 來儲存聽起來很合理
+能力得分。為了方便起見，我們將它們命名為與
+我們在上一課中設定的[列舉值](./Beginner-Tutorial-Utilities.md#enums)。所以如果我們有
+列舉 `STR = "strength"`，我們希望將角色的能力儲存為 Attribute `strength`。
 
-From the Attribute documentation, we can see that we can use `AttributeProperty` to make it so the 
-Attribute is available as `character.strength`, and this is what we will do. 
+從Attribute檔案中，我們可以看到我們可以使用`AttributeProperty`來使其
+Attribute 可用作 `character.strength`，這就是我們要做的。
 
-So, in short, we'll create the saving throws method with the assumption that we will be able to do 
-`character.strength`, `character.constitution`, `character.charisma` etc to get the relevant Abilities.
+因此，簡而言之，我們將建立儲存丟擲方法，假設我們能夠執行以下操作
+`character.strength`、`character.constitution`、`character.charisma` 等以獲得相關能力。
 
 ```python 
 # in mygame/evadventure/rules.py 
@@ -289,14 +296,15 @@ class EvAdventureRollEngine:
         return (dice_roll + bonus) > target, quality
 ```
 
-The `getattr(obj, attrname, default)` function is a very useful Python tool for getting an attribute 
-off an object and getting a default value if the attribute is not defined.
+`getattr(obj, attrname, default)` 函式是一個非常有用的 Python 工具，用於取得 attribute
+如果未定義 attribute，則關閉物件並取得預設值。
 
-### Opposed saving throw 
+(opposed-saving-throw)=
+### 反對豁免
 
-With the building pieces we already created, this method is simple. Remember that the defense you have 
-to beat is always the relevant bonus + 10 in _Knave_. So if the enemy defends with `STR +3`, you must 
-roll higher than `13`.
+使用我們已經建立的建置區塊，此方法很簡單。請記住，你擁有的防禦力
+在_Knave_中擊敗始終是相關獎金+10。所以如果敵人用`STR +3`防禦，你必須
+滾動高於`13`。
 
 ```python
 # in mygame/evadventure/rules.py 
@@ -325,13 +333,14 @@ class EvAdventureRollEngine:
         return result, quality 
 ```
 
-### Morale check 
+(morale-check)=
+### 士氣檢查
 
-We will make the assumption that the `morale` value is available from the creature simply as 
-`monster.morale` - we need to remember to make this so later! 
+我們將假設 `morale` 值可以從生物中簡單地獲得
+`monster.morale` - 我們需要記住稍後再做！
 
-In _Knave_, a creature have roll with `2d6` equal or under its morale to not flee or surrender
-when things go south. The standard morale value is 9.
+在_Knave_中，生物的`2d6`士氣等於或低於其士氣時，不會逃跑或投降
+當事情向南發展時。標準士氣值為 9。
 
 ```python 
 # in mygame/evadventure/rules.py 
@@ -345,14 +354,15 @@ class EvAdventureRollEngine:
     
 ```
 
-### Roll for Healing 
+(roll-for-healing)=
+### 滾動治療
 
-To be able to handle healing, we need to make some more assumptions about how we store 
-health on game entities. We will need `hp_max` (the total amount of available HP) and `hp`
-(the current health value). We again assume these will be available as `obj.hp` and `obj.hp_max`.
+為了能夠處理治癒，我們需要對如何儲存做出更多假設
+遊戲實體的健康狀況。我們將需要`hp_max`（可用總量HP）和`hp`
+（當前健康值）。我們再次假設這些將作為 `obj.hp` 和 `obj.hp_max` 提供。
 
-According to the rules, after consuming a ration and having a full night's sleep, a character regains 
-`1d8 + CON` HP. 
+根據規則，角色在吃完口糧並睡了一整夜後，會恢復
+`1d8 + CON` HP。
 
 ```python 
 # in mygame/evadventure/rules.py 
@@ -372,52 +382,53 @@ class EvAdventureRollEngine:
         character.heal(self.roll("1d8") + con_bonus)
 ```
 
-We make another assumption here - that `character.heal()` is a thing. We tell this function how 
-much the character should heal, and it will do so, making sure to not heal more than its max 
-number of HPs
+我們在這裡做出另一個假設 - `character.heal()` 是一個東西。我們告訴這個函式如何
+角色應該要治癒很多，並且它會這樣做，並確保治癒的量不會超過其最大值
+HP數量
 
-> Knowing what is available on the character and what rule rolls we need is a bit of a chicken-and-egg 
-> problem. We will make sure to implement the matching _Character_ class next lesson.
+> 知道角色上有什麼可用的以及我們需要什麼規則，這有點像先有雞還是先有蛋的問題
+> 問題。我們將確保下一課實現匹配的 _Character_ 類別。
 
 
-### Rolling on a table 
+(rolling-on-a-table)=
+### 在桌子上打滾
 
-We occasionally need to roll on a 'table' - a selection of choices. There are two main table-types
-we need to support:
+我們有時需要在“桌子”上滾動——一系列選擇。有兩種主要的表型別
+我們需要支援：
 
-Simply one element per row of the table (same odds to get each result).
+只需表格的每一行一個元素（獲得每個結果的機率相同）。
 
-| Result |
+| 結果 |
 |:------:|
-| item1  |
-| item2  | 
-| item3  | 
-| item4  | 
+| 專案1  |
+| 專案2  | 
+| 專案3  | 
+| 專案4  | 
 
-This we will simply represent as a plain list 
+我們將簡單地表示為一個簡單的列表
     
 ```python
 ["item1", "item2", "item3", "item4"]
 ```
 
-Ranges per item (varying odds per result):
+每個專案的範圍（每個結果的賠率不同）：
 
-| Range | Result | 
+| 範圍 | 結果 | 
 |:-----:|:------:|
-|  1-5  | item1  |
-| 6-15  | item2  |
-| 16-19 | item3  |
-|  20   | item4  |
+|  1-5  | 專案1  |
+| 6-15  | 專案2  |
+| 16-19 | 專案3  |
+|  20   | 專案4  |
 
-This we will represent as a list of tuples: 
+我們將其表示為元組列表：
 
 ```python
 [("1-5", "item1"), ("6-15", "item2"), ("16-19", "item4"), ("20", "item5")]
 ```
 
-We also need to know what die to roll to get a result on the table (it may not always 
-be obvious, and in some games you could be asked to roll a lower dice to only get 
-early table results, for example).
+我們還需要知道要擲什麼骰子才能得到結果（可能並非總是如此）
+顯而易見，在某些遊戲中，您可能會被要求擲較低的骰子才能獲得
+例如，早期的表格結果）。
 
 ```python
 # in mygame/evadventure/rules.py 
@@ -461,45 +472,46 @@ class EvAdventureRollEngine:
             roll_result = max(1, min(len(table_choices), roll_result))
             return table_choices[roll_result - 1]
 ```
-Check that you understand what this does.
+檢查您是否理解它的作用。
 
-This may be confusing: 
+這可能會令人困惑：
 ```python
 minval, *maxval = valrange.split("-", 1)
 minval = abs(int(minval))
 maxval = abs(int(maxval[0]) if maxval else minval)
 ```
 
-If `valrange` is the string `1-5`, then `valrange.split("-", 1)` would result in a tuple `("1", "5")`. 
-But if the string was in fact just `"20"` (possible for a single entry in an RPG table), this would 
-lead to an error since it would only split out a single element - and we expected two. 
+如果 `valrange` 是字串 `1-5`，則 `valrange.split("-", 1)` 將產生元組 `("1", "5")`。 
+但如果字串實際上只是 `"20"`（可能是 RPG 表中的單一條目），這將
+導致錯誤，因為它只會分裂出一個元素 - 而我們期望兩個。
 
-By using `*maxval` (with the `*`), `maxval` is told to expect _0 or more_ elements in a tuple. 
-So the result for `1-5` will be `("1", ("5",))` and for `20` it will become `("20", ())`. In the line 
+透過使用 `*maxval` （與 `*` 一起），`maxval` 被告知元組中需要 _0 個或更多_ 元素。 
+因此 `1-5` 的結果將是 `("1", ("5",))`，而 `20` 的結果將變為 `("20", ())`。在行
 
 ```python
 maxval = abs(int(maxval[0]) if maxval else minval)
 ```
 
-we check if `maxval` actually has a value `("5",)` or if its empty `()`. The result is either 
-`"5"` or the value of `minval`.
+我們檢查 `maxval` 實際上是否有值 `("5",)` 或它是否為空 `()`。結果是
+`"5"` 或 `minval` 的值。
 
 
-### Roll for death 
+(roll-for-death)=
+### 滾動死亡
 
-While original Knave suggests hitting 0 HP means insta-death, we will grab the optional "death table" from the "prettified" Knave's optional rules to make it a little less punishing. We also changed the result of `2` to 'dead' since we don't simulate 'dismemberment' in this tutorial:
+雖然原始的無賴建議擊中 0 HP 意味著立即死亡，但我們將從“美化”無賴的可選規則中獲取可選的“死亡表”，以使其懲罰減輕一些。我們還將 `2` 的結果更改為“死亡”，因為我們在本教學中不模擬“肢解”：
 
-| Roll |  Result  | -1d4 Loss of Ability | 
+| 卷 |  結果  | -1d4 喪失能力 | 
 |:---: |:--------:|:--------------------:|
-| 1-2  |   dead   |          -           
-| 3 | weakened |         STR          | 
-|4 | unsteady |         DEX          | 
-| 5 | sickly |         CON          | 
-| 6 | addled |         INT          | 
-| 7 | rattled |         WIS          | 
-| 8 | disfigured |         CHA          |
+| 1-2 | 1-2 死了| -
+| 3 | 削弱 |         STR          | 
+|4 | 不穩定的 |         DEX          | 
+| 5 | 病態的 |         CON          | 
+| 6 | 糊塗的 |         INT          | 
+| 7 | 驚慌的 |         WIS          | 
+| 8 | 毀容的 |         CHA          |
 
-All the non-dead values map to a loss of 1d4 in one of the six Abilities (but you get HP back). We need to map back to this from the above table. One also cannot have less than -10 Ability bonus,  if you do, you die too.
+所有非死亡值都對映到六種能力之一的 1d4 損失（但你會得到 HP 恢復）。我們需要從上表中對映回這一點。一個人的能力加值也不能低於-10，如果這樣做，你也會死。
 
 ```python 
 # in mygame/evadventure/rules.py 
@@ -550,16 +562,17 @@ class EvAdventureRollEngine:
 dice = EvAdventureRollEngine()
 ```
 
-Here we roll on the 'death table' from the rules to see what happens. We give the character 
-a message if they survive, to let them know what happened.
+在這裡，我們根據規則滾動“死亡表”，看看會發生什麼。我們賦予角色
+如果他們倖存，就會收到一條訊息，讓他們知道發生了什麼事。
 
-We don't yet know what 'killing the character' technically means, so we mark this as `TODO` and  return to it in a later lesson. We just know that we need to do _something_ here to kill off the character!
+我們還不知道「殺死角色」在技術上意味著什麼，所以我們將其標記為 `TODO` 並在後面的課程中返回它。我們只知道我們需要在這裡做點什麼來殺死這個角色！
 
-## Testing 
+(testing)=
+## 測試
 
-> Make a new module `mygame/evadventure/tests/test_rules.py`
+> 建立一個新模組`mygame/evadventure/tests/test_rules.py`
 
-Testing the `rules` module will also showcase some very useful tools when testing. 
+測試`rules`模組也會在測試時展示一些非常有用的工具。
 
 ```python 
 # mygame/evadventure/tests/test_rules.py 
@@ -584,36 +597,37 @@ class TestEvAdventureRuleEngine(BaseEvenniaTest):
     # test of the other rule methods below ...
 ```
 
-As before, run the specific test with 
+和以前一樣，執行特定測試
 
     evennia test --settings settings.py evadventure.tests.test_rules
 
-### Mocking and patching
+(mocking-and-patching)=
+### 模擬和修補
 
 ```{sidebar}
-In [evennia/contrib/tutorials/evadventure/tests/test_rules.py](../../../api/evennia.contrib.tutorials.evadventure.tests.test_rules.md)
-has a complete example of rule testing.
+在[evennia/contrib/tutorials/evadventure/tests/test_rules.py](../../../api/evennia.contrib.tutorials.evadventure.tests.test_rules.md)中
+有一個完整的規則測試範例。
 ```
-The `setUp` method is a special method of the testing class. It will be run before every 
-test method. We use `super().setUp()` to make sure the parent class' version of this method 
-always fire. Then we create a fresh `EvAdventureRollEngine` we can test with. 
+`setUp`方法是測試類別的特殊方法。 It will be run before every
+測試方法。我們使用 `super().setUp()` 來確定該方法的父類別版本
+總是火。 Then we create a fresh `EvAdventureRollEngine` we can test with.
 
-In our test, we import `patch` from the `unittest.mock` library. This is a very useful tool for testing. 
-Normally the `randint` function we imported in `rules` will return a random value. That's very hard to test for, since the value will be different every test.
+在我們的測試中，我們從 `unittest.mock` 庫匯入 `patch`。這是一個非常有用的測試工具。 
+通常我們在`rules`中匯入的`randint`函式會傳回一個隨機值。這很難測試，因為每次測試的值都會不同。
 
-With `@patch` (this is called a _decorator_), we temporarily replace `rules.randint` with a 'mock' - a  dummy entity. This mock is passed into the testing method. We then take this `mock_randint` and set  `.return_value = 4` on it. 
+使用`@patch`（這稱為_decorator_），我們暫時用「模擬」（虛擬實體）取代`rules.randint`。該模擬被傳遞到測試方法中。然後我們將`mock_randint`設定為`.return_value = 4`。
 
-Adding `return_value` to the mock means that every time this mock is called, it will return 4. For the  duration of the test we can now check with `self.assertEqual` that our `roll` method always returns a  result as-if the random result was 4.
+將 `return_value` 新增到模擬中意味著每次呼叫此模擬時，它將返回 4。在測試期間，我們現在可以使用 `self.assertEqual` 檢查我們的 `roll` 方法是否始終傳回結果，就好像隨機結果是 4 一樣。
 
-There are [many resources for understanding mock](https://realpython.com/python-mock-library/), refer to 
-them for further help.
+有【很多瞭解mock的資源】(https://realpython.com/python-mock-library/)，參考
+他們尋求進一步的幫助。
 
-> The `EvAdventureRollEngine` have many methods to test. We leave this as an extra exercise!
+> `EvAdventureRollEngine`有很多方法可以測試。我們將此作為額外練習！
 
-## Summary 
+(summary)=
+## 概括
 
-This concludes all the core rule mechanics of _Knave_ - the rules used during play. We noticed here  that we are going to soon need to establish how our _Character_ actually stores data. So we will address that next.
-
+這總結了 _Knave_ 的所有核心規則機制 - 遊戲過程中使用的規則。我們在這裡注意到，我們很快就需要確定我們的 _Character_ 實際上如何儲存資料。所以我們接下來會解決這個問題。
 
 
 

@@ -1,10 +1,11 @@
-# NPCs that listen to what is said
+(npcs-that-listen-to-what-is-said)=
+# NPCs 表示聽話
 
     > say hi 
     You say, "hi"
     The troll under the bridge answers, "well, well. Hello."
 
-This howto explains how to make an NPC that reacts to characters speaking in their current location. The principle applies to other situations, such as enemies joining a fight or reacting to a character drawing a weapon. 
+本指南解釋如何製作一個 NPC 對角色在當前位置說話做出反應。此原則適用於其他情況，例如敵人加入戰鬥或對角色拔出武器做出反應。
 
 ```python
 # mygame/typeclasses/npc.py
@@ -29,12 +30,12 @@ class Npc(Character):
         return f"{from_obj} said: '{message}'"
 ```
 
-We add a simple method `at_heard_say` that formats what it hears. We assume that the message that enters it is on the form `Someone says, "Hello"`, and we make sure to only get `Hello` in that example.
+我們加入一個簡單的方法 `at_heard_say` 來格式化它聽到的內容。我們假設輸入的訊息採用 `Someone says, "Hello"` 的形式，並且我們確保在該範例中僅獲取 `Hello`。
 
-We are not actually calling `at_heard_say` yet. We'll handle that next. 
+我們實際上還沒有呼叫`at_heard_say`。接下來我們會處理這個問題。
 
-When someone in the room speaks to this NPC, its `msg` method will be called. We will modify the
-NPCs `.msg` method to catch says so the NPC can respond.
+當房間裡有人對這個 NPC 說話時，它的 `msg` 方法將會被呼叫。我們將修改
+NPCs `.msg` 捕獲方法表示 NPC 可以回應。
 
 
 ```{code-block} python
@@ -71,32 +72,33 @@ class Npc(Character):
         super().msg(text=text, from_obj=from_obj, **kwargs) 
 ```
 
-So if the NPC gets a say and that say is not coming from the NPC itself, it will echo it using the
-`at_heard_say` hook. Some things of note in the above example:
+因此，如果 NPC 獲得發言權，並且該發言權不是來自 NPC 本身，它將使用
+`at_heard_say` 鉤子。上面的例子中有一些值得注意的地方：
 
-- **Line 15** The `text` input can be on many different forms depending on where this `msg` is called from. If you look at the [code of the 'say' command](evennia.commands.default.general.CmdSay) you'd find that it will call `.msg`  with `("Hello", {"type": "say"})`.  We use this knowledge to figure out if this comes from a `say` or not.
-- **Line 24**: We use `execute_cmd` to fire the NPCs own `say` command back. This works because the NPC is actually a child of `DefaultCharacter` - so it has the `CharacterCmdSet` on it!  Normally you should use `execute_cmd` only sparingly; it's usually more efficient to call the actual code used by the Command directly. For this tutorial, invoking the command is shorter to write while making sure all hooks are called
-- **Line26**: Note the comments about `super` at the end. This will trigger the 'default' `msg` (in the parent class) as well. It's not really necessary as long as no one puppets the NPC (by `@ic <npcname>`) but it's wise to keep in there since the puppeting player will be totally blind if `msg()` is never returning anything to them!
+- **第 15 行** `text` 輸入可以採用多種不同的形式，取決於呼叫 `msg` 的位置。如果您檢視[“say”指令的程式碼](evennia.commands.default.general.CmdSay)，您會發現它將使用 `("Hello", {"type": "say"})` 呼叫 `.msg`。  我們利用這些知識來確定這是否來自 `say`。
+- **第 24 行**：我們使用 `execute_cmd` 觸發 NPCs 自己的 `say` 指令。這是有效的，因為 NPC 實際上是 `DefaultCharacter` 的子級 - 所以它上面有 `CharacterCmdSet`！  通常你應該謹慎使用`execute_cmd`；直接呼叫指令使用的實際程式碼通常更有效。對於本教學，呼叫指令的編寫時間較短，同時確保呼叫所有掛鉤
+- **第26行**：注意最後關於`super`的註解。這也將觸發“預設”`msg`（在父類別中）。只要沒有人傀儡NPC（`@ic <npcname>`），這並不是真的必要，但明智的做法是留在那兒，因為如果`msg()`從不向他們返回任何東西，傀儡玩家將完全失明！
 
-Now that's done, let's create an NPC and see what it has to say for itself.
+現在已經完成了，讓我們建立一個 NPC 並看看它本身有什麼含義。
 
 ```
 reload
 create/drop Guild Master:npc.Npc
 ```
 
-(you could also give the path as `typeclasses.npc.Npc`, but Evennia will look into the `typeclasses`
-folder automatically so this is a little shorter).
+（您也可以將路徑指定為 `typeclasses.npc.Npc`，但 Evennia 將檢視 `typeclasses`
+自動資料夾，所以這有點短）。
 
     > say hi
     You say, "hi"
     Guild Master says, "Anna said: 'hi'"
 
-## Assorted notes
+(assorted-notes)=
+## 什錦筆記
 
-There are many ways to implement this kind of functionality. An alternative example to overriding
-`msg` would be to modify the `at_say` hook on the *Character* instead. It could detect that it's
-sending to an NPC and call the `at_heard_say` hook directly.
+有很多方法可以實現這種功能。覆蓋的替代範例
+`msg` 將改為修改 *Character* 上的 `at_say` 掛鉤。它可以檢測到它是
+傳送到 NPC 並直接呼叫 `at_heard_say` 掛鉤。
 
-While the tutorial solution has the advantage of being contained only within the NPC class,
-combining this with using the Character class gives more direct control over how the NPC will react. Which way to go depends on the design requirements of your particular game.
+雖然教學解決方案的優點是僅包含在 NPC 類別中，
+將此與使用 Character 類別結合可以更直接地控制 NPC 將如何反應。選擇哪種方式取決於特定遊戲的設計要求。

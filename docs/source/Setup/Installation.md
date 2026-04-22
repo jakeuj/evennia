@@ -1,125 +1,135 @@
-# Installation
+(installation)=
+# 安裝
 
-The fastest way to install Evennia is to use the `pip` installer that comes with Python (read on). You can also  [clone Evennia from github](./Installation-Git.md)  or use [docker](./Installation-Docker.md).  Some users have also experimented with [installing Evennia on Android](./Installation-Android.md).
+安裝 Evennia 最快的方法是使用 Python 隨附的 `pip` 安裝程式（繼續閱讀）。您也可以[從 github 克隆 Evennia](./Installation-Git.md) 或使用 [docker](./Installation-Docker.md)。  有些使用者也嘗試過[在Android上安裝Evennia](./Installation-Android.md)。
 
-If you are converting an existing game, please follow the [upgrade instructions](./Installation-Upgrade.md).
+如果您要轉換現有遊戲，請按照[升級說明](./Installation-Upgrade.md) 進行操作。
 
-## Requirements
+(requirements)=
+## 要求
 
-```{sidebar} Develop in isolation
-Installing Evennia doesn't make anything visible online. Apart from installation and updating, you can develop your game without any internet connection if you want to.
+```{sidebar} 孤立發展
+安裝 Evennia 不會使任何內容線上上可見。除了安裝和更新之外，如果您願意，您還可以在沒有任何網路連線的情況下開發遊戲。
 ```
-- Evennia requires [Python](https://www.python.org/downloads/) 3.11, 3.12 or 3.13 (recommended). Any OS that supports Python should work.
-	- _Windows_: In the installer, make sure to select `add python to path`. If you have multiple versions of Python installed, use `py` command instead of `python` to have Windows automatically use the latest.
-- Don't install Evennia as administrator or superuser.
-- If you run into trouble, see [installation troubleshooting](./Installation-Troubleshooting.md).
+- Evennia 需要 [Python](https://www.python.org/downloads/) 3.11、3.12 或 3.13（建議）。任何支援 Python 的 OS 都應該可以工作。
+	- _Windows_：在安裝程式中，確保選擇`add python to path`。如果您安裝了多個版本的 Python，請使用 `py` 指令而不是 `python` 讓 Windows 自動使用最新版本。
+- 不要以管理員或超級使用者身分安裝 Evennia。
+- 如果遇到問題，請參閱[安裝疑難排解](./Installation-Troubleshooting.md)。
 
-## Install with `pip`
+(install-with-pip)=
+## 使用`pip`安裝
 
 ```{important}
-You are recommended to setup a light-weight Python virtualenv to install Evennia in. Using a virtualenv is standard practice in Python and allows you to install what you want in isolation from other programs. The virtualenv system is a part of Python and will make your life easier!
+建議您設定一個輕量級的 Python virtualenv 來安裝 Evennia。使用 virtualenv 是 Python 中的標準做法，它允許您獨立於其他程式安裝所需的內容。 virtualenv 系統是 Python 的一部分，將使您的生活更輕鬆！
 ```
 
-You re recommended to [setup a light-weight Python virtualenv](./Installation-Git.md#virtualenv) first.
+建議您先[設定一個輕量級Python virtualenv](./Installation-Git.md#virtualenv)。
 
-Evennia is managed from the terminal (console/Command Prompt on Windows). Once you have Python installed&mdash;and after activating your virtualenv if you are using one&mdash;install Evennia with:
+Evennia 從終端機（Windows 上的控制檯/指令提示字元）進行管理。安裝 Python 後，如果您使用的是 virtualenv，則在啟動 virtualenv 後，安裝 Evennia：
 
-	pip install evennia
+點安裝evennia
 
-Optional: If you use a [contrib](../Contribs/Contribs-Overview.md) that warns you that it needs additional packages, you can  install all extra dependencies with:
+可選：如果您使用警告您需要其他軟體包的 [contrib](../Contribs/Contribs-Overview.md)，您可以使用以下指令安裝所有額外的依賴項：
 
-	pip install evennia[extra]
+pip install evennia[額外]
 
-To update Evennia later, do the following:
+若要稍後更新 Evennia，請執行以下操作：
 
-	pip install --upgrade evennia
+pip install --升級evennia
 
-```{note} **Windows users only -**
-You now must run `python -m evennia` once. This should permanently make the `evennia` command available in your environment.
+```{note} **僅限 Windows 使用者 -**
+您現在必須執行 `python -m evennia` 一次。這應該會使 `evennia` 指令在您的環境中永久可用。
 ```
 
-Once installed, make sure the `evennia` command works. Use `evennia -h` for usage help. If you are using a virtualenv, make sure it is active whenever you need to use the `evennia` command later.
+安裝後，請確保 `evennia` 指令有效。使用 `evennia -h` 獲取使用協助。如果您使用的是 virtualenv，請確保稍後需要使用 `evennia` 指令時它處於活動狀態。
 
-## Initialize a New Game
+(initialize-a-new-game)=
+## 初始化新遊戲
 
-We will create a new "game dir" in which to create your game. Here, and in the rest of the Evennia documentation, we refer to this game dir as  `mygame`, but you should, of course, name your game whatever you like. To create the new `mygame` folder&mdash;or whatever you choose&mdash;in your current location:
+我們將建立一個新的「遊戲目錄」來建立您的遊戲。在這裡以及 Evennia 檔案的其餘部分中，我們將此遊戲目錄稱為 `mygame`，但當然，您應該根據自己的喜好命名您的遊戲。要建立新的 `mygame` 資料夾&mdash;或您選擇的任何內容&mdash;在目前位置：
 
-```{sidebar} Game Dir vs Game Name
-The game dir you create doesn't have to match the name of your game. You can change the name of your game later by editing `mygame/server/conf/settings.py`.
+```{sidebar} 遊戲目錄與遊戲名稱
+您建立的遊戲目錄不必與您的遊戲名稱相符。您可以稍後透過編輯 `mygame/server/conf/settings.py` 更改遊戲名稱。
 ```
 
-	evennia --init mygame
+evennia --init mygame
 
-The resultant folder contains all the empty templates and default settings needed to start the Evennia server.
+產生的資料夾包含啟動 Evennia 伺服器所需的所有空白模板和預設設定。
 
-## Start the New Game
+(start-the-new-game)=
+## 開始新遊戲
 
-First, create the default database (Sqlite3):
+首先，建立預設資料庫（Sqlite3）：
 
-	cd mygame
-	evennia migrate
+cd我的遊戲
+	evennia遷移
 
-The resulting database file is created in `mygame/server/evennia.db3`. If you ever want to start from a fresh database, just delete this file and re-run the `evennia migrate` command.
+產生的資料庫檔案在 `mygame/server/evennia.db3` 中建立。如果您想從新資料庫啟動，只需刪除該檔案並重新執行 `evennia migrate` 指令即可。
 
-Next, start the Evennia server with:
+接下來，使用以下指令啟動 Evennia 伺服器：
 
-	evennia start
+evennia開始
 
-When prompted, enter a username and password for the in-game "god" or "superuser." Providing an email address is optional.
+出現提示時，輸入遊戲中「上帝」或「超級使用者」的使用者名稱和密碼。提供電子郵件地址是可選的。
 
-> You can also [automate](./Installation-Non-Interactive.md) creation of the superuser.
+> 您也可以[自動](./Installation-Non-Interactive.md)建立超級使用者。
 
-If all went well, your new Evennia server is now up and running! To play your new&mdash;albeit empty&mdash;game, point a legacy MUD/telnet client to `localhost:4000` or a web browser to [http://localhost:4001](http://localhost:4001). You may log in as a new account or use the superuser account you created above.
+如果一切順利，您的新 Evennia 伺服器現已啟動並執行！要玩您的新遊戲（儘管是空的），請將舊版 MUD/telnet 使用者端指向 `localhost:4000` 或將 Web 瀏覽器指向 [http://localhost:4001](http://localhost:4001)。您可以作為新帳戶登入或使用您在上面建立的超級使用者帳戶。
 
-## Restarting and Stopping
+(restarting-and-stopping)=
+## 重新啟動和停止
 
 
-You can restart the server (without disconnecting players) by issuing:
+您可以透過發出以下指令重新啟動伺服器（無需斷開玩家連線）：
 
-	evennia restart
+evennia重新啟動
 
-And, to do a full stop and restart (with disconnecting players) use:
+並且，要完全停止並重新啟動（斷開玩家連線），請使用：
 
-	evennia reboot
+evennia重新啟動
 
-A full stop of the server (use `evennia start` to restart) is achieved with:
+伺服器完全停止（使用 `evennia start` 重新啟動）是透過以下方式實現的：
 
-	evennia stop
+evennia停止
 
-See the [Server start-stop-reload](./Running-Evennia.md) documentation page for details.
+有關詳細資訊，請參閱[伺服器啟動-停止-重新載入](./Running-Evennia.md) 檔案頁面。
 
-## View Server Logs
+(view-server-logs)=
+## 檢視伺服器日誌
 
-Log files are located in `mygame/server/logs`. You can tail the logging in real-time with:
+日誌檔案位於`mygame/server/logs`。您可以透過以下方式即時追蹤日誌記錄：
 
-	evennia --log
+evennia --日誌
 
-or just:
+或只是：
 
-	evennia -l
+evennia-l
 
-Press `Ctrl-C` (`Cmd-C` for Mac) to stop viewing the live log.
+按`Ctrl-C`（Mac 為`Cmd-C`）停止檢視即時日誌。
 
-You may also begin viewing the real-time log immediately by adding `-l/--log` to `evennia` commands, such as when starting the server:
+您也可以透過將 `-l/--log` 新增至 `evennia` 指令立即開始檢視即時日誌，例如在啟動伺服器時：
 
     evennia start -l
 
-## Server Configuration
+(server-configuration)=
+## 伺服器設定
 
-Your server's configuration file is `mygame/server/conf/settings.py`. It's empty by default. Copy and paste **only** the settings you want/need from the [default settings file](./Settings-Default.md) to your server's `settings.py`. See the [Settings](./Settings.md) documentation for more information before configuring your server at this time.
+您的伺服器的設定檔是`mygame/server/conf/settings.py`。預設情況下它是空的。 **僅**將您想要/需要的設定從 [預設設定檔](./Settings-Default.md) 複製並貼上到伺服器的 `settings.py`。此時在設定伺服器之前，請參閱[設定](./Settings.md) 檔案以取得更多資訊。
 
-## Register with the Evennia Game Index (optional)
+(register-with-the-evennia-game-index-optional)=
+## 使用 Evennia 遊戲索引註冊（可選）
 
-To let the world know that you are working on a new Evennia-based game, you may register your server with the _Evennia game index_ by issuing:
+為了讓全世界知道您正在開發一款基於 Evennia 的新遊戲，您可以透過發出以下指令向 _Evennia 遊戲索引_ 註冊您的伺服器：
 
     evennia connections
 
-Then, just follow the prompts. You don't have to be open for players to do this &mdash; simply mark your game as closed and "pre-alpha."
+然後，請按照提示操作即可。你不必開放玩家才能做到這一點——只需將您的遊戲標記為已關閉和「pre-alpha」。
 
-See [here](./Evennia-Game-Index.md) for more instructions and please [check out the index](http:games.evennia.com)  beforehand to make sure you don't pick a game name that is already taken &mdash; be nice!
+請參閱[此處](./Evennia-Game-Index.md)以瞭解更多說明，並請事先[檢視索引](http:games.evennia.com)以確保您沒有選擇已被佔用的遊戲名稱 –乖一點！
 
-## Next Steps
+(next-steps)=
+## 下一步
 
-You are good to go!
+你可以走了！
 
-Next, why not head over to the [Starting Tutorial](../Howtos/Beginner-Tutorial/Beginner-Tutorial-Overview.md) to learn how to begin making your new game!
+接下來，何不前往[入門教學](../Howtos/Beginner-Tutorial/Beginner-Tutorial-Overview.md) 學習如何開始製作新遊戲！

@@ -1,4 +1,5 @@
-# Attributes
+(attributes)=
+# 屬性
 
 ```{code-block}
 :caption: In-game
@@ -25,15 +26,17 @@ class MyObject(DefaultObject):
 
 ```
 
-_Attributes_ allow you to to store arbitrary data on objects and make sure the data survives a server reboot. An Attribute can store pretty much any Python data structure and data type, like numbers, strings, lists, dicts etc. You can also store (references to) database objects like characters and rooms. 
+_屬性_允許您在物件上儲存任意資料，並確保資料在伺服器重新啟動後仍然存在。 Attribute 可以儲存幾乎任何 Python 資料結構和資料型別，如數字、字串、列表、字典等。您也可以儲存（引用）資料庫物件，如字元和房間。
 
-## Working with Attributes
+(working-with-attributes)=
+## 使用屬性
 
-Attributes are usually handled in code. All [Typeclassed](./Typeclasses.md) entities ([Accounts](./Accounts.md), [Objects](./Objects.md), [Scripts](./Scripts.md) and [Channels](./Channels.md)) can (and usually do) have Attributes associated with them. There are three ways to manage Attributes, all of which can be mixed.
+屬性通常在程式碼中處理。所有[型別分類](./Typeclasses.md)實體（[帳戶](./Accounts.md)、[物件](./Objects.md)、[Scripts](./Scripts.md)和[通道](./Channels.md))可以（且通常）具有與其關聯的屬性。管理屬性有三種方法，所有這些方法都可以混合使用。
 
-### Using .db
+(using-db)=
+### 使用.db
 
-The simplest way to get/set Attributes is to use the `.db` shortcut. This allows for setting and getting Attributes that lack a _category_ (having category `None`) 
+取得/設定屬性最簡單的方法是使用 `.db` 捷徑。這允許設定和獲取缺少_category_的屬性（具有類別`None`）
 
 ```python
 import evennia
@@ -66,11 +69,12 @@ obj.db.all
 # delete an Attribute
 del obj.db.foo2
 ```
-Trying to access a non-existing Attribute will never lead to an `AttributeError`. Instead you will get `None` back. The special `.db.all` will return a list of all Attributes on the object. You can replace this with your own Attribute `all` if you want, it will replace the default `all` functionality until you delete it again.
+嘗試訪問不存在的 Attribute 永遠不會導致 `AttributeError`。相反，您將得到 `None` 返還。特殊的 `.db.all` 將傳回物件上所有屬性的清單。如果需要，您可以將其替換為您自己的 Attribute `all`，它將替換預設的 `all` 功能，直到您再次刪除它。
 
-### Using .attributes
+(using-attributes)=
+### 使用.attributes
 
-If you want to group your Attribute in a category, or don't know the name of the Attribute beforehand, you can make use of the [AttributeHandler](evennia.typeclasses.attributes.AttributeHandler), available as `.attributes` on all typeclassed entities. With no extra keywords, this is identical to using the `.db` shortcut (`.db` is actually using the `AttributeHandler` internally):
+如果您想將 Attribute 分組到一個類別中，或者事先不知道 Attribute 的名稱，則可以使用 [AttributeHandler](evennia.typeclasses.attributes.AttributeHandler)，它在所有型別分類實體上可用作 `.attributes`。如果沒有額外的關鍵字，這與使用 `.db` 捷徑相同（`.db` 實際上在內部使用 `AttributeHandler`）：
 
 ```python
 is_ouch = rose.attributes.get("has_thorns")
@@ -82,7 +86,7 @@ helmet = obj.attributes.get("helmet")
 obj.attributes.add("my game log", "long text about ...")
 ```
 
-By using a category you can separate same-named Attributes on the same object to help organization.
+透過使用類別，您可以分隔同一物件上的同名屬性以幫助組織。
 
 ```python
 # store (let's say we have gold_necklace and ringmail_armor from before)
@@ -94,17 +98,17 @@ neck_clothing = obj.attributes.get("neck", category="clothing")
 neck_armor = obj.attributes.get("neck", category="armor")
 ```
 
-If you don't specify a category, the Attribute's `category` will be `None` and can thus also be found via `.db`. `None` is considered a category of its own, so you won't find `None`-category Attributes mixed with Attributes having categories.
+如果您不指定類別，Attribute 的 `category` 將是 `None`，因此也可以透過 `.db` 找到。 `None` 被視為自己的類別，因此您不會發現 `None`-類別屬性與具有類別的屬性混合在一起。
 
-Here are the methods of the `AttributeHandler`. See the [AttributeHandler API](evennia.typeclasses.attributes.AttributeHandler) for more details.
+以下是`AttributeHandler`的方法。有關詳細資訊，請參閱 [AttributeHandler API](evennia.typeclasses.attributes.AttributeHandler)。
 
-- `has(...)` - this checks if the object has an Attribute with this key. This is equivalent to doing `obj.db.attrname` except you can also check for a specific `category.
-- `get(...)` - this retrieves the given Attribute. You can also provide a `default` value to return if the Attribute is not defined (instead of None). By supplying an `accessing_object` to the call one can also make sure to check permissions before modifying anything. The `raise_exception` kwarg allows you to raise an `AttributeError` instead of returning `None` when you access a non-existing `Attribute`. The `strattr` kwarg tells the system to store the Attribute as a raw string rather than to pickle it. While an optimization this should usually not be used unless the Attribute is used for some particular, limited purpose.
-- `add(...)` - this adds a new Attribute to the object. An optional [lockstring](./Locks.md) can be supplied here to restrict future access and also the call itself may be checked against locks.
-- `remove(...)` - Remove the given Attribute. This can optionally be made to check for permission before performing the deletion.  - `clear(...)`  - removes all Attributes from object.
-- `all(category=None)` - returns all Attributes (of the given category) attached to this object.
+- `has(...)` - 檢查物件是否有帶有此鍵的 Attribute。這相當於執行 `obj.db.attrname`，只不過您還可以檢查特定的「類別」。
+- `get(...)` - 這將檢索給定的 Attribute。如果未定義 Attribute（而不是「無」），您也可以提供要傳回的 `default` 值。透過向呼叫提供`accessing_object`，還可以確保在修改任何內容之前檢查許可權。當您訪問不存在的 `Attribute` 時，`raise_exception` kwarg 允許您提高 `AttributeError` 而不是返回 `None`。 `strattr` kwarg 告訴系統將 Attribute 儲存為原始字串而不是對其進行 pickle。雖然最佳化通常不應該使用，除非 Attribute 用於某些特定的、有限的目的。
+- `add(...)` - 這會為物件新增新的 Attribute。可以在此處提供可選的 [lockstring](./Locks.md) 以限制將來的訪問，並且還可以檢查呼叫本身是否已鎖定。
+- `remove(...)` - 刪除給定的Attribute。可以選擇在執行刪除之前檢查許可權。  - `clear(...)` - 從物件中刪除所有屬性。
+- `all(category=None)` - 傳回附加到該物件的所有屬性（給定類別）。
 
-Examples:
+範例：
 
 ```python
 try:
@@ -124,9 +128,10 @@ obj.attributes.remove("foo")
 all_clothes = obj.attributes.all(category="clothes")
 ```
 
-### Using AttributeProperty
+(using-attributeproperty)=
+### 使用AttributeProperty
 
-The third way to set up an Attribute is to use an `AttributeProperty`. This is done on the _class level_ of your typeclass and allows you to treat Attributes a bit like Django database Fields. Unlike using `.db` and `.attributes`, an `AttributeProperty` can't be created on the fly, you must assign it in the class code. 
+設定 Attribute 的第三種方法是使用 `AttributeProperty`。這是在 typeclass 的_類別層級_上完成的，並允許您像 Django 資料庫欄位一樣對待屬性。與使用 `.db` 和 `.attributes` 不同，`AttributeProperty` 不能動態建立，您必須在類別程式碼中分配它。
 
 ```python
 # mygame/typeclasses/characters.py
@@ -148,9 +153,9 @@ class Character(DefaultCharacter):
       # ...
 ```
 
-When a new instance of the class is created, new `Attributes` will be created with the value and category given.
+當建立該類別的新例項時，將使用給定的值和類別建立新的`Attributes`。
 
-With `AttributeProperty`'s set up like this, one can access the underlying `Attribute` like a regular property on the created object:
+透過像這樣設定 `AttributeProperty`，人們可以像建立物件上的常規屬性一樣存取底層 `Attribute`：
 
 ```python
 char = create_object(Character)
@@ -166,14 +171,14 @@ char.db.sleepy # returns None because autocreate=False (see below)
 ```
 
 ```{warning}
-Be careful to not assign AttributeProperty's to names of properties and methods already existing on the class, like 'key' or 'at_object_creation'. That could lead to very confusing errors.
+請小心，不要將 AttributeProperty 分配給類別中已存在的屬性和方法的名稱，例如“key”或“at_object_creation”。這可能會導致非常令人困惑的錯誤。
 ```
 
-The `autocreate=False` (default is `True`) used for `sleepy` and `poisoned` is worth a closer explanation. When `False`, _no_ Attribute will be auto-created for these AttributProperties unless they are _explicitly_ set.
+用於 `sleepy` 和 `poisoned` 的 `autocreate=False`（預設為 `True`）值得更詳細的解釋。當 `False` 時，_no_ Attribute 將為這些 AttributProperties 自動建立，除非它們是_明確_設定的。
 
-The advantage of not creating an Attribute is that the default value given to `AttributeProperty` is returned with no database access unless you change it. This also means that if you want to change the default later, all entities previously create will inherit the new default.
+不建立 Attribute 的優點是傳回給 `AttributeProperty` 的預設值，除非您變更它，否則不會存取資料庫。這也意味著，如果您想稍後更改預設值，則先前建立的所有實體都將繼承新的預設值。
 
-The drawback is that without a database precense you can't find the Attribute via `.db` and `.attributes.get` (or by querying for it in other ways in the database):
+缺點是，如果沒有資料庫前置，您無法透過 `.db` 和 `.attributes.get` 找到 Attribute （或透過在資料庫中以其他方式查詢它）：
 
 ```python
 char.sleepy   # returns False, no db access
@@ -188,59 +193,61 @@ char.attributes.get("sleepy")  # now returns True
 char.sleepy  # now returns True, involves db access
 ```
 
-You can e.g. `del char.strength` to set the value back to the default (the value defined in the `AttributeProperty`).
+你可以e.g。 `del char.strength` 將值設定回預設值（`AttributeProperty` 中定義的值）。
 
-See the [AttributeProperty API](evennia.typeclasses.attributes.AttributeProperty) for more details on how to create it with special options, like giving access-restrictions. 
+有關如何使用特殊選項（例如提供訪問限制）建立它的更多詳細資訊，請參閱 [AttributeProperty API](evennia.typeclasses.attributes.AttributeProperty)。
 
 ```{warning}
-While the `AttributeProperty` uses the `AttributeHandler` (`.attributes`) under the hood, the reverse is _not_ true. The `AttributeProperty` has helper methods, like `at_get` and `at_set`. These will _only_ be called if you access the Attribute using the property. 
+雖然 `AttributeProperty` 在幕後使用了 `AttributeHandler` (`.attributes`)，但反之則不然。 `AttributeProperty` 有輔助方法，如 `at_get` 和 `at_set`。如果您使用該屬性存取 Attribute，這些將_僅_被呼叫。
 
-That is, if you do `obj.yourattribute = 1`, the `AttributeProperty.at_set` will be called. But while doing `obj.db.yourattribute = 1`, will lead to the same Attribute being saved, this is 'bypassing' the `AttributeProperty` and using the `AttributeHandler` directly. So in this case the `AttributeProperty.at_set` will _not_ be called. If you added some special functionality in `at_get` this may be confusing.
+也就是說，如果您執行`obj.yourattribute = 1`，則會呼叫`AttributeProperty.at_set`。但是在執行`obj.db.yourattribute = 1`時，會導致儲存相同的Attribute，這是「繞過」`AttributeProperty`並直接使用`AttributeHandler`。因此在這種情況下 `AttributeProperty.at_set` 將_不會_被呼叫。如果您在 `at_get` 中新增了一些特殊功能，這可能會令人困惑。
 
-To avoid confusion, you should aim to be consistent in how you access your Attributes - if you use a `AttributeProperty` to define it, use that also to access and modify the Attribute later.
+為了避免混淆，您應該在存取屬性方面保持一致 - 如果您使用 `AttributeProperty` 來定義它，稍後也可以使用它來存取和修改 Attribute。
 ```
 
 
-### Properties of Attributes
+(properties-of-attributes)=
+### 屬性的特性
 
-An `Attribute` object is stored in the database. It has the following properties:
+`Attribute` 物件儲存在資料庫中。它具有以下屬性：
 
-- `key` - the name of the Attribute. When doing e.g. `obj.db.attrname = value`, this property is set to `attrname`.
-- `value` - this is the value of the Attribute. This value can be anything which can be pickled - objects, lists, numbers or what have you (see [this section](./Attributes.md#what-types-of-data-can-i-save-in-an-attribute) for more info). In the example
-  `obj.db.attrname = value`, the `value` is stored here.
-- `category` - this is an optional property that is set to None for most Attributes. Setting this allows to use Attributes for different functionality. This is usually not needed unless you want to use Attributes for very different functionality ([Nicks](./Nicks.md) is an example of using
-  Attributes in this way). To modify this property you need to use the [Attribute Handler](#attributes)
-- `strvalue` - this is a separate value field that only accepts strings. This severely limits the data possible to store, but allows for easier database lookups. This property is usually not used except when re-using Attributes for some other purpose ([Nicks](./Nicks.md) use it). It is only accessible via the [Attribute Handler](#attributes).
+- `key` - Attribute 的名稱。當做e.g時。 `obj.db.attrname = value`，此屬性設定為 `attrname`。
+- `value` - 這是Attribute 的值。該值可以是任何可以醃製的內容 - 物件、列表、數字或您擁有的任何內容（有關詳細資訊，請參閱[本節](./Attributes.md#what-types-of-data-can-i-save-in-an-attribute)）。在範例中
+`obj.db.attrname = value`，`value` 儲存在這裡。
+- `category` - 這是一個可選屬性，對於大多數屬性設定為“無”。設定此項允許使用屬性來實現不同的功能。這通常是不需要的，除非您想將屬性用於非常不同的功能（[Nicks](./Nicks.md) 是使用的範例
+屬性以這種方式）。要修改此屬性，您需要使用 [Attribute 處理程式](#attributes)
+- `strvalue` - 這是一個單獨的值欄位，僅接受字串。這嚴重限制了可儲存的資料，但允許更輕鬆的資料庫查詢。通常不使用此屬性，除非出於其他目的而重新使用屬性（[Nicks](./Nicks.md) 使用它）。它只能透過 [Attribute 處理程式](#attributes) 存取。
 
-There are also two special properties:
+還有兩個特殊屬性：
 
-- `attrtype` - this is used internally by Evennia to separate [Nicks](./Nicks.md), from Attributes (Nicks use Attributes behind the scenes).
-- `model` - this is a *natural-key* describing the model this Attribute is attached to. This is on the form *appname.modelclass*, like `objects.objectdb`. It is used by the Attribute and NickHandler to quickly sort matches in the database.  Neither this nor `attrtype` should normally need to be modified.
+- `attrtype` - Evennia 在內部使用它來將 [Nicks](./Nicks.md) 與屬性分開（Nicks 在幕後使用屬性）。
+- `model` - 這是一個*自然鍵*，描述了 Attribute 所附加到的模型。其格式為 *appname.modelclass*，如 `objects.objectdb`。 Attribute 和 NickHandler 使用它來快速對資料庫中的匹配項進行排序。  通常不需要修改此值或 `attrtype`。
 
-Non-database attributes are not stored in the database and have no equivalence to `category` nor `strvalue`, `attrtype` or `model`.
+非資料庫屬性不儲存在資料庫中，且不等於`category`、`strvalue`、`attrtype` 或`model`。
 
 
-### Managing Attributes in-game
+(managing-attributes-in-game)=
+### 管理遊戲中的屬性
 
-Attributes are mainly used by code. But one can also allow the builder to use Attributes to 'turn knobs' in-game. For example a builder could want to manually tweak the "level" Attribute of an enemy NPC to lower its difficuly. 
+屬性主要由程式碼使用。但也可以允許建造者使用屬性在遊戲中「轉動旋鈕」。例如，建造者可能想要手動調整敵人 NPC 的「等級」Attribute 以降低其難度。
 
-When setting Attributes this way, you are severely limited in what can be stored - this is because giving players (even builders) the ability to store arbitrary Python would be a severe security problem.
+以這種方式設定屬性時，可以儲存的內容會受到嚴重限制 - 這是因為讓玩家（甚至建構者）能夠儲存任意 Python 將是一個嚴重的安全問題。
 
-In game you can set an Attribute like this:
+在遊戲中你可以像這樣設定Attribute：
 
     set myobj/foo = "bar"
 
-To view, do
+若要檢視，請執行以下操作
 
     set myobj/foo
 
-or see them together with all object-info with
+或將它們與所有物件資訊一起檢視
 
     examine myobj
 
-The first `set`-example will store a new Attribute `foo` on the object `myobj` and give it the value "bar". You can store numbers, booleans, strings, tuples, lists and dicts this way. But if you store a list/tuple/dict they must be proper Python structures and may _only_ contain strings
-or numbers. If you try to insert an unsupported structure, the input will be converted to a
-string.
+第一個 `set`-範例將在物件 `myobj` 上儲存新的 Attribute `foo` 並為其賦予值「bar」。您可以透過這種方式儲存數字、布林值、字串、元組、列表和字典。但是，如果您儲存清單/元組/字典，它們必須是正確的 Python 結構，並且可能_僅_包含字串
+或數字。如果您嘗試插入不支援的結構，輸入將轉換為
+字串。
 
     set myobj/mybool = True
     set myobj/mybool = True
@@ -249,34 +256,35 @@ string.
     set myobj/mydict = {"a": 1, "b": 2, 3: 4}
     set mypobj/mystring = [1, 2, foo]   # foo is invalid Python (no quotes)
 
-For the last line you'll get a warning and the value instead will be saved as a string `"[1, 2, foo]"`.
+對於最後一行，您將收到警告，並且該值將被儲存為字串 `"[1, 2, foo]"`。
 
-### Locking and checking Attributes
+(locking-and-checking-attributes)=
+### 鎖定和檢查屬性
 
-While the `set` command is limited to builders, individual Attributes are usually not locked down. You may want to lock certain sensitive Attributes, in particular for games where you allow player building. You can add such limitations by adding a [lock string](./Locks.md) to your Attribute. A NAttribute have no locks.
+雖然 `set` 指令僅限於建置者，但單一屬性通常不會被鎖定。您可能需要lock某些敏感屬性，特別是對於允許玩家建造的遊戲。您可以透過將 [lock 字串](./Locks.md) 新增至 Attribute 來新增此類限制。 A NAttribute 沒有鎖。
 
-The relevant lock types are
+相關的 lock 型別是
 
-- `attrread` - limits who may read the value of the Attribute
-- `attredit` - limits who may set/change this Attribute
+- `attrread` - 限制誰可以讀取 Attribute 的值
+- `attredit` - 限制誰可以設定/更改此Attribute
 
-You must use the `AttributeHandler` to assign the lockstring to the Attribute:
+您必須使用 `AttributeHandler` 將鎖定字串分配給 Attribute：
 
 ```python
 lockstring = "attread:all();attredit:perm(Admins)"
 obj.attributes.add("myattr", "bar", lockstring=lockstring)"
 ```
 
-If you already have an Attribute and want to add a lock in-place you can do so by having the `AttributeHandler` return the `Attribute` object itself (rather than its value) and then assign the lock to it directly:
+如果您已經有 Attribute 並想要就地新增 lock，您可以透過讓 `AttributeHandler` 返回 `Attribute` 物件本身（而不是其值），然後直接將 lock 分配給它來實現：
 
 ```python
      lockstring = "attread:all();attredit:perm(Admins)"
      obj.attributes.get("myattr", return_obj=True).locks.add(lockstring)
 ```
 
-Note the `return_obj` keyword which makes sure to return the `Attribute` object so its LockHandler could be accessed.
+請注意 `return_obj` 關鍵字，它確保返回 `Attribute` 物件，以便可以存取其 LockHandler。
 
-A lock is no good if nothing checks it -- and by default Evennia does not check locks on Attributes. To check the `lockstring` you provided, make sure you include `accessing_obj` and set `default_access=False` as you make a `get` call.
+如果沒有任何東西檢查它，lock 是沒有用的——並且預設情況下 Evennia 不檢查屬性上的鎖。要檢查您提供的 `lockstring`，請確保在進行 `get` 呼叫時包含 `accessing_obj` 並設定 `default_access=False`。
 
 ```python
     # in some command code where we want to limit
@@ -292,11 +300,12 @@ A lock is no good if nothing checks it -- and by default Evennia does not check 
     # edit the Attribute here
 ```
 
-The same keywords are available to use with `obj.attributes.set()` and `obj.attributes.remove()`, those will check for the `attredit` lock type.
+相同的關鍵字可與 `obj.attributes.set()` 和 `obj.attributes.remove()` 一起使用，它們將檢查 `attredit` lock 型別。
 
-## Querying by Attribute 
+(querying-by-attribute)=
+## 按Attribute查詢
 
-While you can get attributes using the `obj.attributes.get` handler, you can also find objects based on the Attributes they have through the `db_attributes` many-to-many field available on each typeclassed entity:
+雖然您可以使用 `obj.attributes.get` 處理程式來取得屬性，但您也可以透過每個型別分類實體上可用的 `db_attributes` 多對多欄位根據物件具有的屬性來尋找物件：
 
 ```python
 # find objects by attribue assigned (regardless of value)
@@ -306,22 +315,24 @@ objs = evennia.ObjectDB.objects.filter(db_attributes__db_key="foo", db_attribute
 ```
 
 ```{important}
-Internally, Attribute values are stored as _pickled strings_ (see next section). When querying, your search string is converted to the same format and matched in that form. While this means Attributes can store arbitrary Python structures, the drawback is that you cannot do more advanced database comparisons on them. For example doing `db_attributes__db__value__lt=4` or `__gt=0` will not work since less-than and greater-than doesn't do what you want between strings.
+在內部，Attribute 值儲存為_pickled strings_（請參閱下一節）。查詢時，您的搜尋字串將轉換為相同的格式並以該形式進行比對。雖然這意味著屬性可以儲存任意 Python 結構，但缺點是您無法對它們進行更高階的資料庫比較。例如，執行 `db_attributes__db__value__lt=4` 或 `__gt=0` 將不起作用，因為小於和大於不會在字串之間執行您想要的操作。
 ```
 
-## What types of data can I save in an Attribute?
+(what-types-of-data-can-i-save-in-an-attribute)=
+## Attribute 中可以儲存哪些型別的資料？
 
-The database doesn't know anything about Python objects, so Evennia must *serialize* Attribute values into a string representation before storing it to the database. This is done using the [pickle](https://docs.python.org/library/pickle.html) module of Python.
+資料庫對 Python 物件一無所知，因此 Evennia 必須將 Attribute 值序列化為字串表示形式，然後再儲存到資料庫中。這是使用 Python 的 [pickle](https://docs.python.org/library/pickle.html) 模組完成的。
 
-> The only exception is if you use the `strattr` keyword of the `AttributeHandler` to save to the `strvalue` field of the Attribute. In that case you can _only_ save *strings* and those will not be pickled).
+> 唯一的例外是，如果您使用 `AttributeHandler` 的 `strattr` 關鍵字儲存到 Attribute 的 `strvalue` 欄位。在這種情況下，您可以_僅_儲存*字串*，並且這些字串不會被醃製）。
 
-### Storing single objects
+(storing-single-objects)=
+### 儲存單一物件
 
-With a single object, we mean anything that is *not iterable*, like numbers, strings or custom class instances without the `__iter__` method.
+對於單一物件，我們指的是任何「不可迭代」的東西，例如數字、字串或不帶 `__iter__` 方法的自訂類別例項。
 
-* You can generally store any non-iterable Python entity that can be _pickled_.
-* Single database objects/typeclasses can be stored, despite them normally not being possible to pickle. Evennia will convert them to an internal representation using theihr classname, database-id and creation-date with a microsecond precision. When retrieving, the object instance will be re-fetched from the database using this information.
-* If you 'hide' a db-obj as a property on a custom class, Evennia will not be able to find it to serialize it. For that you need to help it out (see below).
+* 您通常可以儲存任何可以_pickled_的不可迭代的Python實體。
+* 可以儲存單一資料庫物件/typeclasses，儘管它們通常無法進行pickle。 Evennia 將使用類別名稱、資料庫 ID 和建立日期以微秒精度將它們轉換為內部表示形式。檢索時，將使用此資訊從資料庫重新取得物件例項。
+* 如果您將 db-obj 作為自訂類別的屬性“隱藏”，Evennia 將無法找到它來序列化它。為此，您需要提供協助（請參閱下文）。
 
 ```{code-block} python
 :caption: Valid assignments
@@ -333,7 +344,7 @@ obj.db.test1 = False
 obj.db.test2 = myobj
 ```
 
-As mentioned, Evennia will not be able to automatically serialize db-objects 'hidden' in arbitrary properties on an object. This will lead to an error when saving the Attribute.
+如前所述，Evennia 將無法自動序列化物件上任意屬性中「隱藏」的資料庫物件。這將導致儲存Attribute時出錯。
 
 ```{code-block} python
 :caption: Invalid, 'hidden' dbobject
@@ -349,7 +360,7 @@ obj.db.mydata = container  # will raise error!
 
 ```
 
-By adding two methods `__serialize_dbobjs__` and `__deserialize_dbobjs__` to the object you want to save, you can pre-serialize and post-deserialize all 'hidden' objects before Evennia's main serializer gets to work. Inside these methods, use Evennia's [evennia.utils.dbserialize.dbserialize](evennia.utils.dbserialize.dbserialize) and [dbunserialize](evennia.utils.dbserialize.dbunserialize) functions to safely serialize the db-objects you want to store.
+透過為要儲存的物件新增兩個方法 `__serialize_dbobjs__` 和 `__deserialize_dbobjs__` ，您可以在 Evennia 的主序列化程式開始工作之前對所有「隱藏」物件進行預序列化和後反序列化。在這些方法中，使用 Evennia 的 [evennia.utils.dbserialize.dbserialize](evennia.utils.dbserialize.dbserialize) 和 [dbunserialize](evennia.utils.dbserialize.dbunserialize) 函式來安全地序列化要儲存的資料庫物件。
 
 ```{code-block} python
 :caption: Fixing an invalid 'hidden' dbobj for storing in Attribute
@@ -378,27 +389,28 @@ container = Container(myobj)
 obj.db.mydata = container  # will now work fine!
 ```
 
-> Note the extra check in `__deserialize_dbobjs__` to make sure the thing you are deserializing is a `bytes` object. This is needed because the Attribute's cache reruns deserializations in some situations when the data was already once deserialized. If you see errors in the log saying  `Could not unpickle data for storage: ...`, the reason is  likely that you forgot to add this check.
+> 請注意 `__deserialize_dbobjs__` 中的額外檢查，以確保您要反序列化的物件是 `bytes` 物件。這是必要的，因為在某些情況下，當資料已經反序列化一次時，Attribute 的快取會重新執行反序列化。如果您在日誌中看到錯誤，顯示`Could not unpickle data for storage:...`，原因可能是您忘記新增此檢查。
 
 
-### Storing multiple objects
+(storing-multiple-objects)=
+### 儲存多個物件
 
-This means storing objects in a collection of some kind and are examples of *iterables*, pickle-able entities you can loop over in a for-loop. Attribute-saving supports the following iterables:
+這意味著將物件儲存在某種型別的集合中，並且是 *iterables* 的範例，可以在 for 迴圈中迴圈的可pickle 實體。 Attribute- saving 支援以下迭代：
 
-* [Tuples](https://docs.python.org/3/library/functions.html#tuple), like `(1,2,"test", <dbobj>)`.
-* [Lists](https://docs.python.org/3/tutorial/datastructures.html#more-on-lists), like `[1,2,"test", <dbobj>]`.
-* [Dicts](https://docs.python.org/3/tutorial/datastructures.html#dictionaries), like `{1:2, "test":<dbobj>]`.
-* [Sets](https://docs.python.org/2/tutorial/datastructures.html#sets), like `{1,2,"test",<dbobj>}`.
-* [collections.OrderedDict](https://docs.python.org/3/library/collections.html#collections.OrderedDict),
-like `OrderedDict((1,2), ("test", <dbobj>))`.
-* [collections.Deque](https://docs.python.org/3/library/collections.html#collections.deque), like `deque((1,2,"test",<dbobj>))`.
-* [collections.DefaultDict](https://docs.python.org/3/library/collections.html#collections.defaultdict) like `defaultdict(list)`.
-* *Nestings* of any combinations of the above, like lists in dicts or an OrderedDict of tuples, each containing dicts, etc.
-* All other iterables (i.e. entities with the `__iter__` method) will be converted to a *list*. Since you can use any combination of the above iterables, this is generally not much of a limitation.
+* [元組](https://docs.python.org/3/library/functions.html#tuple)，如`(1,2,"test", <dbobj>)`。
+* [列表](https://docs.python.org/3/tutorial/datastructures.html#more-on-lists)，例如`[1,2,"test", <dbobj>]`。
+* [字典](https://docs.python.org/3/tutorial/datastructures.html#dictionaries)，例如`{1:2, "test":<dbobj>]`。
+* [集](https://docs.python.org/2/tutorial/datastructures.html#sets)，如`{1,2,"test",<dbobj>}`。
+* [收藏。 OrderedDict](https://docs.python.org/3/library/collections.html#collections.OrderedDict),
+比如`OrderedDict((1,2), ("test", <dbobj>))`。
+* [collections.Deque](https://docs.python.org/3/library/collections.html#collections.deque)，如`deque((1,2,"test",<dbobj>))`。
+* [收藏。 DefaultDict](https://docs.python.org/3/library/collections.html#collections.defaultdict) 就像`defaultdict(list)`。
+* 上述任意組合的*巢狀*，例如字典中的列表或 OrderedDict 元組，每個都包含字典等。
+* 所有其他可迭代物件（i.e。具有 `__iter__` 方法的實體）將轉換為*列表*。由於您可以使用上述迭代的任意組合，因此這通常不是太大的限制。
 
-Any entity listed in the [Single object](./Attributes.md#storing-single-objects) section above can be stored in the iterable.
+上面的[單一物件](./Attributes.md#storing-single-objects)部分中列出的任何實體都可以儲存在可迭代物件中。
 
-> As mentioned in the previous section, database entities (aka typeclasses) are not possible to pickle. So when storing an iterable, Evennia must recursively traverse the iterable *and all its nested sub-iterables* in order to find eventual database objects to convert. This is a very fast process but for efficiency you may want to avoid too deeply nested structures if you can.
+> 如上一節所述，資料庫實體（又稱 typeclasses）無法進行 pickle。因此，在儲存可迭代物件時，Evennia 必須遞迴遍歷可迭代物件*及其所有巢狀的子可迭代物件*，以便找到最終要轉換的資料庫物件。這是一個非常快速的過程，但為了提高效率，您可能希望盡可能避免巢狀太深的結構。
 
 ```python
 # examples of valid iterables to store
@@ -418,14 +430,15 @@ obj.db.test8[2]["test"] = 5
 # test8 is now [4,2,{"test":5}]
 ```
 
-Note that if make some advanced iterable object, and store an db-object on it in a way such that it is _not_ returned by iterating over it, you have created a 'hidden' db-object. See [the previous section](#storing-single-objects) for how to tell Evennia how to serialize such hidden objects safely.
+請注意，如果建立一些高階可迭代物件，並以某種方式儲存資料庫物件，使其不會透過迭代返回，那麼您就建立了一個「隱藏」資料庫物件。請參閱[上一節](#storing-single-objects) 以瞭解如何告訴 Evennia 如何安全地序列化此類隱藏物件。
 
 
-### Retrieving Mutable objects
+(retrieving-mutable-objects)=
+### 檢索可變物件
 
-A side effect of the way Evennia stores Attributes is that *mutable* iterables (iterables that can be modified in-place after they were created, which is everything except tuples) are handled by custom objects called `_SaverList`, `_SaverDict` etc. These `_Saver...` classes behave just like the normal variant except that they are aware of the database and saves to it whenever new data gets assigned to them. This is what allows you to do things like `self.db.mylist[7] = val` and be sure that the new version of list is saved. Without this you would have to load the list into a temporary variable, change it and then re-assign it to the Attribute in order for it to save.
+Evennia 儲存屬性的方式的一個副作用是 *mutable* 可迭代物件（可在建立後就地修改的可迭代物件，除了元組之外的所有內容）由稱為 `_SaverList`、`_SaverDict` 等的自訂物件處理。這些 `_Saver...` 類別的行為就像正常變體一樣，只是它們知道資料庫並在分配新資料時儲存到資料庫。這允許您執行 `self.db.mylist[7] = val` 之類的操作，並確保儲存新版本的清單。如果沒有這個，您必須將清單載入到臨時變數中，更改它，然後將其重新分配給 Attribute 才能儲存。
 
-There is however an important thing to remember. If you retrieve your mutable iterable into another variable, e.g. `mylist2 = obj.db.mylist`, your new variable (`mylist2`) will *still* be a `_SaverList`. This means it will continue to save itself to the database whenever it is updated!
+然而，有一件重要的事情要記住。如果將可變迭代檢索到另一個變數中，e.g。 `mylist2 = obj.db.mylist`，您的新變數 (`mylist2`) *仍然*是 `_SaverList`。這意味著每當更新時它都會繼續將自身儲存到資料庫中！
 
 ```python
 obj.db.mylist = [1, 2, 3, 4]
@@ -437,7 +450,7 @@ print(mylist)  # this is now [1, 2, 3, 5]
 print(obj.db.mylist)  # now also [1, 2, 3, 5]
 ```
 
-When you extract your mutable Attribute data into a variable like `mylist`, think of it as getting a _snapshot_ of the variable. If you update the snapshot, it will save to the database, but this change _will not propagate to any other snapshots you may have done previously_.
+當您將可變的 Attribute 資料提取到像 `mylist` 這樣的變數中時，可以將其視為獲取該變數的_快照_。如果您更新快照，它將儲存到資料庫，但此變更_不會傳播到您之前可能已完成的任何其他快照_。
 
 ```python
 obj.db.mylist = [1, 2, 3, 4]
@@ -453,32 +466,33 @@ print(mylist2)  # still [1, 2, 3, 4]  !
 ```
 
 ```{sidebar}
-Remember, the complexities of this section only relate to *mutable* iterables - things you can update
-in-place, like lists and dicts. [Immutable](https://en.wikipedia.org/wiki/Immutable) objects (strings,
-numbers, tuples etc) are already disconnected from the database from the onset.
+請記住，本節的複雜性僅與*可變*迭代相關 - 您可以更新的東西
+就地，如列表和字典。 [不可變](https://en.wikipedia.org/wiki/Immutable) 物件（字串、
+數字、元組等）從一開始就已經與資料庫斷開連線。
 ```
 
-To avoid confusion with mutable Attributes, only work with one variable (snapshot) at a time and save back the results as needed.
+為了避免與可變屬性混淆，一次僅使用一個變數（快照）並根據需要儲存結果。
 
-You can also choose to "disconnect" the Attribute entirely from the
-database with the help of the `.deserialize()` method:
+您還可以選擇完全“斷開”Attribute 與
+藉助 `.deserialize()` 方法的資料庫：
 
 ```python
 obj.db.mylist = [1, 2, 3, 4, {1: 2}]
 mylist = obj.db.mylist.deserialize()
 ```
 
-The result of this operation will be a structure only consisting of normal Python mutables (`list` instead of `_SaverList`, `dict` instead of `_SaverDict` and so on). If you update it, you need to explicitly save it back to the Attribute for it to save.
+此操作的結果將是僅由普通 Python 可變變陣列成的結構（`list` 而不是 `_SaverList`，`dict` 而不是 `_SaverDict` 等等）。如果更新，則需要明確將其儲存回Attribute才能儲存。
 
 
-## In-memory Attributes (NAttributes)
+(in-memory-attributes-nattributes)=
+## 記憶體中屬性 (NAttributes)
 
-_NAttributes_ (short of Non-database Attributes) mimic Attributes in most things except they
-are **non-persistent** - they will _not_ survive a server reload.
+_NAttributes_（非資料庫屬性的縮寫）在大多數事物中模仿屬性，除了它們
+**非永續性** - 它們不會在伺服器重新載入後倖存下來。
 
-- Instead of `.db` use `.ndb`.
-- Instead of `.attributes` use `.nattributes`
-- Instead of `AttributeProperty`, use `NAttributeProperty`.
+- 使用 `.ndb` 而不是 `.db`。
+- 使用 `.nattributes` 代替 `.attributes`
+- 使用 `NAttributeProperty`，而不是 `AttributeProperty`。
 
 ```python
     rose.ndb.has_thorns = True
@@ -488,29 +502,30 @@ are **non-persistent** - they will _not_ survive a server reload.
     is_ouch = rose.nattributes.get("has_thorns")
 ```
 
-Differences between `Attributes` and `NAttributes`:
+`Attributes` 和 `NAttributes` 之間的差異：
 
-- `NAttribute`s are always wiped on a server reload.
-- They only exist in memory and never involve the database at all, making them faster to
-  access and edit than `Attribute`s.
-- `NAttribute`s can store _any_ Python structure (and database object) without limit. However, if you were to _delete_ a database object you previously stored in an `NAttribute`, the `NAttribute` will not know about this and may give you a python object without a matching database entry. In comparison, an `Attribute` always checks this). If this is a concern, use an `Attribute` or check that the object's `.pk` property is not `None` before saving it. 
-- They can _not_ be set with the standard `set` command (but they are visible with `examine`)
+- `NAttribute`s 總是在伺服器重新載入時被擦除。
+- 它們只存在於記憶體中，根本不涉及資料庫，這使得它們可以更快地被呼叫。
+訪問和編輯次數超過 `Attribute`s。
+- `NAttribute`s 可以無限制地儲存_any_ Python 結構（和資料庫物件）。但是，如果您要_刪除_之前儲存在 `NAttribute` 中的資料庫物件，`NAttribute` 將不知道這一點，並且可能會為您提供一個沒有匹配資料庫條目的 python 物件。相比之下，`Attribute` 總是檢查這一點）。如果這是一個問題，請在儲存之前使用 `Attribute` 或檢查物件的 `.pk` 屬性不是 `None`。
+- 它們_不能_使用標準 `set` 指令設定（但使用 `examine` 可見）
 
-There are some important reasons we recommend using `ndb` to store temporary data rather than the simple alternative of just storing a variable directly on an object:
+我們建議使用 `ndb` 來儲存臨時資料，而不是直接在物件上儲存變數的簡單替代方案，有一些重要原因：
 []()
-- NAttributes are tracked by Evennia and will not be purged in various cache-cleanup operations the server may do. So using them guarantees that they'll remain available at least as long as the server lives.
-- It's a consistent style - `.db/.attributes` and `.ndb/.nattributes` makes for clean-looking code where it's clear how long-lived (or not) your data is to be.
+- NAttributes 由 Evennia 跟蹤，並且不會在伺服器可能執行的各種快取清理操作中被清除。因此，使用它們可以保證它們至少在伺服器存在期間保持可用。
+- 這是一種一致的風格 - `.db/.attributes` 和 `.ndb/.nattributes` 使得程式碼看起來很乾淨，很清楚你的資料的壽命（或壽命）有多長。
 
-### Persistent vs non-persistent
+(persistent-vs-non-persistent)=
+### 永續性與非永續性
 
-So *persistent* data means that your data will survive a server reboot, whereas with
-*non-persistent* data it will not ...
+因此，*持久*資料意味著您的資料將在伺服器重新啟動後繼續存在，而
+*非永續性*資料不會...
 
-... So why would you ever want to use non-persistent data? The answer is, you don't have to. Most of
-the time you really want to save as much as you possibly can. Non-persistent data is potentially
-useful in a few situations though.
+……那麼您為什麼要使用非永續性資料呢？答案是，你不必這樣做。大部分
+您真正想盡可能節省的時間。非永續性資料可能
+但在某些情況下很有用。
 
-- You are worried about database performance. Since Evennia caches Attributes very aggressively, this is not an issue unless you are reading *and* writing to your Attribute very often (like many times per second). Reading from an already cached Attribute is as fast as reading any Python property. But even then this is not likely something to worry about: Apart from Evennia's own caching, modern database systems  themselves also cache data very efficiently for speed. Our default database even runs completely in RAM if possible, alleviating much of the need to write to disk during heavy loads.
-- A more valid reason for using non-persistent data is if you *want* to lose your state when logging off. Maybe you are storing throw-away data that are re-initialized at server startup. Maybe you are implementing some caching of your own. Or maybe you are testing a buggy [Script](./Scripts.md) that does potentially harmful stuff to your character object. With non-persistent storage you can be sure that whatever is messed up, it's nothing a server reboot can't clear up.
-- `NAttribute`s have no restrictions at all on what they can store, since they don't need to worry about being saved to the database - they work very well for temporary storage.
-- You want to implement a fully or partly *non-persistent world*. Who are we to argue with your grand vision!
+- 您擔心資料庫效能。由於 Evennia 非常積極地快取屬性，因此這不是問題，除非您非常頻繁地讀取*和*寫入您的 Attribute（例如每秒多次）。從已快取的 Attribute 讀取與讀取任何 Python 屬性一樣快。但即便如此，這也不太可能是值得擔心的：除了 Evennia 自己的快取之外，現代資料庫系統本身也非常有效地快取資料以提高速度。如果可能的話，我們的預設資料庫甚至完全在 RAM 中執行，從而減輕了在重負載期間寫入磁碟的大部分需求。
+- 使用非永續性資料的一個更有效的原因是您「希望」在登出時遺失狀態。也許您正在儲存伺服器啟動時重新初始化的廢棄資料。也許您正在實施一些自己的快取。或者您可能正在測試一個錯誤 [Script](./Scripts.md)，它會對您的角色物件執行潛在有害的操作。使用非持久儲存，您可以確保無論出現什麼問題，伺服器重新啟動都可以解決。
+- `NAttribute`s 對它們可以儲存的內容沒有任何限制，因為它們不需要擔心被儲存到資料庫中 - 它們非常適合臨時儲存。
+- 您想要實現一個完全或部分*非持久世界*。我們有什麼資格去爭論你的宏偉願景！

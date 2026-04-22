@@ -1,57 +1,59 @@
-# Game website
+(game-website)=
+# 遊戲網站
 
-When Evennia starts it will also start a [Webserver](./Webserver.md) as part of the [Server](./Portal-And-Server.md) process. This uses [Django](https://docs.djangoproject.com) to present a simple but functional default game website.  With the default setup, open your browser to [localhost:4001](http://localhost:4001) or [127.0.0.1:4001](http://127.0.0.1:4001) to see it.
+當 Evennia 啟動時，它還將啟動 [Webserver](./Webserver.md) 作為 [伺服器](./Portal-And-Server.md) 程式的一部分。這使用[Django](https://docs.djangoproject.com)來呈現一個簡單但實用的預設遊戲網站。  使用預設設定，開啟瀏覽器到 [localhost:4001](http://localhost:4001) 或 [127.0.0.1:4001](http://127.0.0.1:4001) 來檢視它。
 
-The website allows existing players to log in using an account-name and password they previously used to register with the game. If a user logs in with the [Webclient](./Webclient.md) they will also log into the website and vice-versa. So if you are logged into the website, opening the webclient will automatically log you into the game as that account.
+該網站允許現有玩家使用他們之前註冊遊戲時使用的帳戶名稱和密碼登入。如果使用者使用 [Webclient](./Webclient.md) 登入，他們也會登入網站，反之亦然。因此，如果您登入了該網站，開啟 webclient 將會自動以該帳號登入遊戲。
 
-The default website shows a "Welcome!" page with a few links to useful resources. It also shows some statistics about how many players are currently connected.
+預設網站顯示「歡迎！」頁麵包含一些有用資源的連結。它還顯示了有關當前連線的玩家數量的一些統計資料。
 
-In the top menu you can find
-- _Home_ - Get back to front page.
-- _Documentation_ - A link to the latest stable Evennia documentation.
-- _Characters_ - This is a demo of connecting in-game characters to the website.
-  It will display a list of all entities of the
-  _typeclasses.characters.Character` typeclass and allow you to view their
-  description with an optional image. The list is only available to logged-in
-  users.
-- _Channels_ - This is a demo of connecting in-game chats to the website. It will
-  show a list of all channels available to you and allow you to view the latest
-  discussions. Most channels require logging in, but the `Public` channel can
-  also be viewed by non-loggedin users.
-- _Help_ - This ties the in-game [Help system](./Help-System.md) to the website. All
-  database-based help entries that are publicly available or accessible to your
-  account can be read. This is a good way to present a body of help for people
-  to read outside of the game.
-- _Play Online_ - This opens the [Webclient](./Webclient.md) in the browser.
-- _Admin_ The [Web admin](Web admin) will only show if you are logged in.
-- _Log in/out_ - Allows you to authenticate using the same credentials you use
-  in the game.
-- _Register_ - Allows you to register a new account. This is the same as
-  creating a new account upon first logging into the game).
+在頂部選單中您可以找到
+- _Home_ - 返回首頁。
+- _文件_ - 最新穩定Evennia文件的連結。
+- _Characters_ - 這是將遊戲中的角色連線到網站的演示。
+它將顯示所有實體的列表
+  _typeclasses.characters.Character` typeclass 並允許您檢視他們的
+  帶有可選影象的描述。此列表僅適用於登入的使用者
+  使用者。
+- _Channels_ - 這是將遊戲內聊天連線到網站的演示。它將
+顯示您可以使用的所有頻道的列表，並允許您檢視最新的頻道
+  討論。大多數頻道需要登入，但`Public`頻道可以
+  未登入的使用者也可以檢視。
+- _幫助_ - 這會將遊戲中的[幫助系統](./Help-System.md) 與網站連結。全部
+公開可用或可供您存取的基於資料庫的說明條目
+  帳戶可以讀取。這是向人們提供幫助的好方法
+  在遊戲之外閱讀。
+- _線上播放_ - 這將在瀏覽器中開啟 [Webclient](./Webclient.md)。
+- _管理員_ [Web 管理員](Web admin) 僅在您登入時才會顯示。
+- _登入/登出_ - 允許您使用您使用的相同憑證進行身份驗證
+在遊戲中。
+- _註冊_ - 允許您註冊一個新帳戶。這與
+首次登入遊戲時建立一個新帳戶）。
 
-## Modifying the default Website
+(modifying-the-default-website)=
+## 修改預設網站
 
-You can modify and override all aspects of the web site from your game dir. You'll mostly be doing so in your settings file (`mygame/server/conf/settings.py` and in the gamedir's `web/folder` (`mygame/web/` if your game folder is `mygame/`).
+您可以從遊戲目錄修改和覆蓋網站的所有方面。您主要會在設定檔中執行此操作（`mygame/server/conf/settings.py` 和遊戲目錄的`web/folder`（如果您的遊戲資料夾是`mygame/`，則為`mygame/web/`）。
 
-> When testing your modifications, it's a good idea to add `DEBUG = True` to
-> your settings file. This will give you nice informative tracebacks directly
-> in your browser instead of generic 404 or 500 error pages. Just remember that
-> DEBUG mode leaks memory (for retaining debug info) and is *not* safe to use
-> for a production game!
+> 測試您的修改時，最好將 `DEBUG = True` 新增到
+> 您的設定檔。這將直接為您提供資訊豐富的回溯
+> 在您的瀏覽器中，而不是通用的 404 或 500 錯誤頁面。只要記住這一點
+> DEBUG 模式會洩漏記憶體（用於保留偵錯資訊）並且使用*不*安全
+> 對於製作遊戲來說！
 
-As explained on the [Webserver](./Webserver.md) page, the process for getting a web page is
+如[Webserver](./Webserver.md)頁面所解釋的，取得網頁的過程是
 
-1. Web browser sends HTTP request to server with an URL
-2. `urls.py` uses regex to match that URL to a _view_ (a Python function or callable class).
-3. The correct Python view is loaded and executes.
-4. The view pulls in a _template_, a HTML document with placeholder markers in it,
-   and fills those in as needed (it may also use a _form_ to customize user-input in the same way).
-   A HTML page may also in turn point to static resources (usually CSS, sometimes images etc).
-5. The rendered HTML page is returned to the browser as a HTTP response.  If
-   the HTML page requires static resources are requested, the browser will
-   fetch those separately before displaying it to the user.
+1. Web 瀏覽器向伺服器傳送 HTTP 請求，帶有 URL
+2. `urls.py` 使用正規表示式將 URL 與 _view_ （Python 函式或可呼叫類別）進行配對。
+3. 正確的 Python 檢視已載入並執行。
+4. 此檢視拉入一個 _template_，一個帶有佔位符標記的 HTML 文件，
+並根據需要填寫這些內容（它也可以使用_form_以相同的方式自訂使用者輸入）。
+   HTML 頁面也可能依序指向靜態資源（通常是 CSS，有時是影象等）。
+5. 呈現的 HTML 頁面以 HTTP 回應返回瀏覽器。  如果
+HTML頁面需要靜態資源，瀏覽器會要求
+   在向使用者顯示之前分別獲取它們。
 
-If you look at the [evennia/web/](github:evennia/web) directory you'll find the following structure (leaving out stuff not relevant to the website):
+如果您檢視 [evennia/web/](github:evennia/web) 目錄，您會發現以下結構（省略與網站無關的內容）：
 
 ```
   evennia/web/
@@ -76,9 +78,9 @@ If you look at the [evennia/web/](github:evennia/web) directory you'll find the 
 
 ```
 
-The top-level `web/urls.py` file 'includes' the `web/website/urls.py` file - that way all the website-related url-handling is kept in the same place.
+頂級 `web/urls.py` 檔案「包含」`web/website/urls.py` 檔案 - 這樣所有與網站相關的 url 處理都儲存在同一個位置。
 
-This is the layout of the `mygame/web/` folder relevant for the website:
+這是與網站相關的 `mygame/web/` 資料夾的佈局：
 
 ```
   mygame/web/
@@ -108,82 +110,87 @@ This is the layout of the `mygame/web/` folder relevant for the website:
 
 ```
 
-As you can see, the `mygame/web/` folder is a copy of the `evennia/web/` folder structure except the `mygame` folders are mostly empty. 
+如您所見，`mygame/web/` 資料夾是 `evennia/web/` 資料夾結構的副本，除了 `mygame` 資料夾大部分為空。
 
-For static- and template-files, Evennia will _first_ look in `mygame/static` and `mygame/templates` before going to the default locations in `evennia/web/`.  So override these resources, you just need to put a file with the same name in the right spot under `mygame/web/` (and then reload the server). Easiest is often to copy the original over and modify it. 
+對於靜態檔案和模板檔案，Evennia 將_首先_查詢 `mygame/static` 和 `mygame/templates`，然後轉到 `evennia/web/` 中的預設位置。  所以要覆蓋這些資源，你只需要把一個同名的檔案放在`mygame/web/`下的正確位置（然後重新載入伺服器）。最簡單的方法通常是複製原始檔案並進行修改。
 
-Overridden views (Python modules) also need an additional tweak to the `website/urls.py` file - you must make sure to repoint the url to the new version rather than it using the original.
+覆蓋檢視（Python 模組）還需要對 `website/urls.py` 檔案進行額外調整 - 您必須確保將 url 重新指向新版本，而不是使用原始版本。
 
-## Examples of commom web changes
+(examples-of-commom-web-changes)=
+## 常見 Web 變更的範例
 
 ```{important}
 
-  Django is a very mature web-design framework. There are endless
-  internet-tutorials, courses and books available to explain how to use Django.
-  So these examples only serve as a first primer to get you started.
+Django 是一個非常成熟的網頁設計框架。還有無窮無盡的
+  可用於解釋如何使用 Django 的網路教學、課程和書籍。
+  因此，這些範例僅作為您入門的入門指南。
 
 ```
 
-### Change Title and blurb
+(change-title-and-blurb)=
+### 更改標題和簡介
 
-The website's title and blurb are simply changed by tweaking
-`settings.SERVERNAME` and `settings.GAME_SLOGAN`. Your settings file is in
-`mygame/server/conf/settings.py`, just set/add
+網站的標題和簡介只需透過調整即可更改
+`settings.SERVERNAME` 和 `settings.GAME_SLOGAN`。您的設定檔位於
+`mygame/server/conf/settings.py`，只需設定/新增
 
     SERVERNAME = "My Awesome Game"
     GAME_SLOGAN = "The best game in the world"
 
-### Change the Logo
+(change-the-logo)=
+### 更改標誌
 
-The Evennia googly-eyed snake logo is probably not what you want for your game.
-The template looks for a file  `web/static/website/images/evennia_logo.png`. Just
-plop your own PNG logo (64x64 pixels large) in there and name it the same.
+Evennia 瞪大眼睛的蛇標誌可能不是您想要的遊戲。
+此範本查詢檔案 `web/static/website/images/evennia_logo.png`。只是
+將您自己的 PNG 徽標（64x64 畫素大）放在那裡，並命名為相同的名稱。
 
 
-### Change front page HTML
+(change-front-page-html)=
+### 更改首頁HTML
 
-The front page of the website is usually referred to as the 'index' in HTML
-parlance.
+網站的首頁通常被稱為HTML中的“索引”
+說法。
 
-The frontpage template is found in `evennia/web/templates/website/index.html`.
-Just copy this to the equivalent place in `mygame/web/`. Modify it there and
-reload the server to see your changes.
+首頁模板位於`evennia/web/templates/website/index.html`。
+只需將其複製到 `mygame/web/` 中的相應位置即可。在那裡修改它並
+重新載入伺服器以檢視您的變更。
 
-Django templates has a few special features that separate them from normal HTML
-documents - they contain a special templating language marked with `{% ... %}` and
-`{{ ... }}`.
+Django 模板有一些特殊的功能，將它們與普通的HTML 區分開來
+檔案 - 它們包含特殊的模板語言，標記為 `{%... %}` 和
+`{{... }}`。
 
-Some important things to know:
+需要了解的一些重要事項：
 
-- `{% extends "base.html" %}` - This is equivalent to a Python `from othermodule import *` statement, but for templates. It allows a given template to use everything from the imported (extended) template, but also to override anything it wants to change. This makes it easy to keep all pages looking the same and avoids a lot of boiler plate.
-- `{% block blockname %}...{% endblock %}` - Blocks are inheritable, named pieces of code that are modified in one place and then used elsewhere. This works a bit in reverse to normal inheritance, because it's commonly in such a way that `base.html` defines an empty block, let's say `contents`: `{% block contents %}{% endblock %}` but makes sure to put that _in the right place_, say in the main body, next to the sidebar etc. Then each page does `{% extends "base.html %"}` and makes their own `{% block contents} <actual content> {% endblock %}`. Their `contents` block will now override the empty one in `base.html` and appear in the right place in the document, without the extending template having to specifying everything else
-  around it!
-- `{{ ... }}` are 'slots' usually embedded inside HTML tags or content. They reference a _context_ (basically a dict) that the Python _view_ makes available to it. Keys on the context are accessed with dot-notation, so if you provide a context `{"stats": {"hp": 10, "mp": 5}}` to your template, you could access that as  `{{ stats.hp }}` to display `10` at that location to display `10` at that location.
+- `{% extends "base.html" %}` - 這相當於 Python `from othermodule import *` 語句，但用於模板。它允許給定模板使用匯入（擴充套件）模板中的所有內容，但也可以覆蓋它想要更改的任何內容。這樣可以輕鬆保持所有頁面看起來相同，並避免大量樣板。
+- `{% block blockname %}...{% endblock %}` - 區塊是可繼承的、命名的程式碼片段，可以在一個位置進行修改，然後在其他地方使用。這與正常繼承有點相反，因為它通常以這樣的方式 `base.html` 定義一個空塊，比方說 `contents`：`{% block contents %}{% endblock %}` 但確保將其放在_正確的位置_，比如在主體中，側邊欄旁邊等。然後每個頁面執行 `{% extends "base.html %"}` 並建立自己的 `{% block contents} <actual content> {% endblock %}`。他們的 `contents` 區塊現在將覆蓋 `base.html` 中的空區塊並出現在檔案中的正確位置，而擴充範本不必指定其他所有內容
+圍繞它！
+- `{{... }}` 是“槽”，通常嵌入在 HTML tags 或內容中。它們引用 Python _view_ 提供的_context_（基本上就是字典）。上下文中的鍵透過點表示法進行訪問，因此，如果您向模板提供上下文 `{"stats": {"hp": 10, "mp": 5}}`，則可以將其訪問為 `{{ stats.hp }}`，以在該位置顯示 `10`，從而在該位置顯示 `10`。
 
-This allows for template inheritance (making it easier to make all pages look the same without rewriting the same thing over and over)
+這允許模板繼承（更容易使所有頁面看起來相同，而無需一遍又一遍地重寫相同的內容）
 
-There's a lot more information to be found in the [Django template language documentation](https://docs.djangoproject.com/en/4.1/ref/templates/language/).
+在[Django 範本語言檔案](https://docs.djangoproject.com/en/4.1/ref/templates/language/) 中可以找到更多資訊。
 
-### Change webpage colors and styling
+(change-webpage-colors-and-styling)=
+### 變更網頁顏色和樣式
 
-You can tweak the [CSS](https://en.wikipedia.org/wiki/Cascading_Style_Sheets) of the entire website. If you investigate the `evennia/web/templates/website/base.html` file you'll see that we use the [Bootstrap 4](https://getbootstrap.com/docs/4.6/getting-started/introduction/) toolkit.
+您可以調整整個網站的[CSS](https://en.wikipedia.org/wiki/Cascading_Style_Sheets)。如果您調查 `evennia/web/templates/website/base.html` 檔案，您會發現我們使用 [Bootstrap 4](https://getbootstrap.com/docs/4.6/getting-started/introduction/) 工具包。
 
-Much structural HTML functionality is actually coming from bootstrap, so you will often be able to just add bootstrap CSS classes to elements in the HTML file to get various effects like text-centering or similar. 
+許多結構性 HTML 功能實際上來自 bootstrap，因此您通常只需將 bootstrap CSS 類別新增到 HTML 檔案中的元素即可獲得各種效果，例如文字居中或類似效果。
 
-The website's custom CSS is found in `evennia/web/static/website/css/website.css` but we also look for a (currently empty) `custom.css` in the same location. You can override either, but it may be easier to revert your changes if you only add things to `custom.css`. 
+網站的自訂 CSS 在 `evennia/web/static/website/css/website.css` 中找到，但我們仍在同一位置尋找（目前為空）`custom.css`。您可以覆蓋其中任何一個，但如果您只將內容新增至 `custom.css`，則恢復變更可能會更容易。
 
-Copy the CSS file you want to modify to the corresponding location in `mygame/web`. Modify it and reload the server to see your changes. 
+將要修改的CSS檔案複製到`mygame/web`中對應位置。修改它並重新載入伺服器以檢視您的更改。
 
-You can also apply static files without reloading, but running this in the terminal:
+您也可以應用靜態檔案而不重新載入，但在終端機中執行：
 
     evennia collectstatic --no-input
 
-(this is run automatically when reloading the server).
+（重新載入伺服器時會自動運作）。
 
-> Note that before you see new CSS files applied you may need to refresh your
-> browser without cache (Ctrl-F5 in Firefox, for example).
+> 請注意，在看到應用程式的新 CSS 檔案之前，您可能需要重新整理您的
+> 沒有快取的瀏覽器（例如​​，Firefox 中的 Ctrl-F5）。
 
-As an example, add/copy `custom.css` to `mygame/web/static/website/css/` and add the following:
+例如，將 `custom.css` 新增/複製到 `mygame/web/static/website/css/` 並新增以下內容：
 
 
 ```css
@@ -198,16 +205,17 @@ As an example, add/copy `custom.css` to `mygame/web/static/website/css/` and add
 
 ```
 
-Reload and your website now has a red theme!
+重新載入，您的網站現在有紅色主題！
 
-> Hint: Learn to use your web browser's [Developer tools](https://torquemag.io/2020/06/browser-developer-tools-tutorial/).
-> These allow you to tweak CSS 'live' to find a look you like and copy it into
-> the .css file only when you want to make the changes permanent.
+> 提示：學習使用網頁瀏覽器的[開發者工具](https://torquemag.io/2020/06/browser-developer-tools-tutorial/)。
+> 這些允許您調整CSS“實時”以找到您喜歡的外觀並將其複製到
+> 僅當您想要使變更永久時才使用.css 檔案。
 
 
-### Change front page functionality
+(change-front-page-functionality)=
+### 變更首頁功能
 
-The logic is all in the view. To find where the index-page view is found, we look in `evennia/web/website/urls.py`. Here we find the following line:
+邏輯盡在眼前。要查詢索引頁面檢視的位置，我們檢視 `evennia/web/website/urls.py`。在這裡我們找到以下行：
 
 ```python
 # in evennia/web/website/urls.py
@@ -219,11 +227,11 @@ The logic is all in the view. To find where the index-page view is found, we loo
 
 ```
 
-The first `""` is the empty url - root - what you get if you just enter `localhost:4001/`
-with no extra path. As expected, this leads to the index page. By looking at the imports
-we find the view is in in `evennia/web/website/views/index.py`.
+第一個 `""` 是空 url - root - 如果你輸入 `localhost:4001/` 你會得到什麼
+沒有額外的路徑。正如預期的那樣，這將導致索引頁。透過檢視進口
+我們發現該檢視位於 `evennia/web/website/views/index.py` 中。
 
-Copy this file to the corresponding location in `mygame/web`. Then tweak your `mygame/web/website/urls.py` file to point to the new file: 
+將此檔案複製到`mygame/web`中對應位置。然後調整 `mygame/web/website/urls.py` 檔案以指向新檔案：
 
 ```python
 # in mygame/web/website/urls.py
@@ -240,50 +248,54 @@ urlpatterns = [
 
 ```
 
-So we just import `index` from the new location and point to it. After a reload the front page will now redirect to use your copy rather than the original.
+所以我們只需從新位置匯入 `index` 並指向它。重新載入後，首頁現在將重定向以使用您的副本而不是原始頁面。
 
-The frontpage view is a class `EvenniaIndexView`. This is a [Django class-based view](https://docs.djangoproject.com/en/4.1/topics/class-based-views/). It's a little less visible what happens in a class-based view than in a function (since the class implements a lot of functionality as methods), but it's powerful and much easier to extend/modify.
+首頁檢視是一個類別`EvenniaIndexView`。這是一個[Django 基於類別的檢視](https://docs.djangoproject.com/en/4.1/topics/class-based-views/)。在基於類別的檢視中發生的事情比函式中發生的事情不太明顯（因為類別以方法的形式實現了許多功能），但它很強大並且更容易擴充套件/修改。
 
-The class property `template_name` sets the location of the template used under the `templates/` folder. So `website/index.html` points to `web/templates/website/index.html` (as we already explored above. 
+類別屬性 `template_name` 設定 `templates/` 資料夾下使用的範本的位置。所以 `website/index.html` 指向 `web/templates/website/index.html` （如我們上面已經探討過的。
 
-The `get_context_data` is a convenient method for providing the context for the template. In the index-page's case we want the game stats (number of recent players etc). These are then made available to use in `{{ ... }}` slots in the template as described in the previous section.
+`get_context_data` 是為範本提供上下文的便捷方法。在索引頁的情況下，我們需要遊戲統計資料（最近玩家的數量等）。然後，它們可在模板中的 `{{... }}` 槽中使用，如上一節所述。
 
-### Change other website pages
+(change-other-website-pages)=
+### 更改其他網站頁面
 
-The other sub pages are handled in the same way - copy the template or static resource to the right place, or copy the view and repoint your `website/urls.py` to your copy. Just remember to reload.
+其他子頁面以相同的方式處理 - 將範本或靜態資源複製到正確的位置，或複製檢視並將 `website/urls.py` 重新指向您的副本。只要記住重新載入即可。
 
-## Adding a new web page
+(adding-a-new-web-page)=
+## 新增網頁
 
-### Using Flat Pages
+(using-flat-pages)=
+### 使用平面頁面
 
-The absolutely simplest way to add a new web page is to use the `Flat Pages` app available in the [Web Admin](./Web-Admin.md). The page will appear with the same styling as the rest of the site.
+新增網頁的最簡單方法是使用 [Web 管理](./Web-Admin.md) 中提供的 `Flat Pages` 應用程式。該頁面將以與網站其他部分相同的樣式顯示。
 
-For the `Flat pages` module to work you must first set up a _Site_ (or domain) to use. You only need to this once.
+為了使 `Flat pages` 模組正常運作，您必須先設定要使用的_站點_（或網域）。您只需要這樣做一次。
 
-- Go to the Web admin and select `Sites`. If your game is at `mygreatgame.com`, that's the domain you need to add. For local experimentation, add the domain `localhost:4001`. Note the `id` of the domain (look at the url when you click on the new domain, if it's for example `http://localhost:4001/admin/sites/site/2/change/`, then the id is `2`).
-- Now add the line `SITE_ID = <id>` to your settings file.
+- 前往 Web 管理並選擇 `Sites`。如果您的遊戲位於 `mygreatgame.com`，則這就是您需要新增的網域。對於本地實驗，請新增網域 `localhost:4001`。記下網域的`id`（點選新網域時檢視url，如果是`http://localhost:4001/admin/sites/site/2/change/`，那麼id就是`2`）。
+- 現在將行 `SITE_ID = <id>` 新增到您的設定檔中。
 
-Next you create new pages easily.
+接下來您可以輕鬆建立新頁面。
 
-- Go the `Flat Pages` web admin and choose to add a new flat page.
-- Set the url. If you want the page to appear as e.g. `localhost:4001/test/`, then
-  add `/test/` here. You need to add both leading and trailing slashes.
-- Set `Title` to the name of the page.
-- The `Content` is the HTML content of the body of the page. Go wild!
-- Finally pick the `Site` you made before, and save.
-- (in the advanced section you can make it so that you have to login to see the page etc).
+- 前往 `Flat Pages` 網路管理員並選擇新增新的平面頁面。
+- 設定網址。如果您希望頁面顯示為e.g。 `localhost:4001/test/`，那麼
+此處新增`/test/`。您需要新增前導斜線和尾隨斜線。
+- 將 `Title` 設定為頁面名稱。
+- `Content` 是頁面正文的 HTML 內容。瘋狂吧！
+- 最後選擇你之前製作的`Site`，並儲存。
+- （在進階部分，您可以設定為必須登入才能檢視頁面等）。
 
-You can now go to `localhost:4001/test/` and see your new page!
+現在您可以轉到`localhost:4001/test/`並檢視您的新頁面！
 
-### Add Custom new page
+(add-custom-new-page)=
+### 新增自訂新頁面
 
-The `Flat Pages` page doesn't allow for (much) dynamic content and customization. For this you need to add the needed components yourself.
+`Flat Pages` 頁面不允許（太多）動態內容和自訂。為此，您需要自行新增所需的元件。
 
-Let's see how to make a `/test/` page from scratch.
+讓我們看看如何從頭開始製作 `/test/` 頁面。
 
-- Add a new `test.html` file under `mygame/web/templates/website/`. Easiest is to base this off an existing file. Make sure to `{% extend base.html %}` if you want to get the same styling as the rest of your site.
-- Add a new view `testview.py` under `mygame/web/website/views/` (don't name it `test.py` or
-  Django/Evennia will think it contains unit tests). Add a view there to process your page. This is a minimal view to start from (read much more [in the Django docs](https://docs.djangoproject.com/en/4.1/topics/class-based-views/)):
+- 在 `mygame/web/templates/website/` 下新增新的 `test.html` 檔案。最簡單的方法是基於現有檔案。如果您想獲得與網站其他部分相同的樣式，請確保`{% extend base.html %}`。
+- 在 `mygame/web/website/views/` 下新增檢視 `testview.py`（不要將其命名為 `test.py` 或
+Django/Evennia 會認為它包含單元測試）。在那裡新增一個檢視來處理您的頁面。這是一個最小的開始檢視（閱讀更多內容[在 Django 檔案中](https://docs.djangoproject.com/en/4.1/topics/class-based-views/)）：
 
     ```python
     # mygame/web/website/views/testview.py
@@ -296,7 +308,7 @@ Let's see how to make a `/test/` page from scratch.
 
     ```
 
-- Finally, point to your view from the `mygame/web/website/urls.py`:
+- 最後，從`mygame/web/website/urls.py`來說你的看法：
 
     ```python
     # in mygame/web/website/urls.py
@@ -311,34 +323,35 @@ Let's see how to make a `/test/` page from scratch.
     ]
 
     ```
-- Reload the server and your new page is available. You can now continue to add
-  all sorts of advanced dynamic content through your view and template!
+- 重新載入伺服器，您的新頁面就可用了。現在您可以繼續新增
+透過您的檢視和模板提供各種高階動態內容！
 
 
-## User forms
+(user-forms)=
+## 使用者表格
 
-All the pages created so far deal with _presenting_ information to the user.
-It's also possible for the user to _input_ data on the page through _forms_. An
-example would be a page of fields and sliders you fill in to create a
-character, with a big 'Submit' button at the bottom.
+到目前為止建立的所有頁面都是向使用者呈現資訊。
+使用者也可以透過_表單_在頁面上_輸入_資料。安
+範例將是您填寫以建立一個欄位和滑桿的頁面
+字元，底部有一個大的“提交”按鈕。
 
-Firstly, this must be represented in HTML. The `<form> ... </form>` is a
-standard HTML element you need to add to your template. It also has some other
-requirements, such as `<input>` and often Javascript components as well (but
-usually Django will help with this). If you are unfamiliar with how HTML forms
-work, [read about them here](https://docs.djangoproject.com/en/4.1/topics/forms/#html-forms).
+首先，這必須以 HTML 表示。 `<form>... </form>` 是一個
+您需要新增到模板中的標準 HTML 元素。它還有一些其他的
+要求，例如 `<input>` 以及通常的 Javascript 元件（但是
+通常 Django 會幫助解決這個問題）。如果您不熟悉 HTML 的形成方式
+工作，[在這裡閱讀有關它們](https://docs.djangoproject.com/en/4.1/topics/forms/#html-forms)。
 
-The basic gist of it is that when you click to 'submit' the form, a POST HTML
-request will be sent to the server containing the data the user entered. It's
-now up to the server to make sure the data makes sense (validation) and then
-process the input somehow (like creating a new character).
+其基本要點是，當您按一下「提交」表單時，會出現 POST HTML
+請求將被傳送到包含使用者輸入的資料的伺服器。這是
+現在由伺服器來確保資料有意義（驗證），然後
+以某種方式處理輸入（例如建立一個新角色）。
 
-On the backend side, we need to specify the logic for validating and processing
-the form data. This is done by the `Form` [Django class](https://docs.djangoproject.com/en/4.1/topics/forms/#forms-in-django).
-This specifies _fields_ on itself that define how to validate that piece of data.
+在後端，我們需要指定驗證和處理的邏輯
+表單資料。這是由 `Form` [Django 類別](https://docs.djangoproject.com/en/4.1/topics/forms/#forms-in-django) 完成的。
+這指定了_fields_本身來定義如何驗證該資料。
 
-The form is then linked into the view-class by adding `form_class = MyFormClass` to
-the view (next to `template_name`).
+然後透過新增 `form_class = MyFormClass` 將表單連結到檢視類
+檢視（`template_name` 旁邊）。
 
-There are several example forms in `evennia/web/website/forms.py`. It's also a good
-idea to read [Building a form in Django](https://docs.djangoproject.com/en/4.1/topics/forms/#building-a-form-in-django) on the Django website - it covers all you need.
+`evennia/web/website/forms.py`中有幾個範例表單。也是不錯的
+建議閱讀 Django 網站上的 [Building a form in Django](https://docs.djangoproject.com/en/4.1/topics/forms/#building-a-form-in-django) - 它涵蓋了您需要的所有內容。

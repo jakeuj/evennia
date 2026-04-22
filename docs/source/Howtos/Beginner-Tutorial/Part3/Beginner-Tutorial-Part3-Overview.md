@@ -1,44 +1,46 @@
-# Part 3: How We Get There (Example Game)
+(part-3-how-we-get-there-example-game)=
+# 第 3 部分：我們如何實現這一目標（範例遊戲）
 
 ```{warning}
-The tutorial game is under development and is not yet complete, nor tested. Use the existing lessons as inspiration and to help get you going, but don't expect out-of-the-box perfection from it at this time.
+教學遊戲正在開發中，尚未完成，也未經過測試。使用現有的課程作為靈感並幫助您繼續前進，但此時不要指望從中獲得開箱即用的完美。
 ```
 
-```{sidebar} Beginner Tutorial Parts
-- [Introduction](../Beginner-Tutorial-Overview.md)
-<br>Getting set up.
-- Part 1: [What We Have](../Part1/Beginner-Tutorial-Part1-Overview.md)
-<br>A tour of Evennia and how to use the tools, including an introduction to Python.
-- Part 2: [What We Want](../Part2/Beginner-Tutorial-Part2-Overview.md)
-<br>Planning our tutorial game and what to consider when planning your own.
-- *Part 3: [How We Get There](./Beginner-Tutorial-Part3-Overview.md)*
-<br>Getting down to the meat of extending Evennia to make your game.
-- Part 4: [Using What We Created](../Part4/Beginner-Tutorial-Part4-Overview.md)
-<br>Building a tech-demo and world content to go with our code.
-- Part 5: [Showing the World](../Part5/Beginner-Tutorial-Part5-Overview.md)
-<br>Taking our new game online and letting players try it out.
+```{sidebar} 初學者教學部分
+- [簡介](../Beginner-Tutorial-Overview.md)
+<br>正在設定。
+- 第1部分：[我們擁有什麼](../Part1/Beginner-Tutorial-Part1-Overview.md)
+<br>Evennia 概覽，以及如何使用這些工具，包括 Python 簡介。
+- 第二部分：[我們想要什麼](../Part2/Beginner-Tutorial-Part2-Overview.md)
+<br>規劃我們的教學遊戲以及規劃您自己的遊戲時要考慮的事項。
+- *第 3 部分：[我們如何實現目標](./Beginner-Tutorial-Part3-Overview.md)*
+<br>開始著手擴充Evennia來製作你的遊戲。
+- 第 4 部分：[使用我們建立的內容](../Part4/Beginner-Tutorial-Part4-Overview.md)
+<br>建立一個技術演示和世界內容以配合我們的程式碼。
+- 第五部分：[向世界展示](../Part5/Beginner-Tutorial-Part5-Overview.md)
+<br>將我們的新遊戲上線並讓玩家嘗試。
 ```
 
-In part three of the Evennia Beginner tutorial we will go through the actual creation of 
-our tutorial game _EvAdventure_, based on the [Knave](https://www.drivethrurpg.com/product/250888/Knave) RPG ruleset. 
+在 Evennia 初學者教學的第三部分中，我們將實際建立
+我們的教學遊戲_EvAdventure_，基於 [Knave](https://www.drivethrurpg.com/product/250888/Knave) RPG 規則集。
 
-If you followed the previous parts of this tutorial series you will have some notions about Python and where to  find and make use of things in Evennia. We also have a good idea of the type of game we will create.
+如果您遵循了本教學系列的前幾部分，您將對 Python 以及在哪裡查詢和使用 Evennia 中的內容有一些概念。我們也很清楚我們將建立的遊戲型別。
 
-Even if this is not the game-style you are interested in, following along will give you a lot 
-of experience using Evennia and be really helpful for doing your own thing later! The EvAdventure game code is also built to easily be expanded upon. 
+即使這不是你感興趣的遊戲風格，跟著一起走也會帶給你很多
+使用 Evennia 的經驗，對以後做自己的事情非常有幫助！ EvAdventure 遊戲程式碼也被建構為易於擴充套件。
 
-Fully coded examples of all code we make in this part can be found in the
-[evennia/contrib/tutorials/evadventure](../../../api/evennia.contrib.tutorials.evadventure.md) package. There are three common ways to learn from this:  
+我們在這部分中編寫的所有程式碼的完整編碼範例可以在
+[evennia/contrib/tutorials/evadventure](../../../api/evennia.contrib.tutorials.evadventure.md) 套件。有以下三種常見的學習方法：
 
-1. Follow the tutorial lessons in sequence and use it to write your own code, referring to the ready-made code as extra help, context, or as a 'facit' to check yourself. 
-2. Read through the code in the package and refer to the tutorial lesson for each part for more information on what you see. 
-3. Some mix of the two.
+1. 按順序遵循教學課程並使用它來編寫您自己的程式碼，將現成的程式碼作為額外的幫助、上下文或作為檢查自己的「事實」。
+2. 通讀包中的程式碼並參閱每個部分的教學課程，以獲取有關您所看到內容的更多資訊。
+3. 兩者的一些混合。
 
-Which approach you choose is individual - we all learn in different ways. 
+您選擇哪種方法是因人而異的——我們都以不同的方式學習。
 
-Either way, this is a big part. You'll be seeing a lot of code and there are plenty of lessons to go through. We are making a whole game from scratch after all. Take your time!
+無論哪種方式，這都是一個重要的部分。您將看到大量程式碼並且有大量課程需要學習。畢竟我們是從頭開始製作整個遊戲。慢慢來！
 
-## Lessons 
+(lessons)=
+## 教訓
 
 
 ```{toctree} 

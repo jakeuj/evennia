@@ -1,6 +1,7 @@
-# Give objects weight
+(give-objects-weight)=
+# 賦予物體重量
 
-All in-game objets you can touch usually has some weight. What weight does varies from game to game. Commonly it limits how much you can carry. A heavy stone may also hurt you more than a ballon, if it falls on you. If you want to get fancy, a pressure plate may only trigger if the one stepping on it is heavy enough. 
+您可以觸控的所有遊戲內物體通常都有一定的重量。重量的作用因遊戲而異。通常它會限制您可以攜帶的數量。如果一塊重石頭落在您身上，對您的傷害也可能比氣球更大。如果你想玩點花俏的，壓力板只有踩在壓力板上的人夠重時才可能觸發。
 
 ```{code-block} python 
 :linenos:
@@ -24,16 +25,16 @@ class Object(ObjectParent, DefaultObject):
     # ...
 ```
 
-```{sidebar} Why not mass? 
-Yes, we know weight varies with gravity. 'Mass' is more scientifically correct. But 'mass' is less commonly used in RPGs, so we stick to 'weight' here. Just know if if your sci-fi characters can vacation on the Moon (1/6 gravity of Earth) you should consider using `mass` everywhere and calculate the current weight on the fly.
+```{sidebar} 為什麼不是大眾？
+是的，我們知道重量隨重力而改變。 「彌撒」在科學上更正確。但「質量」在 RPGs 中不太常用，所以我們在這裡堅持使用「重量」。只要知道您的科幻角色是否可以在月球（地球重力的 1/6）上度假，您應該考慮在任何地方使用 `mass` 並即時計算當前重量。
 ```
 
-- **Line 6**: We use the `ObjectParent` mixin. Since this mixin is used for `Characters`, `Exits` and `Rooms` as well as for `Object`, it means all of those will automatically _also_ have weight!
-- **Line 8**: We use an [AttributeProperty](../Components/Attributes.md#using-attributeproperty) to set up the 'default' weight of 1 (whatever that is). Setting `autocreate=False` means no actual `Attribute` will be created until the weight is actually changed from the default of 1. See the `AttributeProperty` documentation for caveats with this. 
-- **Line 10 and 11**: Using the `@property` decorator on `total_weight` means that we will be able to call `obj.total_weight` instead of `obj.total_weight()` later. 
-- **Line 12**: We sum up all weights from everything "in" this object, by looping over `self.contents`. Since _all_ objects will have weight now, this should always work! 
+- **第 6 行**：我們使用 `ObjectParent` mixin。由於此 mixin 用於 `Characters`、`Exits` 和 `Rooms` 以及 `Object`，這意味著所有這些都將自動_也_具有權重！
+- **第 8 行**：我們使用 [AttributeProperty](../Components/Attributes.md#using-attributeproperty) 設定「預設」權重 1（無論是什麼）。設定 `autocreate=False` 意味著在權重從預設值 1 實際變更之前不會建立實際的 `Attribute`。請參閱 `AttributeProperty` 檔案以瞭解與此相關的注意事項。
+- **第 10 行和第 11 行**：在 `total_weight` 上使用 `@property` 裝飾器意味著我們稍後可以呼叫 `obj.total_weight` 而不是 `obj.total_weight()`。
+- **第 12 行**：我們透過迴圈 `self.contents` 來總結該物件「中」的所有內容的所有權重。由於現在_所有_物體都有重量，所以這應該總是有效！
 
-Let's check out the weight of some trusty boxes
+讓我們看看一些值得信賴的盒子的重量
 ```
 > create/drop box1
 > py self.search("box1").weight
@@ -42,7 +43,7 @@ Let's check out the weight of some trusty boxes
 1 
 ``` 
 
-Let's  put another box into the first one.
+讓我們將另一個盒子放入第一個盒子中。
 
 ```
 > create/drop box2 
@@ -54,9 +55,10 @@ Let's  put another box into the first one.
 ```
 
 
-## Limit inventory by weight carried
+(limit-inventory-by-weight-carried)=
+## 按攜帶重量限制庫存
 
-To limit how much you can carry, you first need to know your own strength
+要限制自己可以攜帶的東西，首先要了解自己的力量
 
 ```python
 # in mygame/typeclasses/characters.py 
@@ -75,14 +77,14 @@ class Character(ObjectParent, DefaultCharacter):
 
 ```
 
-Here we make sure to add another `AttributeProperty` telling us how much to carry. In a real game, this may be based on how strong the Character is. When we consider how much weight we already carry, we should not include _our own_ weight, so we subtract that. 
+在這裡，我們確保新增另一個 `AttributeProperty` 告訴我們要攜帶多少。在真實遊戲中，這可能取決於角色的強度。當我們考慮我們已經攜帶了多少重量時，我們不應該包括我們自己的重量，所以我們減去它。
 
-To honor this limit, we'll need to override the default `get` command. 
+為了遵守此限制，我們需要覆蓋預設的 `get` 指令。
 
 
-```{sidebar} Overriding default commands
+```{sidebar} 覆蓋預設指令
 
-In this example, we implement the beginning of the `CmdGet` and then call the full `CmdGet()` at the end. This is not very efficient, because the parent `CmdGet` will again have to do the `caller.search()` again. To be more efficient, you will likely want to copy the entirety of the `CmdGet` code into your own version and modify it.
+在此範例中，我們實現了 `CmdGet` 的開頭，然後在末尾呼叫完整的 `CmdGet()`。這不是很有效，因為父級 `CmdGet` 必須再次執行 `caller.search()`。為了提高效率，您可能需要將整個 `CmdGet` 程式碼複製到您自己的版本中並進行修改。
 ```
 
 ```python 
@@ -110,4 +112,4 @@ class WeightAwareCmdGet(default_cmds.CmdGet):
         super().func()
 ```
 
-Here we add an extra check for the weight of the thing we are trying to pick up, then we call the normal `CmdGet` with `super().func()`. 
+在這裡，我們對要拾取的物體的重量新增了額外的檢查，然後我們將正常的 `CmdGet` 稱為 `super().func()`。

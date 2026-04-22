@@ -1,10 +1,11 @@
-# Map Builder
+(map-builder)=
+# 地圖產生器
 
-Contribution by Cloud_Keeper 2016
+Cloud_Keeper 2016 的貢獻
 
-Build a game map from the drawing of a 2D ASCII map.
+根據 2D ASCII 地圖的繪製建立遊戲地圖。
 
-This is a command which takes two inputs:
+這是一個需要兩個輸入的指令：
 
     ≈≈≈≈≈
     ≈♣n♣≈   MAP_LEGEND = {("♣", "♠"): build_forest,
@@ -12,21 +13,21 @@ This is a command which takes two inputs:
     ≈♠n♠≈                 ("▲"): build_temple}
     ≈≈≈≈≈
 
-A string of ASCII characters representing a map and a dictionary of functions
-containing build instructions. The characters of the map are iterated over and
-compared to a list of trigger characters. When a match is found the
-corresponding function is executed generating the rooms, exits and objects as
-defined by the users build instructions. If a character is not a match to
-a provided trigger character (including spaces) it is simply skipped and the
-process continues.
+由 ASCII 個字元組成的字串，表示函式的對應和字典
+包含建置指令。地圖的字元被迭代並
+與觸發字元列表相比。當找到匹配項時
+執行對應的函式，產生房間、出口和物件：
+由使用者建構指令定義。如果一個字元不匹配
+提供的觸發字元（包括空格）它會被簡單地跳過並且
+過程仍在繼續。
 
-For instance, the above map represents a temple (▲) amongst mountains (n,∩)
-in a forest (♣,♠) on an island surrounded by water (≈). Each character on the
-first line is iterated over but as there is no match with our `MAP_LEGEND`, it
-is skipped. On the second line it finds "♣" which is a match and so the
-`build_forest` function is called. Next the `build_mountains` function is
-called and so on until the map is completed. Building instructions are passed
-the following arguments:
+例如，上面的地圖代表了山脈 (n,∩) 中的一座寺廟 (▲)
+位於四面環水 (≈) 的島嶼上的森林 (♣,♠) 中。上的每個字元
+第一行被迭代，但由於與我們的 `MAP_LEGEND` 不匹配，所以它
+被跳過。在第二行，它找到“♣”，這是一個匹配項，因此
+`build_forest` 函式被呼叫。接下來 `build_mountains` 函式是
+呼叫等等，直到地圖完成。建築指令已透過
+以下論點：
 
     x         - The rooms position on the maps x axis
     y         - The rooms position on the maps y axis
@@ -36,28 +37,29 @@ the following arguments:
                 functions where tuple coordinates are the keys (x, y).
                 ie room_dict[(2, 2)] will return the temple room above.
 
-Building functions should return the room they create. By default these rooms
-are used to create exits between valid adjacent rooms to the north, south,
-east and west directions. This behaviour can turned off with the use of switch
-arguments. In addition to turning off automatic exit generation the switches
-allow the map to be iterated over a number of times. This is important for
-something like custom exit building. Exits require a reference to both the
-exits location and the exits destination. During the first iteration it is
-possible that an exit is created pointing towards a destination that
-has not yet been created resulting in error. By iterating over the map twice
-the rooms can be created on the first iteration and room reliant code can be
-be used on the second iteration. The iteration number and a dictionary of
-references to rooms previously created is passed to the build commands.
+建築功能應該返回它們建立的房間。預設這些房間
+用於在北、南的有效相鄰房間之間建立出口，
+東、西兩個方向。可以使用開關關閉此行為
+論據。除了關閉自動退出產生之外，開關
+允許地圖迭代多次。這對於
+像是自訂出口建築之類的東西。退出需要引用兩個
+退出位置和退出目的地。在第一次迭代期間是
+可能會建立一個指向目的地的出口
+尚未建立，導致錯誤。透過迭代地圖兩次
+房間可以在第一次迭代時建立，並且房間相關的程式碼可以
+在第二次迭代時使用。迭代次數和字典
+對先前建立的房間的引用將傳遞給建置指令。
 
-You then call the command in-game using the path to the MAP and MAP_LEGEND vars
-The path you provide is relative to the evennia or mygame folder.
+然後，您可以使用 MAP 和 MAP_LEGEND 變數的路徑在遊戲中呼叫該指令
+您提供的路徑是相對於 evennia 或 mygame 資料夾的。
 
-See also the [separate tutorial in the docs](./Contrib-Mapbuilder-Tutorial.md).
+另請參閱[檔案中的單獨教學](./Contrib-Mapbuilder-Tutorial.md)。
 
-## Installation
+(installation)=
+## 安裝
 
-Use by importing and including the command in your default_cmdsets module.
-For example:
+透過將指令匯入並包含在您的 default_cmdsets 模組中來使用。
+例如：
 
 ```python
     # mygame/commands/default_cmdsets.py
@@ -70,25 +72,28 @@ For example:
 ```
 
 
-## Usage:
+(usage)=
+## 用法：
 
     mapbuilder[/switch] <path.to.file.MAPNAME> <path.to.file.MAP_LEGEND>
 
     one - execute build instructions once without automatic exit creation.
     two - execute build instructions twice without automatic exit creation.
 
-## Examples
+(examples)=
+## 範例
 
     mapbuilder world.gamemap.MAP world.maplegend.MAP_LEGEND
     mapbuilder evennia.contrib.grid.mapbuilder.EXAMPLE1_MAP EXAMPLE1_LEGEND
     mapbuilder/two evennia.contrib.grid.mapbuilder.EXAMPLE2_MAP EXAMPLE2_LEGEND
             (Legend path defaults to map path)
 
-Below are two examples showcasing the use of automatic exit generation and
-custom exit generation. Whilst located, and can be used, from this module for
-convenience The below example code should be in `mymap.py` in mygame/world.
+以下是兩個範例，展示了自動退出產生和
+自訂退出生成。雖然可以從該模組找到並使用
+方便 下面的範例程式碼應該位於 mygame/world 的 `mymap.py` 中。
 
-### Example One
+(example-one)=
+### 例項一
 
 ```python
 
@@ -192,7 +197,8 @@ EXAMPLE1_LEGEND = {
 }
 ```
 
-### Example Two
+(example-two)=
+### 範例二
 
 ```python
 # @mapbuilder/two evennia.contrib.grid.mapbuilder.EXAMPLE2_MAP EXAMPLE2_LEGEND
@@ -287,5 +293,5 @@ Contrib-Mapbuilder-Tutorial
 
 ----
 
-<small>This document page is generated from `evennia/contrib/grid/mapbuilder/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\grid\mapbuilder\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

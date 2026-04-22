@@ -1,22 +1,24 @@
-# Script example
+(script-example)=
+# Script 範例
 
-Contribution by Griatch, 2012
+Griatch 的貢獻，2012 年
 
-Example script for testing. This adds a simple timer that has your
-character make small verbal observations at irregular intervals.
+用於測試的範例 script。這新增了一個簡單的計時器，其中包含您的
+人物會不定期地進行一些小小的口頭觀察。
 
-To test, use (in game)
+要測試，請使用（在遊戲中）
 
     > script me = contrib.tutorials.bodyfunctions.BodyFunctions
 
-## Notes
+(notes)=
+## 筆記
 
-Use `scripts me` to see the script running on you. Note that even though
-the timer ticks down to 0, you will _not_ see an echo every tick (it's
-random if an echo is given on a tick or not).
+使用 `scripts me` 檢視您身上執行的 script。請注意，即使
+計時器滴答到 0，你不會在每次滴答時看到迴聲（這是
+是否在刻度上給出迴聲是隨機的）。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/tutorials/bodyfunctions/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\tutorials\bodyfunctions\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

@@ -1,25 +1,27 @@
-# Part 2: What We Want
+(part-2-what-we-want)=
+# 第 2 部分：我們想要什麼
 
-```{sidebar} Beginner Tutorial Parts
-- [Introduction](../Beginner-Tutorial-Overview.md)
-<br>Getting set up.
-- Part 1: [What We Have](../Part1/Beginner-Tutorial-Part1-Overview.md)
-<br>A tour of Evennia and how to use the tools, including an introduction to Python.
-- *Part 2: [What We Want](./Beginner-Tutorial-Part2-Overview.md)*
-<br>Planning our tutorial game and what to consider when planning your own.
-- Part 3: [How We Get There](../Part3/Beginner-Tutorial-Part3-Overview.md)
-<br>Getting down to the meat of extending Evennia to make your game.
-- Part 4: [Using What We Created](../Part4/Beginner-Tutorial-Part4-Overview.md)
-<br>Building a tech-demo and world content to go with our code.
-- Part 5: [Showing the World](../Part5/Beginner-Tutorial-Part5-Overview.md)
-<br>Taking our new game online and letting players try it out.
+```{sidebar} 初學者教學部分
+- [簡介](../Beginner-Tutorial-Overview.md)
+<br>正在設定。
+- 第1部分：[我們擁有什麼](../Part1/Beginner-Tutorial-Part1-Overview.md)
+<br>Evennia 概覽，以及如何使用這些工具，包括 Python 簡介。
+- *第2部分：[我們想要什麼](./Beginner-Tutorial-Part2-Overview.md)*
+<br>規劃我們的教學遊戲以及規劃您自己的遊戲時要考慮的事項。
+- 第 3 部分：[我們如何實現目標](../Part3/Beginner-Tutorial-Part3-Overview.md)
+<br>開始著手擴充Evennia來製作你的遊戲。
+- 第 4 部分：[使用我們建立的內容](../Part4/Beginner-Tutorial-Part4-Overview.md)
+<br>建立一個技術演示和世界內容以配合我們的程式碼。
+- 第五部分：[向世界展示](../Part5/Beginner-Tutorial-Part5-Overview.md)
+<br>將我們的新遊戲上線並讓玩家嘗試。
 ```
 
-In Part Two of the Evennia Beginner Tutorial, we'll take a step back to plan the type of tutorial game that you will create. This part is more 'theoretical' in that we won't do any hands-on programming. 
+在 Evennia 初學者教學的第二部分中，我們將退後一步來規劃您將建立的教學遊戲的型別。這部分更加“理論化”，因為我們不會進行任何實際程式設計。
 
-In the process, we'll address the common questions of "where to start" and "what to think about" when creating a multiplayer online text game.
+在此過程中，我們將解決建立多人線上文字遊戲時「從哪裡開始」和「考慮什麼」的常見問題。
 
-## Lessons
+(lessons)=
+## 教訓
 
 ```{toctree}
 :numbered:

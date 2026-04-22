@@ -1,29 +1,31 @@
-# Searching for things
+(searching-for-things)=
+# 尋找東西
 
-We have gone through how to create the various entities in Evennia. But creating something is of little use if we cannot find and use it afterwards.
+我們已經瞭解如何在 Evennia 中建立各種實體。但是，如果我們事後無法找到並使用它，那麼創造出來的東西就沒有什麼用處。
 
-```{sidebar} Python code vs using the py command
-Most of these tools are intended to be used in Python code, as you create your game. We 
-give examples of how to test things out from the `py` command, but that's just for experimenting and normally not how you code your game. 
+```{sidebar} Python 程式碼與使用 py 指令
+大多數這些工具旨在在您建立遊戲時在 Python 程式碼中使用。我們
+給出如何透過 `py` 指令進行測試的範例，但這只是為了進行實驗，通常不是您編寫遊戲的方式。
 ```
 
-To test out the examples in this tutorial, let's create a few objects we can search for in the current location. 
+為了測試本教學中的範例，讓我們建立一些可以在目前位置搜尋的物件。
 
     > create/drop Rose 
     
-## Searching using Object.search
+(searching-using-objectsearch)=
+## 使用 Object.search 進行搜尋
 
-On the `DefaultObject` is a `.search` method which we have already tried out when we made Commands. For this to be used you must already have an object available, and if you are using `py` you can use yourself: 
+`DefaultObject`上是`.search`的方法，我們在製作指令時已經嘗試過了。要使用此功能，您必須已經有一個可用的物件，如果您使用 `py` 您可以自己使用：
 
     py self.search("rose")
     Rose
 
-- This searches by `key` or `alias` of the object. Strings are always case-insensitive, so searching for `"rose"`, `"Rose"` or `"rOsE"` give the same results. 
-- By default it will always search for objects among those in `obj.location.contents` and `obj.contents` (that is, things in obj's inventory or in the same room).
-- It will always return exactly one match. If it found zero or more than one match, the return is `None`. This is different from `evennia.search` (see below), which always returns a list.
-- On a no-match or multimatch, `.search` will automatically send an error message to `obj`. So you don't have to worry about reporting messages if the result is `None`.
+- 這將按物件的 `key` 或 `alias` 進行搜尋。字串始終不區分大小寫，因此搜尋 `"rose"`、`"Rose"` 或 `"rOsE"` 會得到相同的結果。
+- 預設情況下，它總是在 `obj.location.contents` 和 `obj.contents` 中搜尋物件（即 obj 的庫存中或同一房間中的東西）。
+- 它總是返回恰好一場比賽。如果找到零個或多個符合項，則傳回 `None`。這與 `evennia.search`（見下文）不同，後者總是會傳回一個清單。
+- 如果出現不匹配或多重匹配，`.search` 將自動向 `obj` 傳送錯誤訊息。因此，如果結果是`None`，您不必擔心報告訊息。
 
-In other words, this method handles error messaging for you. A very common way to use it is in commands. You can put your command anywhere, but let's try the pre-filled-in `mygame/commands/command.py`.
+換句話說，此方法為您處理錯誤訊息。一種非常常見的使用方式是在指令中。您可以將指令放在任何地方，但讓我們嘗試預先填寫的 `mygame/commands/command.py`。
 
 ```python
 # in for example mygame/commands/command.py
@@ -52,7 +54,7 @@ class CmdQuickFind(Command):
         self.caller.msg(f"Found match for {query}: {result}")
 ```
 
-If you want to test this command out, add it to the default cmdset (see [the Command tutorial](./Beginner-Tutorial-Adding-Commands.md) for more details) and then reload the server with `reload`: 
+如果您想測試此指令，請將其新增到預設的cmdset（有關更多詳細資訊，請參閱[指令教學](./Beginner-Tutorial-Adding-Commands.md)），然後使用`reload`重新載入伺服器：
 
 ```python
 # in mygame/commands/default_cmdsets.py
@@ -70,56 +72,57 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
 ```
 
 
-Remember, `self.caller` is the one calling the command. This is usually a Character, which
-inherits from `DefaultObject`. So it has `.search()` available on it.
+請記住，`self.caller` 是呼叫該指令的人。這通常是一個角色，
+繼承自 `DefaultObject`。所以它有 `.search()` 可用。
 
-This simple little Command takes its arguments and searches for a match. If it can't find it, `result` will be `None`. The error has already been reported to `self.caller` so we just abort with `return`.
+這個簡單的小指令取得其引數並蒐索匹配項。如果找不到，`result` 將是 `None`。該錯誤已報告給 `self.caller`，因此我們僅使用 `return` 中止。
 
-With the `global_search` flag, you can use `.search` to find anything, not just stuff in the same room:
+使用 `global_search` 標誌，您可以使用 `.search` 來尋找任何內容，而不僅僅是同一房間中的東西：
 
 ```python
 volcano = self.caller.search("Vesuvio", global_search=True)
 ```
 
-You can limit your matches to particular typeclasses: 
+您可以將配對限制為特定的typeclasses：
 
 ```python
 water_glass = self.caller.search("glass", typeclass="typeclasses.objects.WaterGlass")
 ```
 
-If you only want to search for a specific list of things, you can do so too:
+如果您只想搜尋特定的內容列表，您也可以這樣做：
 
 ```python
 stone = self.caller.search("MyStone", candidates=[obj1, obj2, obj3, obj4])
 ```
 
-This will only return a match if "MyStone"  is in the room (or in your inventory) _and_ is one of the four provided candidate objects. This is quite powerful, here's how you'd find something only in your inventory:
+只有當“MyStone”位於房間（或您的庫存中）並且_是提供的四個候選物件之一時，這才會返回匹配項。這非常強大，以下是您如何僅在庫存中找到某些東西的方法：
 
 ```python
 potion = self.caller.search("Healing potion", candidates=self.caller.contents)
 ```
 
-You can also turn off the automatic error handling:
+您也可以關閉自動錯誤處理：
 
 ```python
 swords = self.caller.search("Sword", quiet=True)  # returns a list!
 ```
 
-With `quiet=True` the user will not be notified on zero or multi-match errors. Instead you are expected to handle this yourself. Furthermore, what is returned is now a list of zero, one or more matches!
+使用`quiet=True`，使用者將不會收到零個或多匹配錯誤的通知。相反，您應該自己處理這個問題。此外，現在傳回的是零個、一個或多個符合專案的清單！
     
-## Main search functions
+(main-search-functions)=
+## 主要搜尋功能
 
-The base search tools of Evennia are the `evennia.search_*` functions, such as `evennia.search_object`. These are normally used in your code, but you can also try them out in-game using `py`:
+Evennia的基本搜尋工具是`evennia.search_*`功能，例如`evennia.search_object`。這些通常在您的程式碼中使用，但您也可以使用 `py` 在遊戲中嘗試它們：
 
      > py evennia.search_object("rose")
      <Queryset [Rose]>
 
-```{sidebar} Querysets
+```{sidebar} 查詢集
 
-What is returned from the main search functions is actually a `queryset`. They can be treated like lists except that they can't modified in-place. We'll discuss querysets in the [next lesson](./Beginner-Tutorial-Django-queries.md)
+主搜尋函式傳回的實際上是`queryset`。它們可以像列表一樣對待，只是它們不能就地修改。我們將在[下一課]中討論查詢集(./Beginner-Tutorial-Django-queries.md)
 
 ```
-This searches for objects based on `key` or `alias`.  The `.search` method we talked about in the previous section in fact wraps `evennia.search_object` and handles its output in various ways. Here's the same example in Python code, for example as part of a command or coded system: 
+這將根據 `key` 或 `alias` 搜尋物件。  我們在上一節中討論的 `.search` 方法實際上包裝了 `evennia.search_object` 並以各種方式處理其輸出。這是 Python 程式碼中的相同範例，例如作為指令或編碼系統的一部分：
 
 ```python
 import evennia 
@@ -128,16 +131,16 @@ roses = evennia.search_object("rose")
 accts = evennia.search_account("YourName")
 ```
 
-Above we find first the rose and then an Account. You can try both using `py`: 
+在上面我們先找到玫瑰，然後找到一個帳戶。您可以使用 `py` 嘗試兩者：
 
     > py evennia.search_object("rose")[0]
     Rose
     > py evennia.search_account("YourName")[0]
     <Player: YourName>
 
-The `search_object/account` returns all matches. We use `[0]` to only get the first match of the queryset, which in this case gives us the rose and your Account respectively. Note that if you don't find any matches, using `[0]` like this leads to an error, so it's mostly useful for debugging.
+`search_object/account` 傳回所有符合專案。我們使用 `[0]` 僅取得查詢集的第一個符合項，在本例中分別為我們提供了玫瑰和您的帳戶。請注意，如果找不到任何匹配項，像這樣使用 `[0]` 會導致錯誤，因此它對於偵錯最有用。
 
-In other situations, having zero or more than one match is a sign of a problem and you need to handle this case yourself. This is too detailed for testing out just with `py`, but good to know if you want to make your own search methods:
+在其他情況下，零個或多個匹配項表示存在問題，您需要自行處理這種情況。對於僅使用 `py` 進行測試來說這太詳細了，但是如果您想建立自己的搜尋方法，那麼瞭解一下是很不錯的：
 
 ```python
     the_one_ring = evennia.search_object("The one Ring")
@@ -150,13 +153,14 @@ In other situations, having zero or more than one match is a sign of a problem a
         the_one_ring = the_one_ring[0]
 ```
 
-There are equivalent search functions for all the main resources. You can find a listing of them [in the Search functions section](../../../Evennia-API.md) of the API front page.
+所有主要資源都有等效的搜尋功能。您可以在[API首頁的搜尋功能部分](../../../Evennia-API.md)找到它們的清單。
 
-## Understanding object relationships
+(understanding-object-relationships)=
+## 理解物件關係
 
-It's important to understand how objects relate to one another when searching. 
+搜尋時瞭解物件之間的相互關係非常重要。
 
-Let's consider a `chest` with a `coin` inside it. The chest stands in a `dungeon` room. In the dungeon is also a `door` (an exit leading outside).
+讓我們考慮一個 `chest` ，裡面有一個 `coin` 。箱子位於`dungeon`的房間。地牢裡還有一個`door`（通往外面的出口）。
 
 ```
 ┌───────────────────────┐
@@ -172,111 +176,116 @@ Let's consider a `chest` with a `coin` inside it. The chest stands in a `dungeon
 └───────────────────────┘
 ```
 
-If you have access to any in-game Object, you can find related objects by use if its `.location` and `.contents` properties.
+如果您有權存取任何遊戲內物件，則可以透過使用其 `.location` 和 `.contents` 屬性來尋找相關物件。
 
-- `coin.location` is `chest`.
-- `chest.location` is `dungeon`.
-- `door.location` is `dungeon`.
-- `room.location` is `None` since it's not inside something else.
+- `coin.location` 是 `chest`。
+- `chest.location` 是 `dungeon`。
+- `door.location` 是 `dungeon`。
+- `room.location` 是 `None` 因為它不在其他東西裡面。
 
-One can use this to find what is inside what. For example, `coin.location.location` is the `dungeon`. 
+人們可以用它來找出裡面有什麼。例如，`coin.location.location` 就是 `dungeon`。
 
-- `room.contents` is `[chest, door]`
-- `chest.contents` is `[coin]`
-- `coin.contents` is `[]`, the empty list since there's nothing 'inside' the coin.
-- `door.contents` is `[]` too.
+- `room.contents` 是 `[chest, door]`
+- `chest.contents` 是 `[coin]`
+- `coin.contents` 是 `[]`，空列表，因為硬幣「內部」沒有任何內容。
+- `door.contents` 也是`[]`。
 
-A convenient helper is `.contents_get` - this allows to restrict what is returned:
+一個方便的助手是 `.contents_get` - 這允許限制返回的內容：
 
-- `room.contents_get(exclude=chest)` - this returns everything in the room except the chest (maybe it's hidden?)
+- `room.contents_get(exclude=chest)` - 這將返回房間中除箱子之外的所有東西（也許它是隱藏的？）
 
-There is a special property for finding exits:
+有一個特殊的屬性用來尋找出口：
 
-- `room.exits` is `[door]`
-- `coin.exits` is `[]` since it has no exits (same for all the other objects)
+- `room.exits` 是 `[door]`
+- `coin.exits` 是 `[]`，因為它沒有出口（所有其他物件相同）
 
-There is a property `.destination` which is only used by exits:
+有一個屬性 `.destination` 僅由出口使用：
 
-- `door.destination` is `outside` (or wherever the door leads)
-- `room.destination` is `None` (same for all the other non-exit objects)
+- `door.destination`是`outside`（或門通往的任何地方）
+- `room.destination` 是 `None`（對於所有其他非退出物件相同）
 
-## What can be searched for
+(what-can-be-searched-for)=
+## 可以搜尋什麼
 
-These are the main database entities one can search for:
+這些是人們可以搜尋的主要資料庫實體：
 
-- [Objects](../../../Components/Objects.md)
-- [Accounts](../../../Components/Accounts.md)
+- [物件](../../../Components/Objects.md)
+- [帳戶](../../../Components/Accounts.md)
 - [Scripts](../../../Components/Scripts.md),
-- [Channels](../../../Components/Channels.md) 
-- [Messages](../../../Components/Msg.md)   (used by `page` command by default)
-- [Help Entries](../../../Components/Help-System.md) (help entries created manually)
+- [頻道](../../../Components/Channels.md)
+- [訊息](../../../Components/Msg.md)（預設由 `page` 指令使用）
+- [幫助條目](../../../Components/Help-System.md)（手動建立的幫助條目）
 
-Most of the time you'll likely spend your time searching for Objects and the occasional Accounts.
+大多數時候，您可能會花時間搜尋物件和偶爾的帳戶。
 
-Most search methods are available directly from `evennia`. But there are also a lot of useful search helpers found via `evennia.search`.
+大多數搜尋方法可直接從 `evennia` 取得。但也可以透過 `evennia.search` 找到很多有用的搜尋助手。
 
-So to find an entity, what can be searched for?
+那麼要找到一個實體，可以搜尋什麼？
 
-### Search by key
+(search-by-key)=
+### 按鍵搜尋
 
-The `key` is the name of the entity. Searching for this is always case-insensitive.
+`key` 是實體的名稱。搜尋此內容始終不區分大小寫。
 
-### Search by aliases
+(search-by-aliases)=
+### 按別名搜尋
 
-Objects and Accounts can have any number of aliases. When searching for `key` these will searched too, you can't easily search only for aliases. Let's add an alias to our rose with the default `alias` command:
+物件和帳戶可以有任意數量的別名。當搜尋 `key` 時，這些也會被搜尋，您不能輕鬆地只搜尋別名。讓我們使用預設的`alias`指令為rose新增一個別名：
 
     > alias rose = flower
 
-Alternatively you can achieve the same thing manually (this is what the `alias` command does for you automatically):
+或者，您可以手動實現相同的操作（這是 `alias` 指令自動為您執行的操作）：
 
     > py self.search("rose").aliases.add("flower")
 
-If the above example `rose` has a `key` `"Rose"`, it can now also be found by searching for its alias `flower`.
+如果上面的範例 `rose` 有 `key` `"Rose"`，現在也可以透過搜尋其別名 `flower` 找到它。
 
     > py self.search("flower")
     Rose 
 
-> All default commands uses the same search functionality, so you can now do `look flower` to look at the rose as well.
+> 所有預設指令都使用相同的搜尋功能，因此您現在也可以執行 `look flower` 來檢視玫瑰。
 
-### Search by location
+(search-by-location)=
+### 按地點搜尋
 
-Only Objects (things inheriting from `evennia.DefaultObject`) has a `.location` property. 
+只有物件（從 `evennia.DefaultObject` 繼承的事物）具有 `.location` 屬性。
 
-The `Object.search` method will automatically limit its search by the object's location, so assuming you are in the same room as the rose, this will work:
+`Object.search` 方法將自動根據物件的位置限制其搜尋，因此假設您與玫瑰在同一個房間中，這將起作用：
 
     > py self.search("rose")
     Rose
 
-Let's make another location and move to it - you will no longer find the rose:
+讓我們建立另一個位置並移動到它 - 你將不再找到玫瑰：
 
     > tunnel n = kitchen
     north 
     > py self.search("rose")
     Could not find "rose"
 
-However, using `search_object` will find the rose wherever it's located: 
+但是，使用 `search_object` 將會找到玫瑰，無論它位於何處：
 
      > py evennia.search_object("rose") 
      <QuerySet [Rose]> 
 
-The `evennia.search_object` method doesn't have a `location` argument. What you do instead is to limit the search by setting its `candidates` keyword to the `.contents` of the current location. This is the same as a location search, since it will only accept matches among those in the room. In this example we'll (correctly) find the rose is not in the room.
+`evennia.search_object` 方法沒有 `location` 引數。相反，您所做的是將其 `candidates` 關鍵字設為當前位置的 `.contents` 來限制搜尋。這與位置搜尋相同，因為它只接受房間內的匹配項。在這個例子中，我們將（正確地）發現玫瑰不在房間裡。
 
     > py evennia.search_object("rose", candidate=here.contents)
     <QuerySet []>
 
-In general, the `Object.search` is a shortcut for doing the very common searches of things in the same location, whereas the `search_object` finds objects anywhere.
+一般來說，`Object.search` 是在同一位置進行非常常見的搜尋的快捷方式，而 `search_object` 可以在任何地方找到物件。
 
-### Search by Tags
+(search-by-tags)=
+### 按Tags搜尋
 
-Think of a [Tag](../../../Components/Tags.md) as the label the airport puts on your luggage when flying. Everyone going on the same plane gets a tag, grouping them together so the airport can know what should go to which plane. Entities in Evennia can be grouped in the same way. Any number of tags can be attached to each object.
+將 [Tag](../../../Components/Tags.md) 視為機場在飛行時貼在您行李上的標籤。乘坐同一架飛機的每個人都會得到 tag，將它們分組在一起，以便機場可以知道什麼應該去哪架飛機。 Evennia中的實體可以用同樣的方式分組。每個物件可以附加任意數量的 tags。
 
-Go back to the location of your `rose` and let's create a few more plants:
+返回 `rose` 的位置，讓我們再建立一些植物：
 
     > create/drop Daffodil
     > create/drop Tulip
     > create/drop Cactus
 
-Then let's add the "thorny" and "flowers" tags as ways to group these based on if they are flowers and/or have thorns: 
+然後讓我們新增“有刺”和“花朵”tags 作為根據它們是否是花朵和/或有刺進行分組的方法：
 
     py self.search("rose").tags.add("flowers")
 	py self.search("rose").tags.add("thorny")
@@ -285,96 +294,100 @@ Then let's add the "thorny" and "flowers" tags as ways to group these based on i
     py self.search("cactus").tags.add("flowers")
     py self.search("cactus").tags.add("thorny")	
 
-You can now find all flowers using the `search_tag` function:
+現在您可以使用 `search_tag` 函式來尋找所有花：
 
     py evennia.search_tag("flowers")
     <QuerySet [Rose, Daffodil, Tulip, Cactus]>
     py evennia.search_tag("thorny")
     <QuerySet [Rose, Cactus]>
 
-Tags can also have categories. By default this category is `None` , which is considered a category of its own.  Here are some examples of using categories in plain Python code (you can also try this out with `py` if you want to create the objects first): 
+Tags也可以有類別。預設情況下，此類別是 `None` ，它被視為自己的類別。  以下是在純 Python 程式碼中使用類別的一些範例（如果您想先建立物件，也可以使用 `py` 進行嘗試）：
 
     silmarillion.tags.add("fantasy", category="books")
     ice_and_fire.tags.add("fantasy", category="books")
     mona_lisa_overdrive.tags.add("cyberpunk", category="books")
 
-Note that if you specify the tag  with a category, you _must_ also include its category when searching, otherwise the tag-category of `None` will be searched. 
+請注意，如果您指定 tag 為類別，則在搜尋時_必須_還包括其類別，否則將搜尋 `None` 的 tag-類別。
 
     all_fantasy_books = evennia.search_tag("fantasy")  # no matches!
     all_fantasy_books = evennia.search_tag("fantasy", category="books")
 
-Only the second line above returns the two fantasy books. 
+只有上面的第二行返回兩本幻想書。
 
     all_books = evennia.search_tag(category="books")
 
-This gets all three books.
+這得到了所有三本書。
 
-### Search by Attribute
+(search-by-attribute)=
+### 按Attribute搜尋
 
-We can also search by the [Attributes](../../../Components/Attributes.md) associated with entities.
+我們也可以透過與實體關聯的[屬性](../../../Components/Attributes.md)來搜尋。
 
-For example, let's say our plants have a 'growth state' that updates as it grows: 
+例如，假設我們的植物有一個“生長狀態”，隨著它的生長而更新：
 
     > py self.search("rose").db.growth_state = "blooming"
     > py self.search("daffodil").db.growth_state = "withering"
 
-Now we can find the things that have a given growth state:
+現在我們可以找到具有給定生長狀態的事物：
 
     > py evennia.search_object("withering", attribute_name="growth_state")
     <QuerySet [Rose]> 
 
-> Searching by Attribute can be very practical. But if you want to group entities or search very often, using Tags and search by Tags is faster and more resource-efficient.
+> 以 Attribute 搜尋非常實用。但如果您想要經常對實體進行分組或搜尋，則使用 Tags 並按 Tags 進行搜尋會更快且更節省資源。
 
-### Search by Typeclass
+(search-by-typeclass)=
+### 按Typeclass搜尋
 
-Sometimes it's useful to limit your search by which Typeclass they have. 
+有時，限制搜尋的 Typeclass 很有用。
 
-Let's say you for example have two types of flower, `CursedFlower` and `BlessedFlower` defined under `mygame/typeclasses.flowers.py`. Each class contains custom code that grants curses and blessings respectively. You may have two `rose` objects, and the player doesn't know which one is the bad or the good one. To separate them in your search, you can make sure to get the right one like this (in Python code)
+假設您在 `mygame/typeclasses.flowers.py` 下定義了兩種型別的花，`CursedFlower` 和 `BlessedFlower`。每個類別都包含分別授予詛咒和祝福的自訂程式碼。你可能有兩個`rose`的物體，而玩家不知道哪一個是壞的還是好的。要在搜尋中將它們分開，您可以確保獲得正確的搜尋結果（在 Python 程式碼中）
 
 ```python
 cursed_roses = evennia.search_object("rose", typeclass="typeclasses.flowers.CursedFlower")
 ```
 
-If you e.g. have the `BlessedRose` class already imported you can also pass it directly:
+如果你e.g。已經匯入了 `BlessedRose` 類，你也可以直接傳遞它：
 
 ```python
 from typeclasses.flowers import BlessedFlower
 blessed_roses = evennia.search_object("rose", typeclass=BlessedFlower)
 ```
 
-A common use case is finding _all_ items of a given typeclass, no matter what they are named. For this you don't use `search_object`, but search with the typeclass directly: 
+一個常見的用例是尋找給定 typeclass 的_所有_ 項，無論它們的名稱是什麼。為此，您不使用 `search_object`，而是直接使用 typeclass 進行搜尋：
 
 ```python
 from typeclasses.objects.flowers import Rose
 all_roses = Rose.objects.all()
 ```
 
-This last way of searching is a simple form of a Django _query_. This is a way to express SQL queries using Python. See [the next lesson](./Beginner-Tutorial-Django-queries.md), where we'll explore this way to searching in more detail.
+最後一種搜尋方式是 Django _query_ 的簡單形式。這是一種使用 Python 表達 SQL 查詢的方法。請參閱[下一課](./Beginner-Tutorial-Django-queries.md)，我們將在其中更詳細地探討這種搜尋方式。
 
-### Search by dbref
+(search-by-dbref)=
+### 按資料庫引用搜尋
 
-```{sidebar} Will I run out of dbrefs?
+```{sidebar} 我會用完 dbrefs 嗎？
 
-Since dbrefs are not reused, do you need to worry about your database ids 'running out' in the future? [No, and here's why](../../../Components/Typeclasses.md#will-i-run-out-of-dbrefs).
+由於 dbref 不被重複使用，您是否需要擔心您的資料庫 ID 將來「用完」？ [不，原因如下](../../../Components/Typeclasses.md#will-i-run-out-of-dbrefs)。
 ```
-The database id or `#dbref` is unique and never-reused within each database table. In search methods you can replace the search for `key` with the dbref to search for. This must be written as a string `#dbref`:
+資料庫 ID 或 `#dbref` 是唯一的，並且在每個資料庫表中不會重複使用。在搜尋方法中，您可以將 `key` 的搜尋替換為要搜尋的 dbref。這必須寫成字串`#dbref`：
 
     the_answer = self.caller.search("#42")
     eightball = evennia.search_object("#8")
 
-Since `#dbref` is always unique, this search is always global.
+由於 `#dbref` 始終是唯一的，因此此搜尋始終是全域的。
 
-```{warning} Relying on #dbrefs
+```{warning} 依賴#dbrefs
 
-In legacy code bases you may be used to relying a lot on #dbrefs to find and track things. Looking something up by #dbref can be practical - if used occationally. It is however considered **bad practice** to *rely* on hard-coded #dbrefs in Evennia. Especially to expect end users to know them. It makes your code fragile and hard to maintain, while tying your code to the exact layout of the database. In 99% of use cases you should organize your code such that you pass the actual objects around and search by key/tags/attribute instead.
+在遺留程式碼庫中，您可能習慣於大量依賴#dbrefs來尋找和追蹤事物。如果偶爾使用的話，透過 #dbref 查詢內容可能很實用。然而，「依賴」Evennia 中的硬編碼 #dbrefs 被認為是「不好的做法」。特別是期望終端使用者瞭解它們。它使您的程式碼脆弱且難以維護，同時將您的程式碼與資料庫的確切佈局連結在一起。在 99% 的用例中，您應該組織程式碼，以便傳遞實際物件並按鍵/tags/attribute 進行搜尋。
 ```
 
 
-## Summary
+(summary)=
+## 概括
 
-Knowing how to find things is important and the tools from this section will serve you well. These tools will cover most of your regular needs.
+瞭解如何找到內容很重要，本節中的工具將為您提供很好的幫助。這些工具將滿足您大部分的日常需求。
 
-Not always though. If we go back to the example of a coin in a chest from before, you _could_ use the following to dynamically figure out if there are any chests in the room with coins inside:
+但並不總是如此。如果我們回到之前箱子裡有硬幣的例子，你_可以_使用以下程式碼動態地找出房間裡是否有裝有硬幣的箱子：
 
 ```python 
 from evennia import search_object
@@ -386,4 +399,4 @@ chests = search_object("chest", location=dungeons[0])
 coins = search_object("coin", candidates=chests[0].contents)
 ```
 
-This would work but is both quite inefficient, fragile and a lot to type. This kind of thing is better done by *directly querying the database*. We will get to this in the next lesson. There we will dive into more complex searching using Django database queries and querysets.
+這可行，但效率很低、脆弱且需要輸入大量內容。這種事情最好透過*直接查詢資料庫*來完成。我們將在下一課中討論這一點。在那裡，我們將使用 Django 資料庫查詢和查詢集深入研究更複雜的搜尋。

@@ -1,6 +1,7 @@
-# Objects
+(objects)=
+# 物件
 
-**Message-path:**
+**訊息路徑：**
 ```
 ┌──────┐ │   ┌───────┐    ┌───────┐   ┌──────┐
 │Client├─┼──►│Session├───►│Account├──►│Object│
@@ -8,20 +9,21 @@
                                          ^
 ```
 
-All in-game objects in Evennia, be it characters, chairs, monsters, rooms or hand grenades are jointly referred to as an Evennia *Object*. An Object is generally something you can look and interact with in the game world. When a message travels from the client, the Object-level is the last stop. 
+Evennia 中的所有遊戲內物體，無論是角色、椅子、怪物、房間或手榴彈，統稱為 Evennia *物體*。 An Object is generally something you can look and interact with in the game world. When a message travels from the client, the Object-level is the last stop.
 
-Objects form the core of Evennia and is probably what you'll spend most time working with. Objects are [Typeclassed](./Typeclasses.md) entities.
+物件構成了 Evennia 的核心，並且可能是您花費最多時間處理的物件。物件是[型別分類](./Typeclasses.md)實體。
 
-An Evennia Object is, by definition, a Python class that includes  [evennia.objects.objects.DefaultObject](evennia.objects.objects.DefaultObject) among its parents. Evennia defines several subclasses of `DefaultObject`:
+根據定義，Evennia 物件是一個 Python 類，其父類中包含 [evennia.objects.objects.DefaultObject](evennia.objects.objects.DefaultObject)。 Evennia定義了`DefaultObject`的幾個子類別：
 
-- `Object` - the base in-game entity. Found in `mygame/typeclasses/objects.py`. Inherits directly from `DefaultObject`.
-- [Characters](./Characters.md) -  the normal in-game Character, controlled by a player. Found in  `mygame/typeclasses/characters.py`. Inherits from `DefaultCharacter`, which is turn a child of `DefaultObject`.
-- [Rooms](./Rooms.md) - a location in the game world. Found in `mygame/typeclasses/rooms.py`. Inherits from `DefaultRoom`, which is in turn a child of `DefaultObject`).
-- [Exits](./Exits.md) - represents a one-way connection to another location. Found in `mygame/typeclasses/exits.py` (inherits from `DefaultExit`, which is in turn a child of `DefaultObject`).
+- `Object` - 遊戲中的基本實體。發現於`mygame/typeclasses/objects.py`。直接繼承自`DefaultObject`。
+- [角色](./Characters.md) - 遊戲中的普通角色，由玩家控制。發現於`mygame/typeclasses/characters.py`。繼承自 `DefaultCharacter`，它是 `DefaultObject` 的子級。
+- [房間](./Rooms.md) - 遊戲世界中的一個位置。發現於`mygame/typeclasses/rooms.py`。繼承自 `DefaultRoom`，而 `DefaultRoom` 又是 `DefaultObject` 的子級）。
+- [Exits](./Exits.md) - 表示到另一位置的單向連線。在 `mygame/typeclasses/exits.py` 中找到（繼承自 `DefaultExit`，而 `DefaultExit` 又是 `DefaultObject` 的子級）。
 
-## Object
+(object)=
+## 目的
 
-**Inheritance Tree:**
+**繼承樹：**
 ```
 ┌─────────────┐
 │DefaultObject│
@@ -34,19 +36,20 @@ An Evennia Object is, by definition, a Python class that includes  [evennia.obje
      └──────┘
 ```
 
-> For an explanation of `ObjectParent`, see next section.
+> 有關 `ObjectParent` 的說明，請參閱下一節。
 
-The `Object` class is meant to be used as the basis for creating things that are neither characters, rooms or exits - anything from weapons and armour, equipment and houses can be represented by extending the Object class. Depending on your game, this also goes for NPCs and monsters (in some games you may want to treat NPCs as just an un-puppeted [Character](./Characters.md) instead). 
+`Object` 類別旨在用作建立既不是角色、房間也不是出口的事物的基礎 - 任何武器和盔甲、裝置和房屋都可以透過擴充套件 Object 類別來表示。根據您的遊戲，這也適用於 NPCs 和怪物（在某些遊戲中，您可能希望將 NPCs 視為只是一個非傀儡的 [角色](./Characters.md)）。
 
-You should not use Objects for game _systems_. Don't use an 'invisible' Object for tracking weather, combat, economy or guild memberships - that's what [Scripts](./Scripts.md) are for. 
+您不應該將物件用於遊戲_系統_。不要使用「隱形」物件來追蹤天氣、戰鬥、經濟或公會會員資格 - 這就是 [Scripts](./Scripts.md) 的用途。
 
-##  ObjectParent - Adding common functionality
+(objectparent-adding-common-functionality)=
+## ObjectParent - 新增常用功能
 
-`Object`,  as well as `Character`, `Room` and `Exit` classes all additionally inherit from `mygame.typeclasses.objects.ObjectParent`.
+`Object` 以及 `Character`、`Room` 和 `Exit` 類別都另外繼承自 `mygame.typeclasses.objects.ObjectParent`。
 
-`ObjectParent` is an empty 'mixin' class. You can add stuff to this class that you want _all_ in-game entities to have.
+`ObjectParent` 是一個空的「mixin」類別。您可以向此類新增您希望所有遊戲實體都具有的內容。
 
-Here is an example: 
+這是一個例子：
 
 ```python
 # in mygame/typeclasses/objects.py
@@ -60,13 +63,14 @@ class ObjectParent:
       return False
 ```
 
-Now all of `Object`, `Exit`. `Room` and `Character` default to not being able to be picked up using the `get` command.
+現在全部`Object`、`Exit`。 `Room` 和 `Character` 預設無法使用 `get` 指令拾取。
 
-## Working with children of DefaultObject
+(working-with-children-of-defaultobject)=
+## 與 DefaultObject 的兒童一起工作
 
-This functionality is shared by all sub-classes of `DefaultObject`. You can easily add your own in-game behavior by either modifying one of the typeclasses in  your game dir or by inheriting further from them.  
+此功能由 `DefaultObject` 的所有子類別共用。您可以透過修改遊戲目錄中的 typeclasses 之一或進一步繼承它們來輕鬆新增自己的遊戲內行為。
 
-You can put your new typeclass directly in the relevant module, or you could organize your code in some other way. Here we assume we make a new module `mygame/typeclasses/flowers.py`: 
+您可以將新的 typeclass 直接放入相關模組中，或者您可以以其他方式組織程式碼。這裡我們假設我們建立了一個新模組`mygame/typeclasses/flowers.py`：
 
 ```python
     # mygame/typeclasses/flowers.py
@@ -84,63 +88,65 @@ You can put your new typeclass directly in the relevant module, or you could org
             self.db.desc = "This is a pretty rose with thorns."     
 ```
    
-Now you just need to point to the class *Rose* with the `create` command to make a new rose:
+現在你只需要用`create`指令指向*Rose*類別來製作一朵新的玫瑰：
 
      create/drop MyRose:flowers.Rose
 
-What the `create` command actually *does* is to use the [evennia.create_object](evennia.utils.create.create_object)  function. You can do the same thing yourself in code:
+`create` 指令實際上*做*的是使用 [evennia.create_object](evennia.utils.create.create_object) 函式。您可以在程式碼中自己做同樣的事情：
 
 ```python
     from evennia import create_object
     new_rose = create_object("typeclasses.flowers.Rose", key="MyRose")
 ```
 
-(The `create` command will auto-append the most likely path to your typeclass, if you enter the call manually you have to give the full path to the class. The `create.create_object` function is powerful and should be used for all coded object creating (so this is what you use when defining your own building commands). 
+（`create` 指令將自動將最可能的路徑附加到 typeclass，如果您手動輸入呼叫，則必須提供類別的完整路徑。`create.create_object` 函式功能強大，並且應該用於所有編碼物件建立（因此這是您在定義自己的建置指令時使用的）。
 
-This particular Rose class doesn't really do much, all it does it make sure the attribute `desc`(which is what the `look` command looks for) is pre-set, which is pretty pointless since you will usually want to change this at build time (using the `desc` command or using the [Spawner](./Prototypes.md)). 
+這個特定的 Rose 類別並沒有真正做太多事情，它所做的只是確保 attribute `desc`（這是 `look` 指令查詢的內容）是預先設定的，這是毫無意義的，因為您通常希望在構建時更改它（使用 `desc` 指令或使用 [Spawner](./Prototypes.md)）。
  
-### Properties and functions on Objects
+(properties-and-functions-on-objects)=
+### 物件的屬性和函式
 
-Beyond the properties assigned to all [typeclassed](./Typeclasses.md) objects (see that page for a list
-of those), the Object also has the following custom properties:
+除了分配給所有 [typeclassed](./Typeclasses.md) 物件的屬性之外（請參閱該頁面的列表
+其中），該物件還具有以下自訂屬性：
 
-- `aliases` - a handler that allows you to add and remove aliases from this object. Use `aliases.add()` to add a new alias and `aliases.remove()` to remove one.
-- `location` - a reference to the object currently containing this object.
-- `home` is a backup location. The main motivation is to have a safe place to move the object to if its `location` is destroyed. All objects should usually have a home location for safety.
-- `destination` - this holds a reference to another object this object links to in some way. Its main use is for [Exits](./Exits.md), it's otherwise usually unset.
-- `nicks` - as opposed to aliases, a [Nick](./Nicks.md) holds a convenient nickname replacement for a real name, word or sequence, only valid for this object. This mainly makes sense if the Object is used as a game character - it can then store briefer shorts, example so as to quickly reference game commands or other characters. Use nicks.add(alias, realname) to add a new one.
-- `account` - this holds a reference to a connected [Account](./Accounts.md) controlling this object (if any). Note that this is set also if the controlling account is *not* currently online - to test if an account is online, use the `has_account` property instead.
-- `sessions` - if `account` field is set *and the account is online*, this is a list of all active sessions (server connections) to contact them through (it may be more than one if multiple connections are allowed in settings).
-- `has_account` - a shorthand for checking if an *online* account is currently connected to this object.
-- `contents` - this returns a list referencing all objects 'inside' this object (i,e. which has this object set as their `location`).
-- `exits` - this returns all objects inside this object that are *Exits*, that is, has the `destination` property set.
-- `appearance_template` - this helps formatting the look of the Object when someone looks at it (see next section).l
-- `cmdset` - this is a handler that stores all [command sets](./Command-Sets.md) defined on the object (if any).
-- `scripts` - this is a handler that manages [Scripts](./Scripts.md) attached to the object (if any).
+- `aliases` - 處理程式，允許您為此物件新增和刪除別名。使用 `aliases.add()` 新增別名，使用 `aliases.remove()` 刪除別名。
+- `location` - 對目前包含此物件的物件的引用。
+- `home` 是備份位置。主要動機是在物件 `location` 被破壞時有一個安全的地方可以將其移動到的地方。為了安全起見，所有物件通常都應該有一個固定位置。
+- `destination` - 這儲存了對該物件以某種方式連結到的另一個物件的引用。它的主要用途是[退出](./Exits.md)，否則通常不設定。
+- `nicks` - 與別名相反，[Nick](./Nicks.md) 擁有一個方便的暱稱替換真實姓名、單字或序列，僅對該物件有效。如果物件用作遊戲角色，這主要是有意義的 - 然後它可以儲存更短的短褲，例如以便快速引用遊戲指令或其他角色。使用 nicks.add（別名、真實姓名）新增名稱。
+- `account` - 這包含控制此物件（如果有）的已連線 [帳戶](./Accounts.md) 的參考。請注意，如果控制帳戶目前「不」線上，也會設定此設定 - 若要測試帳戶是否線上，請改用 `has_account` 屬性。
+- `sessions` - 如果設定了 `account` 欄位*並且帳戶線上*，這是所有活動 sessions（伺服器連線）的列表，用於聯絡他們（如果設定中允許多個連線，則可能不只一個）。
+- `has_account` - 用於檢查*線上*帳戶目前是否連線到該物件的簡寫。
+- `contents` - 這將傳回引用此物件「內部」的所有物件的清單（即，將此物件設為其 `location`）。
+- `exits` - 這將傳回該物件內*退出*的所有物件，即設定了 `destination` 屬性。
+- `appearance_template` - 當有人檢視物件時，這有助於格式化物件的外觀（請參閱下一節）。 l
+- `cmdset` - 這是一個儲存在物件上定義的所有[指令集](./Command-Sets.md)（如果有）的處理程式。
+- `scripts` - 這是管理附加到物件（如果有）的 [Scripts](./Scripts.md) 的處理程式。
 
-The Object also has a host of useful utility functions. See the function headers in `src/objects/objects.py` for their arguments and more details.
+該物件還具有許多有用的實用函式。有關引數和更多詳細資訊，請參閱 `src/objects/objects.py` 中的函式頭。
 
-- `msg()` - this function is used to send messages from the server to an account connected to this object.
-- `msg_contents()` - calls `msg` on all objects inside this object.
-- `search()` - this is a convenient shorthand to search for a specific object, at a given location or globally. It's mainly useful when defining commands (in which case the object executing the command is named `caller` and one can do `caller.search()` to find objects in the room to operate on).
-- `execute_cmd()` - Lets the object execute the given string as if it was given on the command line.
-- `move_to` - perform a full move of this object to a new location.  This is the main move method and will call all relevant hooks, do all checks etc.
-- `clear_exits()` - will delete all [Exits](./Exits.md) to *and* from this object.
-- `clear_contents()` - this will not delete anything, but rather move all contents (except Exits) to their designated `Home` locations.
-- `delete()` - deletes this object, first calling `clear_exits()` and `clear_contents()`.
-- `return_appearance`  is the main hook letting the object visually describe itself.
+- `msg()` - 此函式用於將訊息從伺服器傳送到連線到此物件的帳戶。
+- `msg_contents()` - 對該物件內的所有物件呼叫 `msg`。
+- `search()` - 這是在給定位置或全域搜尋特定物件的便捷簡寫。它主要在定義指令時有用（在這種情況下，執行指令的物件被命名為 `caller`，並且可以執行 `caller.search()` 來查詢房間中要操作的物件）。
+- `execute_cmd()` - 讓物件執行給定的字串，就像在指令列上給出的一樣。
+- `move_to` - 將此物件完全移動到新位置。  這是主要的移動方法，將呼叫所有相關的鉤子，執行所有檢查等。
+- `clear_exits()` - 將從該物件刪除所有到*和*的[退出](./Exits.md)。
+- `clear_contents()` - 這不會刪除任何內容，而是將所有內容（退出除外）移至指定的 `Home` 位置。
+- `delete()` - 刪除此物件，先呼叫 `clear_exits()` 和 `clear_contents()`。
+- `return_appearance` 是讓物件直觀地描述自身的主要鉤子。
 
-The Object Typeclass defines many more *hook methods* beyond `at_object_creation`. Evennia calls these hooks at various points.  When implementing your custom objects, you will inherit from the base parent and overload these hooks with your own custom code. See `evennia.objects.objects` for an updated list of all the available hooks or the [API for DefaultObject here](evennia.objects.objects.DefaultObject).
+物件 Typeclass 定義了超出 `at_object_creation` 的更多*鉤子方法*。 Evennia 在不同的點呼叫這些鉤子。  實作自訂物件時，您將從基礎父級繼承並使用您自己的自訂程式碼過載這些掛鉤。有關所有可用掛鉤的更新列表，請參閱 `evennia.objects.objects` 或[此處 DefaultObject 的API](evennia.objects.objects.DefaultObject)。
 
 
-## Changing an Object's appearance
+(changing-an-objects-appearance)=
+## 改變物件的外觀
 
-When you type `look <obj>`, this is the sequence of events that happen: 
+當您鍵入 `look <obj>` 時，發生的事件順序如下：
 
-1. The command checks if the `caller` of the command (the 'looker') passes the `view` [lock](./Locks.md) of the target `obj`. If not, they will not find anything to look at (this is how you make objects invisible). 
-1. The `look` command calls `caller.at_look(obj)` - that is, the `at_look` hook on the 'looker' (the caller of the command) is called to perform the look on the target object. The command will echo whatever this hook returns.
-2. `caller.at_look` calls and returns the outcome of `obj.return_apperance(looker, **kwargs)`. Here `looker` is the `caller` of the command. In other words, we ask the `obj` to descibe itself to `looker`. 
-3. `obj.return_appearance` makes use of its `.appearance_template` property and calls a slew of helper-hooks to populate this template. This is how the template looks by default: 
+1. 此指令檢查指令的 `caller`（「檢視器」）是否透過了目標 `obj` 的 `view` [lock](./Locks.md)。如果沒有，他們將找不到任何東西可看（這就是使物件不可見的方法）。
+1. `look` 指令呼叫 `caller.at_look(obj)` - 也就是說，呼叫「looker」（指令的呼叫者）上的 `at_look` 掛鉤來對目標物件執行尋找。該指令將回顯該鉤子返回的任何內容。
+2. `caller.at_look` 呼叫並傳回`obj.return_apperance(looker, **kwargs)` 的結果。這裡`looker`是指令的`caller`。換句話說，我們要求 `obj` 將自己描述為 `looker`。
+3. `obj.return_appearance` 利用其 `.appearance_template` 屬性並呼叫一系列輔助鉤子來填充此模板。這是模板預設的樣子：
 
             ```python
             appearance_template = """
@@ -151,14 +157,14 @@ When you type `look <obj>`, this is the sequence of events that happen:
             {footer}
             """```
 
-4. Each field of the template is populated by a matching helper method (and their default returns): 
-    - `name` -> `obj.get_display_name(looker, **kwargs)`  - returns `obj.name`. 
-    - `desc` -> `obj.get_display_desc(looker, **kwargs)` - returns `obj.db.desc`.
-    - `header` -> `obj.get_display_header(looker, **kwargs)` - empty by default.
-    - `footer` -> `obj.get_display_footer(looker, **kwargs)` - empty by default.
-    - `exits` -> `obj.get_display_exits(looker, **kwargs)` - a list of `DefaultExit`-inheriting objects found inside this object (usually only present if `obj` is a `Room`).
-    - `characters` -> `obj.get_display_characters(looker, **kwargs)` - a list of `DefaultCharacter`-inheriting entities inside this object.
-    - `things` -> `obj.get_display_things(looker, **kwargs)` - a list of all other Objects inside `obj`. 
-5. `obj.format_appearance(string, looker, **kwargs)` is the last step the populated template string goes through. This can be used for final adjustments, such as stripping whitespace. The return from this method is what the user will see. 
+4. 模板的每個欄位都由匹配的輔助方法填充（及其預設回傳）：
+    - `name` -> `obj.get_display_name(looker, **kwargs)` - 回傳 `obj.name`。
+    - `desc` -> `obj.get_display_desc(looker, **kwargs)` - 回傳 `obj.db.desc`。
+    - `header` -> `obj.get_display_header(looker, **kwargs)` - 預設為空。
+    - `footer` -> `obj.get_display_footer(looker, **kwargs)` - 預設為空。
+    - `exits` -> `obj.get_display_exits(looker, **kwargs)` - 在此物件內找到的 `DefaultExit` 繼承物件的清單（通常只有在 `obj` 是 `Room` 時才出現）。
+    - `characters` -> `obj.get_display_characters(looker, **kwargs)` - 此物件內的 `DefaultCharacter` 繼承實體的清單。
+    - `things` -> `obj.get_display_things(looker, **kwargs)` - `obj` 內所有其他物件的清單。
+5. `obj.format_appearance(string, looker, **kwargs)` 是填充模板字串經歷的最後一步。這可用於最終調整，例如去除空白。使用者將看到此方法的傳回結果。
 
-As each of these hooks (and the template itself) can be overridden in your child class, you can customize your look extensively. You can also have objects look different depending on who is looking at them. The extra `**kwargs` are not used by default, but are there to allow you to pass extra data into the system if you need it (like light conditions etc.)
+由於每個鉤子（以及模板本身）都可以在您的子類別中覆蓋，因此您可以廣泛地自訂您的外觀。您還可以讓物件看起來有所不同，具體取決於觀看它們的人。預設不會使用額外的`**kwargs`，但如果需要的話（例如光照條件等），可以允許您將額外的資料傳遞到系統中

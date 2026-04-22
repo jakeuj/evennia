@@ -1,14 +1,16 @@
-# In-game Rooms 
+(in-game-rooms)=
+# 遊戲內房間
 
-A _room_ describes a specific location in the game world. Being an abstract concept, it can represent any area of game content that is convenient to group together.  In this lesson we will also create a small in-game automap.
+_房間_描述了遊戲世界中的特定位置。作為一個抽象概念，它可以代表遊戲內容的任何易於組合在一起的區域。  在本課中，我們還將建立一個小型的遊戲內自動地圖。
 
-In EvAdventure, we will have two main types of rooms: 
-- Normal, above-ground rooms. Based on a fixed map, these will be created once and then don't change. We'll cover them in this lesson. 
-- Dungeon rooms - these will be examples of _procedurally generated_ rooms, created on the fly as the players explore the underworld. Being subclasses of the normal room, we'll get to them in the [Dungeon generation lesson](./Beginner-Tutorial-Dungeon.md).
+在EvAdventure中，我們將有兩種主要型別的房間：
+- 普通的地上房間。基於固定的地圖，這些將被建立一次，然後不會改變。我們將在本課中介紹它們。
+- 地牢房間 - 這些將是_程式生成_房間的範例，當玩家探索地下世界時動態建立。作為普通房間的子類，我們將在[地下城生成課程](./Beginner-Tutorial-Dungeon.md)中瞭解它們。
 
-## The base room
+(the-base-room)=
+## 基礎房
 
-> Create a new module `evadventure/rooms.py`.
+> 建立一個新模組`evadventure/rooms.py`。
 
 ```python
 # in evadventure/rooms.py
@@ -27,17 +29,18 @@ class EvAdventureRoom(DefaultRoom):
 
 ``` 
 
-Our `EvadventureRoom` is very simple. We use Evennia's `DefaultRoom` as a base and just add three additional Attributes that defines 
+我們的`EvadventureRoom`很簡單。我們使用 Evennia 的 `DefaultRoom` 作為基礎，只增加三個額外的屬性來定義
 
-- If combat is allowed to start in the room at all. 
-- If combat is allowed, if PvP (player vs player) combat is allowed.
-- If combat is allowed, if any side is allowed to die from it.
+- 如果允許戰鬥在房間裡開始的話。
+- 如果允許戰鬥，如果允許 PvP（玩家對玩家）戰鬥。
+- 如果允許戰鬥，如果允許任何一方因此死亡。
 
-Later on we must make sure our combat systems honors these values.
+稍後我們必須確保我們的戰鬥系統尊重這些價值觀。
 
-## PvP room 
+(pvp-room)=
+## PvP 房間
 
-Here's a room that allows non-lethal PvP (sparring):
+這是一個允許非致命 PvP（陪練）的房間：
 
 ```python
 # in evadventure/rooms.py
@@ -60,11 +63,12 @@ class EvAdventurePvPRoom(EvAdventureRoom):
         return "|yNon-lethal PvP combat is allowed here!|n"
 ```
 
-The return of `get_display_footer` will show after the [main room description](../../../Components/Objects.md#changing-an-objects-appearance), showing that the room is a sparring room. This means that when a player drops to 0 HP, they will lose the combat, but don't stand any risk of dying (weapons wear out normally during sparring though).
+[主房間描述](../../../Components/Objects.md#changing-an-objects-appearance)後會顯示`get_display_footer`的返回，表示該房間為陪練室。這意味著當玩家跌至 0 HP 時，他們將輸掉戰鬥，但不會面臨任何死亡風險（儘管武器在陪練過程中通常會磨損）。
 
-## Adding a room map
+(adding-a-room-map)=
+## 新增房間地圖
 
-We want a dynamic map that visualizes the exits you can use at any moment. Here's how our room will display: 
+我們想要一個動態地圖，可以直觀地顯示您可以隨時使用的出口。以下是我們的房間的顯示方式：
 
 ```shell
   o o o
@@ -77,9 +81,9 @@ A place where many roads meet.
 Exits: north, northeast, south, west, and northwest
 ```
 
-> Documentation does not show ansi colors.
+> 檔案不顯示 ansi 顏色。
 
-Let's expand the base `EvAdventureRoom` with the map.
+讓我們用地圖擴充套件基地`EvAdventureRoom`。
 
 ```{code-block} python
 :linenos: 
@@ -156,24 +160,25 @@ class EvAdventureRoom(DefaultRoom):
         return "  " + "\n  ".join("".join(line) for line in reversed(map_grid))
 ```
 
-The string returned from `get_display_header` will end up at the top of the [room description](../../../Components/Objects.md#changing-an-objects-description), a good place to have the map appear! 
+從`get_display_header`傳回的字串將最終出現在[房間描述](../../../Components/Objects.md#changing-an-objects-description)的頂部，這是顯示地圖的好地方！
 
-- **Line 12**:  The map itself consists of the 2D matrix `_MAP_GRID`. This is a 2D area described by a list of Python lists. To find a given place in the list, you first first need to find which of the nested lists to use, and then which element to use in that list. Indices start from 0 in Python. So to draw the `o` symbol for the southermost room, you'd need to do so at `_MAP_GRID[4][2]`. 
-- **Line 19**: The `_EXIT_GRID_SHIFT` indicates the direction to go for each cardinal exit, along with the map symbol to draw at that point. So `"east": (1, 0, "-")` means the east exit will be drawn one step in the positive x direction (to the right), using the "-" symbol. For symbols like `|` and "\\" we need to escape with a double-symbol since these would otherwise be interpreted as part of other formatting. 
-- **Line 51**: We start by making a `deepcopy` of the `_MAP_GRID`. This is so that we don't modify the original but always have an empty template to work from. 
-- **Line 52**: We use `@` to indicate the location of the player (at coordinate `(2, 2)`). We then take the actual exits from the room use their names to figure out what symbols to draw out from the center. 
-- **Line 58**: We want to be able to get on/off the grid if so needed. So if a room has a non-cardinal exit in it (like 'back' or up/down), we'll indicate this by showing the `>` symbol instead of the `@` in your current room.
-- **Line 67**: Once we have placed all the exit- and room-symbols in the grid, we merge it all together into a single string. At the end we use Python's standard [join](https://www.w3schools.com/python/ref_string_join.asp) to convert the grid into a single string. In doing so we must flip the grid upside down (reverse the outermost list). Why is this? If you think about how a MUD game displays its data - by printing at the bottom and then scrolling upwards - you'll realize that Evennia has to send out the top of your map _first_ and the bottom of it _last_ for it to show correctly to the user. 
+- **第 12 行**：地圖本身由 2D 矩陣 `_MAP_GRID` 組成。這是一個由 Python 清單描述的 2D 區域。要查詢列表中的給定位置，首先需要找到要使用哪個巢狀列表，然後找到要在該列表中使用哪個元素。 Python 中的索引從 0 開始。因此，要為最南端的房間繪製 `o` 符號，您需要在 `_MAP_GRID[4][2]` 處繪製。
+- **第 19 行**：`_EXIT_GRID_SHIFT` 指示每個主要出口的方向，以及在該點繪製的地圖符號。因此 `"east": (1, 0, "-")` 表示東出口將沿著正 x 方向（向右）繪製一步，使用「-」符號。對於像 `|` 和“\\”這樣的符號，我們需要使用雙符號進行轉義，因為否則它們會被解釋為其他格式的一部分。
+- **第 51 行**：我們先製作 `_MAP_GRID` 的 `deepcopy`。這樣我們就不會修改原始模板，但總是有一個空模板可供使用。
+- **第52行**：我們使用`@`來指示玩家的位置（在座標`(2, 2)`處）。然後，我們從房間的實際出口處使用它們的名稱來找出要從中心繪製的符號。
+- **第 58 行**：如果需要，我們希望能夠上/下電網。因此，如果房間中有非主要出口（例如「後退」或上/下），我們將透過在目前房間中顯示 `>` 符號而不是 `@` 來表示這一點。
+- **第 67 行**：將所有出口和房間符號放置在網格中後，我們將它們全部合併到一個字串中。最後我們使用Python的標準[join](https://www.w3schools.com/python/ref_string_join.asp)將網格轉換為單一字串。為此，我們必須將網格顛倒過來（反轉最外面的清單）。這是為什麼呢？如果您考慮 MUD 遊戲如何顯示其資料 - 透過在底部列印然後向上滾動 - 您會意識到 Evennia 必須先傳送地圖的頂部並_最後_傳送地圖的底部，才能正確顯示給使用者。
 
-## Adding life to a room 
+(adding-life-to-a-room)=
+## 為房間增添生氣
 
-Normally the room is static until you do something in it. But let's say you are in a room described to be a bustling market. Would it not be nice to occasionally get some random messages like 
+通常情況下，房間是靜態的，直到你在裡面做某事。但假設您身處一個被描述為熙熙攘攘的市場的房間裡。偶爾收到一些隨機訊息不是很好嗎？
 
-	"You hear a merchant calling out his wares."
-	"The sound of music drifts over the square from an open tavern door."
-	"The sound of commerse rises and fall in a steady rythm."
+"You hear a merchant calling out his wares."
+	“音樂聲從敞開的酒館門中飄過廣場。”
+	“商業聲音以穩定的節奏起伏。”
 
-Here's an example of how to accomplish this: 
+以下是如何實現此目的的範例：
 
 ```{code-block} python 
 :linenos:
@@ -206,31 +211,32 @@ class EchoingRoom(EvAdventureRoom):
 		TICKER_HANDLER.remove(self.echo_rate, self.send_echo)
 ```
 
-The [TickerHandler](../../../Components/TickerHandler.md). This is acts as a 'please tick me - subscription service'. In **Line 22** we tell add our `.send_echo` method to the handler and tell the TickerHandler to call that method every `.echo_rate` seconds. 
+[TickerHandler](../../../Components/TickerHandler.md)。這相當於“請勾選我 - 訂閱服務”。在**第 22 行**，我們告訴將 `.send_echo` 方法新增至處理程式，並告訴 TickerHandler 每 `.echo_rate` 秒呼叫該方法。
 
-When the `.send_echo` method is called, it will use `random.random()` to check if we should _actually_ do anything. In our example we only show a message 10% of the time. In that case we use  Python's `random.choice()` to grab a random text string from the `.echoes` list to send to everyone inside this room. 
+當 `.send_echo` 方法被呼叫時，它將使用 `random.random()` 來檢查我們是否應該_實際上_做任何事情。在我們的範例中，我們僅在 10% 的時間內顯示訊息。在這種情況下，我們使用 Python 的 `random.choice()` 從 `.echoes` 清單中抓取隨機文字字串，傳送給這個房間內的每個人。
 
-Here's how you'd use this room in-game: 
+以下是您在遊戲中使用這個房間的方法：
 
     > dig market:evadventure.rooms.EchoingRoom = market,back 
     > market 
     > set here/echoes = ["You hear a merchant shouting", "You hear the clatter of coins"]
     > py here.start_echo() 
 
-If you wait a while you'll eventually see one of the two echoes show up. Use `py here.stop_echo()` if you want. 
+如果您等待一段時間，您最終會看到兩個迴聲之一出現。如果需要，可以使用 `py here.stop_echo()`。
 
-It's a good idea to be able to turn on/off the echoes at will, if nothing else because you'd be surprised how annoying they can be if they show too often. 
+如果沒有別的辦法的話，能夠隨意開啟/關閉迴聲是個好主意，因為如果它們顯示得太頻繁，您會驚訝地發現它們會多麼煩人。
 
-In this example we had to resort to `py` to activate/deactivate the echoes, but you could very easily make little utility [Commands](../Part1/Beginner-Tutorial-Adding-Commands.md) `startecho` and `stopecho` to do it for you. This we leave as a bonus exercise.
+在這個例子中，我們不得不求助於 `py` 來啟用/停用回顯，但是您可以輕鬆地建立一些實用程式 [指令](../Part1/Beginner-Tutorial-Adding-Commands.md) `startecho` 和 `stopecho` 來為您完成此操作。我們將此作為獎勵練習。
 
-## Testing 
+(testing)=
+## 測試
 
-> Create a new module `evadventure/tests/test_rooms.py`.
+> 建立一個新模組`evadventure/tests/test_rooms.py`。
 
 ```{sidebar} 
-You can find a ready testing module [here in the tutorial folder](evennia.contrib.tutorials.evadventure.tests.test_rooms).
+您可以在[教學資料夾中](evennia.contrib.tutorials.evadventure.tests.test_rooms)找到現成的測試模組。
 ```
-The main thing to test with our new rooms is the map. Here's the basic principle for how to do this testing:
+我們的新房間要測試的主要內容是地圖。以下是如何進行此測試的基本原則：
 
 ```python
 # in evadventure/tests/test_rooms.py
@@ -262,8 +268,9 @@ class EvAdventureRoomTest(EvenniaTestCase):
 ```
 
 
-So we create a bunch of rooms, link them to one centr room and then make sure the map in that room looks like we'd expect.
+因此，我們建立了一堆房間，將它們連結到一個中心房間，然後確保房間中的地圖看起來像我們期望的那樣。
 
-## Conclusion  
+(conclusion)=
+## 結論
 
-In this lesson we manipulated strings and made a map. Changing the description of an object is a big part of changing the 'graphics' of a text-based game, so checking out the [parts making up an object description](../../../Components/Objects.md#changing-an-objects-description) is good extra reading.
+在本課中，我們操作字串並製作了地圖。更改物件的描述是更改基於文字的遊戲的「圖形」的一個重要部分，因此檢查[組成物件描述的部分](../../../Components/Objects.md#changing-an-objects-description) 是很好的額外閱讀。

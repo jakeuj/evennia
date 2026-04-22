@@ -1,14 +1,15 @@
+(scripts)=
 # Scripts
 
-[Script API reference](evennia.scripts.scripts)
+[Script API參考](evennia.scripts.scripts)
 
-*Scripts* are the out-of-character siblings to the in-character [Objects](./Objects.md). Scripts are so flexible that the name "Script" is a bit limiting in itself - but we had to pick _something_ to name them. Other possible names (depending on what you'd use them for) would be `OOBObjects`, `StorageContainers` or `TimerObjects`. 
+*Scripts* 是字元內[物件](./Objects.md) 的非字元同級。 Scripts 是如此靈活，以至於名稱「Script」本身就有點限制 - 但我們必須選擇_一些東西_來命名它們。其他可能的名稱（取決於您的用途）為 `OOBObjects`、`StorageContainers` 或 `TimerObjects`。
 
-If you ever consider creating an [Object](./Objects.md) with a `None`-location just to store some game data, you should really be using a Script instead. 
+如果您曾經考慮建立一個帶有 `None` 位置的 [物件](./Objects.md) 只是為了儲存一些遊戲資料，那麼您確實應該使用 Script。
 
-- Scripts are full [Typeclassed](./Typeclasses.md) entities - they have [Attributes](./Attributes.md) and can be modified in the same way. But they have _no in-game existence_, so no location or command-execution like [Objects](./Objects.md) and no connection to a particular player/session like [Accounts](./Accounts.md). This means they are perfectly suitable for acting as database-storage backends for game _systems_: Storing the current state of the economy, who is involved in the current fight, tracking an ongoing barter and so on. They are great as persistent system handlers.
-- Scripts have an optional _timer component_. This means that you can set up the script to tick the `at_repeat` hook on the Script at a certain interval. The timer can be controlled independently of the rest of the script as needed. This component is optional and complementary to other timing functions in Evennia, like [evennia.utils.delay](evennia.utils.utils.delay) and [evennia.utils.repeat](evennia.utils.utils.repeat).
-- Scripts can _attach_ to Objects and Accounts via e.g. `obj.scripts.add/remove`. In the script you can then access the object/account as `self.obj` or `self.account`. This can be used to dynamically extend other typeclasses but also to use the timer component to affect the parent object in various ways. For historical reasons, a Script _not_ attached to an object is referred to as a _Global_ Script.
+- Scripts 是完整的[型別分類](./Typeclasses.md) 實體 - 它們具有[屬性](./Attributes.md) 並且可以以相同的方式進行修改。但它們_在遊戲中不存在_，因此沒有像[物件](./Objects.md)這樣的位置或指令執行，也沒有像[帳號](./Accounts.md)那樣與特定玩家/session的連線。這意味著它們非常適合充當遊戲_系統_的資料庫儲存後端：儲存當前的經濟狀態、誰參與了當前的戰鬥、追蹤正在進行的以物易物等等。它們非常適合作為持久系統處理程式。
+- Scripts 有一個可選的_計時器元件_。這意味著你可以設定script以一定的時間間隔勾選Script上的`at_repeat`鉤子。定時器可以根據需要獨立於script的其餘部分進行控制。該元件是可選的，並且是 Evennia 中其他計時函式的補充，例如 [evennia.utils.delay](evennia.utils.utils.delay) 和 [evennia.utils.repeat](evennia.utils.utils.repeat)。
+- Scripts 可以透過 e.g_附加_到物件和帳戶。 `obj.scripts.add/remove`。在 script 中，您可以以 `self.obj` 或 `self.account` 的身分存取物件/帳戶。這可以用來動態擴充其他typeclasses，也可以使用計時器元件以各種方式影響父物件。由於歷史原因，未附加到物件的 Script 稱為_Global_ Script。
 
 ```{versionchanged} 1.0
    In previous Evennia versions, stopping the Script's timer also meant deleting the Script object.
@@ -17,15 +18,16 @@ If you ever consider creating an [Object](./Objects.md) with a `None`-location j
 
 ```
 
-## Working with Scripts
+(working-with-scripts)=
+## 與 Scripts 一起工作
 
-There are two main commands controlling scripts in the default cmdset:
+有兩個主要指令控制預設cmdset中的scripts：
 
-The `addscript` command is used for attaching scripts to existing objects:
+`addscript` 指令用於將 scripts 附加到現有物件：
 
     > addscript obj = bodyfunctions.BodyFunctions
 
-The `scripts` command is used to view all scripts and perform operations on them:
+`scripts`指令用於檢視所有scripts並對其進行操作：
 
     > scripts
     > scripts/stop bodyfunctions.BodyFunctions
@@ -37,17 +39,18 @@ The `scripts` command is used to view all scripts and perform operations on them
 The `addscript` command used to be only `script` which was easy to confuse with `scripts`.
 ```
 
-### Code examples
+(code-examples)=
+### 程式碼範例
 
-Here are some examples of working with Scripts in-code (more details to follow in later
-sections).
+以下是在程式碼中使用 Scripts 的一些範例（稍後將詳細介紹
+部分）。
 
-Create a new script:
+創造一個新的script：
 ```python
 new_script = evennia.create_script(key="myscript", typeclass=...)
 ```
 
-Create script with timer component:
+使用計時器元件建立 script：
 
 ```python
 # (note that this will call `timed_script.at_repeat` which is empty by default)
@@ -63,7 +66,7 @@ timed_script.pause()
 timed_script.unpause()
 ```
 
-Attach script to another object:
+將script附加到另一個物件：
 
 ```python
 myobj.scripts.add(new_script)
@@ -71,7 +74,7 @@ myobj.scripts.add(evennia.DefaultScript)
 all_scripts_on_obj = myobj.scripts.all()
 ```
 
-Search/find scripts in various ways:
+以各種方式搜尋/尋找 scripts：
 
 ```python
 # regular search (this is always a list, also if there is only one match)
@@ -85,23 +88,25 @@ myscript = GLOBAL_SCRIPTS.myscript
 GLOBAL_SCRIPTS.get("Timed script").db.foo = "bar"
 ```
 
-Delete the Script (this will also stop its timer):
+刪除Script（這也會停止其計時器）：
 
 ```python
 new_script.delete()
 timed_script.delete()
 ```
 
-### Defining new Scripts
+(defining-new-scripts)=
+### 定義新的Scripts
 
-A Script is defined as a class and is created in the same way as other
-[typeclassed](./Typeclasses.md) entities. The parent class is `evennia.DefaultScript`.
+Script 被定義為一個類，其建立方式與其他類相同
+[型分類](./Typeclasses.md) 個實體。父類是`evennia.DefaultScript`。
 
 
-#### Simple storage script
+(simple-storage-script)=
+#### 簡單儲存script
 
-In `mygame/typeclasses/scripts.py` is an empty `Script` class already set up. You
-can use this as a base for your own scripts.
+`mygame/typeclasses/scripts.py` 中是已設定的空 `Script` 類。你
+可以使用它作為您自己的 scripts 的基礎。
 
 ```python
 # in mygame/typeclasses/scripts.py
@@ -119,7 +124,7 @@ class MyScript(Script):
 
 ```
 
-Once created, this simple Script could act as a global storage:
+建立後，這個簡單的 Script 可以充當全域儲存：
 
 ```python
 evennia.create_script('typeclasses.scripts.MyScript')
@@ -132,8 +137,8 @@ myscript.db.something_else = 1000
 
 ```
 
-Note that if you give keyword arguments to `create_script` you can override the values
-you set in your `at_script_creation`:
+請注意，如果將關鍵字引數指定為 `create_script`，則可以覆寫這些值
+您在 `at_script_creation` 中設定：
 
 ```python
 
@@ -143,11 +148,12 @@ evennia.create_script('typeclasses.scripts.MyScript', key="another name",
 
 ```
 
-See the [create_script](evennia.utils.create.create_script) and [search_script](evennia.utils.search.search_script) API documentation for more options on creating and finding Scripts.
+有關建立和尋找 Scripts 的更多選項，請參閱 [create_script](evennia.utils.create.create_script) 和 [search_script](evennia.utils.search.search_script) API 檔案。
 
-#### Timed Script
+(timed-script)=
+#### 定時Script
 
-There are several properties one can set on the Script to control its timer component.
+可以在 Script 上設定多個屬性來控制其計時器元件。
 
 ```python
 # in mygame/typeclasses/scripts.py
@@ -164,59 +170,61 @@ class TimerScript(Script):
 
 ```
 
-This example will call `at_repeat` every minute. The `create_script` function has an `autostart=True` keyword
-set by default - this means the script's timer component will be started automatically. Otherwise
-`.start()` must be called separately.
+此範例將每分鐘呼叫 `at_repeat`。 `create_script` 函式有 `autostart=True` 關鍵字
+預設設定 - 這表示 script 的計時器元件將自動啟動。否則
+`.start()` 必須單獨呼叫。
 
-Supported properties are:
+支援的屬性有：
 
-- `key` (str): The name of the script. This makes it easier to search for it later. If it's a script
-  attached to another object one can also get all scripts off that object and get the script that way.
-- `desc` (str): Note - not `.db.desc`! This is a database field on the Script shown in script listings
-  to help identifying what does what.
-- `interval` (int): The amount of time (in seconds) between every 'tick' of the timer. Note that
-  it's generally bad practice to use sub-second timers for anything in a text-game - the player will
-  not be able to appreciate the precision (and if you print it, it will just spam the screen). For
-  calculations you can pretty much always do them on-demand, or at a much slower interval without the player being the wiser.
-- `start_delay` (bool): If timer should start right away or wait `interval` seconds first.
-- `repeats` (int): If >0, the timer will only run this many times before stopping. Otherwise the
-  number of repeats are infinite. If set to 1, the Script mimics a `delay` action.
-- `persistent` (bool): This defaults to `True` and means the timer will survive a server reload/reboot.
-  If not, a reload will have the timer come back in a stopped state. Setting this to `False` will _not_
-  delete the Script object itself (use `.delete()` for this).
+- `key` (str)：script 的名稱。這樣以後要查詢起來就更容易了。如果是script
+附加到另一個物件上，也可以從該物件上取得所有 scripts 並以這種方式取得 script。
+- `desc` (str)：注意 - 不是 `.db.desc`！這是 script 清單中顯示的 Script 上的資料庫欄位
+幫助辨識什麼作用。
+- `interval` (int)：計時器每次「滴答」之間的時間量（以秒為單位）。注意
+在文字遊戲中使用亞秒計時器通常是不好的做法 - 玩家會
+  無法欣賞其精確度（如果您列印它，它只會在螢幕上產生垃圾郵件）。對於
+  你幾乎總是可以按需進行計算，或者以更慢的時間間隔進行計算，而玩家並不知情。
+- `start_delay` (bool)：計時器是否應立即啟動或先等待 `interval` 秒。
+- `repeats` (int)：如果>0，計時器在停止之前只會運作這麼多次。否則
+重複次數是無限的。如果設定為 1，Script 會模仿 `delay` 操作。
+- `persistent` (bool)：預設為 `True`，表示計時器將在伺服器重新載入/重新啟動後繼續存在。
+如果沒有，重新載入將使計時器回到停止狀態。將其設為 `False` _不會_
+  刪除 Script 物件本身（為此使用 `.delete()`）。
 
-The timer component is controlled with methods on the Script class:
+計時器元件由 Script 類別上的方法控制：
 
-- `.at_repeat()` - this method is called every `interval` seconds while the timer is
-  active.
-- `.is_valid()` - this method is called by the timer just before `at_repeat()`. If it returns `False`
-  the timer is immediately stopped.
-- `.start()` - start/update the timer. If keyword arguments are given, they can be used to
-  change `interval`, `start_delay` etc on the fly. This calls the `.at_start()` hook.
-  This is also called after a server reload assuming the timer was not previously stopped.
-- `.update()` - legacy alias for `.start`.
-- `.stop()`  - stops and resets the timer. This calls the `.at_stop()` hook.
-- `.pause()` - pauses the timer where it is, storing its current position. This calls
-  the `.at_pause(manual_pause=True)` hook. This is also called on a server reload/reboot,
-  at which time the `manual_pause` will be `False`.
-- `.unpause()` - unpause a previously paused script. This will call the `at_start` hook.
-- `.time_until_next_repeat()` - get the time until next time the timer fires.
-- `.remaining_repeats()` - get the number of repeats remaining, or `None` if repeats are infinite.
-- `.reset_callcount()` - this resets the repeat counter to start over from 0. Only useful if `repeats>0`.
-- `.force_repeat()` - this prematurely forces `at_repeat` to be called right away. Doing so will reset the countdown so that next call will again happen after `interval` seconds.
+- `.at_repeat()` - 當計時器啟動時，此方法每 `interval` 秒呼叫一次
+積極的。
+- `.is_valid()` - 此方法由計時器在 `at_repeat()` 之前呼叫。如果返回`False`
+計時器立即停止。
+- `.start()` - 啟動/更新計時器。如果給予關鍵字引數，它們可用於
+動態變更 `interval`、`start_delay` 等。這呼叫 `.at_start()` 鉤子。
+  假設計時器之前沒有停止，這也會在伺服器重新載入後呼叫。
+- `.update()` - `.start` 的舊別名。
+- `.stop()` - 停止並重設計時器。這呼叫了 `.at_stop()` 鉤子。
+- `.pause()` - 將計時器暫停在目前位置，儲存其目前位置。這呼叫
+`.at_pause(manual_pause=True)` 鉤子。這也在伺服器重新載入/重新啟動時呼叫，
+  此時`manual_pause` 將變為`False`。
+- `.unpause()` - 取消暫停前暫停的script。這將呼叫 `at_start` 掛鉤。
+- `.time_until_next_repeat()` - 取得計時器下次觸發之前的時間。
+- `.remaining_repeats()` - 取得剩餘的重複次數，如果重複次數無限，則取得 `None`。
+- `.reset_callcount()` - 這會將重複計數器重設為從 0 開始。僅在 `repeats>0` 時有用。
+- `.force_repeat()` - 這會過早強制立即呼叫 `at_repeat`。這樣做將重置倒數計時，以便下一次呼叫將在 `interval` 秒後再次發生。
 
-### Script timers vs delay/repeat
+(script-timers-vs-delayrepeat)=
+### Script計時器與延遲/重複
 
-If the _only_ goal is to get a repeat/delay effect, the [evennia.utils.delay](evennia.utils.utils.delay) and [evennia.utils.repeat](evennia.utils.utils.repeat) functions should generally be considered first. A Script is a lot 'heavier' to create/delete on the fly. In fact, for making a single delayed call (`script.repeats==1`), the `utils.delay` call is probably always the better choice.
+如果_only_目標是獲得重複/延遲效果，則通常應先考慮 [evennia.utils.delay](evennia.utils.utils.delay) 和 [evennia.utils.repeat](evennia.utils.utils.repeat) 函式。 Script 對於動態建立/刪除來說「更重」。事實上，對於進行單一延遲呼叫 (`script.repeats==1`)，`utils.delay` 呼叫可能始終是更好的選擇。
 
-For repeating tasks, the `utils.repeat` is optimized for quick repeating of a large number of objects. It uses the TickerHandler under the hood. Its subscription-based model makes it very efficient to start/stop the repeating action for an object. The side effect is however that all objects set to tick at a given interval will _all do so at the same time_. This may or may not look strange in-game depending on the situation. By contrast the Script uses its own ticker that will operate independently from the tickers of all other Scripts. 
+對於重複任務，`utils.repeat` 針對快速重複大量物件進行了最佳化。它在底層使用了TickerHandler。其基於訂閱的模型使得啟動/停止物件的重複操作變得非常有效。然而，副作用是所有設定為以給定時間間隔滴答的物件都會_全部同時這樣做_。根據具體情況，這在遊戲中可能看起來很奇怪，也可能不奇怪。相比之下，Script 使用自己的股票程式碼，該股票程式碼將獨立於所有其他 Scripts 的股票程式碼執行。
 
-It's also worth noting that once the script object has _already been created_, starting/stopping/pausing/unpausing the timer has very little overhead. The pause/unpause and update methods of the script also offers a bit more fine-control than using `utils.delays/repeat`.
+另外值得注意的是，一旦 script 物件已_已建立_，啟動/停止/暫停/取消暫停計時器的開銷非常小。 script 的暫停/取消暫停和更新方法也提供了比使用 `utils.delays/repeat` 更精細的控制。
 
-### Script attached to another object
+(script-attached-to-another-object)=
+### Script 附加到另一個物件
 
-Scripts can be attached to an [Account](./Accounts.md) or (more commonly) an [Object](./Objects.md).
-If so, the 'parent object' will be available to the script as either `.obj` or `.account`.
+Scripts 可以附加到[帳戶](./Accounts.md) 或（更常見）[物件](./Objects.md)。
+如果是這樣，「父物件」將作為 `.obj` 或 `.account` 可供 script 使用。
 
 
 ```python
@@ -250,48 +258,50 @@ If so, the 'parent object' will be available to the script as either `.obj` or `
             self.obj.msg_contents(weather)
 ```
 
-If attached to a room, this Script will randomly report some weather
-to everyone in the room every 5 minutes.
+如果連線到一個房間，這個Script會隨機報告一些天氣
+每 5 分鐘向房間中的每個人傳送一次。
 
 ```python
     myroom.scripts.add(scripts.Weather)
 ```
 
-> Note that `typeclasses` in your game dir is added to the setting `TYPECLASS_PATHS`.
-> Therefore we don't need to give the full path (`typeclasses.scripts.Weather`
-> but only `scripts.Weather` above.
+> 請注意，您的遊戲目錄中的 `typeclasses` 將新增到設定 `TYPECLASS_PATHS` 中。
+> 因此我們不需要給出完整路徑（`typeclasses.scripts.Weather`
+> 但上面只有`scripts.Weather`。
 
-You can also attach the script as part of creating it:
+您還可以在建立它時附加 script：
 
 ```python
     create_script('typeclasses.weather.Weather', obj=myroom)
 ```
 
-### Other Script methods
+(other-script-methods)=
+### 其他Script方法
 
-A Script has all the properties of a typeclassed object, such as `db` and `ndb`(see
-[Typeclasses](./Typeclasses.md)). Setting `key` is useful in order to manage scripts (delete them by name
-etc). These are usually set up in the Script's typeclass, but can also be assigned on the fly as
-keyword arguments to `evennia.create_script`.
+Script 具有型別分類物件的所有屬性，例如 `db` 和 `ndb`（請參閱
+[Typeclasses](./Typeclasses.md))。設定 `key` 對於管理 scripts 很有用（按名稱刪除它們）
+等）。這些通常設定在 Script 的 typeclass 中，但也可以動態分配為
+`evennia.create_script` 的關鍵字引數。
 
-- `at_script_creation()` - this is only called once - when the script is first created.
-- `at_server_reload()` - this is called whenever the server is warm-rebooted (e.g. with the `reload` command). It's a good place to save non-persistent data you might want to survive a reload.
-- `at_server_shutdown()` - this is called when a system reset or systems shutdown is invoked.
-- `at_server_start()` - this is called when the server comes back (from reload/shutdown/reboot). It can be usuful for initializations and caching of non-persistent data when starting up a script's functionality.
+- `at_script_creation()` - 僅在首次建立 script 時呼叫一次。
+- `at_server_reload()` - 每當伺服器熱重啟時都會呼叫此函式（e.g。使用 `reload` 指令）。這是儲存您可能希望在重新載入後繼續存在的非永續性資料的好地方。
+- `at_server_shutdown()` - 當呼叫系統重設或系統關閉時呼叫此函式。
+- `at_server_start()` - 當伺服器返回時（從重新載入/關閉/重新啟動），將呼叫此函式。當啟動 script 的功能時，它對於非永續性資料的初始化和快取非常有用。
 - `at_repeat()`
 - `at_start()`
 - `at_pause()`
 - `at_stop()`
-- `delete()` - same as for other typeclassed entities, this will delete the Script. Of note is that
-  it will also stop the timer (if it runs), leading to the `at_stop` hook being called.
+- `delete()` - 與其他型別分類實體相同，這將刪除 Script。值得注意的是
+它還會停止計時器（如果它執行），導致呼叫 `at_stop` 鉤子。
 
-In addition, Scripts support [Attributes](./Attributes.md), [Tags](./Tags.md) and [Locks](./Locks.md) etc like other Typeclassed entities.
+此外，Scripts 像其他型別分類實體一樣支援[屬性](./Attributes.md)、[Tags](./Tags.md) 和[鎖定](./Locks.md) 等。
 
-See also the methods involved in controlling a [Timed Script](#timed-script) above.
+另請參閱上面控制[定時Script](#timed-script)所涉及的方法。
 
-### Dealing with Script Errors
+(dealing-with-script-errors)=
+### 處理 Script 錯誤
 
-Errors inside a timed, executing script can sometimes be rather terse or point to parts of the execution mechanism that is hard to interpret. One way to make it easier to debug scripts is to import Evennia's native logger and wrap your functions in a try/catch block. Evennia's logger can show you where the traceback occurred in your script.
+定時執行 script 內的錯誤有時可能相當簡潔，或指向難以解釋的執行機制部分。更容易偵錯 scripts 的一種方法是匯入 Evennia 的本機記錄器並將函式包裝在 try/catch 區塊中。 Evennia 的記錄器可以向您顯示 script 中回溯發生的位置。
 
 ```python
 
@@ -310,13 +320,14 @@ class Weather(Script):
 ```
 
 
-## Using GLOBAL_SCRIPTS
+(using-global_scripts)=
+## 使用GLOBAL_SCRIPTS
 
-A Script not attached to another entity is commonly referred to as a _Global_ script since it't available
-to access from anywhere. This means they need to be searched for in order to be used.
+未附加到另一個實體的 Script 通常稱為 _Global_ script，因為它不可用
+從任何地方訪問。這意味著需要搜尋它們才能使用。
 
-Evennia supplies a convenient "container" `evennia.GLOBAL_SCRIPTS` to help organize your global
-scripts. All you need is the Script's `key`.
+Evennia提供了一個方便的「容器」`evennia.GLOBAL_SCRIPTS`來幫助組織你的全域性
+scripts。您所需要的只是 Script 的 `key`。
 
 ```python
 from evennia import GLOBAL_SCRIPTS
@@ -333,19 +344,19 @@ GLOBAL_SCRIPTS.weather.db.current_weather = "Cloudy"
 ```
 
 ```{warning}
-Note that global scripts appear as properties on `GLOBAL_SCRIPTS` based on their `key`. If you were to create two global scripts with the same `key` (even with different typeclasses), the `GLOBAL_SCRIPTS` container will only return one of them (which one depends on order in the database). Best is to organize your scripts so that this does not happen. Otherwise, use `evennia.search_script` to get exactly the script you want.
+請注意，全域 scripts 根據其 `key` 顯示為 `GLOBAL_SCRIPTS` 上的屬性。如果您要建立兩個具有相同 `key` 的全域 scripts（即使具有不同的 typeclasses），則 `GLOBAL_SCRIPTS` 容器將只傳回其中之一（哪一個取決於資料庫中的順序）。最好的方法是組織好你的scripts，這樣就不會發生這種情況。否則，使用 `evennia.search_script` 來準確獲得您想要的 script。
 ```
 
-There are two ways to make a script appear as a property on `GLOBAL_SCRIPTS`:
+有兩種方法可以使 script 顯示為 `GLOBAL_SCRIPTS` 上的屬性：
 
-1. Manually create a new global script with a `key` using `create_script`.
-2. Define the script's properties in the `GLOBAL_SCRIPTS` settings variable. This tells Evennia
-   that it should check if a script with that `key` exists and if not, create it for you.
-   This is very useful for scripts that must always exist and/or should be auto-created
-   when your server restarts. If you use this method, you must make sure all
-   script keys are globally unique.
+1. 使用 `create_script` 手動建立一個新的全域 script 和 `key`。
+2. 在 `GLOBAL_SCRIPTS` 設定變數中定義 script 的屬性。這告訴Evennia
+它應該檢查帶有 `key` 的 script 是否存在，如果不存在，則為您建立它。
+   這對於必須始終存在和/或應該自動建立的 scripts 非常有用
+   當你的伺服器重新啟動時。如果您使用此方法，您必須確保所有
+   script 鍵是全域唯一的。
 
-Here's how to tell Evennia to manage the script in settings:
+以下是告訴 Evennia 管理設定中的 script 的方法：
 
 ```python
 # in mygame/server/conf/settings.py
@@ -361,13 +372,13 @@ GLOBAL_SCRIPTS = {
 }
 ```
 
-Above we add two scripts with keys `myscript` and `storagescript`respectively. The following dict can be empty - the `settings.BASE_SCRIPT_TYPECLASS` will then be used. Under the hood, the provided dict (along with the `key`) will be passed into `create_script` automatically, so all the [same keyword arguments as for create_script](evennia.utils.create.create_script) are supported here. 
+上面我們加了兩個scripts，鍵分別為`myscript`和`storagescript`。以下字典可以為空 - 然後將使用 `settings.BASE_SCRIPT_TYPECLASS`。在底層，提供的字典（以及`key`）將自動傳遞到`create_script`，因此這裡支援所有[與create_script相同的關鍵字引數]（evennia.utils.create.create_script）。
 ```{warning}
 
-Before setting up Evennia to manage your script like this, make sure that your Script typeclass does not have any critical errors (test it separately). If there are, you'll see errors in your log and your Script will temporarily fall back to being a `DefaultScript` type.
+在像這樣設定 Evennia 來管理您的 script 之前，請確保您的 Script typeclass 沒有任何嚴重錯誤（單獨測試）。如果有，您將在日誌中看到錯誤，並且 Script 將暫時回退為 `DefaultScript` 型別。
 ```
 
-Moreover, a script defined this way is *guaranteed* to exist when you try to access it:
+此外，當您嘗試訪問它時，以這種方式定義的script*保證*存在：
 
 ```python
 from evennia import GLOBAL_SCRIPTS
@@ -378,7 +389,7 @@ GLOBAL_SCRIPTS.storagescript.delete()
 storage = GLOBAL_SCRIPTS.storagescript
 ```
 
-That is, if the script is deleted, next time you get it from `GLOBAL_SCRIPTS`, Evennia will use the
-information in settings to recreate it for you on the fly.
+也就是說，如果script被刪除，下次從`GLOBAL_SCRIPTS`取得它時，Evennia會使用
+設定中的資訊以便您即時重新建立它。
 
 

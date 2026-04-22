@@ -1,34 +1,36 @@
-# Game Quests
+(game-quests)=
+# 遊戲任務
 
 ```{warning}
-This tutorial lesson is not yet complete, and has some serious bugs in its implementation. So use this as a reference, but the code is not yet ready to use directly.
+本教學尚未完成，並且在實作中存在一些嚴重的錯誤。所以以此作為參考，但程式碼還不能直接使用。
 ```
 
-A _quest_ is a common feature of games. From classic fetch-quests like retrieving 10 flowers to complex quest chains involving drama and intrigue, quests need to be properly tracked in our game. 
+_quest_是遊戲的一個共同特徵。從經典的取回任務（如取回 10 朵花）到涉及戲劇和陰謀的複雜任務鏈，任務需要在我們的遊戲中正確追蹤。
 
-A quest follows a specific development:
+任務遵循特定的發展：
 
-1. The quest is _started_. This normally involves the player accepting the quest, from a quest-giver, job board or other source. But the quest could also be thrust on the player ("save the family from the burning house before it collapses!")
-2. Once a quest has been accepted and assigned to a character, it is either either `Started` (that is, 'in progress'), `Abandoned`, `Failed` or `Complete`. 
-3. A quest may consist of one or more 'steps'. Each step has its own set of finish conditions. 
-4. At suitable times the quest's _progress_ is checked. This could happen on a timer or when trying to 'hand in' the quest. When checking, the current 'step' is checked against its finish conditions. If ok, that step is closed and the next step is checked until it either hits a step that is not yet complete, or there are no more steps, in which case the entire quest is complete.
+1. 任務已_開始_。這通常涉及玩家從任務提供者、工作委員會或其他來源接受任務。但這個任務也可以強加給玩家（「在房子倒塌之前將家人從著火的房子中拯救出來！」）
+2. 一旦任務被接受並分配給角色，它要麼是`Started`（即「進行中」）、`Abandoned`、`Failed` 要麼`Complete`。
+3. 一項任務可能包含一個或多個「步驟」。每個步驟都有自己的一組完成條件。
+4. 在適當的時間檢查任務的_進度_。這可能會在計時器上或嘗試“提交”任務時發生。檢查時，將根據其完成條件檢查當前“步驟”。如果正常，則關閉該步驟並檢查下一步，直到遇到尚未完成的步驟，或沒有更多步驟，在這種情況下整個任務已完成。
 
 ```{sidebar} 
-An example implementation of quests is found under `evennia/contrib/tutorials`, in [evadventure/quests.py](evennia.contrib.tutorials.evadventure.quests).
+任務的範例實作可在 `evennia/contrib/tutorials` 下的 [evadventure/quests.py](evennia.contrib.tutorials.evadventure.quests) 中找到。
 ```
-To represent quests in code, we need 
-- A convenient flexible way to code how we check the status and current steps of the quest. We want this scripting to be as flexible as possible. Ideally we want to be able to code the quests's logic in full Python.
-- Persistence. The fact that we accepted the quest, as well as its status and other flags must be saved in the database and survive a server reboot.
+為了用程式碼表示任務，我們需要
+- 一種方便且靈活的方法來編碼我們如何檢查任務的狀態和當前步驟。我們希望這個指令碼盡可能靈活。理想情況下，我們希望能夠用完整的 Python 來寫任務的邏輯。
+- 堅持。我們接受任務的事實以及它的狀態和其他標誌必須儲存在資料庫中並在伺服器重新啟動後繼續存在。
 
-We'll accomplish this  using two pieces of Python code:
-- `EvAdventureQuest`: A Python class with helper methods that we can call to check current quest status, figure if a given quest-step is complete or not. We will create and script new quests by simply inheriting from this base class and implement new methods on it in a standardized way.
-- `EvAdventureQuestHandler` will sit 'on' each Character as `character.quests`. It will hold all `EvAdventureQuest`s that the character is or has been involved in. It is also responsible for storing quest state using [Attributes](../../../Components/Attributes.md) on the Character. 
+我們將使用兩段 Python 程式碼來完成此任務：
+- `EvAdventureQuest`：一個有輔助方法的Python類，我們可以呼叫它來檢查目前的任務狀態，判斷給定的任務步驟是否完成。我們將透過簡單地繼承這個基類並以標準化的方式在其上實現新方法來建立script新任務。
+- `EvAdventureQuestHandler` 將作為 `character.quests` 坐在每個角色上。它將儲存角色正在或已經參與的所有 `EvAdventureQuest`s。它也負責使用角色上的[屬性](../../../Components/Attributes.md) 來儲存任務狀態。
 
-## The Quest Handler
+(the-quest-handler)=
+## 工作人員
 
-> Create a new module `evadventure/quests.py`.
+> 建立一個新模組`evadventure/quests.py`。
 
-We saw the implementation of an on-object handler back in the [lesson about NPC and monster AI](./Beginner-Tutorial-AI.md#the-aihandler) (the `AIHandler`). 
+我們在[有關 NPC 和怪物 AI 的課程](./Beginner-Tutorial-AI.md#the-aihandler)（`AIHandler`）中看到了物件處理程式的實作。
 
 ```{code-block} python
 :linenos: 
@@ -81,19 +83,19 @@ class EvAdventureQuestHandler:
 
 ```
 
-```{sidebar} Persistent handler pattern
-Persistent handlers are commonly used throughout Evennia. You can read more about them in the [Making a Persistent object Handler](../../Tutorial-Persistent-Handler.md) tutorial.
+```{sidebar} 持久處理程式模式
+持久處理程式在 Evennia 中普遍使用。您可以在[製作永續性物件處理程式](../../Tutorial-Persistent-Handler.md)教學中閱讀有關它們的更多資訊。
 ```
-- **Line 9**:  We know that the quests themselves will be Python classes inheriting from `EvAdventureQuest` (which we haven't created yet). We will store those classes in `self.quest_classes` on the handler. Note that there is a difference between a class and an _instance_ of a class! The class cannot hold any _state_ on its own, such as the status of that quest is for this particular character. The class only holds python code.
-- **Line 10**: We set aside another property on the handler - `self.quest` This is dictionary that will hold `EvAdventureQuest` _instances_. 
-- **Line 11**: Note that we call the `self._load()` method here, this loads up data from the database whenever this handler is accessed. 
-- **Lines 14-18**: We use `self.obj.attributes.get` to fetch an [Attribute](../../../Components/Attributes.md) on the Character named `_quests` and with a category of `evadventure`. If it doesn't exist yet (because we never started any quests), we just return an empty dict. 
-- **Line 21**: Here we loop over all the classes and instantiate them. We haven't defined how these quest-classes look yet, but by instantiating them with `self.obj` (the Character) we should be covered - from the Character class the quest will be able to get to everything else (this handler itself will be accessible as `obj.quests` from that quest instance after all). 
-- **Line 24**: Here we do the corresponding save operation.
+- **第 9 行**：我們知道任務本身將是繼承自 `EvAdventureQuest`（我們尚未建立）的 Python 類別。我們將這些類別儲存在處理程式的 `self.quest_classes` 中。請注意，類別和類別的_例項_之間是有區別的！該類別本身無法儲存任何狀態，例如該任務的狀態是針對該特定角色的。該類別僅包含 python 程式碼。
+- **第 10 行**：我們在處理程式上預留另一個屬性 - `self.quest` 這是將儲存 `EvAdventureQuest` _instances_ 的字典。
+- **第 11 行**：請注意，我們在這裡呼叫 `self._load()` 方法，每當訪問此處理程式時，都會從資料庫載入資料。
+- **第 14-18 行**：我們使用 `self.obj.attributes.get` 來取得名為 `_quests` 且類別為 `evadventure` 的角色上的 [Attribute](../../../Components/Attributes.md)。如果它還不存在（因為我們從未開始任何任務），我們只會回傳一個空字典。
+- **第 21 行**：這裡我們迴圈所有類別並例項化它們。我們還沒有定義這些任務類的外觀，但是透過用 `self.obj` （角色）例項化它們，我們應該被覆蓋 - 從角色類，任務將能夠訪問其他所有內容（畢竟，這個處理程式本身可以從該任務例項作為 `obj.quests` 訪問）。
+- **第24行**：這裡我們進行對應的儲存操作。
 
-The rest of the handler are just access methods for getting, adding and removing quests from the handler. We make one assumption in those code, namely that the quest class has a property `.key` being the unique quest-name. 
+處理程式的其餘部分只是用於從處理程式取得、新增和刪除任務的存取方法。我們在這些程式碼中做出一個假設，即任務類別有一個屬性 `.key` 作為唯一的任務名稱。
 
-This is how it would be used in practice: 
+這就是它在實踐中的使用方式：
 
 ```python 
 # in some questing code 
@@ -109,11 +111,11 @@ def start_super_quest(character):
     character.quests.add(EvAdventureSuperQuest)
 
 ```
-```{sidebar} What can be saved in Attributes?
-For more details, see [the Attributes documentation](../../../Components/Attributes.md#what-types-of-data-can-i-save-in-an-attribute) on the matter.
+```{sidebar} 屬性中可以儲存什麼？
+有關更多詳細資訊，請參閱有關此事的[屬性檔案](../../../Components/Attributes.md#what-types-of-data-can-i-save-in-an-attribute)。
 ```
-We chose to store classes and not instances of classes above. The reason for this has to do with what can be stored in a database `Attribute` - one limitation of an Attribute is that we can't save a class instance _with other database entities baked inside it_. If we saved quest instances as-is, it's highly likely they'd contain database entities 'hidden' inside them - a reference to the Character, maybe to objects required for the quest to be complete etc. Evennia would fail trying to save that data. 
-Instead we store only the classes, instantiate those classes with the Character, and let the quest store its state flags separately, like this: 
+我們選擇儲存類別而不是上面類別的例項。這樣做的原因與資料庫中可以儲存的內容有關`Attribute` - Attribute 的一個限制是我們無法儲存類別例項_與其中烘焙的其他資料庫實體_。如果我們按原樣儲存任務例項，它們很可能會包含「隱藏」在其中的資料庫實體 - 對角色的引用，可能是完成任務所需的物件等。 Evennia 將無法嘗試儲存該資料。 
+相反，我們只儲存類，用角色例項化這些類，並讓任務單獨儲存其狀態標誌，如下所示：
 
 ```python 
 # in evadventure/quests.py 
@@ -144,9 +146,9 @@ class EvAdventureQuestHandler:
 
 ```
 
-This works the same as the `_load` and `_save` methods, except it fetches a property `.data` (this will be a `dict`) on the quest instance and save it. As long as we make sure to call these methods from the quest the quest whenever that `.data` property is changed, all will be well - this is because Attributes know how to properly analyze a `dict` to find and safely serialize any database entities found within. 
+這與 `_load` 和 `_save` 方法的工作方式相同，不同之處在於它會取得任務例項上的屬性 `.data`（這將是 `dict`）並儲存它。只要我們確保在 `.data` 屬性發生更改時從任務中呼叫這些方法，一切都會好起來 - 這是因為屬性知道如何正確分析 `dict` 以查詢並安全地序列化其中找到的任何資料庫實體。
 
-Our handler is ready. We created the `EvAdventureCharacter` class back in the [Character lesson](./Beginner-Tutorial-Characters.md) - let's add quest-support to it.
+我們的處理程式已準備就緒。我們在 [角色課程](./Beginner-Tutorial-Characters.md) 中建立了 `EvAdventureCharacter` 類別 - 讓我們為它新增任務支援。
 
 ```python
 # in evadventure/characters.py
@@ -167,8 +169,9 @@ class EvAdventureCharacter(LivingMixin, DefaultCharacter):
 
 ```
 
-We also need a way to represent the quests themselves though!
-## The Quest class
+不過，我們還需要一種方法來代表任務本身！
+(the-quest-class)=
+## 探索類
 
 
 ```{code-block} python
@@ -219,16 +222,16 @@ class EvAdventureQuest:
 
 ```
 
-- **Line 7**: Each class must have a `.key` property unquely identifying the quest. We depend on this in the quest-handler.
-- **Line 12**: `quester` (the Character) is passed into this class when it is initiated inside `EvAdventureQuestHandler._load()`. 
-- **Line 13**: The handler is also passed in during loading, so this quest instance can use it directly without triggering recursion during lazy loading.
-- **Lines 17, 24 and 31**: `add_data` and `remove_data` call back to `questhandler.save_quest_data` so persistence happens in one place.
+- **第 7 行**：每個類別必須有一個 `.key` 屬性來唯一標識任務。我們在任務處理程式中依賴於此。
+- **第 12 行**：`quester`（角色）在 `EvAdventureQuestHandler._load()` 內部啟動時傳遞到該類別。
+- **第13行**：handler也是在載入時傳入的，所以這個任務例項可以直接使用它，而不會在延遲載入時觸發遞迴。
+- **第 17、24 和 31 行**：`add_data` 和 `remove_data` 回撥到 `questhandler.save_quest_data`，因此永續性發生在一個地方。
 
-The `add/get/remove_data` methods are convenient wrappers for getting data in and out of the database. When we implement a quest we should prefer to use `.get_data`, `add_data` and `remove_data` over manipulating `.data` directly, since the former will make sure to save said that to the database automatically.
+`add/get/remove_data` 方法是用於將資料傳入和傳出資料庫的便捷包裝器。當我們實現一個任務時，我們應該更喜歡使用 `.get_data`、`add_data` 和 `remove_data` 而不是直接操作 `.data`，因為前者會確保自動將所述內容儲存到資料庫中。
 
-The `current_step` tracks the current quest 'step' we are in; what this means is up to each Quest. We set up convenient properties for setting the `current_state` and also make sure to save it in the data dict as "current_step".
+`current_step` 追蹤我們目前所處的任務「步驟」；這意味著什麼取決於每個任務。我們設定了方便的屬性來設定`current_state`，並確保將其儲存在資料字典中為「current_step」。
 
-The quest can have a few possible statuses: "started", "completed", "abandoned" and "failed". We create a few properties and methods for easily control that, while saving everything under the hood:
+任務可以有幾種可能的狀態：「開始」、「完成」、「放棄」和「失敗」。我們建立了一些屬性和方法來輕鬆控制它，同時儲存所有內容：
 
 ```python
 # in evadventure/quests.py
@@ -271,9 +274,9 @@ class EvAdventureQuest:
 
 ```
 
-So far we have only added convenience functions for checking statuses. How will the actual "quest" aspect of this work? 
+到目前為止，我們僅新增了用於檢查狀態的便利功能。這項工作的實際「任務」方面將如何進行？
 
-What will happen when the system wants to check the progress of the quest, is that it will call a method `.progress()` on this class. Similarly, to get help for the current step, it will call a method `.help()`
+當系統想要檢查任務的進度時，會發生什麼，它會呼叫此類的方法`.progress()`。同樣，要獲取當前步驟的幫助，它將呼叫方法`.help()`
 
 ```python
 
@@ -302,14 +305,15 @@ What will happen when the system wants to check the progress of the quest, is th
 
 ```
 
-```{sidebar} What's with the *args, **kwargs?
-These are optional, but allow you to pass extra information into your quest-check. This could be very powerful if you want to add extra context to determine if a quest-step is currently complete or not.
+```{sidebar} *args、**kwargs 是怎麼回事？
+這些是可選的，但允許您將額外的資訊傳遞到任務檢查中。如果您想要新增額外的上下文來確定任務步驟目前是否完成，這可能非常強大。
 ```
-Calling the `.progress(*args, **kwargs)` method will call a method named `step_<current_step>(*args, **kwargs)` on this class. That is, if we are on the _start_ step, the method called will be `self.step_start(*args, **kwargs)`. Where is this method? It has not been implemented yet! In fact, it's up to us to implement methods like this for each quest. By just adding a correctly added method, we will easily be able to add more steps to a quest.  
+呼叫 `.progress(*args, **kwargs)` 方法將呼叫此類上名為 `step_<current_step>(*args, **kwargs)` 的方法。也就是說，如果我們處於 _start_ 步驟，則呼叫的方法將為 `self.step_start(*args, **kwargs)`。這個方法在哪裡呢？還沒實施！事實上，我們需要為每個任務實現這樣的方法。只需新增正確新增的方法，我們就可以輕鬆地為任務新增更多步驟。
 
-Similarly, calling `.help(*args, **kwargs)` will try to find a property `help_<current_step>`. If this is a callable, it will be called as  for example `self.help_start(*args, **kwargs)`. If it is given as a string, then the string will be returned as-is and the `*args, **kwargs` will be ignored.
+同樣，呼叫 `.help(*args, **kwargs)` 將嘗試尋找屬性 `help_<current_step>`。如果這是可呼叫的，則它將被呼叫，例如 `self.help_start(*args, **kwargs)`。如果它以字串形式給出，則該字串將按原樣返回，並且 `*args, **kwargs` 將被忽略。
 
-### Example quest 
+(example-quest)=
+### 範例任務
 
 ```python
 # in some quest module, like world/myquests.py
@@ -333,7 +337,7 @@ class ShortQuest(EvAdventureQuest):
 
 ```
 
-This is a very simple quest that will resolve on its own after two `.progress()` checks. Here's the full life cycle of this quest:
+這是一個非常簡單的任務，在兩次 `.progress()` 檢查後將自行解決。這是此任務的完整生命週期：
 
 ```python 
 # in some module somewhere, using evennia shell or in-game using py
@@ -351,9 +355,10 @@ character.quests.get("short-quest").progress()
 
 ```
 
-### A useful Command
+(a-useful-command)=
+### 一個有用的指令
 
-The player must know which quests they have and be able to inspect them. Here's a simple `quests` command to handle this:
+玩家必須知道他們有哪些任務並能夠檢查它們。這是一個簡單的 `quests` 指令來處理這個問題：
 
 ```python
 # in evadventure/quests.py
@@ -392,17 +397,19 @@ class CmdQuests(Command):
             self.msg(f"Quest {quest.key}: {quest.status}")
 ```
 
-Add this to the `CharacterCmdSet` in `mygame/commands/default_cmdsets.py`. Follow the [Adding a command lesson](../Part1/Beginner-Tutorial-Adding-Commands.md#add-the-echo-command-to-the-default-cmdset) if you are unsure how to do this. Reload and if you are playing as an `EvAdventureCharacter` you should be able to use `quests` to view your quests.
+將其新增到 `mygame/commands/default_cmdsets.py` 中的 `CharacterCmdSet`。如果您不確定如何執行此操作，請按照[新增指令課程](../Part1/Beginner-Tutorial-Adding-Commands.md#add-the-echo-command-to-the-default-cmdset) 進行操作。重新載入，如果您以 `EvAdventureCharacter` 身份玩遊戲，您應該能夠使用 `quests` 檢視您的任務。
 
-## Testing 
+(testing)=
+## 測試
 
-> Create a new folder `evadventure/tests/test_quests.py`.
+> 建立一個新資料夾`evadventure/tests/test_quests.py`。
 
 ```{sidebar} 
-An example test suite for quests is found in `evennia/contrib/tutorials/evadventure`, as [tests/test_quests.py](evennia.contrib.tutorials.evadventure.tests.test_quests).
+任務測試套件範例位於 `evennia/contrib/tutorials/evadventure`，如 [tests/test_quests.py](evennia.contrib.tutorials.evadventure.tests.test_quests)。
 ```
-Testing of the quests means creating a test character, making a dummy quest, add it to the character's quest handler and making sure all methods work correcly. Create the testing quest so that it will automatically step forward when calling `.progress()`, so you can make sure it works as intended. 
+任務測試意味著建立一個測試角色，製作一個虛擬任務，將其新增到角色的任務處理程式中，並確保所有方法都能正確工作。建立測試任務，以便在呼叫 `.progress()` 時自動前進，這樣您就可以確保它按預期工作。
 
-## Conclusions 
+(conclusions)=
+## 結論
 
-What we created here is just the framework for questing. The actual complexity will come when creating the quests themselves (that is, implementing the `step_<current_step>(*args, **kwargs)` methods), which is something we'll get to later, in [Part 4](../Part4/Beginner-Tutorial-Part4-Overview.md) of this tutorial.
+我們在這裡建立的只是探索的框架。實際的複雜性將在建立任務本身（即實現 `step_<current_step>(*args, **kwargs)` 方法）時出現，這是我們稍後將在本教學的[第 4 部分](../Part4/Beginner-Tutorial-Part4-Overview.md) 中介紹的內容。

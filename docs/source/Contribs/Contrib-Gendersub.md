@@ -1,23 +1,25 @@
-# Gendersub
+(gendersub)=
+# 性別子
 
-Contribution by Griatch 2015
+Griatch 2015 年的貢獻
 
-This is a simple gender-aware Character class for allowing users to
-insert custom markers in their text to indicate gender-aware
-messaging. It relies on a modified msg() and is meant as an
-inspiration and starting point to how to do stuff like this.
+這是一個簡單的性別感知角色類，允許使用者
+在文字中插入自訂標記以表示性別意識
+訊息傳遞。它依賴於修改後的 msg() 並且意味著
+如何做這樣的事情的靈感和起點。
 
-An object can have the following genders:
+一個物件可以有以下性別：
 
-- male (he/his)
-- female (her/hers)
-- neutral (it/its)
-- ambiguous (they/them/their/theirs)
+- 男性（他/他的）
+- 女性（她/她的）
+- 中性（它/它的）
+- 模稜兩可的（他們/他們/他們的/他們的）
 
-## Installation
+(installation)=
+## 安裝
 
-Import and add the `SetGender` command to your default cmdset in
-`mygame/commands/default_cmdset.py`:
+匯入`SetGender`指令並將其新增到您的預設cmdset中
+`mygame/commands/default_cmdset.py`：
 
 ```python
 # mygame/commands/default_cmdsets.py
@@ -35,7 +37,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(SetGender())   # <---
 ```
 
-Make your `Character` inherit from `GenderCharacter`.
+讓您的 `Character` 繼承自 `GenderCharacter`。
 
 ```python
 # mygame/typeclasses/characters.py
@@ -48,37 +50,38 @@ class Character(GenderCharacter):  # <---
     # ...
 ```
 
-Reload the server (`evennia reload` or `reload` from inside the game).
+重新載入伺服器（從遊戲內部`evennia reload`或`reload`）。
 
 
-## Usage
+(usage)=
+## 用法
 
-When in use, messages can contain special tags to indicate pronouns gendered
-based on the one being addressed. Capitalization will be retained.
+使用時，訊息可以包含特殊的 tags 來指示代名詞性別
+基於正在處理的問題。大寫字母將保留。
 
-- `|s`, `|S`: Subjective form: he, she, it, He, She, It, They
-- `|o`, `|O`: Objective form: him, her, it, Him, Her, It, Them
-- `|p`, `|P`: Possessive form: his, her, its, His, Her, Its, Their
-- `|a`, `|A`: Absolute Possessive form: his, hers, its, His, Hers, Its, Theirs
+- `|s`, `|S`: 主觀形式: he, she, it, He, She, It, They
+- `|o`、`|O`：客觀形式：他、她、它、他、她、它、他們
+- `|p`、`|P`：所有格形式：他的、她的、它的、他的、她的、它的、他們的
+- `|a`、`|A`：絕對所有格形式：his、hers、its、His、Hers、Its、Theirs
 
-For example,
+例如，
 
 ```
 char.msg("%s falls on |p face with a thud." % char.key)
 "Tom falls on his face with a thud"
 ```
 
-The default gender is "ambiguous" (they/them/their/theirs).
+預設性別是「模糊的」（they/them/their/theirs）。
 
-To use, have DefaultCharacter inherit from this, or change
-setting.DEFAULT_CHARACTER to point to this class.
+要使用，請讓 DefaultCharacter 繼承於此，或更改
+設定.DEFAULT_CHARACTER 指向此類。
 
-The `gender` command is used to set the gender. It needs to be added to the
-default cmdset before it becomes available.
+`gender`指令用於設定性別。需要將其新增到
+在可用之前預設為 cmdset。
 
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/game_systems/gendersub/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\game_systems\gendersub\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

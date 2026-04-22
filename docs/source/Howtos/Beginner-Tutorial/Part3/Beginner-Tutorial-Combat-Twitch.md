@@ -1,6 +1,7 @@
-# Twitch Combat 
+(twitch-combat)=
+# 抽搐戰鬥
 
-In this lesson we will build upon the basic combat framework we devised [in the previous lesson](./Beginner-Tutorial-Combat-Base.md) to create a 'twitch-like' combat system. 
+在本課中，我們將在[上一課中](./Beginner-Tutorial-Combat-Base.md)設計的基本戰鬥框架的基礎上建立一個「類似抽搐」的戰鬥系統。
 ```shell
 > attack troll 
   You attack the Troll! 
@@ -47,34 +48,36 @@ You attack the troll with Sword: Roll vs armor(11):
  
 The battle is over. You are still standing. 
 ```
-> Note that this documentation doesn't show in-game colors. If you are interested in an alternative, see  the [next lesson](./Beginner-Tutorial-Combat-Turnbased.md), where we'll make a turnbased, menu-based system instead.
+> 請注意，本文件不顯示遊戲中的顏色。如果您對替代方案感興趣，請參閱[下一課](./Beginner-Tutorial-Combat-Turnbased.md)，我們將製作一個回合製、基於選單的系統。
 
-With "Twitch" combat, we refer to a type of combat system that runs without any clear divisions of 'turns' (the opposite of [Turn-based combat](./Beginner-Tutorial-Combat-Turnbased.md)). It is inspired by the way combat worked in the old  [DikuMUD](https://en.wikipedia.org/wiki/DikuMUD) codebase, but is more flexible. 
+對於「Twitch」戰鬥，我們指的是一種沒有任何明確的「回合」劃分的戰鬥系統（與[回合製戰鬥](./Beginner-Tutorial-Combat-Turnbased.md)相反）。它的靈感來自於舊的 [DikuMUD](https://en.wikipedia.org/wiki/DikuMUD) 程式碼庫中的戰鬥方式，但更靈活。
 
-```{sidebar} Differences to DIKU combat
-In DIKU, all actions in combat happen on a _global_ 'tick' of, say 3 seconds. In our system, each combatant have their own 'tick' which is completely independent of each other. Now, in Evadventure, each combatant will tick at the same rate and thus mimic DIKU ... but they don't _have_ to. 
+```{sidebar} 與DIKU戰鬥的差異
+在 DIKU 中，戰鬥中的所有動作都在 _global_ 'tick' 內發生，例如 3 秒。在我們的系統中，每個戰鬥人員都有自己的“tick”，彼此完全獨立。現在，在Evadventure中，每個戰鬥人員都會以相同的速率滴答，從而模仿DIKU…但他們_沒有_這樣做。
 ```
 
-Basically, a user enters an action and after a certain time that action will execute (normally an attack). If they don't do anything, the attack will repeat over and over (with a random result) until the enemy or you is defeated. 
+基本上，使用者輸入一個操作，並在一段時間後執行該操作（通常是攻擊）。如果他們不採取任何行動，攻擊就會一遍又一遍地重複（結果隨機），直到敵人或你被擊敗。
 
-You can change up your strategy by performing other actions (like drinking a potion or cast a spell). You can also simply move to another room to 'flee' the combat (but the enemy may of course follow you)
+您可以透過執行其他動作（例如喝藥水或施法）來改變您的策略。你也可以簡單地移動到另一個房間來「逃離」戰鬥（但敵人當然可能會跟著你）
 
-## General principle
+(general-principle)=
+## 一般原則
 
 ```{sidebar}
-An example of an implemented Twitch combat system can be found in `evennia/contrib/tutorials`, in [evadventure/combat_twitch.py](evennia.contrib.tutorials.evadventure.combat_twitch).
+已實現的 Twitch 戰鬥系統的範例可以在 `evennia/contrib/tutorials`、[evadventure/combat_twitch.py](evennia.contrib.tutorials.evadventure.combat_twitch) 中找到。
 ```
-Here is the general design of the Twitch-based combat handler: 
+以下是基於 Twitch 的戰鬥處理程式的整體設計：
 
-- The twitch-version of the CombatHandler will be stored on each combatant whenever combat starts. When combat is over, or they leave the room with combat, the handler will be deleted. 
-- The handler will queue each action independently, starting a timer until they fire.
-- All input are handled via Evennia [Commands](../../../Components/Commands.md).
+- 每當戰鬥開始時，CombatHandler 的抽搐版本將儲存在每個戰鬥人員身上。當戰鬥結束，或他們離開房間進行戰鬥時，處理程式將被刪除。
+- 處理程式將獨立對每個操作進行排隊，啟動計時器直到它們觸發。
+- 所有輸入均透過Evennia [指令](../../../Components/Commands.md) 處理。
 
-## Twitch combat handler
+(twitch-combat-handler)=
+## Twitch 戰鬥處理程式
 
-> Create a new module `evadventure/combat_twitch.py`.
+> 建立一個新模組`evadventure/combat_twitch.py`。
 
-We will make use of the _Combat Actions_, _Action dicts_ and the parent `EvAdventureCombatBaseHandler` [we created previously](./Beginner-Tutorial-Combat-Base.md). 
+我們將利用_Combat Actions_、_Action dicts_ 和父`EvAdventureCombatBaseHandler` [我們先前建立的](./Beginner-Tutorial-Combat-Base.md)。
 
 ```python 
 # in evadventure/combat_twitch.py
@@ -104,9 +107,10 @@ class EvAdventureCombatTwitchHandler(EvAdventureCombatBaseHandler):
                     broadcast=broadcast, location=self.obj.location)
 ```
 
-We make a child class of `EvAdventureCombatBaseHandler` for our Twitch combat. The parent class is a [Script](../../../Components/Scripts.md), and when a Script sits 'on' an Object, that Object is available on the script as `self.obj`. Since this handler is meant to sit 'on' the combatant, then `self.obj` is thus the combatant and `self.obj.location` is the current room the combatant is in. By using `super()` we can reuse the parent class' `msg()` method with these Twitch-specific details.
+我們為 Twitch 戰鬥建立了一個 `EvAdventureCombatBaseHandler` 的子類別。父類別是 [Script](../../../Components/Scripts.md)，當 Script 位於某個物件「之上」時，該物件在 script 上可用作 `self.obj`。由於該處理程式旨在坐在戰鬥人員“身上”，因此 `self.obj` 是戰鬥人員，`self.obj.location` 是戰鬥人員所在的當前房間。透過使用 `super()`，我們可以使用這些 Twitch 特定的詳細資訊重複使用父類別的 `msg()` 方法。
 
-### Getting the sides of combat
+(getting-the-sides-of-combat)=
+### 取得戰鬥雙方
 
 ```python
 # in evadventure/combat_twitch.py 
@@ -162,19 +166,20 @@ class EvAdventureCombatTwitchHandler(EvAdventureCombatBaseHandler):
 
 ```
 
-Next we add our own implementation of the `get_sides()` method. This presents the sides of combat from the perspective of the provided `combatant`. In Twitch combat, there are a few things that identifies a combatant: 
+接下來我們加入我們自己的 `get_sides()` 方法的實作。這從所提供的`combatant`的角度呈現了戰鬥的各個方面。在 Twitch 戰鬥中，有一些東西可以識別戰鬥者：
 
-- That they are in the same location
-- That they each have a `EvAdventureCombatTwitchHandler` script running on themselves
+- 他們在同一個位置
+- 他們每個人都有一個 `EvAdventureCombatTwitchHandler` script 執行在自己身上
 
-```{sidebar} inherits_from 
-Since `inherits_from` is True if your class inherits from the parent at _any_ distance, this particular check would not work if you were to change the NPC class to inherit from our Character class as well. In that case we'd have to come up with some other way to compare the two types of entities.
+```{sidebar} inherits_from
+由於如果您的類別以 _any_ 距離從父類別繼承，則 `inherits_from` 為 True，因此如果您要將 NPC 類別變更為也從我們的 Character 類別繼承，則此特定檢查將無法運作。在這種情況下，我們必須想出一些其他方法來比較這兩種型別的實體。
 ```
-In a PvP-open room, it's all for themselves - everyone else is considered an 'enemy'.  Otherwise we separate PCs from NPCs by seeing if they inherit from `EvAdventureCharacter` (our PC class) or not - if you are a PC, then the NPCs are your enemies and vice versa. The [inherits_from](evennia.utils.utils.inherits_from) is very useful for doing these checks - it will pass also if you inherit from `EvAdventureCharacter` at _any_ distance.
+在 PvP 開放房間中，一切都是為了他們自己 - 其他人都被視為“敵人”。  否則，我們透過檢視 PC 是否繼承自 `EvAdventureCharacter`（我們的 PC 類）來將 PC 與 NPCs 分開 - 如果你是 PC，那麼 NPCs 就是你的敵人，反之亦然。 [inherits_from](evennia.utils.utils.inherits_from) 對於執行這些檢查非常有用 - 如果您以 _any_ 距離從 `EvAdventureCharacter` 繼承，它也會透過。
 
-Note that `allies` does not include the `combatant` itself, so if you are fighting a lone enemy, the return from this method will be `([], [enemy_obj])`.
+請注意，`allies` 不包括 `combatant` 本身，因此如果您正在與孤獨的敵人作戰，此方法的返回將為 `([], [enemy_obj])`。
 
-### Tracking Advantage / Disadvantage 
+(tracking-advantage-disadvantage)=
+### 追蹤優勢/劣勢
 
 ```python
 # in evadventure/combat_twitch.py 
@@ -208,14 +213,15 @@ class EvAdventureCombatTwitchHandler(EvAdventureCombatBaseHandler):
 
 ```
 
-As seen in the previous lesson, the Actions call these methods to store the fact that 
-a given combatant has advantage. 
+如上一課所示，操作呼叫這些方法來儲存以下事實：
+特定的戰鬥者俱有優勢。
 
-In this Twitch-combat case, the one getting the advantage is always one on which the combathandler is defined, so we don't actually need to use the `recipient/combatant` argument (it's always going to be `self.obj`) - only `target` is important.
+在這種 Twitch-combat 情況下，獲得優勢的總是定義了戰鬥處理程式的那個，因此我們實際上不需要使用 `recipient/combatant` 引數（它總是 `self.obj`） - 只有 `target` 很重要。
 
-We create two new Attributes to store the relation as dicts. 
+我們建立兩個新屬性來將關係儲存為字典。
 
-### Queue action 
+(queue-action)=
+### 佇列動作
 
 ```{code-block} python
 :linenos:
@@ -281,16 +287,17 @@ class EvAdventureCombatTwitchHandler(EvAdventureCombatBaseHandler):
 
 ```
 
-- **Line 30**: The `queue_action` method takes an "Action dict" representing an action the combatant wants to perform next. It must be one of the keyed Actions added to the handler in the `action_classes` property (**Line 17**). We make no use of the `combatant` keyword argument since we already know that the combatant is `self.obj`. 
-- **Line 43**: We simply store the given action dict in the Attribute `action_dict` on the handler. Simple and effective!
-- **Line 44**: When you enter e.g. `attack`, you expect in this type of combat to see the `attack` command repeat automatically even if you don't enter anything more. To this end we are looking for a new key in action dicts, indicating that this action should _repeat_ with a certain rate (`dt`, given in seconds).  We make this compatible with all action dicts by simply assuming it's zero if not specified. 
+- **第 30 行**：`queue_action` 方法採用一個“Action dict”，表示戰鬥者下一步想要執行的動作。它必須是新增到 `action_classes` 屬性中的處理程式的鍵控操作之一（**第 17 行**）。我們沒有使用 `combatant` 關鍵字引數，因為我們已經知道戰鬥者是 `self.obj`。
+- **第 43 行**：我們只是將給定的操作字典儲存在處理程式的 Attribute `action_dict` 中。簡單又有效！
+- **第 44 行**：當您輸入 e.g 時。 `attack`，您希望在這種型別的戰鬥中看到 `attack` 指令自動重複，即使您不再輸入任何內容。為此，我們正在操作字典中尋找一個新鍵，指示該操作應該以一定的速率_重複_（`dt`，以秒為單位）。  如果沒有指定，我們只需假設它為零，就可以使其與所有操作指令相容。
 
- [evennia.utils.utils.repeat](evennia.utils.utils.repeat) and [evennia.utils.utils.unrepeat](evennia.utils.utils.unrepeat) are convenient shortcuts to the [TickerHandler](../../../Components/TickerHandler.md). You tell `repeat` to call a given method/function at a certain rate. What you get back is a reference that you can then later use to 'un-repeat' (stop the repeating) later.  We make sure to store this reference (we don't care exactly how it looks, just that we need to store it) in the `current_ticker_ref` Attribute (**Line 26**).
+[evennia.utils.utils.repeat](evennia.utils.utils.repeat) 和 [evennia.utils.utils.unrepeat](evennia.utils.utils.unrepeat) 是 [TickerHandler](../../../Components/TickerHandler.md) 的便利捷徑。您告訴 `repeat` 以一定的速率呼叫給定的方法/函式。您返回的是一個參考，您可以稍後使用該參考來「取消重複」（停止重複）。  我們確保將此引用儲存在 `current_ticker_ref` Attribute（**第 26 行**）中（我們並不關心它到底是什麼樣子，只是我們需要儲存它）。
  
-- **Line 48**: Whenever we queue a new action (it may replace an existing one) we must make sure to kill (un-repeat) any old repeats that are ongoing. Otherwise we would get old actions firing over and over and new ones starting alongside them.
-- **Line 49**: If `dt` is set, we call `repeat` to set up a new repeat action at the given rate. We store this new reference. After `dt` seconds, the `.execute_next_action` method will fire (we'll create that in the next section).
+- **第 48 行**：每當我們對新操作進行排隊（它可能會替換現有操作）時，我們必須確保殺死（不重複）任何正在進行的舊重複操作。否則，我們會一遍又一遍地觸發舊的操作，同時開始新的操作。
+- **第 49 行**：如果設定了 `dt`，我們呼叫 `repeat` 以給定速率設定新的重複操作。我們儲存這個新參考。 `dt` 秒後，`.execute_next_action` 方法將觸發（我們將在下一節中建立它）。
 
-### Execute an action 
+(execute-an-action)=
+### 執行一個動作
 
 ```{code-block} python
 :linenos:
@@ -325,21 +332,22 @@ class EvAdventureCombatTwitchHandler(EvAdventureCombatBaseHandler):
         self.check_stop_combat()
 ```
 
-This is the method called after `dt` seconds in `queue_action`. 
+這是在 `queue_action` 中 `dt` 秒後呼叫的方法。
 
-- **Line 5**: We defined a 'fallback action'. This is used after a one-time action (one that should not repeat) has completed.
-- **Line 15**: We take the `'key'` from the `action_dict` and use the `action_classes` mapping to get an action class (e.g. `ActionAttack` we defined [here](./Beginner-Tutorial-Combat-Base.md#attack-action)). 
-- **Line 16**: Here we initialize the action class with the actual current data - the combatant and the `action_dict`. This calls the `__init__` method on the class and makes the action ready to use.
-```{sidebar} New action-dict keys 
-To summarize, for twitch-combat use we have now introduced two new keys to action-dicts:
-- `dt`: How long to wait (in seconds) from queueing the action until it fires. 
-- `repeat`: Boolean determining if action should automatically be queued again after it fires.
+- **第 5 行**：我們定義了「後備操作」。這是在一次性操作（不應重複的操作）完成後使用的。
+- **第 15 行**：我們從 `action_dict` 中獲取 `'key'` 並使用 `action_classes` 對映來獲取操作類別（e.g。`ActionAttack` 我們在[此處]定義（./Beginner-Tutorial-Combat-Base.md#attack-action））。
+- **第 16 行**：這裡我們用實際的當前資料初始化動作類別 - 戰鬥人員和 `action_dict`。這將呼叫類別上的 `__init__` 方法並使該操作可供使用。
+```{sidebar} 新的動作字典鍵
+總而言之，對於 twitch-combat 使用，我們現在引入了兩個新的操作字典鍵：
+- `dt`：從將操作排隊到觸發需要等待多長時間（以秒為單位）。
+- `repeat`：布林值決定操作在觸發後是否應自動再次排隊。
 ```
-- **Line 18**: Here we run through the usage methods of the action - where we perform the action. We let the action itself handle all the logics.
-- **Line 22**: We check for another optional flag on the action-dict: `repeat`. Unless it's set, we use the fallback-action defined on **Line 5**. Many actions should not repeat - for example, it would not make sense to do `wield` for the same weapon over and over.
-- **Line 27**: It's important that we know how to stop combat. We will write this method next.
+- **第 18 行**：這裡我們執行操作的使用方法 - 我們執行操作的地方。我們讓動作本身處理所有邏輯。
+- **第 22 行**：我們檢查操作字典上的另一個可選標誌：`repeat`。除非已設定，否則我們將使用 **第 5 行** 上定義的後備操作。許多動作不應該重複 - 例如，對同一武器重複執行 `wield` 是沒有意義的。
+- **第 27 行**：我們知道如何停止戰鬥非常重要。接下來我們就來寫這個方法。
 
-### Checking and stopping combat
+(checking-and-stopping-combat)=
+### 檢查並停止戰鬥
 
 ```{code-block} python 
 :linenos: 
@@ -379,27 +387,29 @@ class EvAdventureCombatTwitchHandler(EvAdventureCombatBaseHandler):
         pass  # We'll finish this last
 ```
 
-We must make sure to check if combat is over. 
+我們必須確保檢查戰鬥是否結束。
 
-- **Line 12**: With our `.get_sides()` method we can easily get the two sides of the conflict.
-- **Lines 18, 19**: We get everyone still alive _and still in the same room_. The latter condition is important in case we move away from the battle - you can't hit your enemy from another room. 
+- **第12行**：透過我們的`.get_sides()`方法，我們可以輕鬆獲得衝突的雙方。
+- **第 18、19 行**：我們讓每個人都還活著_並且仍然在同一個房間_。後一個條件很重要，以防我們離開戰鬥——你無法從另一個房間擊中敵人。
 
-In the `stop_combat` method we'll need to do a bunch of cleanup. We'll hold off on implementing this until we have the Commands written out. Read on.
+在 `stop_combat` 方法中，我們需要進行大量清理。我們將推遲實施此操作，直到我們寫出指令為止。請繼續閱讀。
 
-## Commands 
+(commands)=
+## 指令
 
-We want each action to map to a [Command](../../../Components/Commands.md) - an actual input the player can pass to the game.  
+我們希望每個動作對映到一個 [Command](../../../Components/Commands.md) - 玩家可以傳遞給遊戲的實際輸入。
 
-### Base Combat class 
+(base-combat-class)=
+### 基礎戰鬥類
 
-We should try to find the similarities between the commands we'll need and group them into one parent class. When a Command fires, it will fire the following methods on itself, in sequence: 
+我們應該嘗試找到我們需要的指令之間的相似之處，並將它們分組到一個父類別中。當指令觸發時，它將按順序觸發自身的以下方法：
 
 1. `cmd.at_pre_command()`
 2. `cmd.parse()`
 3. `cmd.func()`
 4. `cmd.at_post_command()`
 
-We'll override the first two for our parent. 
+我們將為我們的父母覆蓋前兩個。
 
 ```{code-block} python
 :linenos: 
@@ -468,10 +478,11 @@ class _BaseTwitchCombatCommand(Command):
         return EvAdventureCombatTwitchHandler.get_or_create_combathandler(self.caller)
 ```
 
-- **Line 23**: If the current location doesn't allow combat, all combat commands should exit immediately. To stop the command before it reaches the `.func()`, we must raise the `InterruptCommand()`. 
-- **Line 49**: It's convenient to add a helper method for getting the command handler because all our commands will be using it. It in turn calls the class method `get_or_create_combathandler` we inherit from the parent of `EvAdventureCombatTwitchHandler`. 
+- **第23行**：如果目前位置不允許戰鬥，則所有戰鬥指令應立即退出。要在指令到達 `.func()` 之前停止該指令，我們必須提高 `InterruptCommand()`。
+- **第 49 行**：新增一個輔助方法來取得指令處理程式很方便，因為我們所有的指令都將使用它。它依序呼叫我們從 `EvAdventureCombatTwitchHandler` 的父級繼承的類別方法 `get_or_create_combathandler`。
 
-### In-combat look command
+(in-combat-look-command)=
+### 戰鬥中檢視指令
 
 ```python
 # in evadventure/combat_twitch.py 
@@ -492,18 +503,19 @@ class CmdLook(default_cmds.CmdLook, _BaseTwitchCombatCommand):
             self.msg(f"|r{pad(' Combat Status ', width=maxwidth, fillchar='-')}|n\n{txt}")
 ```
 
-When in combat we want to be able to do `look` and get the normal look but with the extra `combat summary` at the end (on the form `Me (Hurt)  vs  Troll (Perfect)`). So 
+在戰鬥中，我們希望能夠執行 `look` 並獲得正常的外觀，但最後有額外的 `combat summary` （形式為 `Me (Hurt)  vs  Troll (Perfect)`）。所以
 
-The last line uses Evennia's `utils.pad` function to put the text "Combat Status" surrounded by a line on both sides.
+最後一行使用Evennia的`utils.pad`函式將文字「戰鬥狀態」兩邊用一條線包圍起來。
 
-The result will be the look command output followed directly by 
+結果將是look指令輸出，後面緊接著
 
 ```shell
 --------- Combat Status ----------
 You (Wounded)  vs  Troll (Scraped)
 ```
 
-### Hold command 
+(hold-command)=
+### 保持指令
 
 ```python
 class CmdHold(_BaseTwitchCombatCommand):
@@ -523,13 +535,14 @@ class CmdHold(_BaseTwitchCombatCommand):
         combathandler.msg("$You() $conj(hold) back, doing nothing.", self.caller)
 ```
 
-The 'do nothing' command showcases the basic principle of how all following commands work: 
+「不執行任何操作」指令展示了以下所有指令如何運作的基本原理：
 
-1. Get the combathandler (will be created or loaded if it already existed). 
-2. Queue the action by passing its action-dict to the `combathandler.queue_action` method.
-3. Confirm to the caller that they now queued this action. 
+1. 取得戰鬥處理程式（如果已存在，則將建立或載入）。
+2. 透過將操作字典傳遞給 `combathandler.queue_action` 方法來對操作進行排隊。
+3. 向呼叫者確認他們現在已將此操作排隊。
 
-### Attack command 
+(attack-command)=
+### 攻擊指令
 
 ```python
 # in evadventure/combat_twitch.py 
@@ -565,7 +578,7 @@ class CmdAttack(_BaseTwitchCombatCommand):
         combathandler.msg(f"$You() $conj(attack) $You({target.key})!", self.caller)
 ```
 
-The `attack` command becomes quite simple because we do all the heavy lifting in the combathandler and in the `ActionAttack` class. Note that we set `dt` to a fixed `3` here, but in a more complex system one could imagine your skills, weapon and circumstance affecting how long your attack will take.
+`attack` 指令變得非常簡單，因為我們在戰鬥處理程式和 `ActionAttack` 類別中完成了所有繁重的工作。請注意，我們在這裡將 `dt` 設定為固定的 `3`，但在更複雜的系統中，人們可以想像你的技能、武器和環境會影響你的攻擊所需的時間。
 
 ```python
 # in evadventure/combat_twitch.py 
@@ -677,13 +690,14 @@ class CmdStunt(_BaseTwitchCombatCommand):
 
 ```
 
-This looks much longer, but that is only because the stunt command should understand many different input structures depending on if you are trying to create an advantage or disadvantage, and if an ally or enemy should receive the effect of the stunt. 
+這看起來更長，但這只是因為特技指令應該理解許多不同的輸入結構，這取決於您是否試圖創造優勢或劣勢，以及盟友或敵人是否應該收到特技的效果。
 
-Note the `enums.ABILITY_REVERSE_MAP` (created in the [Utilities lesson](./Beginner-Tutorial-Utilities.md)) being useful to convert your input of 'str' into `Ability.STR` needed by the action dict.
+請注意 `enums.ABILITY_REVERSE_MAP`（在[實用工具課程](./Beginner-Tutorial-Utilities.md) 中建立）對於將「str」輸入轉換為操作字典所需的 `Ability.STR` 非常有用。
 
-Once we've sorted out the string parsing, the `func` is simple - we find the target and recipient and use them to build the needed action-dict to queue. 
+一旦我們完成了字串解析，`func` 就很簡單了 - 我們找到目標和接收者，並使用它們來建立所需的操作字典來排隊。
 
-### Using items 
+(using-items)=
+### 使用物品
 
 ```python
 # in evadventure/combat_twitch.py 
@@ -743,9 +757,10 @@ class CmdUseItem(_BaseTwitchCombatCommand):
         )
 ```
 
-To use an item, we need to make sure we are carrying it. Luckily our work in the [Equipment lesson](./Beginner-Tutorial-Equipment.md) gives us easy methods we can use to search for suitable objects.
+要使用某件物品，我們需要確保攜帶它。幸運的是，我們在[裝備課](./Beginner-Tutorial-Equipment.md)中的工作為我們提供了簡單的方法來搜尋合適的物件。
 
-### Wielding new weapons and equipment
+(wielding-new-weapons-and-equipment)=
+### 揮舞新的武器和裝備
 
 ```python
 # in evadventure/combat_twitch.py 
@@ -793,11 +808,12 @@ class CmdWield(_BaseTwitchCombatCommand):
 
 ```
 
-The Wield command follows the same pattern as other commands.
+使用指令遵循與其他指令相同的模式。
 
-## Grouping Commands for use 
+(grouping-commands-for-use)=
+## 使用分組指令
 
-To make these commands available to use we must add them to a [Command Set](../../../Components/Command-Sets.md). 
+為了使這些指令可用，我們必須將它們新增至[指令集](../../../Components/Command-Sets.md)。
 
 ```python 
 # in evadventure/combat_twitch.py 
@@ -832,13 +848,14 @@ class TwitchLookCmdSet(CmdSet):
 
 ```
 
-The first cmdset, `TwitchCombatCmdSet` is intended to be added to the Character. We can do so permanently by adding the cmdset to the default character cmdset (as outlined in the [Beginner Command lesson](../Part1/Beginner-Tutorial-Adding-Commands.md)). In the testing section below, we'll do this in another way.
+第一個 cmdset、`TwitchCombatCmdSet` 旨在新增到角色中。我們可以透過將 cmdset 新增至預設字元 cmdset 來永久執行此操作（如[初學者指令課程](../Part1/Beginner-Tutorial-Adding-Commands.md) 中所述）。在下面的測試部分中，我們將以另一種方式執行此操作。
 
-What about that `TwitchLookCmdSet`? We can't add it to our character permanently, because we only want this particular version of `look` to operate while we are in combat. 
+那`TwitchLookCmdSet`呢？我們無法將其永久新增到我們的角色中，因為我們只希望這個特定版本的 `look` 在我們戰鬥時執行。
 
-We must make sure to add and clean this up when combat starts and ends.
+我們必須確保在戰鬥開始和結束時新增並清理它。
 
-### Combat startup and cleanup
+(combat-startup-and-cleanup)=
+### 戰鬥啟動和清理
 
 ```{code-block} python 
 :linenos: 
@@ -862,26 +879,27 @@ class EvAdventureCombatTwitchHandler(EvAdventureCombatBaseHandler):
         self.delete()
 ```
 
-Now that we have the Look command set, we can finish the Twitch combat handler. 
+現在我們有了 Look 指令集，我們可以完成 Twitch 戰鬥處理程式了。
 
-- **Line 9**: The `at_init` method is a standard Evennia method available on all typeclassed entities (including `Scripts`, which is what our combat handler is). Unlike `at_object_creation` (which only fires once, when the object is first created), `at_init` will be called every time the object is loaded into memory (normally after you do a server `reload`). So we add the `TwitchLookCmdSet` here. We do so non-persistently, since we don't want to get an ever growing number of cmdsets added every time we reload. 
-- **Line 13**: By queuing a hold action with `dt` of `0`, we make sure to kill the `repeat` action that is going on. If not, it would still fire later - and find that the combat handler is gone. 
-- **Line 14**: If looking at how we defined the `get_or_create_combathandler` classmethod (the one we have been using to get/create the combathandler during the combat), you'll see that it caches the handler as `.ndb.combathandler` on the object we send to it. So we delete that cached reference here to make sure it's gone. 
-- **Line 15**: We remove the look-cmdset from ourselves (remember `self.obj` is you, the combatant that now just finished combat).
-- **Line 16**: We delete the combat handler itself. 
+- **第 9 行**：`at_init` 方法是可用於所有型別分類實體的標準 Evennia 方法（包括 `Scripts`，這是我們的戰鬥處理程式）。與`at_object_creation`（僅在第一次建立物件時觸發一次）不同，每次將物件載入記憶體時都會呼叫`at_init`（通常在執行伺服器`reload`之後）。所以我們在這裡新增`TwitchLookCmdSet`。我們這樣做不是持久的，因為我們不希望每次重新載入時都新增越來越多的cmdsets。
+- **第 13 行**：透過將 `dt` 的 `0` 的保留作業排隊，我們確保終止正在進行的 `repeat` 操作。如果沒有，它稍後仍會開火 - 並發現戰鬥處理程式已經消失。
+- **第 14 行**：如果檢視我們如何定義 `get_or_create_combathandler` 類方法（我們在戰鬥期間用來獲取/建立戰鬥處理程式的方法），您會發現它將處理程式快取為我們傳送給它的對像上的 `.ndb.combathandler`。因此，我們刪除此處快取的引用以確保它已消失。
+- **第15行**：我們刪除我們自己的表情-cmdset（記住`self.obj`是你，剛結束戰鬥的戰鬥者）。
+- **第 16 行**：我們刪除戰鬥處理程式本身。
 
 
-## Unit Testing 
+(unit-testing)=
+## 單元測試
 
 ```{sidebar} 
-For examples of unit tests, see `evennia/contrib/tutorials`, in [evadventure/tests/test_combat.py](evennia.contrib.tutorials.evadventure.tests.test_combat) for an example of a full suite of combat tests.
+有關單元測試的範例，請參閱 [evadventure/tests/test_combat.py](evennia.contrib.tutorials.evadventure.tests.test_combat) 中的 `evennia/contrib/tutorials`，以瞭解全套戰鬥測試的範例。
 ```
 
-> Create `evadventure/tests/test_combat.py` (if you don't already have it).
+> 建立`evadventure/tests/test_combat.py`（如果您還沒有）。
 
-Both the Twitch command handler and commands can and should be unit tested.  Testing of commands are made easier by Evennia's special `EvenniaCommandTestMixin` class. This makes the `.call` method available and makes it easy to check if a command returns what you expect. 
+Twitch 指令處理程式和指令都可以而且應該進行單元測試。  Evennia 的特殊 `EvenniaCommandTestMixin` 類別使指令測試變得更加容易。這使得 `.call` 方法可用，並且可以輕鬆檢查指令是否返回您期望的結果。
 
-Here's an example: 
+這是一個例子：
 
 ```python 
 # in evadventure/tests/test_combat.py 
@@ -909,36 +927,37 @@ class TestEvAdventureTwitchCombat(EvenniaCommandTestMixin):
             
 ```
 
-The `EvenniaCommandTestMixin` has a few default objects, including `self.char1`, which we make use of here. 
+`EvenniaCommandTestMixin` 有一些預設物件，包括我們在這裡使用的 `self.char1`。
 
-The two `@patch` lines are Python [decorators](https://realpython.com/primer-on-python-decorators/) that 'patch' the `test_hold_command` method. What they do is basically saying "in the following method, whenever any code tries to access `evadventure.combat_twitch.un/repeat`, just return a Mocked object instead".
+兩行 `@patch` 是 Python [裝飾器](https://realpython.com/primer-on-python-decorators/)，用於「修補」`test_hold_command` 方法。他們所做的基本上是說「在下面的方法中，每當任何程式碼嘗試存取 `evadventure.combat_twitch.un/repeat` 時，只需返回模擬物件」。
 
-We do this patching as an easy way to avoid creating timers in the unit test - these timers would finish after the test finished (which includes deleting its objects) and thus fail. 
+我們進行此修補是一種簡單的方法，以避免在單元測試中建立計時器 - 這些計時器將在測試完成後完成（包括刪除其物件），從而失敗。
 
-Inside the test, we use the `self.call()` method to explicitly fire the Command (with no argument) and check that the output is what we expect.  Lastly we check that the combathandler is set up correctly, having stored the action-dict on itself. 
+在測試中，我們使用 `self.call()` 方法明確觸發指令（不含引數）並檢查輸出是否符合我們的預期。  最後，我們檢查戰鬥處理程式是否設定正確，並將操作字典儲存在其自身上。
 
-## A small combat test
+(a-small-combat-test)=
+## 實戰小測試
 
 ```{sidebar}
-You can find an example batch-command script at `evennia/contrib/tutorials/evadventure`, in [batchscripts/twitch_combat_demo.ev](github:evennia/contrib/tutorials/evadventure/batchscripts/twitch_combat_demo.ev)
+您可以在 [batchscripts/twitch_combat_demo.ev](github:evennia/contrib/tutorials/evadventure/batchscripts/twitch_combat_demo.ev) `evennia/contrib/tutorials/evadventure` 處找到範例批次指令 script
 ```
-Showing that the individual pieces of code works (unit testing) is not enough to be sure that your combat system is actually working. We need to test all the pieces _together_. This is often called _functional testing_. While functional testing can also be automated, wouldn't it be fun to be able to actually see our code in action? 
+顯示各個程式碼片段的工作（單元測試）並不足以確保您的戰鬥系統確實運作。我們需要一起測試所有部分。這通常稱為_功能測試_。雖然功能測試也可以自動化，但能夠實際看到我們的程式碼在執行不是很有趣嗎？
 
-This is what we need for a minimal test: 
+這是我們進行最小測試所需的：
 
- - A room with combat enabled. 
- - An NPC to attack (it won't do anything back yet since we haven't added any AI)
- - A weapon we can `wield` 
- - An item (like a potion) we can `use`. 
+ - 一個可以進行戰鬥的房間。
+ - NPC 進行攻擊（它不會做任何反擊，因為我們還沒有增加任何 AI）
+ - 我們可以`wield`的武器
+ - 一個物品（例如藥水）我們可以`use`。
 
-While you can create these manually in-game, it can be convenient to create a [batch-command script](../../../Components/Batch-Command-Processor.md) to set up your testing environment. 
+雖然您可以在遊戲中手動建立這些，但建立 [batch-command script](../../../Components/Batch-Command-Processor.md) 來設定測試環境會很方便。
 
-> create a new subfolder `evadventure/batchscripts/`  (if it doesn't already exist)
+> 建立一個新的子資料夾 `evadventure/batchscripts/` （如果它尚不存在）
 
 
-> create a new file `evadventure/combat_demo.ev`  (note, it's `.ev` not `.py`!) 
+> 建立一個新檔案`evadventure/combat_demo.ev`（注意，它是`.ev`而不是`.py`！）
 
-A batch-command file is a text file with normal in-game commands, one per line, separated by lines starting with `#` (these are required between all command lines). Here's how it looks: 
+批次指令檔案是一個文字檔案，其中包含正常的遊戲內指令，每行一個，以 `#` 開頭的行分隔（所有指令列之間都需要這些指令）。它看起來是這樣的：
 
 ```
 # Evadventure combat demo 
@@ -992,18 +1011,19 @@ set dummy/hp_max = 1000
 set dummy/hp = 1000
 ```
 
-Log into the game with a developer/superuser account and run
+使用開發者/超級使用者帳戶登入遊戲並執行
 
     > batchcmd evadventure.batchscripts.twitch_combat_demo 
     
-This should place you in the arena with the dummy (if not, check for errors in the output! Use `objects` and `delete` commands to list and delete objects if you need to start over. )
+這應該會將您置於與虛擬人一起的競技場中（如果沒有，請檢查輸出中是否有錯誤！如果需要重新開始，請使用 `objects` 和 `delete` 指令列出並刪除物件。）
 
-You can now try `attack dummy` and should be able to pound away at the dummy (lower its health to test destroying it). Use `back` to 'flee' the combat. 
+現在您可以嘗試`attack dummy`，並且應該能夠猛擊假人（降低其生命值以測試摧毀它）。使用`back`「逃離」戰鬥。
 
-## Conclusions 
+(conclusions)=
+## 結論
 
-This was a big lesson! Even though our combat system is not very complex, there are still many moving parts to keep in mind. 
+這是一個很大的教訓！儘管我們的戰鬥系統不是很複雜，但仍然有許多活動部件需要記住。
 
-Also, while pretty simple, there is also a lot of growth possible with this system. You could easily expand from this or use it as inspiration for your own game.
+此外，雖然非常簡單，但該系統也有很大的發展空間。您可以輕鬆地從中擴充套件或將其用作您自己的遊戲的靈感。
 
-Next we'll try to achieve the same thing within a turn-based framework! 
+接下來我們將嘗試在回合製框架中實現同樣的目標！

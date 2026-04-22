@@ -1,31 +1,33 @@
-# Adding room coordinates to your game
+(adding-room-coordinates-to-your-game)=
+# 將房間座標新增到您的遊戲中
 
-```{sidebar} The XYZGrid 
-See also the [XYZGrid contrib](../Contribs/Contrib-XYZGrid.md), which adds coordinate support and pathfinding.
+```{sidebar} XYZGrid
+另請參閱 [XYZGrid contrib](../Contribs/Contrib-XYZGrid.md)，它新增了座標支援和尋路。
 ```
-This tutorial is moderately difficult in content.  You might want to be familiar and at ease with some Python concepts (like properties) and possibly Django concepts (like queries), although this tutorial will try to walk you through the process and give enough explanations each time.  If you don't feel very confident with math, don't hesitate to pause, go to the example section, which shows a tiny map, and try to walk around the code or read the explanation.
+本教學的內容難度適中。  您可能希望熟悉並輕鬆瞭解一些 Python 概念（如屬性）和可能的 Django 概念（如查詢），儘管本教學將嘗試引導您完成整個過程並每次都給出足夠的解釋。  如果您對數學不太有信心，請立即暫停，轉到範例部分，其中顯示了一張小地圖，並嘗試瀏覽程式碼或閱讀說明。
 
-Evennia doesn't have a coordinate system by default.  Rooms and other objects are linked by location and content:
+Evennia 預設沒有座標系。  房間和其他物件透過位置和內容連結：
 
-- An object can be in a location, that is, another object.  Like an exit in a room.
-- An object can access its content.  A room can see what objects uses it as location (that would
-  include exits, rooms, characters and so on).
+- 一個物件可以位於一個位置，即另一個物件。  就像房間裡的出口一樣。
+- 物件可以存取其內容。  房間可以看到哪些物件使用它作為位置（這將
+包括出口、房間、角色等）。
 
-This system allows for a lot of flexibility and, fortunately, can be extended by other systems.
-Here, I offer you a way to add coordinates to every room in a way most compliant with Evennia
-design.  This will also show you how to use coordinates, find rooms around a given point for
-instance.
+該系統具有很大的靈活性，幸運的是，可以透過其他系統進行擴充套件。
+在這裡，我為您提供一種以最符合Evennia的方式為每個房間新增座標的方法
+設計。  這也將向您展示如何使用座標，尋找給定點周圍的房間
+例項。
 
-## Coordinates as tags
+(coordinates-as-tags)=
+## 座標為tags
 
-The first concept might be the most surprising at first glance: we will create coordinates as
-[tags](../Components/Tags.md).
+第一個概念乍看之下可能是最令人驚訝的：我們將建立坐標為
+[tags](../Components/Tags.md)。
 
-So, why not attributes, wouldn't that be easier?  It would.  We could just do something like `room.db.x = 3`.  The advantage of using tags is that it will be easy and effective to search.  Although this might not seem like a huge advantage right now, with a database of thousands of rooms, it might make a difference, particularly if you have a lot of things based on coordinates.
+那麼，為什麼不使用屬性，這不是更容易嗎？  會的。  我們可以做類似 `room.db.x = 3` 的事。  使用tags的好處是搜尋起來既簡單又有效。  雖然現在這看起來並不是一個巨大的優勢，但對於擁有數千個房間的資料庫來說，它可能會產生影響，特別是如果你有很多基於座標的東西。
 
-Rather than giving you a step-by-step process, We'll show you the code.  Notice that we use
-properties to easily access and update coordinates.  This is a Pythonic approach.  Here's our first
-`Room` class, that you can modify in `typeclasses/rooms.py`:
+我們不會向您提供逐步過程，而是向您展示程式碼。  請注意，我們使用
+屬性以輕鬆存取和更新座標。  這是一種 Pythonic 方法。  這是我們的第一個
+`Room` 類，您可以在 `typeclasses/rooms.py` 中修改：
 
 ```python
 # in typeclasses/rooms.py
@@ -89,12 +91,12 @@ class Room(DefaultRoom):
             self.tags.add(str(z), category="coordz")
 ```
 
-If you aren't familiar with the concept of properties in Python, I encourage you to read a good
-tutorial on the subject.  [This article on Python properties](https://www.programiz.com/python-
+如果您不熟悉 Python 中的屬性概念，我鼓勵您閱讀一本好書
+關於該主題的教學。  [這篇關於Python屬性的文章](https://www.programiz.com/python-
 programming/property)
-is well-explained and should help you understand the idea.
+解釋得很清楚，應該可以幫助您理解這個想法。
 
-Let's look at our properties for `x`.  First of all is the read property.
+讓我們看看 `x` 的屬性。  首先是讀取屬性。
 
 ```python
     @property
@@ -104,16 +106,16 @@ Let's look at our properties for `x`.  First of all is the read property.
         return int(x) if isinstance(x, str) else None
 ```
 
-What it does is pretty simple:
+它的作用非常簡單：
 
-1. It gets the tag of category `"coordx"`.  It's the tag category where we store our X coordinate.
-   The `tags.get` method will return `None` if the tag can't be found.
-2. We convert the value to an integer, if it's a `str`.  Remember that tags can only contain `str`,
-   so we'll need to convert it.
+1. 它獲取類別 `"coordx"` 的 tag。  這是我們儲存 X 座標的 tag 類別。
+如果找不到 tag，`tags.get` 方法將回傳 `None`。
+2. 如果該值是 `str`，我們會將其轉換為整數。  請記住tags只能包含`str`，
+所以我們需要轉換它。
 
-So can Tags contain values? Well, technically, they can't: they're either here or not.  But using tag categories, as we have done, we get a tag, knowing only its category.  That's the basic approach to coordinates in this tutorial.
+那麼Tags可以包含數值嗎？好吧，從技術上講，他們不能：他們要麼在這裡，要麼不在這裡。  但使用 tag 類別，就像我們所做的那樣，我們得到 tag，只知道它的類別。  這是本教學中座標的基本方法。
 
-Now, let's look at the method that will be called when we wish to set `x` in our room:
+現在，讓我們看看當我們希望在房間中設定 `x` 時將呼叫的方法：
 
 ```python
     @x.setter
@@ -126,12 +128,12 @@ Now, let's look at the method that will be called when we wish to set `x` in our
             self.tags.add(str(x), category="coordx")
 ```
 
-1. First, we remove the old X coordinate, if it exists.  Otherwise, we'd end up with two tags in our
-   room with "coordx" as their category, which wouldn't do at all.
-2. Then we add the new tag, giving it the proper category.
+1. 首先，我們刪除舊的 X 座標（如果存在）。  否則，我們最終會得到兩個 tags
+房間以“coordx”為類別，這根本行不通。
+2. 然後我們新增新的 tag，為其指定正確的類別。
 
-If you add this code and reload your game, once you're logged in with a character in a room as its
-location, you can play around:
+如果您新增此程式碼並重新載入遊戲，一旦您使用房間中的角色登入
+位置，你可以玩：
 
 ```
 py here.x
@@ -141,23 +143,25 @@ py here.z = -2
 py here.z = None
 ```
 
-## Some additional searches
+(some-additional-searches)=
+## 一些額外的搜尋
 
-Having coordinates is useful for several reasons:
+擁有座標很有用，原因如下：
 
-1. It can help in shaping a truly logical world, in its geography, at least.
-2. It can allow to look for specific rooms at given coordinates.
-3. It can be good in order to quickly find the rooms around a location.
-4. It can even be great in path-finding (finding the shortest path between two rooms).
+1. 它可以幫助塑造一個真正邏輯的世界，至少在地理上是如此。
+2. 它可以允許在給定座標處尋找特定房間。
+3. 它可以很好地快速找到某個位置周圍的房間。
+4. 它甚至在尋路（找到兩個房間之間的最短路徑）方面也很有用。
 
-So far, our coordinate system can help with 1., but not much else.  Here are some methods that we
-could add to the `Room` typeclass.  These methods will just be search methods.  Notice that they are
-class methods, since we want to get rooms.
+到目前為止，我們的座標係可以幫助解決 1. 問題，但除此之外就沒有什麼幫助了。  以下是我們所採用的一些方法
+可以加到`Room` typeclass。  這些方法只是搜尋方法。  請注意，他們是
+類別方法，因為我們想要獲得房間。
 
-### Finding one room
+(finding-one-room)=
+### 尋找一間房間
 
-First, a simple one: how to find a room at a given coordinate?  Say, what is the room at X=0, Y=0,
-Z=0?
+首先，一個簡單的問題：如何在給定座標處找到房間？  比如說，X=0、Y=0 處的房間是多少，
+Z=0？
 
 ```python
 class Room(DefaultRoom):
@@ -186,20 +190,21 @@ class Room(DefaultRoom):
         return None
 ```
 
-This solution includes some [Django queries](Basic-Tutorial-Django-queries).  Basically, what we do is reach for the object manager and search for objects with the matching tags. Again, don't spend too much time worrying about the mechanism, the method is quite easy to use:
+此解決方案包括一些[Django查詢](Basic-Tutorial-Django-queries)。  基本上，我們所做的就是存取物件管理器並搜尋具有匹配 tags 的物件。再次強調，不要花太多時間擔心機制，這個方法非常容易使用：
 
 ```
 Room.get_room_at(5, 2, -3)
 ```
 
-Notice that this is a class method: you will call it from `Room` (the class), not an instance. Though you still can:
+請注意，這是一個類別方法：您將從 `Room` （類別）而不是例項呼叫它。儘管你仍然可以：
 
     py here.get_room_at(3, 8, 0)
 
-### Finding several rooms
+(finding-several-rooms)=
+### 找幾個房間
 
-Here's another useful method that allows us to look for rooms around a given coordinate.  This is more advanced search and doing some calculation, beware!  Look at the following section if you're
-lost.
+這是另一種有用的方法，它允許我們尋找給定座標周圍的房間。  這是更高階的搜尋並進行一些計算，請注意！  如果您是，請檢視以下部分
+丟失了。
 
 ```python
 from math import sqrt
@@ -260,22 +265,23 @@ class Room(DefaultRoom):
         return rooms
 ```
 
-This gets more serious.
+這變得更加嚴重。
 
-1. We have specified coordinates as parameters.  We determine a broad range using the distance.
-   That is, for each coordinate, we create a list of possible matches.  See the example below.
-2. We then search for the rooms within this broader range.  It gives us a square around our location.  Some rooms are definitely outside the range.  Again, see the example below to follow the logic.
-3. We filter down the list and sort it by distance from the specified coordinates.
+1. 我們指定了座標作為引數。  我們使用距離來確定一個廣泛的範圍。
+也就是說，對於每個座標，我們建立一個可能匹配的清單。  請參閱下面的範例。
+2. 然後我們在這個更廣泛的範圍內搜尋房間。  它在我們的位置周圍提供了一個正方形。  有些房間絕對不在範圍內。  再次，請參閱下面的範例以遵循邏輯。
+3. 我們過濾列表並按指定座標的距離對其進行排序。
 
-Notice that we only search starting at step 2.  Thus, the Django search doesn't look and cache all
-objects, just a wider range than what would be really necessary.  This method returns a circle of
-coordinates around a specified point.  Django looks for a square.  What wouldn't fit in the circle
-is removed at step 3, which is the only part that includes systematic calculation.  This method is
-optimized to be quick and efficient.
+請注意，我們僅從步驟 2 開始搜尋。因此，Django 搜尋不會尋找並快取所有內容
+物件，只是比真正需要的範圍更廣泛。  該方法傳回一個圓
+圍繞指定點的座標。  姜戈尋找一個正方形。  什麼不適合圈子
+在步驟3中被刪除，這是唯一包含系統計算的部分。  這個方法是
+最佳化以快速且有效率。
 
-### An example
+(an-example)=
+### 一個例子
 
-An example might help.  Consider this very simple map (a textual description follows):
+一個例子可能會有所幫助。  考慮這個非常簡單的地圖（下面有文字描述）：
 
 ```
 4 A B C D
@@ -285,18 +291,18 @@ An example might help.  Consider this very simple map (a textual description fol
   1 2 3 4
 ```
 
-The X coordinates are given below.  The Y coordinates are given on the left.  This is a simple square with 16 rooms: 4 on each line, 4 lines of them.  All the rooms are identified by letters in this example: the first line at the top has rooms A to D, the second E to H, the third I to L and the fourth M to P.  The bottom-left room, X=1 and Y=1, is M.  The upper-right room X=4 and Y=4 is D. 
-So let's say we want to find all the neighbors, distance 1, from the room J.  J is at X=2, Y=2.
+X 座標如下。  Y 座標在左側給出。  這是一個簡單的正方形，有 16 個房間：每行 4 個，共 4 行。  在此範例中，所有房間均由字母標識：頂部第一行為房間 A 至 D，第二行為房間 A 至 D，第二行為房間 E 至 H，第三行為房間 I 至 L，第四行為 M 至 P。左下房間 X=1 和 Y=1 為 M。右上房間 X=4 且 Y=4 為 D。 
+假設我們想要找出所有距房間 J 的鄰居，距離為 1。 J 位於 X=2，Y=2 處。
 
-So we use:
+所以我們使用：
 
     Room.get_rooms_around(x=2, y=2, z=0, distance=1)
     # we'll assume a z coordinate of 0 for simplicity
 
-1. First, this method gets all the rooms in a square around J.  So it gets E F G, I J K, M N O.  If you want, draw the square around these coordinates to see what's happening.
-2. Next, we browse over this list and check the real distance between J (X=2, Y=2) and the room. The four corners of the square are not in this circle.  For instance, the distance between J and M is not 1.  If you draw a circle of center J and radius 1, you'll notice that the four corners of our square (E, G, M and O) are not in this circle. So we remove them. 3. We sort by distance from J.
+1. 首先，此方法取得 J 周圍正方形中的所有房間。因此它得到 E F G、I J K、M N O。如果需要，可以在這些座標周圍繪製正方形以檢視發生了什麼。
+2. 接下來，我們瀏覽此清單並檢查 J（X=2，Y=2）與房間之間的實際距離。正方形的四個角不在這個圓內。  例如，J 和 M 之間的距離不是 1。如果您畫一個以 J 為中心、半徑為 1 的圓，您會注意到正方形的四個角（E、G、M 和 O）不在該圓內。所以我們刪除它們。 3.我們按照與J的距離排序。
 
-So in the end we might obtain something like this:
+所以最終我們可能會得到這樣的結果：
 
 ```
 [
@@ -308,9 +314,10 @@ So in the end we might obtain something like this:
 ]
 ```
 
-You can try with more examples if you want to see this in action.
+如果您想檢視實際效果，可以嘗試更多範例。
 
-## To conclude
+(to-conclude)=
+## 總結一下
 
-You can also use this system to map other objects, not just rooms.  You can easily remove the
-`Z` coordinate too, if you simply need `X` and `Y`.
+您還可以使用該系統來對映其他物件，而不僅僅是房間。  您可以輕鬆刪除
+`Z` 座標，如果您只需要 `X` 和 `Y`。

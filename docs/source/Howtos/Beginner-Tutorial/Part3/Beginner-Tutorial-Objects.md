@@ -1,20 +1,22 @@
-# In-game Objects and items
+(in-game-objects-and-items)=
+# 遊戲內的物品和物品
 
-In the previous lesson we established what a 'Character' is in our game. Before we continue 
-we also need to have a notion what an 'item' or 'object' is. 
+在上一課中，我們確定了遊戲中的「角色」。在我們繼續之前
+我們還需要知道什麼是“專案”或“物件”。
 
-Looking at _Knave_'s item lists, we can get some ideas of what we need to track: 
+檢視 _Knave_ 的專案列表，我們可以瞭解需要追蹤的內容：
 
-- `size` - this is how many 'slots' the item uses in the character's inventory.
-- `value` - a base value if we want to sell or buy the item. 
-- `inventory_use_slot` - some items can be worn or wielded. For example, a helmet needs to be  worn on the head and a shield in the shield hand. Some items can't be used this way at all, but  only belong in the backpack.
-- `obj_type` - Which 'type' of item this is.
+- `size` - 這是該物品在角色的庫存中使用的「槽位」數量。
+- `value` - 如果我們想出售或購買該物品，則為基礎值。
+- `inventory_use_slot` - 有些物品可以穿戴或揮舞。例如頭上需要戴頭盔，手上需要戴盾牌。有些物品根本不能這樣使用，只能放在揹包裡。
+- `obj_type` - 這是哪種「型別」的物品。
   
 
-## New Enums 
+(new-enums)=
+## 新列舉
 
-We added a few enumberations for Abilities back in the [Utilities tutorial](./Beginner-Tutorial-Utilities.md).
-Before we continue, let's expand with enums for use-slots and object types.
+我們在[實用工具教學](./Beginner-Tutorial-Utilities.md) 中加入了一些能力的編號。
+在繼續之前，讓我們用列舉來擴充套件使用槽和物件型別。
 
 ```python
 # mygame/evadventure/enums.py
@@ -43,19 +45,20 @@ class ObjType(Enum):
     TREASURE = "treasure"
 ```
 
-Once we have these enums, we will use them for referencing things.
+一旦我們有了這些列舉，我們將使用它們來引用事物。
 
-## The base object
+(the-base-object)=
+## 基礎物件
 
-> Create a new module `mygame/evadventure/objects.py`
+> 建立一個新模組`mygame/evadventure/objects.py`
 
 ```{sidebar}
-[evennia/contrib/tutorials/evadventure/objects.py](../../../api/evennia.contrib.tutorials.evadventure.objects.md) has 
-a full set of objects implemented.
+[evennia/contrib/tutorials/evadventure/objects.py](../../../api/evennia.contrib.tutorials.evadventure.objects.md) 有
+實現的一整套物件。
 ```
 <div style="clear: right;"></div>
 
-We will make a base `EvAdventureObject` class off Evennia's standard `DefaultObject`. We will then add child classes to represent the relevant types: 
+我們將根據 Evennia 的標準 `DefaultObject` 制定基本 `EvAdventureObject` 等級。然後我們將新增子類別來表示相關型別：
 
 ```python 
 # mygame/evadventure/objects.py
@@ -119,10 +122,11 @@ class EvAdventureObject(DefaultObject):
         return "No help for this item"
 ```
 
-### Using Attributes or not
+(using-attributes-or-not)=
+### 是否使用屬性
 
-In theory, `size` and `value` does not change and _could_ also be just set as a regular Python 
-property on the class: 
+理論上，`size` 和 `value` 不會改變，_也可以_設定為常規 Python
+類別上的屬性：
 
 ```python 
 class EvAdventureObject(DefaultObject):
@@ -131,24 +135,25 @@ class EvAdventureObject(DefaultObject):
     value = 0 
 ```
 
-The problem with this is that if we want to make a new object of `size 3` and `value 20`, we have to  make a new class for it. We can't change it on the fly because the change would only be in memory and  be lost on next server reload. 
+這樣做的問題是，如果我們想建立一個`size 3`和`value 20`的新物件，我們必須為其建立一個新類別。我們無法即時更改它，因為更改只會儲存在記憶體中，並且會在下次伺服器重新載入時遺失。
 
-Because we use `AttributeProperties`, we can set `size` and `value` to whatever we like when we  create the object (or later), and the Attributes will remember our changes to that object indefinitely.
+因為我們使用`AttributeProperties`，所以我們可以在建立物件時（或以後）將`size`和`value`設定為我們喜歡的任何內容，並且屬性將無限期地記住我們對該物件的更改。
 
-To make this a little more efficient, we use `autocreate=False`. Normally when you create a new object with defined `AttributeProperties`, a matching `Attribute` is immediately created at  the same time. So normally, the object would be created along with two Attributes `size` and `value`. With `autocreate=False`, no Attribute will be created _unless the default is changed_. That is, as  long as your object has `size=1` no database `Attribute` will be created at all. This saves time and  resources when creating large number of objects.
+為了提高效率，我們使用`autocreate=False`。通常，當您建立定義了 `AttributeProperties` 的新物件時，會立即同時建立符合的 `Attribute`。因此，通常情況下，該物件將與兩個屬性 `size` 和 `value` 一起建立。對於 `autocreate=False`，不會建立 Attribute _除非更改預設值_。也就是說，只要你的物件有`size=1`，就根本不會建立資料庫`Attribute`。建立大量物件時，這可以節省時間和資源。
 
-The drawback is that since no Attribute is created you can't refer to it with `obj.db.size` or `obj.attributes.get("size")` _unless you change its default_. You also can't query  the database for all objects with `size=1`, since most objects would not yet have an in-database
-`size` Attribute to search for.
+缺點是，由於沒有建立 Attribute，因此您無法使用 `obj.db.size` 或 `obj.attributes.get("size")` 引用它_除非您更改其預設值_。您也無法在資料庫中查詢帶有 `size=1` 的所有物件，因為大多數物件還沒有資料庫內資料
+`size` Attribute 進行搜尋。
 
-In our case, we'll only refer to these properties as `obj.size` etc, and have no need to find 
-all objects of a particular size. So we should be safe.
+在我們的例子中，我們只會將這些屬性稱為 `obj.size` 等，並且不需要查詢
+所有具有特定尺寸的物體。所以我們應該是安全的。
 
-### Creating tags in `at_object_creation`
+(creating-tags-in-at_object_creation)=
+### 在 `at_object_creation` 中建立 tags
 
-The `at_object_creation` is a method Evennia calls on every child of `DefaultObject` whenever it is first created. 
+`at_object_creation` 是 Evennia 的方法，每當首次建立 `DefaultObject` 的每個子級時都會呼叫該方法。
 
-We do a tricky thing here, converting our `.obj_type` to one or more [Tags](../../../Components/Tags.md). Tagging the  object like this means you can later efficiently find all objects of a given type (or combination of 
-types) with Evennia's search functions:
+我們在這裡做了一件棘手的事情，將 `.obj_type` 轉換為一個或多個 [Tags](../../../Components/Tags.md)。像這樣標記物件意味著您以後可以有效地查詢給定型別（或組合）的所有物件
+型別）與 Evennia 的搜尋功能：
 
 ```python
     from .enums import ObjType 
@@ -158,11 +163,12 @@ types) with Evennia's search functions:
     all_shields = search.search_object_by_tag(ObjType.SHIELD.value, category="obj_type")
 ```
 
-We allow `.obj_type` to be given as a single value or a list of values. We use `make_iter` from the  evennia utility library to make sure we don't balk at either. This means you could have a Shield that  is also Magical, for example.
+我們允許 `.obj_type` 作為單一值或值列表給出。我們使用 evennia 實用程式庫中的 `make_iter` 來確保我們不會猶豫。例如，這意味著您可以擁有一個同樣是魔法的盾牌。
 
-## Other object types 
+(other-object-types)=
+## 其他物件型別
 
-Some of the other object types are very simple so far. 
+到目前為止，其他一些物件型別非常簡單。
 
 ```python 
 # mygame/evadventure/objects.py 
@@ -185,9 +191,10 @@ class EvAdventureTreasure(EvAdventureObject):
     
 ```
 
-## Consumables 
+(consumables)=
+## 耗材
 
-A 'consumable' is an item that has a certain number of 'uses'. Once fully consumed, it can't be used  anymore. An example would be a health potion.
+「消耗品」是具有一定次數「使用」的物品。一旦完全消耗，就無法再使用。一個例子是健康藥水。
 
 
 ```python 
@@ -225,13 +232,14 @@ class EvAdventureConsumable(EvAdventureObject):
             self.delete()
 ```
 
-In `at_pre_use` we check if we have specified a target (heal someone else or throw a fire bomb at an enemy?), making sure we are in the same location. We also make sure we have `usages` left. In `at_post_use` we make sure to tick off usages. 
+在`at_pre_use`中，我們檢查是否指定了目標（治療其他人或向敵人投擲火焰彈？），確保我們位於同一位置。我們也確保還剩下`usages`。在`at_post_use`中，我們確保勾選用法。
 
-What exactly each consumable does will vary - we will need to implement children of this class  later, overriding `at_use` with different effects.
+每個消耗品的具體作用會有所不同 - 我們稍後需要實現此類的子級，以不同的效果覆蓋 `at_use`。
 
-## Weapons
+(weapons)=
+## 武器
 
-All weapons need properties that describe how efficient they are in battle. To 'use' a weapon means to attack with it, so we can let the weapon itself handle all logic around performing an attack. Having the attack code on the weapon also means that if we in the future wanted a weapon doing something special on-attack (for example, a vampiric sword that heals the attacker when hurting the enemy), we could easily add that on the weapon subclass in question without modifying other code.
+所有武器都需要描述它們在戰鬥中的效率的屬性。 「使用」武器意味著用它進行攻擊，因此我們可以讓武器本身處理有關執行攻擊的所有邏輯。在武器上新增攻擊程式碼也意味著，如果我們將來想要一種武器在攻擊時做一些特殊的事情（例如，在傷害敵人時治癒攻擊者的吸血鬼劍），我們可以輕鬆地將其新增到相關武器子類中，而無需修改其他程式碼。
 
 ```python 
 # mygame/evadventure/objects.py 
@@ -313,15 +321,15 @@ def at_pre_use(self, user, target=None, *args, **kwargs):
            user.msg(f"|r{self.get_display_name(user)} breaks and can no longer be used!")
 ```
 
-In EvAdventure, we will assume all weapons (including bows etc) are used in the same location as the target. Weapons also have a `quality` attribute that gets worn down if the user rolls a critical failure. Once quality is down to 0, the weapon is broken and needs to be repaired. 
+在EvAdventure中，我們假設所有武器（包括弓箭等）都在與目標相同的位置使用。武器還有`quality` attribute，如果使用者發生嚴重故障，武器就會磨損。一旦品質降到0，武器就壞了，需要修理。
 
-The `quality` is something we need to track in _Knave_. When getting critical failures on attacks,  a weapon's quality will go down. When it reaches 0, it will break. We assume that a `quality` of `None` means that quality doesn't apply (that is, the item is unbreakable), so we must consider that when checking.
+`quality` 是我們需要在 _Knave_ 中追蹤的內容。當攻擊嚴重失敗時，武器的品質就會下降。當它達到0時，它就會破裂。我們假設 `None` 的 `quality` 意味著品質不適用（即該物品牢不可破），因此我們在檢查時必須考慮到這一點。
 
-The attack/defend type tracks how we resolve attacks with the weapon, like `roll + STR vs ARMOR + 10`.
+攻擊/防禦型別追蹤我們如何解決使用武器的攻擊，例如`roll + STR vs ARMOR + 10`。
 
-In the `use` method we make use of the `rules` module we [created earlier](./Beginner-Tutorial-Rules.md) to perform all the dice rolls needed to resolve the attack. 
+在 `use` 方法中，我們利用[先前建立的](./Beginner-Tutorial-Rules.md) `rules` 模組來執行解決攻擊所需的所有擲骰子操作。
 
-This code requires some additional explanation: 
+這段程式碼需要一些額外的解釋：
 ```python
 location.msg_contents(
     f"$You() $conj(attack) $you({target.key}) with {self.key}: {txt}",
@@ -329,44 +337,45 @@ location.msg_contents(
     mapping={target.key: target},
 )
 ```
-`location.msg_contents` sends a message to everyone in `location`. Since people will usually notice if you swing a sword at somone, this makes sense to tell people about. This message should however look _different_ depending on who sees it. 
+`location.msg_contents` 向 `location` 中的每個人傳送訊息。由於人們通常會注意到您是否向某人揮舞劍，因此告訴人們這一點是有意義的。然而，這則訊息看起來應該_不同_取決於誰看到它。
 
-I should see: 
+我應該看到：
 
     You attack Grendel with sword: <dice roll results> 
 
-Others should see 
+其他人應該看到
 
     Beowulf attacks Grendel with sword: <dice roll results>  
 
-And Grendel should see 
+格倫德爾應該看到
 
     Beowulf attacks you with sword: <dice roll results>
 
-We provide the following string to `msg_contents`: 
+我們向`msg_contents`提供以下字串：
 ```python 
 f"$You() $conj(attack) $You({target.key}) with {self.key}: {txt}"
 ```
 
-The `{...}` are normal f-string formatting markers like those we have used before. The `$func(...)` bits are [Evennnia FuncParser](../../../Components/FuncParser.md) function calls. FuncParser calls are executed as functions and the result replaces their position in the string. As this string is parsed by Evennia, this is what happens: 
+`{...}` 是普通的 f 字串格式標記，就像我們之前使用的一樣。 `$func(...)` 位元是 [Evennnia FuncParser](../../../Components/FuncParser.md) 函式呼叫。 FuncParser 呼叫作為函式執行，結果會取代它們在字串中的位置。當該字串被 Evennia 解析時，會發生以下情況：
 
-First the f-string markers are replaced, so that we get this: 
+首先替換 f 字串標記，這樣我們就得到了：
 
 ```python 
 "$You() $cobj(attack) $you(Grendel) with sword: \n rolled 8 on d20 ..."
 ```
 
-Next the funcparser functions are run: 
+接下來執行 funcparser 函式：
 
- - `$You()` becomes the name or `You` depending on if the string is to be sent to that object or not. It uses the `from_obj=` kwarg to the `msg_contents` method to know this. Since `msg_contents=attacker` , this becomes `You` or `Beowulf` in this example. 
- - `$you(Grendel)` looks for the `mapping=` kwarg to `msg_contents` to determine who should be addressed here. If will replace this with the display name or the lowercase `you`. We have added `mapping={target.key: target}` - that is `{"Grendel": <grendel_obj>}`. So this will become `you` or `Grendel` depending on who sees the string. 
-- `$conj(attack)` _conjugates_ the verb depending on who sees it. The result will be `You attack ...` or `Beowulf attacks` (note the extra `s`). 
+ - `$You()` 成為名稱或 `You`，取決於字串是否傳送到該物件。它使用 `from_obj=` kwarg 到 `msg_contents` 方法來瞭解這一點。由於 `msg_contents=attacker` ，在此範例中變為 `You` 或 `Beowulf` 。
+ - `$you(Grendel)` 尋找 `mapping=` kwarg 到 `msg_contents` 以確定應在此處處理的人員。如果將其替換為顯示名稱或小寫`you`。我們新增了 `mapping={target.key: target}` - 即 `{"Grendel": <grendel_obj>}`。因此，這將變成 `you` 或 `Grendel`，具體取決於誰看到字串。
+- `$conj(attack)`_結合_動詞取決於誰看到它。結果將是 `You attack...` 或 `Beowulf attacks`（注意額外的 `s`）。
 
-A few funcparser calls compacts all these points of view into one string! 
+一些 funcparser 呼叫將所有這些觀點壓縮到一個字串中！
 
-## Magic 
+(magic)=
+## 魔法
 
-In _Knave_, anyone can use magic if they are wielding a rune stone (our name for spell books) in both  hands. You can only use a rune stone once per rest. So a rune stone is an example of a 'magical weapon' that is also a 'consumable' of sorts.
+在_Knave_中，任何人只要雙手持有符文石（我們對咒語書的稱呼），就可以使用魔法。每次休息只能使用一次符文石。因此，符文石是「魔法武器」的一個例子，同時也是一種「消耗品」。
 
 
 ```python 
@@ -402,16 +411,17 @@ class EvAdventureRuneStone(EvAdventureWeapon, EvAdventureConsumable):
         self.uses = 1
 ```
 
-We make the rune stone a mix of weapon and consumable. Note that we don't have to add `.uses`  again, it's inherited from `EvAdventureConsumable` parent. The `at_pre_use` and `use` methods  are also inherited; we only override `at_post_use` since we don't want the runestone to be deleted  when it runs out of uses.
+我們使符文石成為武器和消耗品的混合體。請注意，我們不必再增加 `.uses`，它是從 `EvAdventureConsumable` 父級繼承的。 `at_pre_use`和`use`方法也是繼承的；我們只涵蓋`at_post_use`，因為我們不希望符石在用完後被刪除。
 
-We add a little convenience method `refresh` - we should call this when the character rests, to  make the runestone active again.
+我們新增了一些方便的方法 `refresh` - 我們應該在角色休息時呼叫它，以使符石再次啟動。
 
-Exactly what rune stones _do_ will be implemented in the `at_use` methods of subclasses to this  base class. Since magic in _Knave_ tends to be pretty custom, it makes sense that it will lead to a lot  of custom code.
+符文石的確切用途將在該基類的子類的 `at_use` 方法中實現。由於 _Knave_ 中的魔法往往是非常自訂的，因此它會導致大量自訂程式碼是有道理的。
 
 
-## Armor 
+(armor)=
+## 盔甲
 
-Armor, shields and helmets increase the `ARMOR` stat of the character. In _Knave_, what is stored is the  defense value of the armor (values 11-20). We will instead store the 'armor bonus' (1-10). As we know,  defending is always `bonus + 10`, so the result will be the same - this means  we can use `Ability.ARMOR` as any other defensive ability without worrying about a special case.
+盔甲、盾牌和頭盔會增加角色的`ARMOR`屬性。在_Knave_中，儲存的是盔甲的防禦值（值11-20）。我們將儲存「護甲加值」(1-10)。我們知道，防禦總是`bonus + 10`，所以結果是一樣的——這意味著我們可以像任何其他防禦能力一樣使用`Ability.ARMOR`，而不必擔心特殊情況。
 
 ``
 ```python 
@@ -437,11 +447,12 @@ class EvAdventureHelmet(EvAdventureArmor):
     inventory_use_slot = WieldLocation.HEAD
 ``` 
 
-## Your Bare hands 
+(your-bare-hands)=
+## 你赤手空拳
 
-When we don't have any weapons, we'll be using our bare fists to fight. 
+當我們沒有武器的時候，我們就用赤手空拳去戰鬥。
 
-We will use this in the upcoming  [Equipment tutorial lesson](./Beginner-Tutorial-Equipment.md) to represent when you have 'nothing'  in your hands. This way we don't need to add any special case for this.
+我們將在接下來的[裝備教學](./Beginner-Tutorial-Equipment.md)中用它來表示你手中「什麼都沒有」的情況。這樣我們就不需要為此新增任何特殊情況。
 
 ```python
 # mygame/evadventure/objects.py
@@ -472,20 +483,21 @@ def get_bare_hands():
 ```
 
 ```{sidebar}
-Creating a single instance of something that is used everywhere is called to create a _Singleton_. 
+建立一個在任何地方都使用的單一例項稱為建立_Singleton_。
 ```
-Since everyone's empty hands are the same (in our game), we create _one_ `Bare hands` weapon object that everyone shares. We do this by searching for the object with `search_object`  (the `.first()` means we grab the first one even if we should by accident have created multiple hands, see [The Django querying tutorial](../Part1/Beginner-Tutorial-Django-queries.md) for more info). If we find none, we create it. 
+由於每個人的空手都是相同的（在我們的遊戲中），因此我們建立每個人共享的 _one_ `Bare hands` 武器物件。我們透過使用 `search_object` 搜尋物件來做到這一點（`.first()` 意味著我們抓住第一個物件，即使我們不小心建立了多隻手，請參閱 [Django 查詢教學](../Part1/Beginner-Tutorial-Django-queries.md) 以瞭解更多資訊）。如果我們找不到，我們就會創造它。
 
-By use of the `global` Python keyword, we cache the bare hands object get/create in a module level property `_BARE_HANDS`. So this acts as a cache to not have to search the database more than necessary. 
+透過使用 `global` Python 關鍵字，我們將徒手物件 get/create 快取在模組級屬性 `_BARE_HANDS` 中。因此，這充當快取，不必不必要地搜尋資料庫。
 
-From now on, other modules can just import and run this function to get the bare hands.
+從此以後，其他模組只需匯入並執行函式即可輕鬆上手。
 
-## Testing and Extra credits 
+(testing-and-extra-credits)=
+## 測試和額外學分
 
-Remember the `get_obj_stats` function from the [Utility Tutorial](./Beginner-Tutorial-Utilities.md) earlier?  We had to use dummy-values since we didn't yet know how we would store properties on Objects in the game. 
+還記得之前[實用教學](./Beginner-Tutorial-Utilities.md)中的`get_obj_stats`函式嗎？  我們必須使用虛擬值，因為我們還不知道如何在遊戲中的物件上儲存屬性。
 
-Well, we just figured out all we need! You can go back and update `get_obj_stats` to properly read the data  from the object it receives. 
+好吧，我們剛剛找到了我們需要的一切！您可以返回並更新 `get_obj_stats` 以正確地從它接收的物件中讀取資料。
 
-When you change this function you must also update the related unit test - so your existing test becomes a  nice way to test your new Objects as well! Add more tests showing the output of feeding different object-types to `get_obj_stats`.
+當您更改此功能時，您還必須更新相關的單元測試 - 因此您現有的測試也成為測試新物件的好方法！新增更多測試，顯示將不同物件型別提供給 `get_obj_stats` 的輸出。
 
-Try it out yourself. If you need help, a finished utility example is found in [evennia/contrib/tutorials/evadventure/utils.py](get_obj_stats).
+自己嘗試一下。如果您需要協助，可以在 [evennia/contrib/tutorials/evadventure/utils.py](get_obj_stats) 中找到已完成的實用程式範例。

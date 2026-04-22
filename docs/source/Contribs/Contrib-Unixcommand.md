@@ -1,25 +1,27 @@
-# Unix-like Command style
+(unix-like-command-style)=
+# 類似 Unix 的指令風格
 
-Contribution by Vincent Le Geoff (vlgeoff), 2017
+Vincent Le Geoff (vlgeoff) 的貢獻，2017 年
 
-This module contains a command class with an alternate syntax parser implementing
-Unix-style command syntax in-game. This means `--options`, positional arguments
-and stuff like `-n 10`. It might not the best syntax for the average player
-but can be really useful for builders when they need to have a single command do
-many things with many options. It uses the `ArgumentParser` from Python's standard
-library under the hood.
+該模組包含一個指令類，帶有一個替代語法解析器，實現
+遊戲中的 Unix 風格指令語法。這意味著`--options`，位置引數
+以及像 `-n 10` 這樣的東西。對普通玩家來說這可能不是最好的語法
+但當建構者需要使用單一指令執行操作時，這對他們來說非常有用
+很多事情有很多選擇。它使用Python標準中的`ArgumentParser`
+引擎蓋下的圖書館。
 
-## Installation
+(installation)=
+## 安裝
 
-To use, inherit `UnixCommand` from this module from your own commands. You need
-to override two methods:
+要使用，請從您自己的指令繼承此模組的`UnixCommand`。你需要
+重寫兩個方法：
 
-- The `init_parser` method, which adds options to the parser. Note that you
-  should normally *not* override the normal `parse` method when inheriting from
-  `UnixCommand`.
-- The `func` method, called to execute the command once parsed (like any Command).
+- `init_parser` 方法，為解析器新增選項。請注意，您
+繼承自時通常*不*覆蓋正常的 `parse` 方法
+  `UnixCommand`。
+- `func` 方法，被呼叫以執行解析後的指令（與任何指令一樣）。
 
-Here's a short example:
+這是一個簡短的例子：
 
 ```python
 from evennia.contrib.base_systems.unixcommand import UnixCommand
@@ -61,11 +63,11 @@ class CmdPlant(UnixCommand):
                 key, age, hidden))
 ```
 
-To see the full power of argparse and the types of supported options, visit
-[the documentation of argparse](https://docs.python.org/2/library/argparse.html).
+要了解 argparse 的全部功能以及支援的選項型別，請訪問
+[argparse 的文件](https://docs.python.org/2/library/argparse.html)。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/base_systems/unixcommand/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\base_systems\unixcommand\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

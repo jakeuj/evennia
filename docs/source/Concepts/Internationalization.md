@@ -1,14 +1,15 @@
-# Internationalization
+(internationalization)=
+# 國際化
 
-*Internationalization* (often abbreviated *i18n* since there are 18 characters
-between the first "i" and the last "n" in that word) allows Evennia's core
-server to return texts in other languages than English - without anyone having
-to edit the source code.
+*國際化*（通常縮寫為 *i18n* 因為有 18 個字元
+在該單字中的第一個“i”和最後一個“n”之間）允許 Evennia 的核心
+伺服器傳回英語以外的其他語言的文字 - 無需任何人
+編輯原始碼。
 
-Language-translations are done by volunteers, so support can vary a lot
-depending on when a given language was last updated. Below are all languages
-(besides English) with some level of support. Generally, any language not
-updated after Sept 2022 will be missing some translations.
+語言翻譯是由志願者完成的，因此支援可能會有很大差異
+取決於給定語言的上次更新時間。以下是所有語言
+（除了英語）有一定程度的支援。一般來說，任何語言都不能
+2022 年 9 月後更新將缺少一些翻譯。
 
 ```{eval-rst}
 
@@ -39,14 +40,15 @@ updated after Sept 2022 will be missing some translations.
 +---------------+----------------------+--------------+
 ```
 
-Language translations are found in the [evennia/locale](github:evennia/locale/)
-folder. Read below if you want to help improve an existing translation of
-contribute a new one.
+語言翻譯可在 [evennia/locale](github:evennia/locale/) 中找到
+資料夾。如果您想協助改進現有的翻譯，請閱讀以下內容
+貢獻一份新的。
 
-## Changing server language
+(changing-server-language)=
+## 更改伺服器語言
 
-Change language by adding the following to your `mygame/server/conf/settings.py`
-file:
+透過將以下內容新增至您的 `mygame/server/conf/settings.py` 來變更語言
+檔案：
 
 ```python
     USE_I18N = True
@@ -54,126 +56,130 @@ file:
 
 ```
 
-Here `'en'` (the default English) should be changed to the abbreviation for one
-of the supported languages found in `locale/` (and in the list above). Restart
-the server to activate i18n.
+這裡的`'en'`（預設英文）應該改為一的縮寫
+在 `locale/`（以及上面的列表中）找到的支援語言。重新啟動
+伺服器啟動 i18n。
 
 ```{important}
 
-Even for a 'fully translated' language you will still see English text
-in many places when you start Evennia. This is because we expect you (the
-developer) to know English (you are reading this manual after all). So we
-translate *hard-coded strings that the end player may see* - things you
-can't easily change from your mygame/ folder. Outputs from Commands and
-Typeclasses are generally *not* translated, nor are console/log outputs.
+即使對於“完全翻譯”的語言，您仍然會看到英文文字
+當你開始Evennia時，很多地方。這是因為我們期望您（
+開發人員）瞭解英語（畢竟您正在閱讀本手冊）。所以我們
+翻譯*最終玩家可能看到的硬編碼字串* - 您的東西
+無法輕鬆地從您的 mygame/ 資料夾進行更改。指令的輸出和
+Typeclasses 通常*未*翻譯，控制檯/日誌輸出也未翻譯。
 
-To cut down on work, you may consider only translating the player-facing commands (look, get etc) and leave the default admin commands in English. To change the language of some commands (such as `look`) you need to override the relevant hook-methods on your Typeclasses (check out the code for the default command to see what it calls).
+為了減少工作量，您可以考慮僅翻譯面向玩家的指令（檢視、獲取等），並將預設管理指令保留為英文。要更改某些指令的語言（例如 `look`），您需要覆蓋 Typeclasses 上的相關掛鉤方法（檢視預設指令的程式碼以瞭解它呼叫的內容）。
 ```
 
-```{sidebar} Windows users
+```{sidebar} Windows使用者
 
-If you get errors concerning `gettext` or `xgettext` on Windows,
-see the [Django documentation](https://docs.djangoproject.com/en/4.1/topics/i18n/translation/#gettext-on-windows).
-A self-installing and up-to-date version of gettext for Windows (32/64-bit) is
-available on Github as [gettext-iconv-windows](https://github.com/mlocati/gettext-iconv-windows).
+如果您在 Windows 上收到有關 `gettext` 或 `xgettext` 的錯誤，
+請參閱[Django 檔案](https://docs.djangoproject.com/en/4.1/topics/i18n/translation/#gettext-on-windows)。
+適用於 Windows（32/64 位元）的 gettext 的自動安裝最新版本是
+在 Github 上可用 [gettext-iconv-windows](https://github.com/mlocati/gettext-iconv-windows)。
 
 ```
 
-## Translating Evennia
+(translating-evennia)=
+## 翻譯Evennia
 
-Translations are found in the core `evennia/` library, under
-`evennia/evennia/locale/`. You must make sure to have cloned this repository
-from [Evennia's github](github:evennia) before you can proceed.
+翻譯可在核心 `evennia/` 庫中找到，位於
+`evennia/evennia/locale/`。您必須確保已克隆此儲存庫
+從 [Evennia 的 github](github:evennia) 開始，然後才能繼續。
 
-If you cannot find your language in `evennia/evennia/locale/` it's because no one
-has translated it yet.  Alternatively you might have the language but find the
-translation bad ... You are welcome to help improve the situation!
+如果您在 `evennia/evennia/locale/` 中找不到您的語言，那是因為沒有人
+已經翻譯了。  或者，您可能有該語言，但找不到
+翻譯不好...歡迎您幫忙改善這個情況！
 
-To start a new translation you need to first have cloned the Evennia repository
-with GIT and activated a python virtualenv as described on the
-[Setup Quickstart](../Setup/Installation.md) page.
+要開始新翻譯，您需要先克隆 Evennia 儲存庫
+使用 GIT 並啟動了 python virtualenv，如上所述
+[安裝快速入門](../Setup/Installation.md) 頁面。
 
-Go to `evennia/evennia/` - that is, not your game dir, but inside the `evennia/`
-repo itself. If you see the `locale/` folder you are in the right place.  Make
-sure your `virtualenv` is active so the `evennia` command is available. Then run
+前往 `evennia/evennia/` - 也就是說，不是您的遊戲目錄，而是在 `evennia/` 內
+回購本身。如果您看到 `locale/` 資料夾，那麼您來對地方了。  製造
+確保您的 `virtualenv` 處於活動狀態，以便 `evennia` 指令可用。然後執行
 
      evennia makemessages --locale <language-code>
 
-where `<language-code>` is the [two-letter locale code](http://www.science.co.il/Language/Codes.asp)
-for the language you want to translate, like 'sv' for Swedish or 'es' for
-Spanish. After a moment it will tell you the language has been processed.  For
-instance:
+其中 `<language-code>` 是[兩個字母的區域設定程式碼](http://www.science.co.il/Language/Codes.asp)
+您要翻譯的語言，例如瑞典語的“sv”或瑞典語的“es”
+西班牙語。過了一會兒，它會告訴您語言已被處理。  為了
+例項：
 
      evennia makemessages --locale sv
 
-If you started a new language, a new folder for that language will have emerged
-in the `locale/` folder. Otherwise the system will just have updated the
-existing translation with eventual new strings found in the server. Running this
-command will not overwrite any existing strings so you can run it as much as you
-want.
+如果您開始使用新語言，則會出現該語言的新資料夾
+在`locale/`資料夾中。否則系統只會更新
+現有翻譯以及最終在伺服器中找到的新字串。執行這個
+指令不會覆蓋任何現有字串，因此您可以盡可能多地執行它
+想要。
 
-Next head to `locale/<language-code>/LC_MESSAGES` and edit the `**.po` file you
-find there. You can edit this with a normal text editor but it is easiest if
-you use a special po-file editor from the web (search the web for "po editor"
-for many free alternatives), for example:
+接下來前往 `locale/<language-code>/LC_MESSAGES` 並編輯您的 `**.po` 檔案
+在那裡找到。您可以使用普通的文字編輯器對其進行編輯，但如果
+您使用網路上的特殊 po 檔案編輯器（在網路上搜尋“po editor”
+對於許多免費的替代品），例如：
 
-- [gtranslator](https://wiki.gnome.org/Apps/Gtranslator)
-- [poeditor](https://poeditor.com/)
+- [g翻譯](https://wiki.gnome.org/Apps/Gtranslator)
+- [編輯](https://poeditor.com/)
 
-The concept of translating is simple, it's just a matter of taking the english
-strings you find in the `django.po` file and add your language's translation best
-you can. Once you are done, run
+翻譯的概念很簡單，就是取英文的問題
+您在 `django.po` 檔案中找到的字串並新增您的語言的最佳翻譯
+你可以。完成後，執行
 
     evennia compilemessages
 
-This will compile all languages. Check your language and also check back to your
-`.po` file in case the process updated it - you may need to fill in some missing
-header fields and should usually note who did the translation.
+這將編譯所有語言。檢查您的語言並檢查您的
+`.po` 檔案，以防程式更新它 - 您可能需要填寫一些缺少的內容
+標頭欄位，通常應註明翻譯者是誰。
 
-When you are done, make sure that everyone can benefit from your translation!
-Make a PR against Evennia with the updated `django.po` file. Less ideally (if git is
-not your thing) you can also attach it to a new post in our forums.
+完成後，請確保每個人都能從您的翻譯中受益！
+使用更新的 `django.po` 檔案針對 Evennia 建立 PR。不太理想（如果 git 是
+不是你的事）你也可以將其附加到我們論壇的新帖子中。
 
-### Hints on translation
+(hints-on-translation)=
+### 翻譯提示
 
-Many of the translation strings use `{ ... }` placeholders. This is because they
-are to be used in `.format()` python operations. While you can change the
-_order_  of these if it makes more sense in your language, you must _not_
-translate the variables in these formatting tags - Python will look for them!
+許多翻譯字串使用 `{... }` 佔位符。這是因為他們
+將在 `.format()` python 操作中使用。雖然您可以更改
+如果這些內容在您的語言中更有意義，則_順序_，您一定_不_
+翻譯這些格式的變數 tags - Python 將尋找它們！
 
     Original: "|G{key} connected|n"
     Swedish:  "|G{key} anslöt|n"
 
-You must also retain line breaks _at the start and end_ of a message, if any
-(your po-editor should stop you if you don't). Try to also end with the same
-sentence delimiter (if that makes sense in your language).
+您還必須在訊息的_開頭和結尾_保留換行符（如果有）
+（如果你不這樣做，你的po編輯應該阻止你）。嘗試也以相同的方式結束
+句子分隔符號（如果這對您的語言有意義）。
 
     Original: "\n(Unsuccessfull tried '{path}')."
     Swedish: "\nMisslyckades med att nå '{path}')."
 
-Finally, try to get a feel for who a string is for. If a special technical term
-is used it may be more confusing than helpful to translate it, even if it's
-outside of a `{...}` tag. A mix of English and your language may be clearer
-than you forcing some ad-hoc translation for a term everyone usually reads in
-English anyway.
+最後，試著感受一下字串的用途。如果有特殊的技術術語
+使用它可能會更令人困惑，而不是翻譯它，即使它是
+`{...}` tag 之外。英語和您的語言混合可能會更清晰
+比你強行對每個人通常讀到的術語進行一些臨時翻譯
+反正是英語。
 
     Original: "\nError loading cmdset: No cmdset class '{classname}' in '{path}'.
                \n(Traceback was logged {timestamp})"
     Swedish:  "Fel medan cmdset laddades: Ingen cmdset-klass med namn '{classname}' i {path}.
                \n(Traceback loggades {timestamp})"
 
-## Marking Strings in Code for Translation
+(marking-strings-in-code-for-translation)=
+## 在程式碼中標記字串以進行翻譯
 
-If you modify the Python module code, you can mark strings for translation by passing them to the `gettext()` method. In Evennia, this is usually imported as `_()` for convenience:
+如果修改 Python 模組程式碼，則可以透過將字串傳遞給 `gettext()` 方法來標記要翻譯的字串。在 Evennia 中，為了方便起見，通常會將其匯入為 `_()`：
 
 ```python
 from django.utils.translation import gettext as _
 string = _("Text to translate")
 ```
 
-### Formatting Considerations
+(formatting-considerations)=
+### 格式化注意事項
 
-When using formatted strings, ensure that you pass the "raw" string to `gettext` for translation first and then format the output. Otherwise, placeholders will be replaced before translation occurs, preventing the correct string from being found in the `.po` file. It's also recommended to use named placeholders (e.g., `{char}`) instead of positional ones (e.g., `{}`) for better readability and maintainability.
+使用格式化字串時，請確保先將「原始」字串傳遞給 `gettext` 進行翻譯，然後格式化輸出。否則，佔位符將在翻譯之前被替換，從而阻止在 `.po` 檔案中找到正確的字串。也建議使用命名佔位符（e.g.、`{char}`）而不是位置佔位符（e.g.、`{}`），以獲得更好的可讀性和可維護性。
 
 ```python
 # incorrect:
@@ -183,7 +189,7 @@ string2 = _("Hello {char}!".format(char=caller.name))
 string2 = _("Hello {char}!").format(char=caller.name)
 ```
 
-This is also why f-strings don't work with `gettext`:
+這也是 f 字串不能與 `gettext` 一起使用的原因：
 
 ```python
 # will not work

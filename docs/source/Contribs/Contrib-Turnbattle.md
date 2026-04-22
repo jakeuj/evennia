@@ -1,17 +1,18 @@
-# Turn based battle system framework
+(turn-based-battle-system-framework)=
+# 回合製戰鬥系統框架
 
-Contribution by Tim Ashley Jenkins, 2017
+蒂姆·阿什利·詹金斯 (Tim Ashley Jenkins) 貢獻，2017 年
 
-This is a framework for a simple turn-based combat system, similar
-to those used in D&D-style tabletop role playing games. It allows
-any character to start a fight in a room, at which point initiative
-is rolled and a turn order is established. Each participant in combat
-has a limited time to decide their action for that turn (30 seconds by
-default), and combat progresses through the turn order, looping through
-the participants until the fight ends.
+這是一個簡單的回合製戰鬥系統的框架，類似
+用於 D&D 風格的桌上角色扮演遊戲中的那些。它允許
+任何角色在房間內發動戰鬥，此時主動
+捲動並建立回合順序。每一個參與戰鬥的人
+決定該回合行動的時間有限（30 秒
+預設），戰鬥按照回合順序進行，迴圈
+參與者直到戰鬥結束。
 
-This folder contains multiple examples of how such a system can be
-implemented and customized:
+該資料夾包含多個範例，說明如何建置這樣的系統
+實施與客製化：
 
     tb_basic.py - The simplest system, which implements initiative and turn
             order, attack rolls against defense values, and damage to hit
@@ -40,22 +41,22 @@ implemented and customized:
             combat, as well as differentiates between melee and ranged
             attacks.
 
-This system is meant as a basic framework to start from, and is modeled
-after the combat systems of popular tabletop role playing games rather than
-the real-time battle systems that many MMOs and some MUDs use. As such, it
-may be better suited to role-playing or more story-oriented games, or games
-meant to closely emulate the experience of playing a tabletop RPG.
+該系統旨在作為一個基本框架，並對其進行建模
+遵循流行的桌上角色扮演遊戲的戰鬥系統而不是
+許多MMOs和一些MUDs使用的即時戰鬥系統。因此，它
+可能更適合角色扮演或更注重故事的遊戲，或者遊戲
+旨在密切模擬玩桌上遊戲的體驗RPG。
 
-Each of these modules contains the full functionality of the battle system
-with different customizations added in - the instructions to install each
-one is contained in the module itself. It's recommended that you install
-and test `tb_basic` first, so you can better understand how the other
-modules expand on it and get a better idea of how you can customize the
-system to your liking and integrate the subsystems presented here into
-your own combat system.
+每個模組都包含戰鬥系統的全部功能
+新增了不同的自訂專案 - 安裝每個專案的說明
+一個包含在模組本身中。建議您安裝
+並且先測試`tb_basic`，這樣你就可以更瞭解其他
+模組對其進行擴充套件，並更好地瞭解如何自訂
+根據您的喜好自訂系統並將此處介紹的子系統整合到
+你自己的戰鬥系統。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/game_systems/turnbattle/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\game_systems\turnbattle\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

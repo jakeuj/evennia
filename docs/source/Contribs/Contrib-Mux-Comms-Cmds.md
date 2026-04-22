@@ -1,30 +1,32 @@
-# Legacy Comms-commands
+(legacy-comms-commands)=
+# 舊版通訊指令
 
-Contribution by Griatch 2021
+Gratch 2021 的貢獻
 
-In Evennia 1.0+, the old Channel commands (originally inspired by MUX) were
-replaced by the single `channel` command that performs all these functions.
-This contrib (extracted from Evennia 0.9.5) breaks out the functionality into 
-separate Commands more familiar to MU* users. This is just for show though, the 
-main `channel` command is still called under the hood.
+在 Evennia 1.0+ 中，舊的 Channel 指令（最初受 MUX 啟發）是
+替換為執行所有這些功能的單一 `channel` 指令。
+這個contrib（摘自Evennia 0.9.5）將功能分解為
+MU* 使用者更熟悉的單獨指令。這只是為了展示，
+main `channel` 指令仍然在後臺呼叫。
 
-| Contrib syntax | Default `channel` syntax                                  |
+| Contrib 文法 | 預設 `channel` 語法                                  |
 | -------------- | --------------------------------------------------------- |
-| `allcom`       |  `channel/all` and `channel`                              |
-| `addcom`       | `channel/alias`, `channel/sub` and `channel/unmute`       |
-| `delcom`       | `channel/unalias`, `alias/unsub` and `channel/mute`       |
-| `cboot`        | `channel/boot` (`channel/ban` and `/unban` not supported) |
+| `allcom`       |  `channel/all` 和 `channel`                              |
+| `addcom`       | `channel/alias`、`channel/sub` 和 `channel/unmute`       |
+| `delcom`       | `channel/unalias`、`alias/unsub` 和 `channel/mute`       |
+| `cboot`        | `channel/boot`（不支援`channel/ban`和`/unban`） |
 | `cwho`         | `channel/who`                                             |
 | `ccreate`      | `channel/create`                                          |
 | `cdestroy`     | `channel/destroy`                                         |
 | `clock`        | `channel/lock`                                            |
 | `cdesc`        | `channel/desc`                                            |
 
-##  Installation
+(installation)=
+## 安裝
 
-- Import the `CmdSetLegacyComms` cmdset from this module into `mygame/commands/default_cmdsets.py`
-- Add it to the CharacterCmdSet's `at_cmdset_creation` method (see below).
-- Reload the server.
+- 將 `CmdSetLegacyComms` cmdset 從此模組匯入到 `mygame/commands/default_cmdsets.py`
+- 將其新增到 CharacterCmdSet 的 `at_cmdset_creation` 方法中（見下文）。
+- 重新載入伺服器。
 
 ```python
 # in mygame/commands/default_cmdsets.py
@@ -40,11 +42,11 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
 
 ```
 
-Note that you will still be able to use the `channel` command; this is actually
-still used under the hood by these commands.
+請注意，您仍然可以使用 `channel` 指令；這實際上是
+這些指令仍然在幕後使用。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/base_systems/mux_comms_cmds/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\base_systems\mux_comms_cmds\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

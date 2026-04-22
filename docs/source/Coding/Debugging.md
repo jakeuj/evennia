@@ -1,43 +1,46 @@
-# Debugging
+(debugging)=
+# 偵錯
 
-Sometimes, an error is not trivial to resolve. A few simple `print` statements is not enough to find the cause of the issue. The traceback is not informative or even non-existing.
+有時，解決錯誤並不容易。一些簡單的 `print` 語句不足以找到問題的原因。回溯沒有提供任何訊息，甚至不存在。
 
-Running a *debugger* can then be very helpful and save a lot of time. Debugging means running Evennia under control of a special *debugger* program. This allows you to stop the action at a given point, view the current state and step forward through the program to see how its logic works.
+執行*偵錯程式*會非常有幫助並且可以節省大量時間。除錯意味著在特殊*偵錯程式*程式的控制下執行Evennia。這允許您在給定點停止操作，檢視當前狀態並逐步執行程式以檢視其邏輯如何運作。
 
-Evennia natively supports these debuggers:
+Evennia 本機支援這些偵錯程式：
 
-- [Pdb](https://docs.python.org/2/library/pdb.html) is a part of the Python distribution and
-  available out-of-the-box.
-- [PuDB](https://pypi.org/project/pudb/) is a third-party debugger that has a slightly more
-  'graphical', curses-based user interface than pdb. It is installed with `pip install pudb`.
+- [Pdb](https://docs.python.org/2/library/pdb.html) 是 Python 發行版的一部分，並且
+開箱即用。
+- [PuDB](https://pypi.org/project/pudb/) 是一個第三方偵錯程式，功能稍多一些
+'圖形'，基於curses的使用者介面而不是pdb。它是用`pip install pudb`安裝的。
 
-## Debugging Evennia
+(debugging-evennia)=
+## 除錯Evennia
 
-To run Evennia with the debugger, follow these steps:
+若要使用偵錯器執行 Evennia，請依照下列步驟操作：
 
-1. Find the point in the code where you want to have more insight. Add the following line at that
-   point.
+1. 在程式碼中找到您想要獲得更多見解的點。在該處新增以下行
+觀點。
     ```python
     from evennia import set_trace;set_trace()
     ```
-2. (Re-)start Evennia in interactive (foreground) mode with `evennia istart`. This is important - without this step the debugger will not start correctly - it will start in this interactive terminal.
-3. Perform the steps that will trigger the line where you added the `set_trace()` call. The debugger will start in the terminal from which Evennia was interactively started.
+2. 使用 `evennia istart` 以互動（前臺）模式（重新）啟動 Evennia。這很重要 - 如果沒有這一步，偵錯器將無法正確啟動 - 它將在此互動終端中啟動。
+3. 執行將觸發您新增 `set_trace()` 呼叫的行的步驟。偵錯程式將在互動式啟動 Evennia 的終端中啟動。
 
-The `evennia.set_trace` function takes the following arguments:
+`evennia.set_trace` 函式採用下列引數：
 
 
 ```python
     evennia.set_trace(debugger='auto', term_size=(140, 40))
 ```
 
-Here, `debugger` is one of `pdb`, `pudb` or `auto`. If `auto`, use `pudb` if available, otherwise use `pdb`. The `term_size` tuple sets the viewport size for `pudb` only (it's ignored by `pdb`).
+這裡，`debugger`是`pdb`、`pudb`或`auto`之一。如果 `auto`，則使用 `pudb`（如果可用），否則使用 `pdb`。 `term_size` 元組僅設定 `pudb` 的視口大小（它被 `pdb` 忽略）。
 
 
-## A simple example using pdb
+(a-simple-example-using-pdb)=
+## 使用 pdb 的簡單範例
 
-The debugger is useful in different cases, but to begin with, let's see it working in a command.
-Add the following test command (which has a range of deliberate errors) and also add it to your
-default cmdset. Then restart Evennia in interactive mode with `evennia istart`.
+偵錯程式在不同的情況下很有用，但首先，讓我們看看它在指令中的工作情況。
+新增以下測試指令（其中有一系列故意錯誤）並將其新增到您的
+預設cmdset。然後以互動模式與 `evennia istart` 重新啟動 Evennia。
 
 
 ```python
@@ -63,7 +66,7 @@ class CmdTest(Command):
 
 ```
 
-If you type `test` in your game, everything will freeze.  You won't get any feedback from the game, and you won't be able to enter any command (nor anyone else).  It's because the debugger has started in your console, and you will find it here. Below is an example with `pdb`.
+如果您在遊戲中輸入`test`，一切都會凍結。  您不會從遊戲中獲得任何回饋，也無法輸入任何指令（也無法輸入其他任何人）。  這是因為偵錯程式已在您的控制檯中啟動，您將在此處找到它。下面是一個帶有 `pdb` 的範例。
 
 ```
 ...
@@ -73,11 +76,12 @@ If you type `test` in your game, everything will freeze.  You won't get any feed
 
 ```
 
-`pdb` notes where it has stopped execution and, what line is about to be executed (in our case, `obj = self.search(self.args)`), and ask what you would like to do.
+`pdb` 記錄它在哪裡停止執行以及將要執行哪一行（在我們的例子中，`obj = self.search(self.args)`），並詢問您想要做什麼。
 
-### Listing surrounding lines of code
+(listing-surrounding-lines-of-code)=
+### 列出周圍的程式碼行
 
-When you have the `pdb` prompt `(Pdb)`, you can type in different commands to explore the code.  The first one you should know is `list` (you can type `l` for short):
+當出現 `pdb` 提示字元 `(Pdb)` 時，您可以鍵入不同的指令來探索程式碼。  您應該知道的第一個是 `list`（您可以簡稱為 `l`）：
 
 ```
 (Pdb) l
@@ -95,13 +99,14 @@ When you have the `pdb` prompt `(Pdb)`, you can type in different commands to ex
 (Pdb)
 ```
 
-Okay, this didn't do anything spectacular, but when you become more confident with `pdb` and find yourself in lots of different files, you sometimes need to see what's around in code.  Notice that there is a little arrow (`->`) before the line that is about to be executed.
+好吧，這並沒有做任何引人注目的事情，但是當您對 `pdb` 更加自信並發現自己處於許多不同的檔案中時，您有時需要檢視程式碼中的內容。  請注意，在即將執行的行之前有一個小箭頭 (`->`)。
 
-This is important: **about to be**, not **has just been**.  You need to tell `pdb` to go on (we'll soon see how).
+這很重要：**即將**，而不是**剛剛**。  您需要告訴 `pdb` 繼續（我們很快就會看到如何進行）。
 
-### Examining variables
+(examining-variables)=
+### 檢查變數
 
-`pdb` allows you to examine variables (or really, to run any Python instruction).  It is very useful to know the values of variables at a specific line.  To see a variable, just type its name (as if you were in the Python interpreter:
+`pdb` 允許您檢查變數（或實際上，執行任何 Python 指令）。  瞭解特定行的變數值非常有用。  要檢視變數，只需鍵入其名稱（就像在 Python 直譯器中一樣：
 
 ```
 (Pdb) self
@@ -113,7 +118,7 @@ u''
 (Pdb)
 ```
 
-If you try to see the variable `obj`, you'll get an error:
+如果您嘗試檢視變數 `obj`，您將收到錯誤：
 
 ```
 (Pdb) obj
@@ -121,17 +126,18 @@ If you try to see the variable `obj`, you'll get an error:
 (Pdb)
 ```
 
-That figures, since at this point, we haven't created the variable yet.
+這個數字是這樣的，因為此時我們還沒有建立變數。
 
-> Examining variable in this way is quite powerful.  You can even run Python code and keep on
-> executing, which can help to check that your fix is actually working when you have identified an
-> error.  If you have variable names that will conflict with `pdb` commands (like a `list`
-> variable), you can prefix your variable with `!`, to tell `pdb` that what follows is Python code.
+> 以這種方式檢查變數是非常強大的。  您甚至可以執行 Python 程式碼並繼續
+> 執行，當您識別出問題時，這可以幫助檢查您的修復是否確實有效
+> 錯誤。  如果您的變數名稱將與 `pdb` 指令衝突（例如 `list`
+> 變數），您可以在變數前加上 `!` 字首，以告訴 `pdb` 接下來是 Python 程式碼。
 
-### Executing the current line
+(executing-the-current-line)=
+### 執行目前行
 
-It's time we asked `pdb` to execute the current line. To do so, use the `next` command.  You can
-shorten it by just typing `n`:
+現在是我們要求 `pdb` 執行目前行的時候了。為此，請使用 `next` 指令。  你可以
+只需輸入 `n` 即可縮短它：
 
 ```
 (Pdb) n
@@ -141,22 +147,23 @@ AttributeError: "'CmdTest' object has no attribute 'search'"
 (Pdb)
 ```
 
-`Pdb` is complaining that you try to call the `search` method on a command... whereas there's no `search` method on commands.  The character executing the command is in `self.caller`, so we might change our line: 
+`Pdb` 抱怨您嘗試在指令上呼叫 `search` 方法...而指令上沒有 `search` 方法。  執行指令的字元位於 `self.caller` 中，因此我們可以更改行：
 
 ```python
 obj = self.caller.search(self.args)
 ```
 
-### Letting the program run
+(letting-the-program-run)=
+### 讓程式執行
 
-`pdb` is waiting to execute the same instruction... it provoked an error but it's ready to try again, just in case.  We have fixed it in theory, but we need to reload, so we need to enter a command.  To tell `pdb` to terminate and keep on running the program, use the `continue` (or `c`) command: 
+`pdb` 正在等待執行相同的指令...它引發了錯誤，但已準備好重試，以防萬一。  理論上我們已經修復了，但是需要重新載入，所以需要輸入指令。  要告訴 `pdb` 終止並繼續執行程式，請使用 `continue`（或 `c`）指令：
 
 ```
 (Pdb) c
 ...
 ```
 
-You see an error being caught, that's the error we have fixed... or hope to have.  Let's reload the game and try again. You need to run `evennia istart` again and then run `test` to get into the command again. 
+您看到一個錯誤被捕獲，這就是我們已經修復的錯誤......或者希望有的錯誤。  讓我們重新載入遊戲並重試。您需要再次執行 `evennia istart`，然後執行 `test` 才能再次進入該指令。
 
 ```
 > .../mygame/commands/command.py(79)func()
@@ -165,7 +172,7 @@ You see an error being caught, that's the error we have fixed... or hope to have
 
 ```
 
-`pdb` is about to run the line again.
+`pdb` 即將再次執行該線路。
 
 ```
 (Pdb) n
@@ -174,7 +181,7 @@ You see an error being caught, that's the error we have fixed... or hope to have
 (Pdb)
 ```
 
-This time the line ran without error.  Let's see what is in the `obj` variable:
+這次線路執行沒有錯誤。  讓我們看看 `obj` 變數中有什麼：
 
 ```
 (Pdb) obj
@@ -183,18 +190,18 @@ None
 (Pdb)
 ```
 
-We have entered the `test` command without parameter, so no object could be found in the search
-(`self.args` is an empty string).
+我們輸入了不含引數的`test`指令，所以在搜尋中找不到物件
+（`self.args` 是空字串）。
 
-Let's allow the command to continue and try to use an object name as parameter (although, we should
-fix that bug too, it would be better):
+讓我們允許指令繼續並嘗試使用物件名稱作為引數（儘管我們應該
+也修復這個錯誤，那就更好了）：
 
 ```
 (Pdb) c
 ...
 ```
 
-Notice that you'll have an error in the game this time.  Let's try with a valid parameter.  I have another character, `barkeep`, in this room:
+請注意，這次您將在遊戲中遇到錯誤。  讓我們嘗試使用有效的引數。  我在這個房間裡還有另一個角色，`barkeep`：
 
 ```test barkeep```
 
@@ -204,23 +211,23 @@ Let's execute this line right away:
 
 ```
 > .../mygame/commands/command.py(79)func()
--> obj = self.caller.search(self.args)
+-> 物件 = self.caller.search(self.args)
 (Pdb) n
 > .../mygame/commands/command.py(80)func()
--> self.msg("You've found {}.".format(obj.get_display_name()))
-(Pdb) obj
+-> self.msg("您已找到 {}。".format(obj.get_display_name()))
+(Pdb) 物件
 <Character: barkeep>
-(Pdb)
+（資料庫）
 ```
 
 At least this time we have found the object.  Let's process...
 
 ```
 (Pdb) n
-TypeError: 'get_display_name() takes exactly 2 arguments (1 given)'
+TypeError: 'get_display_name() 恰好需要 2 個引數（給定 1 個）'
 > .../mygame/commands/command.py(80)func()
--> self.msg("You've found {}.".format(obj.get_display_name()))
-(Pdb)
+-> self.msg("您找到了 {}。".format(obj.get_display_name()))
+（資料庫）
 ```
 
 As an exercise, fix this error, reload and run the debugger again.  Nothing better than some experimenting!

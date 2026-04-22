@@ -1,17 +1,20 @@
-# Tutorials and How-To's
-Below you will find a variety of tutorials and how-to's for Evennia. The Beginner Tutorial is the recommended starting point.
+(tutorials-and-how-tos)=
+# 教學與 Howto
+下面您將找到Evennia 的各種教學和操作方法。初學者教程是推薦的起點。
 
 ```{note}
-Want more details about something? See the documentation for Evennia's core [Components](../Components/Components-Overview.md) and important [Concepts](../Concepts/Concepts-Overview.md).
+想了解更多細節嗎？請參閱檔案以瞭解 Evennia 的核心[元件](../Components/Components-Overview.md) 和重要的[概念](../Concepts/Concepts-Overview.md)。
 ```
 
-## Beginner Tutorial
+(beginner-tutorial)=
+<a id="beginner-tutorial"></a>
+## 新手教學
 
-Recommended starting point! This will take you from absolute beginner to making
-a small -- but full -- game with Evennia. Other tutorials and how-to's tend to assume you are already familiar with the concepts explained in the Beginner Tutorial.
+推薦起點！這將帶你從絕對的初學者到製作
+一個小但完整的遊戲，帶有 Evennia。其他教程和操作方法往往假設您已經熟悉初學者教程中解釋的概念。
 
 ```{note}
-Part 3 and onwards are still under development.
+第 3 部分及後續部分仍在開發中。
 ```
 
 ```{toctree}
@@ -28,7 +31,9 @@ Part 3 and onwards are still under development.
 :maxdepth: 1
 Howtos-Overview.md 
 ``` 
-## How-To's
+(how-tos)=
+<a id="how-tos"></a>
+## Howto
 
 ```{toctree}
 :maxdepth: 1
@@ -45,7 +50,9 @@ Tutorial-Building-a-Mech.md
 Tutorial-Building-a-Train.md
 ```
 
-## Systems
+(systems)=
+<a id="systems"></a>
+## 系統
 ```{toctree}
 :maxdepth: 1
 
@@ -56,9 +63,11 @@ Tutorial-Coordinates.md
 Tutorial-Displaying-Room-Map.md
 ```
 
-## Website Tutorials
+(website-tutorials)=
+<a id="website-tutorials"></a>
+## 網站教學
 
-_Some of these will likely move into the Beginner tutorial later_.
+_其中一些可能稍後會進入初學者教程_。
 
 ```{toctree}
 :maxdepth: 1
@@ -71,7 +80,9 @@ Web-Help-System-Tutorial.md
 Web-Extending-the-REST-API
 Web-Tweeting-Game-Stats.md
 ```
-## Deep Dives
+(deep-dives)=
+<a id="deep-dives"></a>
+## 深入主題
 
 ```{toctree}
 :maxdepth: 1
@@ -84,9 +95,10 @@ Evennia-for-MUSH-Users.md
 Tutorial-Using-Arxcode.md
 ```
 
-## Old Tutorials
+(old-tutorials)=
+## 較舊的教學
 
-These will be replaced by the Beginner Tutorial, but remain here until that is complete. 
+這些將被初學者教程取代，但保留在這裡直到完成。
 
 ```{toctree}
 :maxdepth: 1

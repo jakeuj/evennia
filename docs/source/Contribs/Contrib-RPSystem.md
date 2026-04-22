@@ -1,30 +1,33 @@
-# Roleplaying base system for Evennia
+(roleplaying-base-system-for-evennia)=
+# Evennia 的角色扮演基礎系統
 
-Contribution by Griatch, 2015
+Griatch 的貢獻，2015 年
 
-A full roleplaying emote system. Short-descriptions and recognition (only know people by their looks until you assign a name to them). Room poses. Masks/disguises (hide your description). Speak directly in emote, with optional language obscuration (words get garbled if you don't know the language, you can also have different languages with different 'sounding' garbling). Whispers can be partly overheard from a distance. A very powerful in-emote reference system, for referencing and differentiate targets (including objects).
+完整的角色扮演表情系統。簡短的描述和識別（在給他們指定名字之前只能透過外表來認識他們）。房間姿勢。面具/偽裝（隱藏您的描述）。直接用表情說話，可選擇語言模糊（如果您不懂該語言，單字會出現亂碼，您也可以使用不同的語言，並具有不同的「發音」亂碼）。從遠處就可以聽到部分耳語。一個非常強大的表情內參考系統，用於參考和區分目標（包括物件）。
 
-The system contains of two main modules - the roleplaying emote system and the language obscuration module.
+該系統包含兩個主要模組——角色扮演表情系統和語言模糊模組。
 
-## Roleplaying emotes
+(roleplaying-emotes)=
+## 角色扮演表情
 
-This module contains the ContribRPObject, ContribRPRoom and ContribRPCharacter typeclasses.  If you inherit your objects/rooms/character from these (or make them the defaults) from these you will get the following features:
+此模組包含ContribRPObject、ContribRPRoom 和ContribRPCharacter typeclasses。  如果您從這些繼承您的物件/房間/角色（或將它們設為預設值），您將獲得以下功能：
 
-- Objects/Rooms will get the ability to have poses and will report the poses of items inside them (the latter most useful for Rooms).
-- Characters will get poses and also sdescs (short descriptions) that will be used instead of their keys. They will gain commands for managing recognition (custom sdesc-replacement), masking themselves as well as an advanced free-form emote command.
+- 物件/房間將能夠擁有姿勢並報告其內部物品的姿勢（後者對房間最有用）。
+- 角色將獲得姿勢和 sdesc（簡短描述），這些將用來代替他們的按鍵。他們將獲得管理識別的指令（自訂 sdesc 替換）、隱藏自己以及高階的自由形式表情指令。
 
-In more detail, This RP base system introduces the following features to a game, common to many RP-centric games:
+更詳細地說，這個 RP 基本系統為遊戲引入了以下功能，這是許多 RP- 中心遊戲所共有的：
 
-- emote system using director stance emoting (names/sdescs).  This uses a customizable replacement noun (/me, @ etc) to represent you in the emote. You can use /sdesc, /nick, /key or /alias to reference objects in the room. You can use any number of sdesc sub-parts to differentiate a local sdesc, or use /1-sdesc etc to differentiate them. The emote also identifies nested says and separates case.
-- sdesc obscuration of real character names for use in emotes and in any referencing such as object.search().  This relies on an SdescHandler `sdesc` being set on the Character and makes use of a custom Character.get_display_name hook. If sdesc is not set, the character's `key` is used instead. This is particularly used in the emoting system.
-- recog system to assign your own nicknames to characters, can then be used for referencing. The user may recog a user and assign any personal nick to them. This will be shown in descriptions and used to reference them. This is making use of the nick functionality of Evennia.
-- masks to hide your identity (using a simple lock).
-- pose system to set room-persistent poses, visible in room descriptions and when looking at the person/object.  This is a simple Attribute that modifies how the characters is viewed when in a room as sdesc + pose.
-- in-emote says, including seamless integration with language obscuration routine (such as contrib/rplanguage.py)
+- 使用導演姿態表情的表情系統（名稱/sdescs）。  這使用可自訂的替換名詞（/me、@等）來代表您的表情。您可以使用 /sdesc、/nick、/key 或 /alias 來引用房間中的物件。您可以使用任意數量的 sdesc 子部分來區分本地 sdesc，或使用 /1-sdesc 等來區分它們。該表情還識別巢狀的說並分隔大小寫。
+- sdesc 隱藏真實角色名稱，用於表情和任何引用，例如 object.search()。  這依賴於在角色上設定的 SdescHandler `sdesc` 並使用自訂角色。 get_display_name 掛鉤。如果未設定 sdesc，則使用字元的 `key`。這尤其用於情緒系統。
+- 識別系統為角色分配您自己的暱稱，然後可以用於參考。使用者可以識別使用者並向他們分配任何個人暱稱。這將在描述中顯示並用於引用它們。這是利用 Evennia 的暱稱功能。
+- 隱藏您身分的面具（使用簡單的lock）。
+- 姿勢系統設定房間持久姿勢，在房間描述中以及在檢視人/物體時可見。  這是一個簡單的Attribute，它以 sdesc + 姿勢修改角色在房間中的觀看方式。
+- in-emote 表示，包括與語言模糊例程的無縫整合（例如 contrib/rplanguage.py）
 
-### Installation:
+(installation)=
+### 安裝：
 
-Add `RPSystemCmdSet` from this module to your CharacterCmdSet:
+將此模組中的 `RPSystemCmdSet` 新增到您的 CharacterCmdSet：
 
 ```python
 # mygame/commands/default_cmdsets.py
@@ -41,8 +44,8 @@ class CharacterCmdSet(default_cmds.CharacterCmdset):
 
 ```
 
-You also need to make your Characters/Objects/Rooms inherit from
-the typeclasses in this module:
+您還需要使您的角色/物件/房間繼承自
+該模組中的typeclasses：
 
 ```python
 # in mygame/typeclasses/characters.py
@@ -73,24 +76,26 @@ class Room(ContribRPRoom):
     # ...
 
 ```
-You need to set up Evennia to use the RPsystem's form to separate
-between sdescs (`3-tall`) to make it compatible with how the rest of Evennia
-separates between other multi-matches of searches/commands:
+您需要設定Evennia以使用RPsystem的形式來分離
+sdescs (`3-tall`) 之間，使其與 Evennia 的其餘部分相容
+分隔其他多重符合的搜尋/指令：
 
     SEARCH_MULTIMATCH_REGEX = r"(?P<number>[0-9]+)-(?P<name>[^-]*)(?P<args>.*)"
     SEARCH_MULTIMATCH_TEMPLATE = " {number}-{name}{aliases}{info}\n"
 
-Finally, you will then need to reload the server and potentially force-reload
-your objects, if you originally created them without this.
+最後，您將需要重新載入伺服器並可能強制重新載入
+你的物件，如果你最初建立它們時沒有使用它。
 
-Example for your character:
+您的角色範例：
 
     > type/reset/force me = typeclasses.characters.Character
 
 
-### Usage
+(usage)=
+### 用法
 
-#### Sdescs
+(sdescs)=
+#### 描述
 
     > look
 
@@ -99,42 +104,46 @@ Example for your character:
 
     *A tall man* is standing by the bar.
 
-Above is an example of a player with an sdesc "a tall man". It is also an example of a static *pose*: The "standing by the bar" has been set by the player of the tall man, so that people looking at him can tell at a glance what is going on.
+上面是一個 sdesc“a high man”的玩家範例。這也是一個靜態*姿勢*的例子：「站在吧檯旁」是由高個子的玩家設定的，這樣人們一看他就知道發生了什麼。
 
     > emote /me looks at /Tall and says "Hello!"
 
-I see:
+我懂了：
 
     Griatch looks at Tall man and says "Hello".
 
-Tall man (assuming his name is Tom) sees:
+高個子男人（假設他的名字是湯姆）看到：
 
     The godlike figure looks at Tom and says "Hello".
 
-Note that by default, the case of the tag matters, so `/tall` will lead to 'tall man' while `/Tall` will become 'Tall man' and /TALL becomes /TALL MAN. If you don't want this behavior, you can pass case_sensitive=False to the `send_emote` function.
+請注意，預設情況下，tag 的大小寫很重要，因此 `/tall` 將導致“tall man”，而 `/Tall` 將變為“Tall man”，而 /TALL 將變為 /TALL MAN。如果您不希望出現此行為，可以將 case_sensitive=False 傳遞給 `send_emote` 函式。
 
-#### Language integration
+(language-integration)=
+#### 語言整合
 
-Speech can be identified as a particular language by prefixing it with the language key.
+透過在語音前面加上語言鍵字首，可以將語音辨識為特定語言。
 
     emote says with a growl, orcish"Hello".
 
-This will identify the speech "Hello" as being spoken in orcish, and then pass that information on to `process_language` on your Character. By default, it doesn't do much, but you can hook in a language system such as the `rplanguage` module below to do more interesting things.
+這會將語音「Hello」識別為獸人語，然後將該訊息傳遞給您角色上的 `process_language`。預設情況下，它不會做太多事情，但是您可以掛鉤語言系統（例如下面的 `rplanguage` 模組）來做更多有趣的事情。
 
 
-##  Language and whisper obfuscation system
+(language-and-whisper-obfuscation-system)=
+## 語言和耳語混淆系統
 
-This module is intented to be used with an emoting system (such as `contrib/rpg/rpsystem.py`). It offers the ability to obfuscate spoken words in the game in various ways:
+此模組旨在與表情系統（例如`contrib/rpg/rpsystem.py`）一起使用。它提供了以各種方式混淆遊戲中口頭單字的能力：
 
-- Language: The language functionality defines a pseudo-language map to any number of languages.  The string will be obfuscated depending on a scaling that (most likely) will be input as a weighted average of the language skill of the speaker and listener.
-- Whisper: The whisper functionality will gradually "fade out" a whisper along as scale 0-1, where the fading is based on gradually removing sections of the whisper that is (supposedly) easier to overhear (for example "s" sounds tend to be audible even when no other meaning can be determined).
+- 語言：語言功能定義了到任意數量語言的偽語言對映。  該字串將根據縮放比例進行混淆，該縮放比例（最有可能）將作為說話者和聽眾語言技能的加權平均值輸入。
+- 耳語：耳語功能將按照 0-1 級逐漸「淡出」耳語，其中淡出是基於逐漸刪除（據說）更容易無意中聽到的耳語部分（例如，即使無法確定其他含義，「s」聲音也往往是可聽見的）。
 
 
-### Installation
+(installation-1)=
+### 安裝
 
-This module adds no new commands; embed it in your say/emote/whisper commands.
+該模組沒有新增新指令；將其嵌入到您的 say/emote/whisper 指令中。
 
-### Usage:
+(usage-1)=
+### 用法：
 
 ```python
 from evennia.contrib.rpg.rpsystem import rplanguage
@@ -165,9 +174,9 @@ result = rplanguage.obfuscate_whisper(whisper, level=1.0)
 
 ```
 
-To set up new languages, import and use the `add_language()` helper method in this module. This allows you to customize the "feel" of the semi-random language you are creating. Especially the `word_length_variance` helps vary the length of translated words compared to the original and can help change the "feel" for the language you are creating. You can also add your own dictionary and "fix" random words for a list of input words.
+若要設定新語言，請匯入並使用此模組中的 `add_language()` 輔助方法。這允許您自訂您正在建立的半隨機語言的“感覺”。特別是 `word_length_variance` 有助於改變翻譯單字與原始單字的長度，並有助於改變您正在建立的語言的「感覺」。您還可以新增自己的字典並“修復”輸入單字列表中的隨機單字。
 
-Below is an example of "elvish", using "rounder" vowels and sounds:
+下面是「elvish」的一個例子，使用了「rounder」母音和發音：
 
 ```python
 # vowel/consonant grammar possibilities
@@ -214,14 +223,14 @@ rplanguage.add_language(key="elvish", phonemes=phonemes, grammar=grammar,
 
 ```
 
-This will produce a decicively more "rounded" and "soft" language than the default one. The few `manual_translations` also make sure to make it at least look superficially "reasonable".
+這將產生一種比預設語言更加“圓潤”和“柔和”的語言。這幾個`manual_translations`也確保至少表面上看起來「合理」。
 
-The `auto_translations` keyword is useful, this accepts either a list or a path to a text-file (with one word per line). This listing of words is used to 'fix' translations for those words according to the grammatical rules. These translations are stored persistently as long as the language exists.
+`auto_translations` 關鍵字很有用，它接受清單或文字檔案的路徑（每行一個單字）。該單字清單用於根據語法規則「修復」這些單字的翻譯。只要語言存在，這些翻譯就會永久儲存。
 
-This allows to quickly build a large corpus of translated words that never change. This produces a language that seem moderately consistent, since words like 'the' will always be translated to the same thing.  The disadvantage (or advantage, depending on your game) is that players can end up learn what words mean even if their characters don't know the langauge.
+這樣可以快速建立一個永不改變的大型翻譯單字語料庫。這產生了一種看起來相當一致的語言，因為像「the」這樣的字總是會被翻譯成相同的東西。  缺點（或優點，取決於您的遊戲）是玩家最終可以瞭解單字的含義，即使他們的角色不知道該語言。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/rpg/rpsystem/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\rpg\rpsystem\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

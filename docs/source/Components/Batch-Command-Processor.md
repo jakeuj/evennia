@@ -1,43 +1,45 @@
-# Batch Command Processor
+(batch-command-processor)=
+# 批次指令處理器
 
 
-For an introduction and motivation to using batch processors, see [here](./Batch-Processors.md). This
-page describes the Batch-*command* processor. The Batch-*code* one is covered [here](Batch-Code-
-Processor).
+有關使用批處理器的介紹和動機，請參閱[此處](./Batch-Processors.md)。這個
+頁面描述了 Batch-*command* 處理器。 Batch-*code* 已在[此處](Batch-Code-
+Processor) 介紹。
 
-The batch-command processor is a superuser-only function, invoked by 
+批次指令處理器是一個僅限超級使用者的函式，由
 
      > batchcommand path.to.batchcmdfile
 
-Where `path.to.batchcmdfile` is the path to a *batch-command file* with the "`.ev`" file ending.
-This path is given like a python path relative to a folder you define to hold your batch files, set
-with `BATCH_IMPORT_PATH` in your settings. Default folder is (assuming your game is in the `mygame`
-folder) `mygame/world`. So if you want to run the example batch file in
-`mygame/world/batch_cmds.ev`, you could use
+其中 `path.to.batchcmdfile` 是以「`.ev`」檔案結尾的*批次指令檔*的路徑。
+該路徑類似於相對於您定義的用於儲存批次檔的資料夾的 python 路徑，設定
+在您的設定中包含`BATCH_IMPORT_PATH`。預設資料夾是（假設您的遊戲位於`mygame`
+資料夾）`mygame/world`。因此，如果您想執行範例批次檔案
+`mygame/world/batch_cmds.ev`，你可以使用
 
      > batchcommand batch_cmds
 
-A batch-command file contains a list of Evennia in-game commands separated by comments. The
-processor will run the batch file from beginning to end. Note that *it will not stop if commands in
-it fail* (there is no universal way for the processor to know what a failure looks like for all
-different commands). So keep a close watch on the output, or use *Interactive mode* (see below) to
-run the file in a more controlled, gradual manner.
+批次指令檔案包含由註解分隔的 Evennia 遊戲內指令清單。的
+處理器將從頭到尾執行批次檔。請注意，*如果指令在
+它失敗*（處理器沒有通用的方法來知道所有的失敗是什麼樣子的）
+不同的指令）。因此，請密切注意輸出，或使用*互動模式*（見下文）來
+以更受控、漸進的方式執行該檔案。
 
-## The batch file
+(the-batch-file)=
+## 批次檔
 
-The batch file is a simple plain-text file containing Evennia commands. Just like you would write
-them in-game, except you have more freedom with line breaks.
+批次檔是一個簡單的純文字檔案，包含 Evennia 指令。就像你會寫的那樣
+它們在遊戲中，除了你有更多的換行自由。
 
-Here are the rules of syntax of an `*.ev` file. You'll find it's really, really simple:
+以下是 `*.ev` 檔案的語法規則。你會發現它真的非常非常簡單：
 
-- All lines having the `#` (hash)-symbol *as the first one on the line* are considered *comments*. All non-comment lines are treated as a command and/or their arguments.
-- Comment lines have an actual function -- they mark the *end of the previous command definition*. So never put two commands directly after one another in the file - separate them with a comment, or the second of the two will be considered an argument to the first one. Besides, using plenty of comments is good practice anyway.
-- A line that starts with the word `#INSERT` is a comment line but also signifies a special instruction. The syntax is `#INSERT <path.batchfile>` and tries to import a given batch-cmd file into this one. The inserted batch file (file ending `.ev`) will run normally from the point of the `#INSERT` instruction.
-- Extra whitespace in a command definition is *ignored*.  - A completely empty line translates in to a line break in texts. Two empty lines thus means a new paragraph (this is obviously only relevant for commands accepting such formatting, such as the `@desc` command).
-- The very last command in the file is not required to end with a comment.
-- You *cannot* nest another `batchcommand` statement into your batch file. If you want to link many batch-files together, use the `#INSERT` batch instruction instead. You also cannot launch the `batchcode` command from your batch file, the two batch processors are not compatible.
+- 所有具有`#`（雜湊）符號*作為該行第一行*的行都被視為*註解*。所有非註解行都被視為指令和/或其引數。
+- 註解行有一個實際的功能－它們標記*前一個指令定義的結束*。因此，切勿將兩個指令直接放在檔案中 - 用註釋將它們分開，否則兩個指令中的第二個將被視為第一個指令的引數。此外，無論如何，使用大量註釋是一種很好的做法。
+- 以 `#INSERT` 開頭的行是註解行，但也表示特殊指令。語法為 `#INSERT <path.batchfile>` 並嘗試將給定的批次指令檔案匯入此檔案。插入的批次檔（以`.ev`結尾的檔案）將從`#INSERT`指令處正常運作。
+- 指令定義中的額外空格將被*忽略*。  - 完全空白行會轉換為文字中的換行符號。因此，兩個空白行意味著一個新段落（這顯然僅與接受此類格式的指令相關，例如 `@desc` 指令）。
+- 檔案中的最後一個指令不需要以註解結尾。
+- 您*不能*將另一個 `batchcommand` 語句巢狀到批次檔中。如果要將多個批次檔連結在一起，請改用 `#INSERT` 批次指令。您也無法從批次檔啟動 `batchcode` 指令，這兩個批次處理器不相容。
 
-Below is a version of the example file found in `evennia/contrib/tutorials/batchprocessor/example_batch_cmds.ev`. 
+以下是在 `evennia/contrib/tutorials/batchprocessor/example_batch_cmds.ev` 中找到的範例檔案的版本。
 
 ```bash
     #
@@ -82,40 +84,42 @@ Below is a version of the example file found in `evennia/contrib/tutorials/batch
     drop button
 ```
 
-To test this, run `batchcommand` on the file: 
+若要對此進行測試，請在檔案上執行 `batchcommand`：
 
     > batchcommand tutorials.batchprocessor.example_batch_cmds
 
-A button will be created, described and dropped in Limbo. All commands will be executed by the user calling the command.
+將在 Limbo 中建​​立、描述並放置一個按鈕。所有指令都將由呼叫該指令的使用者執行。
 
-> Note that if you interact with the button, you might find that its description changes, loosing your custom-set description above. This is just the way this particular object works.
+> 請注意，如果您與按鈕互動，您可能會發現其描述發生變化，從而丟失上面的自訂設定描述。這就是這個特定物件的工作方式。
 
-## Interactive mode
+(interactive-mode)=
+## 互動模式
 
-Interactive mode allows you to more step-wise control over how the batch file is executed. This is useful for debugging and also if you have a large batch file and is only updating a small part of it -- running the entire file again would be a waste of time (and in the case of `create`-ing objects you would to end up with multiple copies of same-named objects, for example). Use `batchcommand` with the `/interactive` flag to enter interactive mode. 
+互動模式可讓您更逐步地控制批次檔的執行方式。這對於偵錯很有用，如果您有一個很大的批次檔並且只更新其中的一小部分，那麼再次執行整個檔案將是浪費時間（例如，在 `create`-ing 物件的情況下，您最終會得到同名物件的多個副本）。使用 `batchcommand` 和 `/interactive` 標誌進入互動模式。
 
      > batchcommand/interactive tutorials.batchprocessor.example_batch_cmds
 
-You will see this:
+你會看到這個：
 
     01/04: create button:red_button.RedButton  (hh for help) 
 
-This shows that you are on the `create` command, the first out of only four commands in this batch file. Observe that the command `create` has *not* been actually processed at this point!
+這表示您正在執行 `create` 指令，這是該批次檔中僅有的四個指令中的第一個。請注意，指令 `create` 此時「尚未」被實際處理！
 
-To take a look at the full command you are about to run, use `ll` (a batch-processor version of
-`look`). Use `pp` to actually process the current command (this will actually `create` the button) -- and make sure it worked as planned. Use `nn` (next) to go to the next command.  Use `hh` for a list of commands.
+若要檢視您將要執行的完整指令，請使用 `ll` （批次版本
+`look`）。使用 `pp` 實際處理當前指令（這實際上將 `create` 按鈕）——並確保它按計劃工作。使用`nn`（下一個）轉到下一個指令。  使用 `hh` 作為指令清單。
 
-If there are errors, fix them in the batch file, then use `rr` to reload the file. You will still be at the same command and can rerun it easily with `pp` as needed. This makes for a simple debug cycle. It also allows you to rerun individual troublesome commands - as mentioned, in a large batch file this can be very useful. Do note that in many cases, commands depend on the previous ones (e.g. if `create` in the example above had failed, the following commands would have had nothing to operate on).
+如果有錯誤，請在批次檔中修復它們，然後使用 `rr` 重新載入檔案。您仍將使用相同的指令，並且可以根據需要使用 `pp` 輕鬆重新執行它。這使得除錯週期變得簡單。它還允許您重新執行單一麻煩的指令 - 如前所述，在大型批次檔中這可能非常有用。請注意，在許多情況下，指令依賴前面的指令（e.g。如果上例中的 `create` 失敗，則後面的指令將沒有任何操作）。
 
-Use `nn` and `bb` (next and back) to step through the file; e.g. `nn 12` will jump 12 steps forward (without processing any command in between). All normal commands of Evennia should work too while working in interactive mode.
+使用 `nn` 和 `bb`（下一個和後一個）逐步瀏覽檔案； e.g。 `nn 12` 將向前跳 12 步（中間不處理任何指令）。在互動模式下工作時，Evennia 的所有正常指令也應該起作用。
 
-## Limitations and Caveats
+(limitations-and-caveats)=
+## 限制和注意事項
 
-The main issue with batch-command builds is that when you run a batch-command script you (*you*, as in your character) are actually moving around in the game creating and building rooms in sequence, just as if you had been entering those commands manually, one by one. 
+批次指令建置的主要問題是，當您執行批次指令 script 時，您（*您*，就像您的角色一樣）實際上是在遊戲中按順序移動建立和建立房間，就像您手動一一輸入這些指令一樣。
 
-You have to take this into account when creating the file, so that you can 'walk' (or teleport) to the right places in order. It also means that you may be affected by the things you create, such as mobs attacking you or traps immediately hurting you. 
+建立檔案時必須考慮到這一點，以便您可以按順序「行走」（或傳送）到正確的位置。這也意味著你可能會受到你所創造的事物的影響，例如攻擊你的小怪或立即傷害你的陷阱。
 
-If you know that your rooms and objects are going to be deployed via a batch-command script, you can plan for this beforehand. To help with this, you can use the fact that the non-persistent Attribute `batch_batchmode` is _only_ set while the batch-processor is running. Here's an example of how to use it: 
+如果您知道您的房間和物件將透過批次指令 script 部署，您可以提前對此進行規劃。為了幫助解決此問題，您可以利用以下事實：非持久 Attribute `batch_batchmode` 僅在批次處理器執行時設定。以下是如何使用它的範例：
 
 ```python
 class HorribleTrapRoom(Room):
@@ -127,11 +131,12 @@ class HorribleTrapRoom(Room):
             return 
         # commence horrible trap code
 ```
-So we skip the hook if we are currently building the room. This can work for anything, including making sure mobs don't start attacking you while you are creating them. 
+因此，如果我們目前正在建造房間，我們就跳過這個鉤子。這可以用於任何事情，包括確保小怪在您建立它們時不會開始攻擊您。
 
-There are other strategies, such as adding an on/off switch to actiive objects and make sure it's always set to *off* upon creation.
+還有其他策略，例如向活動物件新增開/關開關，並確保在建立時將其始終設定為“關閉”。
 
-## Editor highlighting for .ev files
+(editor-highlighting-for-ev-files)=
+## .ev 檔案的編輯器反白顯示
 
-- [GNU Emacs](https://www.gnu.org/software/emacs/) users might find it interesting to use emacs' *evennia mode*. This is an Emacs major mode found in `evennia/utils/evennia-mode.el`. It offers correct syntax highlighting and indentation with `<tab>` when editing `.ev` files in Emacs. See the header of that file for installation instructions.
-- [VIM](https://www.vim.org/) users can use amfl's [vim-evennia](https://github.com/amfl/vim-evennia) mode instead, see its readme for install instructions.
+- [GNU Emacs](https://www.gnu.org/software/emacs/) 使用者可能會發現使用 emacs 的 *evennia 模式*很有趣。這是在 `evennia/utils/evennia-mode.el` 中找到的 Emacs 主模式。在 Emacs 中編輯 `.ev` 檔案時，它提供正確的語法突出顯示和 `<tab>` 縮排。有關安裝說明，請參閱該檔案的標頭。
+- [VIM](https://www.vim.org/) 使用者可以使用 amfl 的 [vim-evennia](https://github.com/amfl/vim-evennia) 模式代替，請參閱其自述檔案以取得安裝說明。

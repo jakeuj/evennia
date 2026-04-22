@@ -1,7 +1,8 @@
 
-# Rooms
+(rooms)=
+# 客房
 
-**Inheritance Tree:**
+**繼承樹：**
 ```
 ┌─────────────┐
 │DefaultObject│
@@ -18,14 +19,14 @@
     └────┘
 ```
 
-[Rooms](evennia.objects.objects.DefaultRoom) are in-game [Objects](./Objects.md) representing the root containers of all other objects. 
+[房間](evennia.objects.objects.DefaultRoom) 是遊戲中的[物件](./Objects.md)，代表所有其他物件的根容器。
 
-The only thing technically separating a room from any other object is that they have no `location` of their own and that default commands like `dig` creates objects of this class - so if you want to expand your rooms with more functionality, just inherit from `evennia.DefaultRoom`. 
+從技術上講，房間與任何其他物件的唯一區別是它們沒有自己的 `location`，並且像 `dig` 這樣的預設指令會建立此類物件 - 因此，如果您想使用更多功能擴充套件房間，只需從 `evennia.DefaultRoom` 繼承即可。
 
-To change the default room created by `dig`, `tunnel` and other default commands, change it in settings: 
+若要變更`dig`、`tunnel`和其他預設指令所建立的預設房間，請在設定中變更：
 
     BASE_ROOM_TYPECLASS = "typeclases.rooms.Room"
 
-The empty class in `mygame/typeclasses/rooms.py` is a good place to start! 
+`mygame/typeclasses/rooms.py` 中的空類別是一個很好的起點！
 
-While the default Room is very simple, there are several Evennia [contribs](../Contribs/Contribs-Overview.md) customizing and extending rooms with more functionality. 
+雖然預設的 Room 非常簡單，但有幾個 Evennia [contribs](../Contribs/Contribs-Overview.md) 可以自訂和擴充套件具有更多功能的 Room。

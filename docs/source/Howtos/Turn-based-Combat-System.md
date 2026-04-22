@@ -1,52 +1,56 @@
-# Turn based Combat System
+(turn-based-combat-system)=
+# 回合製戰鬥系統
 
 
-This tutorial gives an example of a full, if simplified, combat system for Evennia. It was inspired
-by the discussions held on the [mailing
-list](https://groups.google.com/forum/#!msg/evennia/wnJNM2sXSfs/-dbLRrgWnYMJ).
+本教學提供了 Evennia 的完整（如果簡化）戰鬥系統的範例。受到了啟發
+透過在[郵寄
+列表](https://groups.google.com/forum/#!msg/evennia/wnJNM2sXSfs/-dbLRrgWnYMJ)。
 
-## Overview of combat system concepts
+(overview-of-combat-system-concepts)=
+## 戰鬥系統概念概述
 
-Most MUDs will use some sort of combat system. There are several main variations:
+大多數MUDs會使用某種戰鬥系統。有幾個主要的變體：
 
-- _Freeform_ - the simplest form of combat to implement, common to MUSH-style roleplaying games. This means the system only supplies dice rollers or maybe commands to compare skills and spit out the result. Dice rolls are done to resolve combat according to the rules of the game and to direct the scene. A game master may be required to resolve rule disputes.
-- _Twitch_ - This is the traditional MUD hack&slash style combat. In a twitch system there is often no difference between your normal "move-around-and-explore mode" and the "combat mode". You enter an attack command and the system will calculate if the attack hits and how much damage was caused. Normally attack commands have some sort of timeout or notion of recovery/balance to reduce the advantage of spamming or client scripting. Whereas the simplest systems just means entering `kill <target>` over and over, more sophisticated twitch systems include anything from defensive stances to tactical positioning.
-- _Turn-based_ - a turn based system means that the system pauses to make sure all combatants can choose their actions before continuing. In some systems, such entered actions happen immediately (like twitch-based) whereas in others the resolution happens simultaneously at the end of the turn. The disadvantage of a turn-based system is that the game must switch to a "combat mode" and one also needs to take special care of how to handle new combatants and the passage of time. The advantage is that success is not dependent on typing speed or of setting up quick client macros. This potentially allows for emoting as part of combat which is an advantage for roleplay-heavy games.
+- _自由形式_ - 最簡單的戰鬥形式，常見於 MUSH 風格的角色扮演遊戲。這意味著系統僅提供骰子滾輪或可能的指令來比較技能並吐出結果。擲骰子是為了根據遊戲規則解決戰鬥並指揮場景。可能需要遊戲管理員來解決規則爭議。
+- _Twitch_ - 這是傳統的 MUD hack&slash 風格的戰鬥。在抽搐系統中，正常的「移動和探索模式」和「戰鬥模式」之間通常沒有區別。你輸入攻擊指令，系統會計算攻擊是否命中以及造成了多少傷害。通常，攻擊指令具有某種逾時或恢復/平衡概念，以減少垃圾郵件或用戶端指令碼的優勢。最簡單的系統只意味著一遍又一遍地輸入`kill <target>`，而更複雜的抽搐系統包括從防禦姿態到戰術定位的任何內容。
+- _回合製_ - 回合製系統意味著系統會暫停以確保所有戰鬥人員可以在繼續之前選擇他們的行動。在某些系統中，此類輸入的動作會立即發生（例如基於抽搐），而在其他系統中，解決方案會在回合結束時同時發生。回合製的缺點是遊戲必須切換到“戰鬥模式”，並且還需要特別注意如何應對新的戰鬥人員和時間的流逝。優點是成功不依賴打字速度或設定快速用戶端巨集。這可能允許將情緒作為戰鬥的一部分，這對角色扮演遊戲來說是一個優勢。
 
-To implement a freeform combat system all you need is a dice roller and a roleplaying rulebook. See [contrib/dice.py](../Contribs/Contrib-Dice.md) for an example dice roller. To implement at twitch-based system you basically need a few combat [commands](../Components/Commands.md), possibly ones with a [cooldown](./Howto-Command-Cooldown.md). You also need a [game rule module](./Implementing-a-game-rule-system.md) that makes use of it. We will focus on the turn-based variety here. 
+要實現自由形式的戰鬥系統，您只需要一個擲骰子和一本角色扮演規則手冊。有關骰子滾輪的範例，請參閱 [contrib/dice.py](../Contribs/Contrib-Dice.md)。要在基於抽搐的系統上實施，您基本上需要一些戰鬥[指令](../Components/Commands.md)，可能是帶有[冷卻時間](./Howto-Command-Cooldown.md)的指令。您還需要一個使用它的[遊戲規則模組](./Implementing-a-game-rule-system.md)。我們將在這裡重點關注回合製遊戲。
 
-## Tutorial overview
+(tutorial-overview)=
+## 教學概述
 
-This tutorial will implement the slightly more complex turn-based combat system. Our example has the following properties:
+本教學將實現稍微複雜的回合製戰鬥系統。我們的範例具有以下屬性：
 
-- Combat is initiated with `attack <target>`, this initiates the combat mode.
-- Characters may join an ongoing battle using `attack <target>` against a character already in
-combat.
-- Each turn every combating character will get to enter two commands, their internal order matters and they are compared one-to-one in the order given by each combatant.  Use of `say` and `pose` is free.
-- The commands are (in our example) simple; they can either `hit <target>`, `feint <target>` or `parry <target>`. They can also `defend`, a generic passive defense. Finally they may choose to `disengage/flee`.
-- When attacking we use a classic [rock-paper-scissors](https://en.wikipedia.org/wiki/Rock-paper- scissors) mechanic to determine success: `hit` defeats `feint`, which defeats `parry` which defeats `hit`. `defend` is a general passive action that has a percentage chance to win against `hit` (only).
-- `disengage/flee` must be entered two times in a row and will only succeed if there is no `hit` against them in that time. If so they will leave combat mode.
-- Once every player has entered two commands, all commands are resolved in order and the result is reported. A new turn then begins.
-- If players are too slow the turn will time out and any unset commands will be set to `defend`. 
+- 戰鬥以`attack <target>`開始，這將啟動戰鬥模式。
+- 角色可以使用 `attack <target>` 加入正在進行的戰鬥，對抗已經在場的角色
+戰鬥。
+- 每個回合，每個戰鬥角色都會輸入兩個指令，它們的內部順序很重要，並且按照每個戰鬥者給出的順序進行一對一比較。  `say` 和 `pose` 的使用是免費的。
+- 指令（在我們的範例中）很簡單；它們可以是`hit <target>`、`feint <target>` 或`parry <target>`。他們還可以`defend`，一種通用的被動防禦。最後他們可能會選擇`disengage/flee`。
+- 攻擊時，我們使用經典的[石頭剪刀布](https://en.wikipedia.org/wiki/Rock-paper- scissors)機制來確定成功：`hit`擊敗`feint`，`feint`擊敗`parry`，`hit`擊敗`hit`。 `defend` 是一般被動動作，有一定百分比的機會戰勝 `hit`（僅）。
+- `disengage/flee` 必須連續輸入兩次，並且只有在當時沒有 `hit` 反對的情況下才會成功。如果是這樣，他們將離開戰鬥模式。
+- 一旦每個玩家輸入兩個指令，所有指令將按順序解析並報告結果。然後新的回合開始。
+- 如果玩家太慢，回合將逾時，任何未設定的指令將被設定為`defend`。
 
-For creating the combat system we will need the following components:
+為了建立戰鬥系統，我們需要以下元件：
 
-- A combat handler. This is the main mechanic of the system. This is a [Script](../Components/Scripts.md) object created for each combat.  It is not assigned to a specific object but is shared by the combating characters and handles all the combat information. Since Scripts are database entities it also means that the combat will not be affected by a server reload.
-- A combat [command set](../Components/Command-Sets.md) with the relevant commands needed for combat, such as the various attack/defend options and the `flee/disengage` command to leave the combat mode.
-- A rule resolution system. The basics of making such a module is described in the [rule system tutorial](./Implementing-a-game-rule-system.md). We will only sketch such a module here for our end-turn combat resolution.
-- An `attack` [command](../Components/Commands.md) for initiating the combat mode. This is added to the default command set. It will create the combat handler and add the character(s) to it. It will also assign the combat command set to the characters.
+- 戰鬥處理者。這是系統的主要機制。這是為每次戰鬥建立的 [Script](../Components/Scripts.md) 物件。  它不分配給特定的物件，而是由戰鬥角色共享並處理所有戰鬥資訊。由於 Scripts 是資料庫實體，這也意味著戰鬥不會受到伺服器重新載入的影響。
+- 戰鬥[指令集](../Components/Command-Sets.md)，包含戰鬥所需的相關指令，例如各種攻擊/防禦選項和退出戰鬥模式的`flee/disengage`指令。
+- 規則解析系統。 [規則系統教學](./Implementing-a-game-rule-system.md)中描述了製作此類模組的基礎知識。我們只會在這裡為我們的最終回合戰鬥解決方案繪製這樣一個模組。
+- 用於啟動戰鬥模式的`attack` [指令](../Components/Commands.md)。這被新增到預設指令集中。它將建立戰鬥處理程式並向其中新增角色。它還會將戰鬥指令集指派給角色。
 
-## The combat handler
+(the-combat-handler)=
+## 戰鬥處理者
 
-The _combat handler_ is implemented as a stand-alone [Script](../Components/Scripts.md).  This Script is created when the first Character decides to attack another and is deleted when no one is fighting any more. Each handler represents one instance of combat and one combat only. Each instance of combat can hold any number of characters but each character can only be part of one combat at a time (a player would
-need to disengage from the first combat before they could join another).
+_combat handler_ 是作為獨立的 [Script](../Components/Scripts.md) 實現的。  當第一個角色決定攻擊另一個角色時，會建立此Script，並在無人再戰鬥時刪除。每個處理程式代表一次戰鬥例項，並且僅代表一次戰鬥。每個戰鬥例項可以容納任意數量的角色，但每個角色一次只能參與一場戰鬥（玩家將
+需要先脫離第一次戰鬥才能加入另一場戰鬥）。
 
-The reason we don't store this Script "on" any specific character is because any character may leave the combat at any time. Instead the script holds references to all characters involved in the combat.  Vice-versa, all characters holds a back-reference to the current combat handler. While we don't use this very much here this might allow the combat commands on the characters to access and update the combat handler state directly. 
+我們不將這個 Script 儲存在任何特定角色上的原因是因為任何角色都可能隨時離開戰鬥。相反，script 包含對參與戰鬥的所有角色的引用。  反之亦然，所有角色都持有對當前戰鬥處理程式的反向引用。雖然我們在這裡不經常使用它，但這可能允許角色上的戰鬥指令直接存取和更新戰鬥處理程式狀態。
 
-_Note: Another way to implement a combat handler would be to use a normal Python object and handle time-keeping with the [TickerHandler](../Components/TickerHandler.md). This would require either adding custom hook methods on the character or to implement a custom child of the TickerHandler class to track turns. Whereas the TickerHandler is easy to use, a Script offers more power in this case._
+_注意：實現戰鬥處理程式的另一種方法是使用普通的 Python 物件並使用 [TickerHandler](../Components/TickerHandler.md) 處理計時。這需要在角色上新增自訂掛鉤方法或實作 TickerHandler 類別的自訂子層級來追蹤回合。雖然 TickerHandler 易於使用，但 Script 在此 case._ 中提供了更多功能
 
-Here is a basic combat handler. Assuming our game folder is named `mygame`, we store it in
-`mygame/typeclasses/combat_handler.py`:
+這是一個基本的戰鬥處理程式。假設我們的遊戲資料夾名為`mygame`，我們將其儲存在
+`mygame/typeclasses/combat_handler.py`：
 
 ```python
 # mygame/typeclasses/combat_handler.py
@@ -212,20 +216,21 @@ class CombatHandler(DefaultScript):
             self.msg_all("Next turn begins ...")
 ```
 
-This implements all the useful properties of our combat handler. This Script will survive a reboot
-and will automatically re-assert itself when it comes back online. Even the current state of the
-combat should be unaffected since it is saved in Attributes at every turn. An important part to note
-is the use of the Script's standard `at_repeat` hook and the `force_repeat` method to end each turn.
-This allows for everything to go through the same mechanisms with minimal repetition of code.
+這實現了我們的戰鬥處理程式的所有有用屬性。此 Script 將在重新啟動後繼續存在
+當它重新上線時會自動重新宣告自己。即使是目前的狀態
+戰鬥應該不受影響，因為它每次都會儲存在屬性中。需要注意的重要部分
+是使用Script的標準`at_repeat`鉤子和`force_repeat`方法來結束每一回合。
+這允許一切都透過相同的機制，並且程式碼重複最少。
 
-What is not present in this handler is a way for players to view the actions they set or to change
-their actions once they have been added (but before the last one has added theirs). We leave this as an exercise.
+此處理程式中不存在玩家檢視他們設定或更改的操作的方法
+新增後（但在最後一個新增他們的操作之前）他們的操作。我們將此作為練習。
 
-## Combat commands
+(combat-commands)=
+## 戰鬥指令
 
-Our combat commands - the commands that are to be available to us during the combat - are (in our example) very simple. In a full implementation the commands available might be determined by the weapon(s) held by the player or by which skills they know.
+我們的戰鬥指令 - 在戰鬥期間我們可以使用的指令 - （在我們的範例中）非常簡單。在完整的實現中，可用的指令可能由玩家持有的武器或他們所知道的技能決定。
 
-We create them in `mygame/commands/combat.py`.
+我們在`mygame/commands/combat.py`中建立它們。
 
 ```python
 # mygame/commands/combat.py
@@ -265,9 +270,9 @@ class CmdHit(Command):
         self.caller.ndb.combat_handler.check_end_turn()
 ```
 
-The other commands `CmdParry`, `CmdFeint`, `CmdDefend` and `CmdDisengage` look basically the same. We should also add a custom `help` command to list all the available combat commands and what they do. 
+其他指令`CmdParry`、`CmdFeint`、`CmdDefend` 和`CmdDisengage` 看起來基本上相同。我們還應該新增一個自訂 `help` 指令來列出所有可用的戰鬥指令及其用途。
 
-We just need to put them all in a cmdset. We do this at the end of the same module:
+我們只需要將它們全部放在cmdset中。我們在同一模組的末尾執行此操作：
 
 ```python
 # mygame/commands/combat.py
@@ -292,24 +297,25 @@ class CombatCmdSet(CmdSet):
         self.add(default_cmds.CmdSay())
 ```
 
-## Rules module
+(rules-module)=
+## 規則模組
 
-A general way to implement a rule module is found in the [rule system tutorial](Implementing-a-game- rule-system). Proper resolution would likely require us to change our Characters to store things like strength, weapon skills and so on. So for this example we will settle for a very simplistic rock-paper-scissors kind of setup with some randomness thrown in. We will not deal with damage here but just announce the results of each turn. In a real system the Character objects would hold stats to affect their skills, their chosen weapon affect the choices, they would be able to lose health etc.
+實作規則模組的一般方法可以在[規則系統教學](Implementing-a-game- rule-system)中找到。正確的解決方案可能需要我們更改角色來儲存力量、武器技能等內容。因此，對於這個例子，我們將採用一個非常簡單的石頭剪刀布型別的設定，並新增一些隨機性。我們不會在這裡處理傷害，而只是宣佈每回合的結果。在真實的系統中，角色物件將儲存統計資料來影響他們的技能，他們選擇的武器會影響選擇，他們將能夠失去生命值等。
 
-Within each turn, there are "sub-turns", each consisting of one action per character. The actions within each sub-turn happens simultaneously and only once they have all been resolved we move on to the next sub-turn (or end the full turn).
+每個回合中都有“子回合”，每個子回合由每個角色的一個動作組成。每個子回合中的動作同時發生，只有當它們全部解決後，我們才會進入下一個子回合（或結束整個回合）。
 
-*Note: In our simple example the sub-turns don't affect each other (except for `disengage/flee`), nor do any effects carry over between turns. The real power of a turn-based system would be to add
-real tactical possibilities here though; For example if your hit got parried you could be out of
-balance and your next action would be at a disadvantage. A successful feint would open up for a
-subsequent attack and so on ...*
+*注意：在我們的簡單範例中，子回合不會相互影響（`disengage/flee` 除外），回合之間也不會延續任何效果。回合製系統的真正威力在於新增
+不過，這裡有真正的戰術可能性；例如，如果你的攻擊被招架，你可能會出局
+平衡，你的下一步就會處於不利地位。一次成功的佯攻將會為
+隨後的攻擊等等......*
 
-Our rock-paper-scissor setup works like this: 
+我們的石頭剪刀布設定是這樣的：
 
-- `hit` beats `feint` and `flee/disengage`. It has a random chance to fail against `defend`. 
-- `parry` beats `hit`.
-- `feint` beats `parry` and is then counted as a `hit`.
-- `defend` does nothing but has a chance to beat `hit`.
-- `flee/disengage` must succeed two times in a row (i.e. not beaten by a `hit` once during the turn). If so the character leaves combat.
+- `hit` 擊敗 `feint` 和 `flee/disengage`。它有隨機機會失敗於 `defend`。
+- `parry` 勝過 `hit`。
+- `feint` 擊敗 `parry`，然後算 `hit`。
+- `defend`什麼都不做，但有機會擊敗`hit`。
+- `flee/disengage`必須連續成功兩次（i.e。在回合中一次未被`hit`擊敗）。如果是這樣，角色就會離開戰鬥。
 
 ```python
 # mygame/world/rules.py
@@ -392,11 +398,12 @@ def resolve_combat(combat_handler, actiondict):
             combat_handler.remove_character(char)
 ```
 
-To make it simple (and to save space), this example rule module actually resolves each interchange twice - first when it gets to each character and then again when handling the target. Also, since we use the combat handler's `msg_all` method here, the system will get pretty spammy. To clean it up, one could imagine tracking all the possible interactions to make sure each pair is only handled and reported once.
+為了簡單起見（並節省空間），這個範例規則模組實際上解析每個交換兩次 - 第一次是在到達每個字元時，然後是在處理目標時。另外，由於我們在這裡使用戰鬥處理程式的 `msg_all` 方法，系統將變得相當垃圾。為了清理它，我們可以想像追蹤所有可能的互動，以確保每一對僅被處理和報告一次。
 
-## Combat initiator command
+(combat-initiator-command)=
+## 戰鬥發動者指令
 
-This is the last component we need, a command to initiate combat. This will tie everything together. We store this with the other combat commands.
+這是我們需要的最後一個元件，啟動戰鬥的指令。這會將一切聯絡在一起。我們將其與其他戰鬥指令一起儲存。
 
 ```python
 # mygame/commands/combat.py
@@ -439,9 +446,10 @@ class CmdAttack(Command):
             target.msg(f"{self.caller} attacks you! You are in combat.")       
 ```
 
-The `attack` command will not go into the combat cmdset but rather into the default cmdset. See e.g. the [Adding Command Tutorial](Beginner-Tutorial/Part1/Beginner-Tutorial-Adding-Commands.md) if you are unsure about how to do this.
+`attack` 指令不會進入戰鬥 cmdset，而是進入預設的 cmdset。請參閱e.g。如果您不確定如何執行此操作，請參閱[新增指令教學](Beginner-Tutorial/Part1/Beginner-Tutorial-Adding-Commands.md)。
 
-## Expanding the example
+(expanding-the-example)=
+## 擴充範例
 
-At this point you should have a simple but flexible turn-based combat system. We have taken several shortcuts and simplifications in this example. The output to the players is likely too verbose during combat and too limited when it comes to informing about things surrounding it. Methods for changing your commands or list them, view who is in combat etc is likely needed - this will require play testing for each game and style. There is also currently no information displayed for other people happening to be in the same room as the combat - some less detailed information should probably be echoed to the room to
-show others what's going on.
+此時你應該有一個簡單但靈活的回合製戰鬥系統。在這個例子中我們採取了一些捷徑和簡化。在戰鬥中向玩家輸出的內容可能過於冗長，而在告知周圍事物時又過於有限。可能需要更改指令或列出指令、檢視誰在戰鬥等的方法 - 這將需要對每個遊戲和風格進行遊戲測試。目前還沒有顯示與戰鬥在同一個房間的其他人的資訊 - 一些不太詳細的資訊可能應該回顯到房間中
+向其他人展示正在發生的事情。

@@ -1,53 +1,56 @@
+(contribs)=
 # Contribs
 
-```{sidebar} More contributions
-Additional Evennia code snippets and contributions can be found
-in the [Community Contribs & Snippets][forum] forum.
+```{sidebar} 更多貢獻
+可以找到額外的 Evennia 程式碼片段和貢獻
+在[社群Contribs和片段][forum]論壇中。
 ```
-_Contribs_ are optional code snippets and systems contributed by
-the Evennia community. They vary in size and complexity and
-may be more specific about game types and styles than 'core' Evennia.
-This page is auto-generated and summarizes all **53** contribs currently included
-with the Evennia distribution.
+_Contribs_ 是可選的程式碼片段和系統貢獻者
+Evennia 社群。它們的大小和複雜性各不相同
+可能比「核心」Evennia 更具體地說明遊戲型別和風格。
+此頁面是自動產生的，總結了目前包含的所有 **53** contribs
+具有 Evennia 分佈。
 
-All contrib categories are imported from `evennia.contrib`, such as
+所有contrib類別均從`evennia.contrib`匯入，例如
 
     from evennia.contrib.base_systems import building_menu
 
-Each contrib contains installation instructions for how to integrate it
-with your other code. If you want to tweak the code of a contrib, just
-copy its entire folder to your game directory and modify/use it from there.
+每個contrib都包含有關如何整合它的安裝說明
+與你的其他程式碼。如果你想調整 contrib 的程式碼，只需
+將其整個資料夾複製到您的遊戲目錄並從那裡修改/使用它。
 
-If you want to add a contrib, see [the contrib guidelines](./Contribs-Guidelines.md)!
+如果您想加contrib，請參閱[contrib指南](./Contribs-Guidelines.md)！
 
 [forum]: https://github.com/evennia/evennia/discussions/categories/community-contribs-snippets
 
-## Index
+(index)=
+## 指數
 | | | | | | | |
 |---|---|---|---|---|---|---|
-| [base_systems](#base_systems) | [full_systems](#full_systems) | [game_systems](#game_systems) | [grid](#grid) | [rpg](#rpg) | [tutorials](#tutorials) | [utils](#utils) |
+| [base_systems](#base_systems) | [full_systems](#full_systems) | [game_systems](#game_systems) | [網格](#grid) | [角色](#rpg) | [教學](#tutorials) | [實用程式](#utils) |
 
 | | | | | |
 |---|---|---|---|---|
-| [achievements](#achievements) | [auditing](#auditing) | [awsstorage](#awsstorage) | [barter](#barter) | [batchprocessor](#batchprocessor) |
-| [bodyfunctions](#bodyfunctions) | [buffs](#buffs) | [building_menu](#building_menu) | [character_creator](#character_creator) | [clothing](#clothing) |
-| [color_markups](#color_markups) | [components](#components) | [containers](#containers) | [cooldowns](#cooldowns) | [crafting](#crafting) |
-| [custom_gametime](#custom_gametime) | [debugpy](#debugpy) | [dice](#dice) | [email_login](#email_login) | [evadventure](#evadventure) |
-| [evscaperoom](#evscaperoom) | [extended_room](#extended_room) | [fieldfill](#fieldfill) | [gendersub](#gendersub) | [git_integration](#git_integration) |
+| [成就](#achievements) | [審核](#auditing) | [aws儲存](#awsstorage) | [以物易物](#barter) | [批次程式](#batchprocessor) |
+| [身體功能](#bodyfunctions) | [增益](#buffs) | [building_menu](#building_menu) | [character_creator](#character_creator) | [服裝](#clothing) |
+| [color_markups](#color_markups) | [成分](#components) | [容器](#containers) | [冷卻時間](#cooldowns) | [製作](#crafting) |
+| [custom_gametime](#custom_gametime) | [除錯](#debugpy) | [骰子](#dice) | [email_login](#email_login) | [evadventure](#evadventure) |
+| [evscaperoom](#evscaperoom) | [extended_room](#extended_room) | [欄位填充](#fieldfill) | [性別子](#gendersub) | [git_integration](#git_integration) |
 | [godotwebsocket](#godotwebsocket) | [health_bar](#health_bar) | [ingame_map_display](#ingame_map_display) | [ingame_python](#ingame_python) | [ingame_reports](#ingame_reports) |
-| [llm](#llm) | [mail](#mail) | [mapbuilder](#mapbuilder) | [menu_login](#menu_login) | [mirror](#mirror) |
-| [multidescer](#multidescer) | [mux_comms_cmds](#mux_comms_cmds) | [name_generator](#name_generator) | [puzzles](#puzzles) | [random_string_generator](#random_string_generator) |
-| [red_button](#red_button) | [rpsystem](#rpsystem) | [simpledoor](#simpledoor) | [slow_exit](#slow_exit) | [storage](#storage) |
-| [talking_npc](#talking_npc) | [traits](#traits) | [tree_select](#tree_select) | [turnbattle](#turnbattle) | [tutorial_world](#tutorial_world) |
-| [unixcommand](#unixcommand) | [wilderness](#wilderness) | [xyzgrid](#xyzgrid) |
+| [llm](#llm) | [郵件](#mail) | [地圖建構器](#mapbuilder) | [menu_login](#menu_login) | [映象](#mirror) |
+| [多解析度](#multidescer) | [mux_comms_cmds](#mux_comms_cmds) | [name_generator](#name_generator) | [謎題](#puzzles) | [random_string_generator](#random_string_generator) |
+| [red_button](#red_button) | [rp系統](#rpsystem) | [簡單門](#simpledoor) | [slow_exit](#slow_exit) | [儲存](#storage) |
+| [talking_npc](#talking_npc) | [性狀](#traits) | [tree_select](#tree_select) | [逆轉戰](#turnbattle) | [tutorial_world](#tutorial_world) |
+| [unix指令](#unixcommand) | [荒野](#wilderness) | [xyz格](#xyzgrid) |
 
 
 
+(base_systems)=
 ## base_systems
 
-_Systems that are not necessarily tied to a specific
-in-game mechanic but which are useful for the game as a whole. Examples include
-login systems, new command syntaxes, and build helpers._
+_系統不一定與特定的系統相關
+遊戲中的機制，但對整個遊戲很有用。例子包括
+登入系統、新指令語法和建置 helpers._
 
 
 ```{toctree}
@@ -72,167 +75,180 @@ Contrib-Unixcommand.md
 ```
 
 
+(awsstorage)=
 ### `awsstorage`
 
-_Contrib by The Right Honourable Reverend (trhr), 2020_
+_尊敬的牧師 (trhr) 的貢獻，2020_
 
-This plugin migrates the Web-based portion of Evennia, namely images,
-javascript, and other items located inside staticfiles into Amazon AWS (S3)
-cloud hosting. Great for those serving media with the game.
+該外掛遷移 Evennia 的基於 Web 的部分，即影象，
+javascript 以及位於 Amazon AWS (S3) 靜態檔案內的其他專案
+雲端託管。非常適合透過遊戲提供媒體服務的人。
 
-[Read the documentation](./Contrib-AWSStorage.md) - [Browse the Code](evennia.contrib.base_systems.awsstorage)
+[閱讀檔案](./Contrib-AWSStorage.md) - [瀏覽程式碼](evennia.contrib.base_systems.awsstorage)
 
 
 
+(building_menu)=
 ### `building_menu`
 
-_Contrib by vincent-lg, 2018_
+_vincent-lg 的貢獻，2018_
 
-Building menus are in-game menus, not unlike `EvMenu` though using a
-different approach. Building menus have been specifically designed to edit
-information as a builder. Creating a building menu in a command allows
-builders quick-editing of a given object, like a room. If you follow the
-steps to add the contrib, you will have access to an `edit` command
-that will edit any default object, offering to change its key and description.
+建築選單是遊戲中的選單，與 `EvMenu` 不同，儘管使用
+不同的方法。建築選單經過特別設計，可以編輯
+作為建設者的資訊。在指令中建立建置選單允許
+建構者可以快速編輯給定的物件，例如房間。如果您遵循
+新增 contrib 的步驟，您將有權存取 `edit` 指令
+這將編輯任何預設物件，提供更改其鍵和描述。
 
-[Read the documentation](./Contrib-Building-Menu.md) - [Browse the Code](evennia.contrib.base_systems.building_menu)
+[閱讀檔案](./Contrib-Building-Menu.md) - [瀏覽程式碼](evennia.contrib.base_systems.building_menu)
 
 
 
+(color_markups)=
 ### `color_markups`
 
-_Contrib by Griatch, 2017_
+_Griatch 的貢獻，2017 年_
 
-Additional color markup styles for Evennia (extending or replacing the default
-`|r`, `|234`). Adds support for MUSH-style (`%cr`, `%c123`) and/or legacy-Evennia
-(`{r`, `{123`).
+Evennia 的附加顏色標記樣式（擴充或取代預設值
+`|r`、`|234`）。新增對 MUSH 樣式（`%cr`、`%c123`）和/或舊版Evennia 的支援
+（`{r`，`{123`）。
 
-[Read the documentation](./Contrib-Color-Markups.md) - [Browse the Code](evennia.contrib.base_systems.color_markups)
+[閱讀檔案](./Contrib-Color-Markups.md) - [瀏覽程式碼](evennia.contrib.base_systems.color_markups)
 
 
 
+(components)=
 ### `components`
 
-_Contrib by ChrisLR, 2021_
+_貢獻者：ChrisLR，2021_
 
-Expand typeclasses using a components/composition approach.
+使用元件/組合方法擴充套件typeclasses。
 
-[Read the documentation](./Contrib-Components.md) - [Browse the Code](evennia.contrib.base_systems.components)
+[閱讀檔案](./Contrib-Components.md) - [瀏覽程式碼](evennia.contrib.base_systems.components)
 
 
 
+(custom_gametime)=
 ### `custom_gametime`
 
-_Contrib by vlgeoff, 2017 - based on Griatch's core original_
+_vlgeoff 的貢獻，2017 年 - 基於 Griatch 的核心原創_
 
-This reimplements the `evennia.utils.gametime` module but with a _custom_
-calendar (unusual number of days per week/month/year etc) for your game world.
-Like the original, it allows for scheduling events to happen at given
-in-game times, but now taking this custom calendar into account.
+這重新實現了 `evennia.utils.gametime` 模組，但帶有 _custom_
+您的遊戲世界的日曆（每週/每月/每年的異常天數等）。
+與原始版本一樣，它允許安排事件在給定的時間發生
+遊戲中的時間，但現在考慮到這個自訂日曆。
 
-[Read the documentation](./Contrib-Custom-Gametime.md) - [Browse the Code](evennia.contrib.base_systems.custom_gametime)
+[閱讀檔案](./Contrib-Custom-Gametime.md) - [瀏覽程式碼](evennia.contrib.base_systems.custom_gametime)
 
 
 
+(email_login)=
 ### `email_login`
 
-_Contrib by Griatch, 2012_
+_Griatch 的貢獻，2012 年_
 
-This is a variant of the login system that asks for an email-address
-instead of a username to login. Note that it does not verify the email,
-it just uses it as the identifier rather than a username.
+這是登入系統的變體，要求提供電子郵件地址
+而不是使用者名稱來登入。請注意，它不會驗證電子郵件，
+它只是將其用作識別符號而不是使用者名稱。
 
-[Read the documentation](./Contrib-Email-Login.md) - [Browse the Code](evennia.contrib.base_systems.email_login)
+[閱讀檔案](./Contrib-Email-Login.md) - [瀏覽程式碼](evennia.contrib.base_systems.email_login)
 
 
 
+(godotwebsocket)=
 ### `godotwebsocket`
 
-_Contribution by ChrisLR, 2022_
+_ChrisLR 貢獻，2022_
 
-This contrib allows you to connect a Godot Client directly to your mud,
-and display regular text with color in Godot's RichTextLabel using BBCode.
-You can use Godot to provide advanced functionality with proper Evennia support.
+這個contrib允許你將Godot用戶端直接連線到你的mud，
+並使用 BBCode 以 Godot RichTextLabel 的顏色顯示常規文字。
+您可以使用 Godot 提供具有適當 Evennia 支援的進階功能。
 
-[Read the documentation](./Contrib-Godotwebsocket.md) - [Browse the Code](evennia.contrib.base_systems.godotwebsocket)
+[閱讀檔案](./Contrib-Godotwebsocket.md) - [瀏覽程式碼](evennia.contrib.base_systems.godotwebsocket)
 
 
 
+(ingame_python)=
 ### `ingame_python`
 
-_Contrib by Vincent Le Goff 2017_
+_Vincent Le Goff 2017 年貢獻_
 
-This contrib adds the ability to script with Python in-game. It allows trusted
-staff/builders to dynamically add features and triggers to individual objects
-without needing to do it in external Python modules. Using custom Python in-game,
-specific rooms, exits, characters, objects etc can be made to behave differently from
-its "cousins". This is similar to how softcode works for MU or MudProgs for DIKU.
-Keep in mind, however, that allowing Python in-game comes with _severe_
-security concerns (you must trust your builders deeply), so read the warnings in
-this module carefully before continuing.
+這 contrib 增加了 script 在遊戲中使用 Python 的能力。它允許可信
+工作人員/建構者動態新增功能和觸發器到單一物件
+無需在外部 Python 模組中執行此操作。在遊戲中使用自訂Python，
+特定的房間、出口、角色、物件等可以表現得與
+它的「表兄弟」。這類似於軟程式碼對於 MU 或 MudProgs 對於 DIKU 的工作方式。
+但請記住，允許在遊戲中使用 Python 會帶來嚴重的後果
+安全問題（您必須深深信任您的建造者），因此請閱讀中的警告
+在繼續之前請仔細閱讀此模組。
 
-[Read the documentation](./Contrib-Ingame-Python.md) - [Browse the Code](evennia.contrib.base_systems.ingame_python)
+[閱讀檔案](./Contrib-Ingame-Python.md) - [瀏覽程式碼](evennia.contrib.base_systems.ingame_python)
 
 
 
+(ingame_reports)=
 ### `ingame_reports`
 
-_Contrib by InspectorCaracal, 2024_
+_貢獻者：InspectorCaracal，2024_
 
-This contrib provides an in-game reports system, handling bug reports, player reports, and idea submissions by default. It also supports adding your own types of reports, or removing any of the default report types.
+這個contrib提供了一個遊戲內報告系統，預設處理錯誤報告、玩家報告和想法提交。它還支援新增您自己的報告型別，或刪除任何預設報告型別。
 
-[Read the documentation](./Contrib-Ingame-Reports.md) - [Browse the Code](evennia.contrib.base_systems.ingame_reports)
+[閱讀檔案](./Contrib-Ingame-Reports.md) - [瀏覽程式碼](evennia.contrib.base_systems.ingame_reports)
 
 
 
+(menu_login)=
 ### `menu_login`
 
-_Contribution by Vincent-lg 2016. Reworked for modern EvMenu by Griatch, 2019._
+_Vincent-lg 2016 年貢獻。由 Griatch 重新設計為現代 EvMenu，2019 年。 _
 
-This changes the Evennia login to ask for the account name and password as a series
-of questions instead of requiring you to enter both at once. It uses Evennia's 
-menu system `EvMenu` under the hood.
+這將Evennia登入更改為要求輸入帳戶名稱和密碼作為一系列
+問題，而不是要求您同時輸入兩個問題。它使用Evennia的
+選單系統 `EvMenu` 在引擎蓋下。
 
-[Read the documentation](./Contrib-Menu-Login.md) - [Browse the Code](evennia.contrib.base_systems.menu_login)
+[閱讀檔案](./Contrib-Menu-Login.md) - [瀏覽程式碼](evennia.contrib.base_systems.menu_login)
 
 
 
+(mux_comms_cmds)=
 ### `mux_comms_cmds`
 
-_Contribution by Griatch 2021_
+_Griatch 2021 貢獻_
 
-In Evennia 1.0+, the old Channel commands (originally inspired by MUX) were
-replaced by the single `channel` command that performs all these functions.
-This contrib (extracted from Evennia 0.9.5) breaks out the functionality into 
-separate Commands more familiar to MU* users. This is just for show though, the 
-main `channel` command is still called under the hood.
+在 Evennia 1.0+ 中，舊的 Channel 指令（最初受 MUX 啟發）是
+替換為執行所有這些功能的單一 `channel` 指令。
+這個contrib（摘自Evennia 0.9.5）將功能分解為
+MU* 使用者更熟悉的單獨指令。這只是為了展示，
+main `channel` 指令仍然在後臺呼叫。
 
-[Read the documentation](./Contrib-Mux-Comms-Cmds.md) - [Browse the Code](evennia.contrib.base_systems.mux_comms_cmds)
+[閱讀檔案](./Contrib-Mux-Comms-Cmds.md) - [瀏覽程式碼](evennia.contrib.base_systems.mux_comms_cmds)
 
 
 
+(unixcommand)=
 ### `unixcommand`
 
-_Contribution by Vincent Le Geoff (vlgeoff), 2017_
+_Vincent Le Geoff (vlgeoff) 的貢獻，2017 年_
 
-This module contains a command class with an alternate syntax parser implementing
-Unix-style command syntax in-game. This means `--options`, positional arguments
-and stuff like `-n 10`. It might not the best syntax for the average player
-but can be really useful for builders when they need to have a single command do
-many things with many options. It uses the `ArgumentParser` from Python's standard
-library under the hood.
+該模組包含一個指令類，帶有一個替代語法解析器，實現
+遊戲中的 Unix 風格指令語法。這意味著`--options`，位置引數
+以及像 `-n 10` 這樣的東西。對普通玩家來說這可能不是最好的語法
+但當建構者需要使用單一指令執行操作時，這對他們來說非常有用
+很多事情有很多選擇。它使用Python標準中的`ArgumentParser`
+引擎蓋下的圖書館。
 
-[Read the documentation](./Contrib-Unixcommand.md) - [Browse the Code](evennia.contrib.base_systems.unixcommand)
-
-
+[閱讀檔案](./Contrib-Unixcommand.md) - [瀏覽程式碼](evennia.contrib.base_systems.unixcommand)
 
 
 
 
+
+
+(full_systems)=
 ## full_systems
 
-_'Complete' game engines that can be used directly to start creating content
-without no further additions (unless you want to)._
+_‘完整’的遊戲引擎，可直接用於開始建立內容
+無需進一步新增（除非您願意）._
 
 
 ```{toctree}
@@ -246,29 +262,31 @@ Contrib-Evscaperoom.md
 ```
 
 
+(evscaperoom)=
 ### `evscaperoom`
 
-_Contribution by Griatch, 2019_
+_Griatch 的貢獻，2019 年_
 
-A full engine for creating multiplayer escape-rooms in Evennia. Allows players to
-spawn and join puzzle rooms that track their state independently. Any number of players
-can join to solve a room together. This is the engine created for 'EvscapeRoom', which won
-the MUD Coders Guild "One Room" Game Jam in April-May, 2019. The contrib has only
-very minimal game content, it contains the utilities and base classes and an empty example room.
+用於在 Evennia 中建立多人逃脫室的完整引擎。允許玩家
+生成並加入獨立追蹤其狀態的謎題房間。任意數量的玩家
+可以一起解決房間問題。這是為“EvscapeRoom”建立的引擎，它贏得了
+2019 年 4 月至 5 月舉行的 MUD Coders Guild“One Room”Game Jam。 contrib 僅
+非常小的遊戲內容，它包含實用程式和基類以及一個空的範例房間。
 
-[Read the documentation](./Contrib-Evscaperoom.md) - [Browse the Code](evennia.contrib.full_systems.evscaperoom)
-
-
+[閱讀檔案](./Contrib-Evscaperoom.md) - [瀏覽程式碼](evennia.contrib.full_systems.evscaperoom)
 
 
 
 
+
+
+(game_systems)=
 ## game_systems
 
-_In-game gameplay systems like crafting, mail, combat and more.
-Each system is meant to be adopted piecemeal and adopted for your game.
-This does not include roleplaying-specific systems, those are found in
-the `rpg` category._
+_遊戲內的遊戲系統，如製作、郵件、戰鬥等等。
+每個系統都應該逐步採用並用於您的遊戲。
+這不包括特定於角色扮演的系統，這些系統可以在
+`rpg` category._
 
 
 ```{toctree}
@@ -293,167 +311,181 @@ Contrib-Turnbattle.md
 ```
 
 
+(achievements)=
 ### `achievements`
 
-_A simple, but reasonably comprehensive, system for tracking achievements. Achievements are defined using ordinary Python dicts, reminiscent of the core prototypes system, and while it's expected you'll use it only on Characters or Accounts, they can be tracked for any typeclassed object._
+_一個簡單但相當全面的成就追蹤系統。成就是使用普通的 Python 字典定義的，讓人想起核心原型系統，雖然預計您只會在角色或帳戶上使用它，但可以追蹤任何型別分類的object._
 
-The contrib provides several functions for tracking and accessing achievements, as well as a basic in-game command for viewing achievement status.
+contrib 提供了多種用於追蹤和存取成就的功能，以及用於檢視成就狀態的基本遊戲內指令。
 
-[Read the documentation](./Contrib-Achievements.md) - [Browse the Code](evennia.contrib.game_systems.achievements)
+[閱讀檔案](./Contrib-Achievements.md) - [瀏覽程式碼](evennia.contrib.game_systems.achievements)
 
 
 
+(barter)=
 ### `barter`
 
-_Contribution by Griatch, 2012_
+_Griatch 的貢獻，2012 年_
 
-This implements a full barter system - a way for players to safely
-trade items between each other in code rather than simple `give/get`
-commands. This increases both safety (at no time will one player have 
-both goods and payment in-hand) and speed, since agreed goods will 
-be moved automatically). By just replacing one side with coin objects,
-(or a mix of coins and goods), this also works fine for regular money 
-transactions.
+這實現了完整的以物易物系統 - 讓玩家安全地進行交易的方式
+用程式碼而不是簡單的`give/get`相互之間交易物品
+指令。這增加了安全性（任何時候一個玩家都不會
+貨物和付款在手）和速度，因為約定的貨物將
+自動移動）。只需用硬幣物體替換一側，
+（或硬幣和商品的混合），這也適用於普通貨幣
+交易。
 
-[Read the documentation](./Contrib-Barter.md) - [Browse the Code](evennia.contrib.game_systems.barter)
+[閱讀檔案](./Contrib-Barter.md) - [瀏覽程式碼](evennia.contrib.game_systems.barter)
 
 
 
+(clothing)=
 ### `clothing`
 
-_Contribution by Tim Ashley Jenkins, 2017_
+_蒂姆·阿什利·詹金斯貢獻，2017 年_
 
-Provides a typeclass and commands for wearable clothing. These 
-look of these clothes are appended to the character's description when worn.
+提供 typeclass 和可穿戴服裝的指令。這些
+這些衣服的外觀會附加到角色穿著時的描述中。
 
-[Read the documentation](./Contrib-Clothing.md) - [Browse the Code](evennia.contrib.game_systems.clothing)
+[閱讀檔案](./Contrib-Clothing.md) - [瀏覽程式碼](evennia.contrib.game_systems.clothing)
 
 
 
+(containers)=
 ### `containers`
 
-_Adds the ability to put objects into other container objects by providing a container typeclass and extending certain base commands._
+_透過提供容器typeclass並擴充套件某些基礎commands._，增加將物件放入其他容器物件的能力
 
-## Installation
+(installation)=
+## 安裝
 
-[Read the documentation](./Contrib-Containers.md) - [Browse the Code](evennia.contrib.game_systems.containers)
+[閱讀檔案](./Contrib-Containers.md) - [瀏覽程式碼](evennia.contrib.game_systems.containers)
 
 
 
+(cooldowns)=
 ### `cooldowns`
 
-_Contribution by owllex, 2021_
+_owllex 的貢獻，2021 年_
 
-Cooldowns are used to model rate-limited actions, like how often a
-character can perform a given action; until a certain time has passed their
-command can not be used again. This contrib provides a simple cooldown
-handler that can be attached to any typeclass. A cooldown is a lightweight persistent
-asynchronous timer that you can query to see if a certain time has yet passed.
+冷卻時間用於對速率限制的操作進行建模，例如
+角色可以執行給定的動作；直到過了一定的時間
+指令無法再次使用。這個contrib提供了一個簡單的冷卻時間
+可以附加到任何 typeclass 的處理程式。冷卻時間是輕量級的永續性
+非同步計時器，您可以查詢該計時器以檢視是否已經過了某個時間。
 
-[Read the documentation](./Contrib-Cooldowns.md) - [Browse the Code](evennia.contrib.game_systems.cooldowns)
+[閱讀檔案](./Contrib-Cooldowns.md) - [瀏覽程式碼](evennia.contrib.game_systems.cooldowns)
 
 
 
+(crafting)=
 ### `crafting`
 
-_Contribution by Griatch 2020_
+_Griatch 2020 的貢獻_
 
-This implements a full crafting system. The principle is that of a 'recipe',
-where you combine items (tagged as ingredients) create something new. The recipe can also
-require certain (non-consumed) tools. An example would be to use the 'bread recipe' to
-combine 'flour', 'water' and 'yeast' with an 'oven' to bake a 'loaf of bread'.
+這實現了完整的製作系統。原則就是“食譜”，
+您將物品（標記為成分）組合起來創造出新的東西。食譜還可以
+需要某些（非消耗性）工具。一個例子是使用“麵包配方”
+將「麵粉」、「水」和「酵母」與「烤箱」結合起來烘烤「一條麵包」。
 
-[Read the documentation](./Contrib-Crafting.md) - [Browse the Code](evennia.contrib.game_systems.crafting)
+[閱讀檔案](./Contrib-Crafting.md) - [瀏覽程式碼](evennia.contrib.game_systems.crafting)
 
 
 
+(gendersub)=
 ### `gendersub`
 
-_Contribution by Griatch 2015_
+_Griatch 2015 年貢獻_
 
-This is a simple gender-aware Character class for allowing users to
-insert custom markers in their text to indicate gender-aware
-messaging. It relies on a modified msg() and is meant as an
-inspiration and starting point to how to do stuff like this.
+這是一個簡單的性別感知角色類，允許使用者
+在文字中插入自訂標記以表示性別意識
+訊息傳遞。它依賴於修改後的 msg() 並且意味著
+如何做這樣的事情的靈感和起點。
 
-[Read the documentation](./Contrib-Gendersub.md) - [Browse the Code](evennia.contrib.game_systems.gendersub)
+[閱讀檔案](./Contrib-Gendersub.md) - [瀏覽程式碼](evennia.contrib.game_systems.gendersub)
 
 
 
+(mail)=
 ### `mail`
 
-_Contribution by grungies1138 2016_
+_grungie1138 2016 年貢獻_
 
-A simple Brandymail style mail system that uses the `Msg` class from Evennia
-Core. It has two Commands for either sending mails between Accounts (out of game)
-or between Characters (in-game). The two types of mails can be used together or
-on their own.
+一個簡單的 Brandymail 風格的郵件系統，使用來自 Evennia 的 `Msg` 類
+核心。它有兩個指令用於在帳戶之間傳送郵件（遊戲外）
+或角色之間（遊戲中）。這兩種型別的郵件可以一起使用或
+靠他們自己。
 
-[Read the documentation](./Contrib-Mail.md) - [Browse the Code](evennia.contrib.game_systems.mail)
+[閱讀檔案](./Contrib-Mail.md) - [瀏覽程式碼](evennia.contrib.game_systems.mail)
 
 
 
+(multidescer)=
 ### `multidescer`
 
-_Contribution by Griatch 2016_
+_Griatch 2016 年貢獻_
 
-A "multidescer" is a concept from the MUSH world. It allows for
-splitting your descriptions into arbitrary named 'sections' which you can
-then swap out at will. It is a way for quickly managing your look (such as when
-changing clothes) in more free-form roleplaying systems. This will also
-work well together with the `rpsystem` contrib.
+「multidescer」是來自 MUSH 世界的概念。它允許
+將您的描述分成任意命名的“部分”，您可以
+然後隨意交換。這是一種快速管理您的外觀的方法（例如當
+更自由的角色扮演系統中的換衣服）。這也將
+與 `rpsystem` contrib 配合良好。
 
-[Read the documentation](./Contrib-Multidescer.md) - [Browse the Code](evennia.contrib.game_systems.multidescer)
+[閱讀檔案](./Contrib-Multidescer.md) - [瀏覽程式碼](evennia.contrib.game_systems.multidescer)
 
 
 
+(puzzles)=
 ### `puzzles`
 
-_Contribution by Henddher 2018_
+_Henddher 2018 年貢獻_
 
-Intended for adventure-game style combination puzzles, such as combining fruits
-and a blender to create a smoothie. Provides a typeclass and commands for objects 
-that can be combined (i.e. used together). Unlike the `crafting` contrib, each 
-puzzle is built from unique objects rather than using tags and a builder can create 
-the puzzle entirely from in-game.
+適用於冒險遊戲風格的組合謎題，例如組合水果
+和攪拌機來製作冰沙。為物件提供typeclass和指令
+可以組合（i.e。一起使用）。與 `crafting` contrib 不同，每個
+拼圖是由獨特的物件建構的，而不是使用 tags 並且建構者可以建立
+謎題完全來自遊戲內。
 
-[Read the documentation](./Contrib-Puzzles.md) - [Browse the Code](evennia.contrib.game_systems.puzzles)
+[閱讀檔案](./Contrib-Puzzles.md) - [瀏覽程式碼](evennia.contrib.game_systems.puzzles)
 
 
 
+(storage)=
 ### `storage`
 
-_Contribution by helpme (2024)_
+_helpme 的貢獻 (2024)_
 
-This module allows certain rooms to be marked as storage locations.
+此模組允許將某些房間標記為存放位置。
 
-[Read the documentation](./Contrib-Storage.md) - [Browse the Code](evennia.contrib.game_systems.storage)
+[閱讀檔案](./Contrib-Storage.md) - [瀏覽程式碼](evennia.contrib.game_systems.storage)
 
 
 
+(turnbattle)=
 ### `turnbattle`
 
-_Contribution by Tim Ashley Jenkins, 2017_
+_蒂姆·阿什利·詹金斯貢獻，2017 年_
 
-This is a framework for a simple turn-based combat system, similar
-to those used in D&D-style tabletop role playing games. It allows
-any character to start a fight in a room, at which point initiative
-is rolled and a turn order is established. Each participant in combat
-has a limited time to decide their action for that turn (30 seconds by
-default), and combat progresses through the turn order, looping through
-the participants until the fight ends.
+這是一個簡單的回合製戰鬥系統的框架，類似
+用於 D&D 風格的桌上角色扮演遊戲中的那些。它允許
+任何角色在房間內發動戰鬥，此時主動
+捲動並建立回合順序。每一個參與戰鬥的人
+決定該回合行動的時間有限（30 秒
+預設），戰鬥按照回合順序進行，迴圈
+參與者直到戰鬥結束。
 
-[Read the documentation](./Contrib-Turnbattle.md) - [Browse the Code](evennia.contrib.game_systems.turnbattle)
-
-
+[閱讀檔案](./Contrib-Turnbattle.md) - [瀏覽程式碼](evennia.contrib.game_systems.turnbattle)
 
 
 
 
-## grid
 
-_Systems related to the game world's topology and structure. Contribs related
-to rooms, exits and map building._
+
+(grid)=
+## 網格
+
+_與遊戲世界的拓樸和結構相關的系統。 Contribs相關
+到房間、出口和地圖building._
 
 
 ```{toctree}
@@ -473,106 +505,114 @@ Contrib-XYZGrid.md
 ```
 
 
+(extended_room)=
 ### `extended_room`
 
-_Contribution - Griatch 2012, vincent-lg 2019, Griatch 2023_
+_貢獻 - Griatch 2012、vincent-lg 2019、Griatch 2023_
 
-This extends the normal `Room` typeclass to allow its description to change with
-time-of-day and/or season as well as any other state (like flooded or dark).
-Embedding `$state(burning, This place is on fire!)` in the description will
-allow for changing the description based on room state. The room also supports
-`details` for the player to look at in the room (without having to create a new
-in-game object for each), as well as support for random echoes. The room
-comes with a set of alternate commands for `look` and `@desc`, as well as new
-commands `detail`, `roomstate` and `time`.
+這擴充套件了正常的 `Room` typeclass 以允許其描述隨
+一天中的時間和/或季節以及任何其他狀態（如洪水或黑暗）。
+在描述中嵌入 `$state(burning, This place is on fire!)` 將
+允許根據房間狀態變更描述。房間還支援
+`details` 供玩家在房間中檢視（無需建立新的
+每個的遊戲內物件），以及對隨機迴聲的支援。房間
+附帶一組用於 `look` 和 `@desc` 的備用指令，以及新指令
+指令`detail`、`roomstate` 和`time`。
 
-[Read the documentation](./Contrib-Extended-Room.md) - [Browse the Code](evennia.contrib.grid.extended_room)
+[閱讀檔案](./Contrib-Extended-Room.md) - [瀏覽程式碼](evennia.contrib.grid.extended_room)
 
 
 
+(ingame_map_display)=
 ### `ingame_map_display`
 
-_Contribution - helpme 2022_
+_貢獻 - helpme 2022_
 
-This adds an ascii `map` to a given room which can be viewed with the `map` command.
-You can easily alter it to add special characters, room colors etc. The map shown is
-dynamically generated on use, and supports all compass directions and up/down. Other
-directions are ignored.
+這會將 ascii `map` 新增到給定房間，可以使用 `map` 指令檢視該房間。
+您可以輕鬆地更改它以新增特殊字元、房間顏色等。顯示的地圖是
+使用時動態生成，並支援所有羅盤方向和向上/向下。其他
+方向被忽略。
 
-[Read the documentation](./Contrib-Ingame-Map-Display.md) - [Browse the Code](evennia.contrib.grid.ingame_map_display)
+[閱讀檔案](./Contrib-Ingame-Map-Display.md) - [瀏覽程式碼](evennia.contrib.grid.ingame_map_display)
 
 
 
+(mapbuilder)=
 ### `mapbuilder`
 
-_Contribution by Cloud_Keeper 2016_
+_Cloud_Keeper 2016 的貢獻_
 
-Build a game map from the drawing of a 2D ASCII map.
+根據 2D ASCII 地圖的繪製建立遊戲地圖。
 
-[Read the documentation](./Contrib-Mapbuilder.md) - [Browse the Code](evennia.contrib.grid.mapbuilder)
+[閱讀檔案](./Contrib-Mapbuilder.md) - [瀏覽程式碼](evennia.contrib.grid.mapbuilder)
 
 
 
+(simpledoor)=
 ### `simpledoor`
 
-_Contribution by Griatch, 2016_
+_Griatch 的貢獻，2016 年_
 
-A simple two-way exit that represents a door that can be opened and
-closed from both sides. Can easily be expanded to make it lockable, 
-destroyable etc. 
+一個簡單的雙向出口，代表一扇可以開啟和關閉的門
+從兩側關閉。可以輕鬆擴充套件以使其可鎖定，
+可破壞等
 
-[Read the documentation](./Contrib-Simpledoor.md) - [Browse the Code](evennia.contrib.grid.simpledoor)
+[閱讀檔案](./Contrib-Simpledoor.md) - [瀏覽程式碼](evennia.contrib.grid.simpledoor)
 
 
 
+(slow_exit)=
 ### `slow_exit`
 
-_Contribution by Griatch 2014_
+_Griatch 2014 年貢獻_
 
-An example of an Exit-type that delays its traversal. This simulates
-slow movement, common in many games. The contrib also
-contains two commands, `setspeed` and `stop` for changing the movement speed
-and abort an ongoing traversal, respectively.
+延遲其遍歷的退出型別的範例。這模擬了
+緩慢的移動，在許多遊戲中很常見。 contrib 也
+包含兩個指令，`setspeed` 和 `stop` 用於改變移動速度
+並分別中止正在進行的遍歷。
 
-[Read the documentation](./Contrib-Slow-Exit.md) - [Browse the Code](evennia.contrib.grid.slow_exit)
+[閱讀檔案](./Contrib-Slow-Exit.md) - [瀏覽程式碼](evennia.contrib.grid.slow_exit)
 
 
 
+(wilderness)=
 ### `wilderness`
 
-_Contribution by titeuf87, 2017_
+_titeuf87 的貢獻，2017 年_
 
-This contrib provides a wilderness map without actually creating a large number
-of rooms - as you move, you instead end up back in the same room but its description
-changes. This means you can make huge areas with little database use as
-long as the rooms are relatively similar (e.g. only the names/descs changing).
+這contrib提供了荒野地圖，而沒有實際建立大量
+房間數 - 當您移動時，您最終會回到同一個房間，但其描述
+變化。這意味著您可以使用很少的資料庫來建立巨大的區域，例如
+只要房間相對相似（e.g。僅名稱/描述發生變化）。
 
-[Read the documentation](./Contrib-Wilderness.md) - [Browse the Code](evennia.contrib.grid.wilderness)
+[閱讀檔案](./Contrib-Wilderness.md) - [瀏覽程式碼](evennia.contrib.grid.wilderness)
 
 
 
+(xyzgrid)=
 ### `xyzgrid`
 
-_Contribution by Griatch 2021_
+_Griatch 2021 貢獻_
 
-Places Evennia's game world on an xy (z being different maps) coordinate grid.
-Grid is created and maintained externally by drawing and parsing 2D ASCII maps,
-including teleports, map transitions and special markers to aid pathfinding.
-Supports very fast shortest-route pathfinding on each map. Also includes a
-fast view function for seeing only a limited number of steps away from your
-current location (useful for displaying the grid as an in-game, updating map).
+將 Evennia 的遊戲世界放置在 xy（z 是不同的地圖）座標網格上。
+網格是透過繪製和解析 2D ASCII 地圖在外部建立和維護的，
+包括傳送、地圖轉換和幫助尋路的特殊標記。
+支援在每個地圖上非常快速的最短路徑尋路。還包括一個
+快速檢視功能，僅檢視距離您有限的步數
+目前位置（對於將網格顯示為遊戲中的更新地圖很有用）。
 
-[Read the documentation](./Contrib-XYZGrid.md) - [Browse the Code](evennia.contrib.grid.xyzgrid)
-
-
+[閱讀檔案](./Contrib-XYZGrid.md) - [瀏覽程式碼](evennia.contrib.grid.xyzgrid)
 
 
 
 
-## rpg
 
-_Systems specifically related to roleplaying
-and rule implementation like character traits, dice rolling and emoting._
+
+(rpg)=
+## 角色扮演遊戲
+
+_專門與角色扮演相關的系統
+以及規則實施，例如性格特徵、擲骰子和emoting._
 
 
 ```{toctree}
@@ -592,98 +632,106 @@ Contrib-Traits.md
 ```
 
 
+(buffs)=
 ### `buffs`
 
-_Contribution by Tegiminis 2022_
+_Tegiminis 2022 年的貢獻_
 
-A buff is a timed object, attached to a game entity. It is capable of modifying values, triggering code, or both. 
-It is a common design pattern in RPGs, particularly action games.
+buff 是一個定時物件，附加到遊戲實體。它能夠修改值、觸發程式碼或兩者兼而有之。 
+這是RPGs中常見的設計模式，尤其是動作遊戲。
 
-[Read the documentation](./Contrib-Buffs.md) - [Browse the Code](evennia.contrib.rpg.buffs)
+[閱讀檔案](./Contrib-Buffs.md) - [瀏覽程式碼](evennia.contrib.rpg.buffs)
 
 
 
+(character_creator)=
 ### `character_creator`
 
-_Contribution by InspectorCaracal, 2022_
+_InspectorCaracal 貢獻，2022_
 
-Commands for managing and initiating an in-game character-creation menu.
+用於管理和啟動遊戲內角色建立選單的指令。
 
-[Read the documentation](./Contrib-Character-Creator.md) - [Browse the Code](evennia.contrib.rpg.character_creator)
+[閱讀檔案](./Contrib-Character-Creator.md) - [瀏覽程式碼](evennia.contrib.rpg.character_creator)
 
 
 
+(dice)=
 ### `dice`
 
-_Contribution by Griatch, 2012, 2023_
+_Griatch 貢獻，2012 年、2023 年_
 
-A dice roller for any number and side of dice. Adds in-game dice rolling
-(like `roll 2d10 + 1`) as well as conditionals (roll under/over/equal to a target)
-and functions for rolling dice in code. Command also supports hidden or secret
-rolls for use by a human game master.
+適用於任意數量和麵的骰子的骰子滾輪。新增遊戲中的骰子滾動
+（如 `roll 2d10 + 1`）以及條件（低於/高於/等於目標）
+以及程式碼中擲骰子的函式。指令還支援隱藏或秘密
+供人類遊戲大師使用的捲。
 
-[Read the documentation](./Contrib-Dice.md) - [Browse the Code](evennia.contrib.rpg.dice)
+[閱讀檔案](./Contrib-Dice.md) - [瀏覽程式碼](evennia.contrib.rpg.dice)
 
 
 
+(health_bar)=
 ### `health_bar`
 
-_Contribution by Tim Ashley Jenkins, 2017_
+_蒂姆·阿什利·詹金斯貢獻，2017 年_
 
-The function provided in this module lets you easily display visual
-bars or meters as a colorful bar instead of just a number. A "health bar"
-is merely the most obvious use for this, but the bar is highly customizable
-and can be used for any sort of appropriate data besides player health.
+此模組提供的功能可讓您輕鬆展示視覺效果
+條或米作為彩色條而不僅僅是數字。一個“健康棒”
+這只是最明顯的用途，但該欄是高度可自訂的
+並且可以用於玩家健康以外的任何型別的適當資料。
 
-[Read the documentation](./Contrib-Health-Bar.md) - [Browse the Code](evennia.contrib.rpg.health_bar)
+[閱讀檔案](./Contrib-Health-Bar.md) - [瀏覽程式碼](evennia.contrib.rpg.health_bar)
 
 
 
+(llm)=
 ### `llm`
 
-_Contribution by Griatch 2023_
+_Griatch 2023 的貢獻_
 
-This adds an LLMClient that allows Evennia to send prompts to a  LLM server (Large Language Model, along the lines of ChatGPT). Example uses a local OSS LLM install. Included is an NPC you can chat with using a new `talk` command. The NPC will respond using the AI responses from the LLM server. All calls are asynchronous, so if the LLM is slow, Evennia is not affected.
+這會增加一個 LLMClient，允許 Evennia 向 LLM 伺服器傳送提示（大語言模型，與 ChatGPT 類似）。範例使用本地 OSS LLM 安裝。其中包括一個 NPC，您可以使用新的 `talk` 指令與之聊天。 NPC 將使用來自 LLM 伺服器的 AI 回應進行回應。所有呼叫都是非同步的，因此如果 LLM 很慢，Evennia 不會受到影響。
 
-[Read the documentation](./Contrib-Llm.md) - [Browse the Code](evennia.contrib.rpg.llm)
+[閱讀檔案](./Contrib-Llm.md) - [瀏覽程式碼](evennia.contrib.rpg.llm)
 
 
 
+(rpsystem)=
 ### `rpsystem`
 
-_Contribution by Griatch, 2015_
+_Griatch 的貢獻，2015 年_
 
-A full roleplaying emote system. Short-descriptions and recognition (only know people by their looks until you assign a name to them). Room poses. Masks/disguises (hide your description). Speak directly in emote, with optional language obscuration (words get garbled if you don't know the language, you can also have different languages with different 'sounding' garbling). Whispers can be partly overheard from a distance. A very powerful in-emote reference system, for referencing and differentiate targets (including objects).
+完整的角色扮演表情系統。簡短的描述和識別（在給他們指定名字之前只能透過外表來認識他們）。房間姿勢。面具/偽裝（隱藏您的描述）。直接用表情說話，可選擇語言模糊（如果您不懂該語言，單字會出現亂碼，您也可以使用不同的語言，並具有不同的「發音」亂碼）。從遠處就可以聽到部分耳語。一個非常強大的表情內參考系統，用於參考和區分目標（包括物件）。
 
-[Read the documentation](./Contrib-RPSystem.md) - [Browse the Code](evennia.contrib.rpg.rpsystem)
+[閱讀檔案](./Contrib-RPSystem.md) - [瀏覽程式碼](evennia.contrib.rpg.rpsystem)
 
 
 
+(traits)=
 ### `traits`
 
-_Contribution by Griatch 2020, based on code by Whitenoise and Ainneve contribs, 2014_
+_Griatch 2020 年貢獻，基於 Whitenoise 和 Ainneve contribs 的程式碼，2014 年_
 
-A `Trait` represents a modifiable property on (usually) a Character. They can
-be used to represent everything from attributes (str, agi etc) to skills
-(hunting 10, swords 14 etc) and dynamically changing things like HP, XP etc.
-Traits differ from normal Attributes in that they track their changes and limit
-themselves to particular value-ranges. One can add/subtract from them easily and
-they can even change dynamically at a particular rate (like you being poisoned or
-healed).
+`Trait` 代表（通常）角色的可修改屬性。他們可以
+用來表示從屬性（力量、敏捷等）到技能的一切
+（狩獵 10，劍 14 等）和動態變化的東西，如 HP、XP 等。
+特徵與普通屬性的不同之處在於它們追蹤其變化和限制
+自己到特定的值範圍。人們可以輕鬆地新增/減去它們，並且
+它們甚至可以以特定的速率動態變化（例如你中毒了或
+痊癒了）。
 
-[Read the documentation](./Contrib-Traits.md) - [Browse the Code](evennia.contrib.rpg.traits)
-
-
+[閱讀檔案](./Contrib-Traits.md) - [瀏覽程式碼](evennia.contrib.rpg.traits)
 
 
 
 
-## tutorials
 
-_Helper resources specifically meant to teach a development concept or
-to exemplify an Evennia system. Any extra resources tied to documentation
-tutorials are found here. Also the home of the Tutorial-World and Evadventure
-demo codes._
+
+(tutorials)=
+## 教學
+
+_幫助資源專門用於教授開發概念或
+以 Evennia 系統為例。與檔案相關的任何額外資源
+教學可以在這裡找到。也是教學世界和Evadventure的所在地
+演示codes._
 
 
 ```{toctree}
@@ -703,97 +751,105 @@ Contrib-Tutorial-World.md
 ```
 
 
+(batchprocessor)=
 ### `batchprocessor`
 
-_Contibution by Griatch, 2012_
+_Griatch 的貢獻，2012 年_
 
-Simple examples for the batch-processor. The batch processor is used for generating 
-in-game content from one or more static files. Files can be stored with version 
-control and then 'applied' to the game to create content.
+批處理器的簡單範例。批處理器用於生成
+來自一個或多個靜態檔案的遊戲內容。檔案可以與版本一起儲存
+控制然後“應用”到遊戲中以建立內容。
 
-[Read the documentation](./Contrib-Batchprocessor.md) - [Browse the Code](evennia.contrib.tutorials.batchprocessor)
+[閱讀檔案](./Contrib-Batchprocessor.md) - [瀏覽程式碼](evennia.contrib.tutorials.batchprocessor)
 
 
 
+(bodyfunctions)=
 ### `bodyfunctions`
 
-_Contribution by Griatch, 2012_
+_Griatch 的貢獻，2012 年_
 
-Example script for testing. This adds a simple timer that has your
-character make small verbal observations at irregular intervals.
+用於測試的範例 script。這新增了一個簡單的計時器，其中包含您的
+人物會不定期地進行一些小小的口頭觀察。
 
-[Read the documentation](./Contrib-Bodyfunctions.md) - [Browse the Code](evennia.contrib.tutorials.bodyfunctions)
+[閱讀檔案](./Contrib-Bodyfunctions.md) - [瀏覽程式碼](evennia.contrib.tutorials.bodyfunctions)
 
 
 
+(evadventure)=
 ### `evadventure`
 
-_Contrib by Griatch 2023-_
+_Griatch 2023 年的貢獻-_
 
 
 ```{warning}
-NOTE - this tutorial is WIP and NOT complete yet! You will still learn
-things from it, but don't expect perfection.
+NOTE - 本教學已完成 WIP 和 NOT！你仍然會學習
+從中得到一些東西，但不要期望完美。
 ```
 
-[Read the documentation](./Contrib-Evadventure.md) - [Browse the Code](evennia.contrib.tutorials.evadventure)
+[閱讀檔案](./Contrib-Evadventure.md) - [瀏覽程式碼](evennia.contrib.tutorials.evadventure)
 
 
 
+(mirror)=
 ### `mirror`
 
-_Contribution by Griatch, 2017_
+_Griatch 的貢獻，2017 年_
 
-A simple mirror object to experiment with. It will respond to being looked at.
+一個簡單的鏡子物件進行實驗。它會對被注視做出反應。
 
-[Read the documentation](./Contrib-Mirror.md) - [Browse the Code](evennia.contrib.tutorials.mirror)
+[閱讀檔案](./Contrib-Mirror.md) - [瀏覽程式碼](evennia.contrib.tutorials.mirror)
 
 
 
+(red_button)=
 ### `red_button`
 
-_Contribution by Griatch, 2011_
+_Griatch 貢獻，2011 年_
 
-A red button that you can press to have an effect. This is a more advanced example 
-object with its own functionality and state tracking.
+一個紅色按鈕，按下即可產生效果。這是一個更高階的例子
+具有自己的功能和狀態追蹤的物件。
 
-[Read the documentation](./Contrib-Red-Button.md) - [Browse the Code](evennia.contrib.tutorials.red_button)
+[閱讀檔案](./Contrib-Red-Button.md) - [瀏覽程式碼](evennia.contrib.tutorials.red_button)
 
 
 
+(talking_npc)=
 ### `talking_npc`
 
-_Contribution by Griatch 2011. Updated by grungies1138, 2016_
+_Griatch 2011 年貢獻。由 grungies1138 更新，2016 年_
 
-This is an example of a static NPC object capable of holding a simple menu-driven
-conversation. Suitable for example as a quest giver or merchant.
+這是一個靜態 NPC 物件的範例，能夠容納簡單的選單驅動
+談話。例如適合作為任務提供者或商人。
 
-[Read the documentation](./Contrib-Talking-Npc.md) - [Browse the Code](evennia.contrib.tutorials.talking_npc)
+[閱讀檔案](./Contrib-Talking-Npc.md) - [瀏覽程式碼](evennia.contrib.tutorials.talking_npc)
 
 
 
+(tutorial_world)=
 ### `tutorial_world`
 
-_Contribution by Griatch 2011, 2015_
+_Griatch 2011、2015 年貢獻_
 
-A stand-alone tutorial area for an unmodified Evennia install.
-Think of it as a sort of single-player adventure rather than a
-full-fledged multi-player game world. The various rooms and objects
-are designed to show off features of Evennia, not to be a
-very challenging (nor long) gaming experience. As such it's of course
-only skimming the surface of what is possible. Taking this apart 
-is a great way to start learning the system.
+用於未修改的 Evennia 安裝的獨立教學區域。
+將其視為一種單人冒險而不是
+成熟的多人遊戲世界。各種房間和物體
+旨在炫耀 Evennia 的功能，而不是成為
+非常具有挑戰性（也不長）的遊戲體驗。既然如此，那當然是
+只瀏覽了可能發生的事情的表面。把這個拆開
+是開始學習該系統的好方法。
 
-[Read the documentation](./Contrib-Tutorial-World.md) - [Browse the Code](evennia.contrib.tutorials.tutorial_world)
-
-
+[閱讀檔案](./Contrib-Tutorial-World.md) - [瀏覽程式碼](evennia.contrib.tutorials.tutorial_world)
 
 
 
 
-## utils
 
-_Miscellaneous, tools for manipulating text, security auditing, and more._
+
+(utils)=
+## 實用程式
+
+_Miscellaneous，用於操作文字、安全審核的工具以及more._
 
 
 ```{toctree}
@@ -813,89 +869,96 @@ Contrib-Tree-Select.md
 ```
 
 
+(auditing)=
 ### `auditing`
 
-_Contribution by Johnny, 2017_
+_Johnny 的貢獻，2017 年_
 
-Utility that taps and intercepts all data sent to/from clients and the
-server and passes it to a callback of your choosing. This is intended for 
-quality assurance, post-incident investigations and debugging.
+實用程式可以竊聽並攔截傳送到/從用戶端傳送的所有資料以及
+伺服器並將其傳遞給您選擇的回撥。這是為了
+品質保證、事故後調查和除錯。
 
-[Read the documentation](./Contrib-Auditing.md) - [Browse the Code](evennia.contrib.utils.auditing)
+[閱讀檔案](./Contrib-Auditing.md) - [瀏覽程式碼](evennia.contrib.utils.auditing)
 
 
 
+(debugpy)=
 ### `debugpy`
 
-_Contribution by electroglyph, 2025_
+_ Electroglyph 的貢獻，2025 年_
 
-This registers an in-game command `debugpy` which starts the debugpy debugger and listens on port 5678.
-For now this is only available for Visual Studio Code (VS Code).
+這會註冊一個遊戲內指令 `debugpy`，該指令啟動 debugpy 偵錯器並偵聽連線埠 5678。
+目前，這僅適用於 Visual Studio Code (VS Code)。
 
-[Read the documentation](./Contrib-Debugpy.md) - [Browse the Code](evennia.contrib.utils.debugpy)
+[閱讀檔案](./Contrib-Debugpy.md) - [瀏覽程式碼](evennia.contrib.utils.debugpy)
 
 
 
+(fieldfill)=
 ### `fieldfill`
 
-_Contribution by Tim Ashley Jenkins, 2018_
+_ Tim Ashley Jenkins 貢獻，2018 年_
 
-This module contains a function that generates an `EvMenu` for you - this
-menu presents the player with a form of fields that can be filled
-out in any order (e.g. for character generation or building). Each field's value can 
-be verified, with the function allowing easy checks for text and integer input, 
-minimum and maximum values / character lengths, or can even be verified by a custom 
-function. Once the form is submitted, the form's data is submitted as a dictionary 
-to any callable of your choice.
+該模組包含一個為您產生 `EvMenu` 的函式 - 這
+選單向玩家呈現一種可以填滿的欄位形式
+以任意順序輸出（e.g.用於角色生成或建構）。每個欄位的值可以
+進行驗證，該功能可以輕鬆檢查文字和整數輸入，
+最小值和最大值/字元長度，甚至可以由自訂驗證
+功能。提交表單後，表單的資料將作為字典提交
+到您選擇的任何可呼叫物件。
 
-[Read the documentation](./Contrib-Fieldfill.md) - [Browse the Code](evennia.contrib.utils.fieldfill)
+[閱讀檔案](./Contrib-Fieldfill.md) - [瀏覽程式碼](evennia.contrib.utils.fieldfill)
 
 
 
+(git_integration)=
 ### `git_integration`
 
-_Contribution by helpme (2022)_
+_helpme 的貢獻 (2022)_
 
-A module to integrate a stripped-down version of git within the game, allowing developers to view their git status, change branches, and pull updated code of both their local mygame repo and Evennia core. After a successful pull or checkout, the git command will reload the game: Manual restarts may be required to to apply certain changes that would impact persistent scripts etc.
+一個在遊戲中整合 git 精簡版本的模組，讓開發人員可以檢視其 git 狀態、更改分支以及提取本地 mygame 儲存庫和 Evennia 核心的更新程式碼。成功拉取或簽出後，git 指令將重新載入遊戲：可能需要手動重新啟動才能套用某些會影響持久scripts 等的變更。
 
-[Read the documentation](./Contrib-Git-Integration.md) - [Browse the Code](evennia.contrib.utils.git_integration)
+[閱讀檔案](./Contrib-Git-Integration.md) - [瀏覽程式碼](evennia.contrib.utils.git_integration)
 
 
 
+(name_generator)=
 ### `name_generator`
 
-_Contribution by InspectorCaracal (2022)_
+_InspectorCaracal 的貢獻 (2022)_
 
-A module for generating random names, both real-world and fantasy. Real-world
-names can be generated either as first (personal) names, family (last) names, or
-full names (first, optional middles, and last). The name data is from [Behind the Name](https://www.behindthename.com/)
-and used under the [CC BY-SA 4.0 license](https://creativecommons.org/licenses/by-sa/4.0/).
+用於產生隨機名稱的模組，包括現實世界和幻想世界。現實世界
+名稱可以產生為名字、姓氏或
+全名（名字、可選的中間名和姓氏）。姓名資料來自[姓名背後](https://www.behindthename.com/)
+並在 [CC BY-SA 4.0 許可證](https://creativecommons.org/licenses/by-sa/4.0/) 下使用。
 
-[Read the documentation](./Contrib-Name-Generator.md) - [Browse the Code](evennia.contrib.utils.name_generator)
+[閱讀檔案](./Contrib-Name-Generator.md) - [瀏覽程式碼](evennia.contrib.utils.name_generator)
 
 
 
+(random_string_generator)=
 ### `random_string_generator`
 
-_Contribution by Vincent Le Goff (vlgeoff), 2017_
+_Vincent Le Goff (vlgeoff) 的貢獻，2017 年_
 
-This utility can be used to generate pseudo-random strings of information
-with specific criteria.  You could, for instance, use it to generate
-phone numbers, license plate numbers, validation codes, in-game security 
-passwords and so on. The strings generated will be stored and won't be repeated.
+此實用程式可用於產生偽隨機資訊字串
+具有特定的標準。  例如，您可以使用它來生成
+電話號碼、車牌號碼、驗證碼、遊戲內安全
+密碼等。產生的字串將被儲存並且不會重複。
 
-[Read the documentation](./Contrib-Random-String-Generator.md) - [Browse the Code](evennia.contrib.utils.random_string_generator)
+[閱讀檔案](./Contrib-Random-String-Generator.md) - [瀏覽程式碼](evennia.contrib.utils.random_string_generator)
 
 
 
+(tree_select)=
 ### `tree_select`
 
-_Contribution by Tim Ashley Jenkins, 2017_
+_蒂姆·阿什利·詹金斯貢獻，2017 年_
 
-This utility allows you to create and initialize an entire branching EvMenu
-instance from a multi-line string passed to one function.
+該實用程式可讓您建立並初始化整個分支EvMenu
+傳遞給一個函式的多行字串的例項。
 
-[Read the documentation](./Contrib-Tree-Select.md) - [Browse the Code](evennia.contrib.utils.tree_select)
+[閱讀檔案](./Contrib-Tree-Select.md) - [瀏覽程式碼](evennia.contrib.utils.tree_select)
 
 
 
@@ -905,5 +968,5 @@ instance from a multi-line string passed to one function.
 
 ----
 
-<small>This document page is auto-generated. Manual changes
-will be overwritten.</small>
+<small>此檔案頁面是自動產生的。手動更改
+將被覆蓋。 </small>

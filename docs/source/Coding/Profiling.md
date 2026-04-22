@@ -1,22 +1,24 @@
-# Profiling
+(profiling)=
+# 分析
 
 ```{important}
-This is considered an advanced topic. It's mainly of interest to server developers.
+這被認為是一個高階主題。它主要是伺服器開發人員感興趣的。
 ```
 
-Sometimes it can be useful to try to determine just how efficient a particular piece of code is, or to figure out if one could speed up things more than they are. There are many ways to test the performance of Python and the running server.
+有時，嘗試確定特定程式碼的效率，或弄清楚是否可以比實際速度更快，可能會很有用。有很多方法可以測試Python和執行伺服器的效能。
 
-Before digging into this section, remember Donald Knuth's [words of wisdom](https://en.wikipedia.org/wiki/Program_optimization#When_to_optimize):
+在深入研究本節之前，請記住 Donald Knuth 的[智慧之言](https://en.wikipedia.org/wiki/Program_optimization#When_to_optimize)：
 
-> *[...]about 97% of the time: Premature optimization is the root of all evil*.
+> *[...]大約 97% 的時間：過早的最佳化是萬惡之源*。
 
-That is, don't start to try to optimize your code until you have actually identified a need to do so. This means your code must actually be working before you start to consider optimization.  Optimization will also often make your code more complex and harder to read. Consider readability and maintainability and you may find that a small gain in speed is just not worth it.
+也就是說，在您真正確定需要這樣做之前，不要開始嘗試最佳化程式碼。這意味著在開始考慮最佳化之前，您的程式碼必須實際執行。  最佳化通常還會使您的程式碼變得更加複雜且難以閱讀。考慮可讀性和可維護性，您可能會發現速度的微小提升是不值得的。
 
-## Simple timer tests
+(simple-timer-tests)=
+## 簡單的定時器測試
 
-Python's `timeit` module is very good for testing small things. For example, in
-order to test if it is faster to use a `for` loop or a list comprehension you
-could use the following code:
+Python 的 `timeit` 模組非常適合測試小東西。例如，在
+為了測試使用 `for` 迴圈或清單理解是否更快
+可以使用以下程式碼：
 
 ```python
     import timeit
@@ -28,35 +30,37 @@ could use the following code:
    <<<  5.358283996582031
 ```
 
-The `setup` keyword is used to set up things that should not be included in the time measurement, like `a = []` in the first call.
+`setup` 關鍵字用於設定不應包含在時間測量中的內容，例如第一次呼叫中的`a = []`。
 
-By default the `timeit` function will re-run the given test 1000000 times and returns the *total time* to do so (so *not* the average per test). A hint is to not use this default for testing something that includes database writes - for that you may want to use a lower number of repeats (say 100 or 1000) using the `number=100` keyword. 
+預設情況下，`timeit` 函式將重新執行給定測試 1000000 次並傳回執行此操作的*總時間*（因此*不是*每個測試的平均值）。提示是不要使用此預設值來測試包含資料庫寫入的內容 - 為此，您可能想要使用 `number=100` 關鍵字來使用較少的重複次數（例如 100 或 1000）。
 
-In the example above, we see that this number of calls, using a list comprehension is about twice as fast as building a list using `.append()`.
+在上面的範例中，我們看到使用清單理解的呼叫次數大約是使用 `.append()` 建立清單的兩倍。
 
-## Using cProfile
+(using-cprofile)=
+## 使用cProfile
 
-Python comes with its own profiler, named cProfile (this is for cPython, no tests have been done with `pypy` at this point). Due to the way Evennia's processes are handled, there is no point in using the normal way to start the profiler (`python -m cProfile evennia.py`). Instead you start the profiler through the launcher:
+Python 附帶自己的分析器，名為 cProfile（這是針對 cPython 的，目前尚未使用 `pypy` 進行任何測試）。由於 Evennia 程式的處理方式，使用正常方式啟動探查器 (`python -m cProfile evennia.py`) 是沒有意義的。相反，您可以透過啟動器啟動分析器：
 
     evennia --profiler start
 
-This will start Evennia with the Server component running (in daemon mode) under cProfile. You could instead try `--profile` with the `portal` argument to profile the Portal (you would then need to [start the Server separately](../Setup/Running-Evennia.md)).
+這將啟動 Evennia，伺服器元件在 cProfile 下運作（以守護程式模式）。您可以嘗試使用 `--profile` 和 `portal` 引數來分析 Portal（然後您需要[單獨啟動伺服器](../Setup/Running-Evennia.md)）。
 
-Please note that while the profiler is running, your process will use a lot more memory than usual.  Memory usage is even likely to climb over time. So don't leave it running perpetually but monitor it carefully (for example using the `top` command on Linux or the Task Manager's memory display on Windows). 
+請注意，當分析器執行時，您的程式將使用比平常更多的記憶體。  隨著時間的推移，記憶體使用量甚至可能會攀升。因此，不要讓它永久執行，而是要仔細監視它（例如在 Linux 上使用 `top` 指令或在 Windows 上使用工作管理員的記憶體顯示）。
 
-Once you have run the server for a while, you need to stop it so the profiler can give its report.  Do *not* kill the program from your task manager or by sending it a kill signal - this will most likely also mess with the profiler. Instead either use `evennia.py stop` or (which may be even better), use `@shutdown` from inside the game.
+一旦您執行伺服器一段時間，您需要停止它，以便探查器可以提供其報告。  請勿從工作管理員終止程式或透過向其傳送終止訊號來終止程式 -​​ 這很可能也會擾亂分析器。相反，可以使用 `evennia.py stop` 或（這可能更好），在遊戲內部使用 `@shutdown`。
 
-Once the server has fully shut down (this may be a lot slower than usual) you will find that profiler has created a new file `mygame/server/logs/server.prof`.
+一旦伺服器完全關閉（這可能比平常慢很多），您會發現探查器建立了一個新檔案`mygame/server/logs/server.prof`。
 
-### Analyzing the profile
+(analyzing-the-profile)=
+### 分析個人資料
 
-The `server.prof` file is a binary file. There are many ways to analyze and display its contents, all of which has only been tested in Linux (If you are a Windows/Mac user, let us know what works). 
+`server.prof` 檔案是二進位檔案。有許多方法可以分析和顯示其內容，所有這些方法僅在 Linux 中進行了測試（如果您是 Windows/Mac 使用者，請告訴我們哪些方法有效）。
 
-You can look at the contents of the profile file with Python's in-built `pstats` module in the evennia shell (it's recommended you install `ipython` with `pip install ipython` in your virtualenv first, for prettier output):
+您可以在 evennia shell 中使用 Python 內建的 `pstats` 模組檢視設定檔的內容（建議您先在 virtualenv 中安裝 `ipython` 和 `pip install ipython`，以獲得更漂亮的輸出）：
 
     evennia shell
 
-Then in the shell
+然後在殼裡
 
 ```python
 import pstats
@@ -67,63 +71,64 @@ p.strip_dirs().sort_stats(-1).print_stats()
 
 ```
 
-See the [Python profiling documentation](https://docs.python.org/3/library/profile.html#instant-user-s-manual) for more information.
+有關詳細資訊，請參閱[Python 分析檔案](https://docs.python.org/3/library/profile.html#instant-user-s-manual)。
 
-You can also visualize the data in various ways.
-- [Runsnake](https://pypi.org/project/RunSnakeRun/) visualizes the profile to
-  give a good overview. Install with `pip install runsnakerun`. Note that this
-  may require a C compiler and be quite slow to install.
-- For more detailed listing of usage time, you can use
-  [KCachegrind](http://kcachegrind.sourceforge.net/html/Home.html). To make
-  KCachegrind work with Python profiles you also need the wrapper script
-  [pyprof2calltree](https://pypi.python.org/pypi/pyprof2calltree/). You can get
-  `pyprof2calltree` via `pip` whereas KCacheGrind is something you need to get
-  via your package manager or their homepage.
+您也可以透過多種方式視覺化資料。
+- [Runsnake](https://pypi.org/project/RunSnakeRun/) 將設定檔視覺化
+給出一個很好的概述。使用 `pip install runsnakerun` 安裝。請注意，這
+  可能需要 C 編譯器且安裝速度相當慢。
+- 如需更詳細的使用時間列表，您可以使用
+[KCachegrind](http://kcachegrind.sourceforge.net/html/Home.html)。使
+  KCachegrind 使用 Python 設定檔案，您還需要包裝器 script
+  [pyprof2calltree](https://pypi.python.org/pypi/pyprof2calltree/)。你可以獲得
+  `pyprof2calltree` 透過 `pip` 而 KCacheGrind 是你需要得到的東西
+  透過您的套件管理器或其主頁。
 
-How to analyze and interpret profiling data is not a trivial issue and depends on what you are profiling for. Evennia being an asynchronous server can also confuse profiling. Ask on the mailing list if you need help and be ready to be able to supply your `server.prof` file for comparison, along with the exact conditions under which it was obtained.
+如何分析和解釋分析資料並不是一個小問題，這取決於您分析的目的。 Evennia 作為非同步伺服器也會使分析變得混亂。在郵件清單中詢問您是否需要協助，並準備好提供您的 `server.prof` 檔案以供比較，以及取得該檔案的確切條件。
 
-## The Dummyrunner
+(the-dummyrunner)=
+## 假跑者
 
-It is difficult to test "actual" game performance without having players in your game. For this reason Evennia comes with the *Dummyrunner* system. The Dummyrunner is a stress-testing system: a separate program that logs into your game with simulated players (aka "bots" or "dummies"). Once connected, these dummies will semi-randomly perform various tasks from a list of possible actions.  Use `Ctrl-C` to stop the Dummyrunner.
+如果遊戲中沒有玩家，則很難測試「實際」遊戲效能。因此 Evennia 隨 *Dummyrunner* 系統一起提供。 Dummyrunner 是一個壓力測試系統：一個單獨的程式，可以使用模擬玩家（又稱「機器人」或「假人」）登入您的遊戲。連線後，這些假人將半隨機地從可能的操作清單中執行各種任務。  使用 `Ctrl-C` 停止 Dummyrunner。
 
 ```{warning}
 
     You should not run the Dummyrunner on a production database. It
     will spawn many objects and also needs to run with general permissions.
 
-This is the recommended process for using the dummy runner:
+這是使用虛擬跑步者的推薦流程：
 ```
 
-1. Stop your server completely with `evennia stop`.
-1. At _the end_ of your `mygame/server/conf.settings.py` file, add the line
+1. 使用 `evennia stop` 完全停止你的伺服器。
+1. 在 `mygame/server/conf.settings.py` 檔案的末尾新增以下行
 
         from evennia.server.profiling.settings_mixin import *
 
-   This will override your settings and disable Evennia's rate limiters and DoS-protections, which would otherwise block mass-connecting clients from one IP. Notably, it will also change to a different (faster) password hasher.
-1. (recommended): Build a new database. If you use default Sqlite3 and want to
-   keep your existing database, just rename `mygame/server/evennia.db3` to
-   `mygame/server/evennia.db3_backup` and run `evennia migrate` and `evennia
-   start` to create a new superuser as usual.
-1. (recommended) Log into the game as your superuser. This is just so you
-   can manually check response. If you kept an old database, you will _not_
-   be able to connect with an _existing_ user since the password hasher changed!
-1. Start the dummyrunner with 10 dummy users from the terminal with
+這將覆蓋您的設定並停用 Evennia 的速率限制器和 DoS 保護，否則將阻止來自 1IP 的大量連線使用者端。值得注意的是，它還將更改為不同的（更快的）密碼雜湊器。
+1. （建議）：建立一個新的資料庫。如果您使用預設的 Sqlite3 並且想要
+保留現有資料庫，只需將 `mygame/server/evennia.db3` 重新命名為
+   `mygame/server/evennia.db3_backup` 並執行 `evennia migrate` 和 `evennia
+   start` 像往常一樣建立一個新的超級使用者。
+1. （推薦）以超級使用者登入遊戲。這正是你
+可以手動檢查響應。如果您保留舊資料庫，您將_不會_
+   由於密碼雜湊器更改，能夠與_現有_使用者連線！
+1. 從終端啟動 10 個虛擬使用者的 dummyrunner
 
         evennia --dummyrunner 10
 
-   Use `Ctrl-C` (or `Cmd-C`) to stop it.
+使用`Ctrl-C`（或`Cmd-C`）來停止它。
 
-If you want to see what the dummies are actually doing you can run with a single dummy:
+如果您想檢視虛擬機器實際上在做什麼，您可以使用單一虛擬機器執行：
 
     evennia --dummyrunner 1
 
-The inputs/outputs from the dummy will then be printed. By default the runner uses the 'looker' profile, which just logs in and sends the 'look' command over and over. To change the settings, copy the file `evennia/server/profiling/dummyrunner_settings.py` to your `mygame/server/conf/` directory, then add this line to your settings file to use it in the new location:
+然後將列印虛擬機器的輸入/輸出。預設情況下，跑步者使用“looker”設定檔案，該設定檔案僅登入並一遍又一遍地傳送“look”指令。要更改設定，請將檔案 `evennia/server/profiling/dummyrunner_settings.py` 複製到您的 `mygame/server/conf/` 目錄，然後將此行新增到您的設定檔案中以在新位置使用它：
 
     DUMMYRUNNER_SETTINGS_MODULE = "server/conf/dummyrunner_settings.py"
 
-The dummyrunner settings file is a python code module in its own right - it defines the actions available to the dummies. These are just tuples of command strings (like "look here") for the dummy to send to the server along with a probability of them happening. The dummyrunner looks for a global variable `ACTIONS`, a list of tuples, where the first two elements define the commands for logging in/out of the server.
+dummyrunner 設定檔本身就是一個 Python 程式碼模組 - 它定義了傻瓜可用的操作。這些只是指令字串的元組（例如“看這裡”），供虛擬物件傳送到伺服器以及它們發生的機率。 dummyrunner 尋找全域變數 `ACTIONS`，這是一個元組列表，其中前兩個元素定義用於登入/登出伺服器的指令。
 
-Below is a simplified minimal setup (the default settings file adds a lot more functionality and info):
+以下是簡化的最小設定（預設設定檔新增了更多功能和資訊）：
 
 ```python
 # minimal dummyrunner setup file
@@ -169,29 +174,30 @@ ACTIONS = (
 
 ```
 
-At the bottom of the default file are a few default profiles you can test out by just setting the `PROFILE` variable to one of the options.
+預設檔案的底部是一些預設設定檔案，您只需將 `PROFILE` 變數設定為選項之一即可測試。
 
-### Dummyrunner hints
+(dummyrunner-hints)=
+### 虛擬跑者提示
 
-- Don't start with too many dummies. The Dummyrunner taxes the server much more
-  than 'real' users tend to do. Start with 10-100 to begin with.
-- Stress-testing can be fun, but also consider what a 'realistic' number of
-  users would be for your game.
-- Note in the dummyrunner output how many commands/s are being sent to the
-  server by all dummies. This is usually a lot higher than what you'd
-  realistically expect to see from the same number of users.
-- The default settings sets up a 'lag' measure to measaure the round-about
-  message time. It updates with an average every 30 seconds. It can be worth to
-  have this running for a small number of dummies in one terminal before adding
-  more by starting another dummyrunner in another terminal - the first one will
-  act as a measure of how lag changes with different loads. Also verify the
-  lag-times by entering commands manually in-game.
-- Check the CPU usage of your server using `top/htop` (linux). In-game, use the
-  `server` command.
-- You can run the server with `--profiler start` to test it with dummies. Note
-  that the profiler will itself affect server performance, especially memory
-  consumption.
-- Generally, the dummyrunner system makes for a decent test of general
-  performance; but it is of course hard to actually mimic human user behavior.
-  For this, actual real-game testing is required.
+- 不要從太多的假人開始。 Dummyrunner 對伺服器的負擔更大
+比「真實」使用者傾向於做的事情。從 10-100 開始。
+- 壓力測試可能很有趣，但也要考慮「現實」的數量
+使用者會喜歡你的遊戲。
+- 請注意 dummyrunner 輸出中有多少指令被傳送到
+伺服器由所有傻瓜組成。這通常比你想要的要高得多
+  實際上期望看到相同數量的使用者。
+- 預設設定設定“滯後”測量來測量迂迴
+留言時間。平均每 30 秒更新一次。值得
+  在新增之前，在一個終端機中為少量虛擬機器執行此程式
+  更多透過在另一個終端啟動另一個 dummyrunner - 第一個將
+  衡量滯後如何隨不同負載變化。還要驗證
+  透過在遊戲中手動輸入指令來減少延遲時間。
+- 使用 `top/htop` (linux) 檢查伺服器的 CPU 使用情況。在遊戲中，使用
+`server`指令。
+- 您可以使用 `--profiler start` 執行伺服器來使用虛擬機器進行測試。筆記
+分析器本身會影響伺服器效能，尤其是記憶體
+  消費。
+- 一般來說，dummyrunner 系統可以對一般的測試進行不錯的測試
+表現;但實際上模仿人類使用者的行為當然很難。
+  為此，需要進行實際的真實遊戲測試。
 

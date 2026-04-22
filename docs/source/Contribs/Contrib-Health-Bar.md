@@ -1,25 +1,27 @@
-# Health Bar
+(health-bar)=
+# 生命棒
 
-Contribution by Tim Ashley Jenkins, 2017
+蒂姆·阿什利·詹金斯 (Tim Ashley Jenkins) 貢獻，2017 年
 
-The function provided in this module lets you easily display visual
-bars or meters as a colorful bar instead of just a number. A "health bar"
-is merely the most obvious use for this, but the bar is highly customizable
-and can be used for any sort of appropriate data besides player health.
+此模組提供的功能可讓您輕鬆展示視覺效果
+條或米作為彩色條而不僅僅是數字。一個“健康棒”
+這只是最明顯的用途，但該欄是高度可自訂的
+並且可以用於玩家健康以外的任何型別的適當資料。
 
-Today's players may be more used to seeing statistics like health,
-stamina, magic, and etc. displayed as bars rather than bare numerical
-values, so using this module to present this data this way may make it
-more accessible. Keep in mind, however, that players may also be using
-a screen reader to connect to your game, which will not be able to
-represent the colors of the bar in any way. By default, the values
-represented are rendered as text inside the bar which can be read by
-screen readers.
+今天的玩家可能更習慣檢視健康狀況等統計資料，
+耐力、魔法等顯示為條形而非純粹的數字
+值，因此使用此模組以這種方式呈現此資料可能會使其
+更容易接近。但請記住，玩家也可能會使用
+螢幕閱讀器連線到您的遊戲，這將無法
+以任何方式表示條形的顏色。預設情況下，這些值
+表示呈現為條內的文字，可以透過
+螢幕閱讀器。
 
-## Usage
+(usage)=
+## 用法
 
-No installation, just import and use `display_meter` from this
-module:
+無需安裝，只需從此匯入並使用`display_meter`
+模組：
 
 ```python
     from evennia.contrib.rpg.health_bar import display_meter
@@ -30,13 +32,13 @@ module:
 
 ```
 
-The health bar will account for current values above the maximum or
-below 0, rendering them as a completely full or empty bar with the
-values displayed within.
+健康欄將考慮當前值高於最大值或
+低於 0，將它們渲染為完全滿或空的條形
+內顯示的值。
 
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/rpg/health_bar/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\rpg\health_bar\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

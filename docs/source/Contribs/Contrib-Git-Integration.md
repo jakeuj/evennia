@@ -1,35 +1,38 @@
-# In-game Git Integration
+(in-game-git-integration)=
+# 遊戲內 Git 整合
 
-Contribution by helpme (2022)
+helpme 的貢獻 (2022)
 
-A module to integrate a stripped-down version of git within the game, allowing developers to view their git status, change branches, and pull updated code of both their local mygame repo and Evennia core. After a successful pull or checkout, the git command will reload the game: Manual restarts may be required to to apply certain changes that would impact persistent scripts etc.
+一個在遊戲中整合 git 精簡版本的模組，讓開發人員可以檢視其 git 狀態、更改分支以及提取本地 mygame 儲存庫和 Evennia 核心的更新程式碼。成功拉取或簽出後，git 指令將重新載入遊戲：可能需要手動重新啟動才能套用某些會影響持久scripts 等的變更。
 
-Once the contrib is set up, integrating remote changes is as simple as entering the following into your game:
+設定 contrib 後，整合遠端變更就像在遊戲中輸入以下內容一樣簡單：
 
 ```
 git pull
 ```
 
-The repositories you want to work with, be it only your local mygame repo, only Evennia core, or both, must be git directories for the command to function. If you are only interested in using this to get upstream Evennia changes, only the Evennia repository needs to be a git repository. [Get started with version control here.](https://www.evennia.com/docs/1.0-dev/Coding/Version-Control.html)
+您想要使用的儲存庫（無論是本機 mygame 儲存庫、僅 Evennia core 還是兩者）都必須是 git 目錄，指令才能發揮作用。如果您只想使用它來獲取上游 Evennia 更改，則僅 Evennia 儲存庫需要是 git 儲存庫。 [從這裡開始版本控制。 ](https://www.evennia.com/docs/1.0-dev/Coding/Version-Control.html)
 
-## Dependencies
+(dependencies)=
+## 依賴關係
 
-This package requires the dependency "gitpython", a python library used to
-interact with git repositories. To install, it's easiest to install Evennia's
-extra requirements:
+該套件需要依賴項“gitpython”，這是一個用於
+與 git 儲存庫互動。安裝，安裝Evennia最簡單
+額外要求：
 
     pip install evennia[extra]
 
-If you installed with `git` you can also do
+如果您安裝了`git`，您也可以這樣做
 
-- `cd` to the root of the Evennia repository.
-- `pip install --upgrade -e .[extra]`
+- `cd` 到 Evennia 儲存庫的根目錄。
+- `pip install --upgrade -e.[extra]`
 
-## Installation
+(installation)=
+## 安裝
 
-This utility adds a simple assortment of 'git' commands. Import the module into your commands and add it to your command set to make it available.
+該實用程式新增了一系列簡單的“git”指令。將模組匯入到您的指令中並將其新增至您的指令集中以使其可用。
 
-Specifically, in `mygame/commands/default_cmdsets.py`:
+具體來說，在`mygame/commands/default_cmdsets.py`中：
 
 ```python
 ...
@@ -43,37 +46,39 @@ class CharacterCmdset(default_cmds.Character_CmdSet):
 
 ```
 
-Then `reload` to make the git command available.
+然後 `reload` 使 git 指令可用。
 
-## Usage
+(usage)=
+## 用法
 
-This utility will only work if the directory you wish to work with is a git directory. If they are not, you will be prompted to initiate your directory as a git repository using the following commands in your terminal:
+只有當您希望使用的目錄是 git 目錄時，此實用程式才有效。如果不是，系統將提示您在終端機中使用以下指令將目錄啟動為 git 儲存庫：
 
 ```
 git init
 git remote add origin 'link to your repository'
 ```
 
-By default, the git commands are only available to those with Developer permissions and higher. You can change this by overriding the command and setting its locks from "cmd:pperm(Developer)" to the lock of your choice.
+預設情況下，git 指令僅適用於具有開發人員及更高許可權的人員。您可以透過覆蓋指令並將其鎖定從「cmd:pperm(Developer)」設定為您選擇的 lock 來變更此設定。
 
-The supported commands are:
-* git status: An overview of your git repository, which files have been changed locally, and the commit you're on.
-* git branch: What branches are available for you to check out.
-* git checkout 'branch': Checkout a branch.
-* git pull: Pull the latest code from your current branch.
+支援的指令有：
+* git status：您的 git 儲存庫的概述、哪些檔案已在本機變更以及您正在進行的提交。
+* gitbranch：有哪些分支可供您檢視。
+* git checkout 'branch'：簽出一個分支。
+* git pull：從目前分支中提取最新程式碼。
 
-* All of these commands are also available with 'evennia', to serve the same functionality related to your Evennia directory. So:
-* git evennia status
-* git evennia branch
-* git evennia checkout 'branch'
-* git evennia pull: Pull the latest Evennia code.
+* 所有這些指令也可與「evennia」一起使用，以提供與 Evennia 目錄相關的相同功能。所以：
+* git evennia 狀態
+* git evennia 分支
+* git evennia 簽出“分支”
+* git evennia pull：拉取最新的Evennia程式碼。
 
-## Settings Used
+(settings-used)=
+## 使用的設定
 
-The utility uses the existing GAME_DIR and EVENNIA_DIR settings from settings.py. You should not need to alter these if you have a standard directory setup, they ought to exist without any setup required from you.
+該實用程式使用settings.py 中的現有GAME_DIR 和EVENNIA_DIR 設定。如果您有標準目錄設定，則不需要更改它們，它們應該存在而無需您進行任何設定。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/utils/git_integration/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\utils\git_integration\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

@@ -1,6 +1,7 @@
-# Turnbased Combat
+(turnbased-combat)=
+# 回合製戰鬥
 
-In this lesson we will be building on the [combat base](./Beginner-Tutorial-Combat-Base.md) to implement a combat system that works in turns and where you select your actions in a menu, like this:
+在本課程中，我們將在[戰鬥基礎](./Beginner-Tutorial-Combat-Base.md) 的基礎上實現一個輪流執行的戰鬥系統，您可以在選單中選擇操作，如下所示：
 
 ```shell
 
@@ -69,29 +70,31 @@ You use Potion of Strength.
  Renewed strength coarses through your body!
  Potion of Strength was used up.
 ```
-> Note that this documentation doesn't show in-game colors. Also, if you interested in an alternative, see the [previous lesson](./Beginner-Tutorial-Combat-Twitch.md) where we implemented a 'twitch'-like combat system based on entering direct commands for every action.
+> 請注意，本文件不顯示遊戲中的顏色。另外，如果您對替代方案感興趣，請參閱[上一課](./Beginner-Tutorial-Combat-Twitch.md)，其中我們透過為每個動作輸入直接指令來實現類似「抽搐」的戰鬥系統。
 
-With 'turnbased' combat, we mean combat that 'ticks' along at a slower pace, slow enough to allow the participants to select their options in a menu (the menu is not strictly necessary, but it's a good way to learn how to make menus as well). Their actions are queued and will be executed when the turn timer runs out. To avoid waiting unnecessarily, we will also move on to the next round whenever everyone has made their choices.
+對於「回合製」戰鬥，我們指的是以較慢的速度「滴答作響」的戰鬥，速度足夠慢，足以讓參與者在選單中選擇他們的選項（選單並不是絕對必要的，但它也是學習如何製作選單的好方法）。他們的行動會排隊，並在回合計時器用完時執行。為了避免不必要的等待，當大家做出選擇後，我們也會進入下一輪。
 
-The advantage of a turnbased system is that it removes player speed from the equation; your prowess in combat does not depend on how quickly you can enter a command. For RPG-heavy games you could also allow players time to make RP emotes during the rounds of combat to flesh out the action.
+回合製系統的優點是它消除了玩家的速度。你的戰鬥能力並不取決於你輸入指令的速度。對於 RPG- 重型遊戲，您還可以讓玩家有時間在戰鬥回合中做出 RP 表情，以充實動作。
 
-The advantage of using a menu is that you have all possible actions directly available to you, making it beginner friendly and easy to know what you can do. It also means a lot less writing which can be an advantage to some players.
+使用選單的優點是您可以直接執行所有可能的操作，這使得初學者友好且易於知道您可以做什麼。這也意味著更少的寫作，這對某些玩家來說可能是一個優勢。
 
-## General Principle
+(general-principle)=
+## 一般原則
 
 ```{sidebar}
-An example of an implemented Turnbased combat system can be found under `evennia/contrib/tutorials/evadventure/`, in [combat_turnbased.py](evennia.contrib.tutorials.evadventure.combat_turnbased).
+已實施的回合製戰鬥系統的範例可以在 `evennia/contrib/tutorials/evadventure/` 下的 [combat_turnbased.py](evennia.contrib.tutorials.evadventure.combat_turnbased) 中找到。
 ```
-Here is the general principle of the Turnbased combat handler:
+以下是回合製戰鬥處理程式的一般原理：
 
-- The turnbased version of the CombatHandler will be stored on the _current location_. That means that there will only be one combat per location. Anyone else starting combat will join the same handler and be assigned a side to fight on.
-- The handler will run a central timer of 30s (in this example). When it fires, all queued actions will be executed. If everyone has submitted their actions, this will happen immediately when the last one submits.
-- While in combat you will not be able to move around - you are stuck in the room. Fleeing combat is a separate action that takes a few turns to complete (we will need to create this).
-- Starting the combat is done via the `attack <target>` command. After that you are in the combat menu and will use the menu for all subsequent actions.
+- CombatHandler 的回合製版本將儲存在_目前位置_。這意味著每個地點只會發生一場戰鬥。任何其他開始戰鬥的人都會加入同一個處理者並被分配到一邊戰鬥。
+- 處理程式將執行 30 秒的中央計時器（在本例中）。當它觸發時，所有排隊的操作都將被執行。如果每個人都提交了他們的操作，那麼這將在最後一個提交時立即發生。
+- 在戰鬥中你將無法走動——你被困在房間裡。逃離戰鬥是一個單獨的動作，需要幾個回合才能完成（我們需要建立這個）。
+- 開始戰鬥是透過`attack <target>`指令完成的。之後，您將進入戰鬥選單，並將使用該選單執行所有後續操作。
 
-## Turnbased combat handler
+(turnbased-combat-handler)=
+## 回合製戰鬥處理程式
 
-> Create a new module `evadventure/combat_turnbased.py`.
+> 建立一個新模組`evadventure/combat_turnbased.py`。
 
 ```python
 # in evadventure/combat_turnbased.py
@@ -144,13 +147,14 @@ class EvadventureTurnbasedCombatHandler(EvAdventureCombatBaseHandler):
 
 ```
 
-We leave a placeholder for the `"flee"` action since we haven't created it yet.
+我們為 `"flee"` 操作留下一個佔位符，因為我們還沒有建立它。
 
-Since the turnbased combat handler is shared between all combatants, we need to store references to those combatants on the handler, in the `combatants` [Attribute](Attribute).  In the same way we must store a _matrix_ of who has advantage/disadvantage against whom. We must also track who is _fleeing_, in particular how long they have been fleeing, since they will be leaving combat after that time.
+由於回合製戰鬥處理程式在所有戰鬥人員之間共享，因此我們需要在處理程式上儲存對這些戰鬥人員的引用，在 `combatants` [Attribute](Attribute) 中。  以同樣的方式，我們必須儲存一個誰對誰有優勢/劣勢的_矩陣_。我們還必須追蹤誰在逃跑，特別是他們逃跑了多長時間，因為在那之後他們就會離開戰鬥。
 
-### Getting the sides of combat
+(getting-the-sides-of-combat)=
+### 取得戰鬥雙方
 
-The two sides are different depending on if we are in an [PvP room](./Beginner-Tutorial-Rooms.md) or not: In a PvP room everyone else is your enemy. Otherwise only NPCs in combat is your enemy (you are assumed to be teaming up with your fellow players).
+雙方的差異取決於我們是否在[PvP房間](./Beginner-Tutorial-Rooms.md)中：在PvP房間中，其他人都是你的敵人。否則，戰鬥中只有 NPCs 是你的敵人（假設你與其他玩家組隊）。
 
 ```python
 # in evadventure/combat_turnbased.py
@@ -185,11 +189,12 @@ class EvadventureTurnbasedCombatHandler(EvAdventureCombatBaseHandler):
         return allies, enemies
 ```
 
-Note that since the `EvadventureCombatBaseHandler` (which our turnbased handler is based on) is a [Script](../../../Components/Scripts.md), it provides many useful features. For example `self.obj` is the entity on which this Script 'sits'. Since we are planning to put this handler on the current location, then `self.obj` will be that Room.
+請注意，由於 `EvadventureCombatBaseHandler`（我們的回合處理程式所基於的）是 [Script](../../../Components/Scripts.md)，因此它提供了許多有用的功能。例如，`self.obj` 是 Script “所在”的實體。由於我們計劃將此處理程式放在目前位置，因此 `self.obj` 將是該房間。
 
-All we do here is check if it's a PvP room or not and use this to figure out who would be an ally or an enemy. Note that the `combatant` is _not_ included in the `allies` return - we'll need to remember this.
+我們在這裡所做的就是檢查它是否是 PvP 房間，並用它來確定誰是盟友還是敵人。請注意，`combatant` _不_包含在 `allies` 回傳值中 - 我們需要記住這一點。
 
-### Tracking Advantage/Disadvantage
+(tracking-advantagedisadvantage)=
+### 追蹤優勢/劣勢
 
 ```python
 # in evadventure/combat_turnbased.py
@@ -215,19 +220,20 @@ class EvadventureTurnbasedCombatHandler(EvAdventureCombatBaseHandler):
         return bool(self.disadvantage_matrix[combatant].pop(target, False))
 ```
 
-We use the `advantage/disadvantage_matrix` Attributes to track who has advantage against whom.
+我們使用 `advantage/disadvantage_matrix` 屬性來追蹤誰對誰有優勢。
 
-```{sidebar} .pop()
-The Python `.pop()` method removes an element from a list or dict and returns it. For a list, it removes by index (or the last element by default). For a dict (like here), you specify which key to remove. Providing a default value as a second argument prevents an error if the key doesn't exist.
+```{sidebar} 。流行音樂（）
+Python `.pop()` 方法從清單或字典中刪除一個元素並傳回它。對於列表，它按索引刪除（或預設情況下最後一個元素）。對於字典（如此處），您指定要刪除的鍵。提供預設值作為第二個引數可以防止在鍵不存在時出現錯誤。
 ```
-In the `has dis/advantage` methods we `pop` the target from the matrix which will result either in the value `True` or `False` (the default value we give to `pop` if the target is not in the matrix). This means that the advantage, once gained, can only be used once.
+在 `has dis/advantage` 方法中，我們從矩陣中提取 `pop` 目標，這將導致值 `True` 或 `False`（如果目標不在矩陣中，我們給出的預設值為 `pop`）。這意味著優勢一旦獲得，就只能使用一次。
 
-We also consider everyone to have advantage against fleeing combatants.
+我們也認為每個人在對抗逃跑的戰鬥人員時都具有優勢。
 
-### Adding and removing combatants
+(adding-and-removing-combatants)=
+### 新增和刪除戰鬥人員
 
-Since the combat handler is shared we must be able to add- and remove combatants easily.
-This is new compared to the base handler.
+由於戰鬥處理程式是共享的，我們必須能夠輕鬆新增和刪除戰鬥人員。
+與基本處理程式相比，這是新的。
 
 ```python
 # in evadventure/combat_turnbased.py
@@ -256,13 +262,14 @@ class EvadventureTurnbasedCombatHandler(EvAdventureCombatBaseHandler):
 		# TODO!
 ```
 
-We simply add the the combatant with the fallback action-dict to start with. We return a `bool` from `add_combatant` so that the calling function will know if they were actually added anew or not (we may want to do some extra setup if they are new).
+我們只需新增帶有後備動作字典的戰鬥人員即可。我們從`add_combatant`返回`bool`，以便呼叫函式知道它們是否實際上是重新新增的（如果它們是新的，我們可能需要做一些額外的設定）。
 
-For now we just `pop` the combatant, but in the future we'll need to do some extra cleanup of the menu when combat ends (we'll get to that).
+現在我們只是 `pop` 戰鬥人員，但將來我們需要在戰鬥結束時對選單進行一些額外的清理（我們會做到這一點）。
 
-### Flee Action
+(flee-action)=
+### 逃跑行動
 
-Since you can't just move away from the room to flee turnbased combat, we need to add a new `CombatAction` subclass like the ones we created in the [base combat lesson](./Beginner-Tutorial-Combat-Base.md#actions).
+由於你不能只是離開房間來逃離回合製戰鬥，我們需要新增一個新的 `CombatAction` 子類，就像我們在 [基礎戰鬥課程](./Beginner-Tutorial-Combat-Base.md#actions) 中建立的子類一樣。
 
 
 ```python
@@ -315,11 +322,12 @@ class EvadventureTurnbasedCombatHandler(EvAdventureCombatBaseHandler):
 	# ...
 ```
 
-We create the action to make use of the `fleeing_combatants` dict we set up in the combat handler. This dict stores the fleeing combatant along with the  `turn`  its fleeing started. If performing the `flee` action multiple times, we will just display how many turns are remaining.
+我們建立動作來利用我們在戰鬥處理程式中設定的 `fleeing_combatants` 字典。該指令儲存了逃跑的戰鬥人員及其逃跑開始的`turn`。如果多次執行 `flee` 操作，我們將只顯示剩餘的回合數。
 
-Finally, we make sure to add our new `CombatActionFlee` to the `action_classes` registry on the combat handler.
+最後，我們確保將新的 `CombatActionFlee` 新增至戰鬥處理程式的 `action_classes` 登錄檔中。
 
-### Queue action
+(queue-action)=
+### 佇列動作
 
 ```python
 # in evadventure/combat_turnbased.py
@@ -342,11 +350,12 @@ class EvadventureTurnbasedCombatHandler(EvAdventureCombatBaseHandler):
 
 ```
 
-To queue an action, we simply store its `action_dict` with the combatant in the `combatants` Attribute.
+為了對一個動作進行排隊，我們只需將其 `action_dict` 與戰鬥者一起存放在 `combatants` Attribute 中。
 
-We use a Python `set()` to track who has queued an action this turn. If all combatants have entered a new (or renewed) action this turn, we use the `.force_repeat()` method, which is available on all [Scripts](../../../Components/Scripts.md). When this is called, the next round will fire immediately instead of waiting until it times out.
+我們使用 Python `set()` 來追蹤本回合誰已將操作排隊。如果本回合所有戰鬥人員都輸入了新的（或更新的）動作，我們將使用 `.force_repeat()` 方法，該方法適用於所有 [Scripts](../../../Components/Scripts.md)。當呼叫此函式時，下一輪將立即觸發，而不是等到逾時。
 
-### Execute an action and tick the round
+(execute-an-action-and-tick-the-round)=
+### 執行一個動作並勾選該回合
 
 ```{code-block} python
 :linenos:
@@ -407,21 +416,22 @@ class EvadventureTurnbasedCombatHandler(EvAdventureCombatBaseHandler):
 
 ```
 
-Our action-execution consists of two parts - the `execute_next_action` (which was defined in the parent class for us to implement) and the `at_repeat` method which is a part of the [Script](../../../Components/Scripts.md)
+我們的操作執行由兩部分組成 - `execute_next_action`（在父類中定義供我們實現）和 `at_repeat` 方法，該方法是 [Script](../../../Components/Scripts.md) 的一部分
 
-For `execute_next_action` :
+對於`execute_next_action`：
 
-- **Line 13**: We get the `action_dict` from the `combatants` Attribute. We return the `fallback_action_dict` if nothing was queued (this defaults to `hold`).
-- **Line 16**: We use the `key` of the `action_dict` (which would be something like "attack", "use", "wield" etc) to get the class of the matching Action from the `action_classes` dictionary.
-- **Line 17**: Here the action class is instantiated with the combatant and action dict, making it ready to execute. This is then executed on the following lines.
-- **Line 22**: We introduce a new optional `action-dict` here, the boolean `repeat` key. This allows us to re-queue the action. If not the fallback action will be used.
+- **第 13 行**：我們從 `combatants` Attribute 得到 `action_dict`。如果沒有任何內容排隊，我們將返回 `fallback_action_dict`（預設為 `hold`）。
+- **第 16 行**：我們使用 `action_dict` 的 `key`（類似「攻擊」、「使用」、「揮舞」等）從 `action_classes` 字典中取得符合 Action 的類別。
+- **第 17 行**：這裡使用戰鬥人員和動作字典例項化動作類，使其準備好執行。然後在以下幾行執行此操作。
+- **第 22 行**：我們在這裡引入一個新的可選 `action-dict`，即布林值 `repeat` 鍵。這允許我們重新排隊操作。如果不是，將使用後備操作。
 
-The `at_repeat` is called repeatedly every `interval` seconds that the Script fires. This is what we use to track when each round ends.
+Script 觸發後，每 `interval` 秒重複呼叫 `at_repeat`。這是我們用來追蹤每輪結束時間的方法。
 
-- **Lines 43**: In this example, we have no internal order between actions. So we simply randomize in which order they fire.
-- **Line 49**: This `set` was assigned to in the `queue_action` method to know when everyone submitted a new action. We must make sure to unset it here before the next round.
+- **第 43 行**：在此範例中，我們的操作之間沒有內部順序。所以我們只是隨機化它們的發射順序。
+- **第 49 行**：這個 `set` 被分配給 `queue_action` 方法，以瞭解每個人何時提交新作業。我們必須確保在下一輪之前在這裡取消設定。
 
-### Check and stop combat
+(check-and-stop-combat)=
+### 檢查並停止戰鬥
 
 ```{code-block} python
 :linenos:
@@ -500,17 +510,18 @@ class EvadventureTurnbasedCombatHandler(EvAdventureCombatBaseHandler):
             self.stop_combat()
 ```
 
-The `check_stop_combat` is called at the end of the round. We want to figure out who is dead and if one of the 'sides' won.
+`check_stop_combat` 在回合結束時被呼叫。我們想弄清楚誰死了以及“一方”是否獲勝。
 
-- **Lines 28-38**: We go over all combatants and determine if they are out of HP. If so we fire the relevant hooks and add them to the `defeated_combatants` Attribute.
-- **Line 38**: For all surviving combatants, we make sure give them the `fallback_action_dict`.
-- **Lines 41-46**: The `fleeing_combatant` Attribute is a dict on the form `{fleeing_combatant: turn_number}`, tracking when they first started fleeing. We compare this with the current turn number and the `flee_timeout` to see if they now flee and should be allowed to be removed from combat.
-- **Lines 49-56**: Here on we are determining if one 'side' of the conflict has defeated the other side.
-- **Line 60**: The `list_to_string` Evennia utility converts a list of entries, like `["a", "b", "c"` to a nice string `"a, b and c"`. We use this to be able to present some nice ending messages to the combatants.
+- **第28-38行**：我們檢查所有戰鬥人員並確定他們是否在HP之外。如果是這樣，我們觸發相關的鉤子並將它們新增到 `defeated_combatants` Attribute 中。
+- **第 38 行**：對於所有倖存的戰鬥人員，我們確保給他們`fallback_action_dict`。
+- **第 41-46 行**：`fleeing_combatant` Attribute 是 `{fleeing_combatant: turn_number}` 形式的字典，追蹤他們第一次開始逃跑的時間。我們將其與當前回合數和 `flee_timeout` 進行比較，看看他們是否現在逃跑並應該被允許從戰鬥中移除。
+- **第 49-56 行**：這裡我們正在確定衝突的一方是否擊敗了另一方。
+- **第 60 行**：`list_to_string` Evennia 實用程式將條目清單（例如 `["a", "b", "c"`）轉換為漂亮的字串 `"a, b and c"`。我們用它來向戰鬥人員呈現一些美好的結局訊息。
 
-### Start combat
+(start-combat)=
+### 開始戰鬥
 
-Since we are using the timer-component of the [Script](../../../Components/Scripts.md) to tick our combat, we also need a helper method to 'start' that.
+由於我們使用 [Script](../../../Components/Scripts.md) 的計時器元件來計時我們的戰鬥，因此我們還需要一個輔助方法來「啟動」它。
 
 ```python
 from evennia.utils.utils import list_to_string
@@ -534,13 +545,14 @@ class EvadventureTurnbasedCombatHandler(EvAdventureCombatBaseHandler):
 
 ```
 
-The `start(**kwargs)` method is a method on the Script, and will make it start to call `at_repeat` every `interval` seconds. We will pass that `interval` inside `kwargs` (so for example, we'll do `combathandler.start_combat(interval=30)` later).
+`start(**kwargs)` 方法是 Script 上的方法，並且將使其開始每 `interval` 秒呼叫 `at_repeat`。我們將在 `kwargs` 內傳遞 `interval`（例如，我們稍後將傳遞 `combathandler.start_combat(interval=30)`）。
 
-## Using EvMenu for the combat menu
+(using-evmenu-for-the-combat-menu)=
+## 使用EvMenu作為戰鬥選單
 
-The _EvMenu_ used to create in-game menues in Evennia. We used a simple EvMenu already in the [Character Generation Lesson](./Beginner-Tutorial-Chargen.md). This time we'll need to be a bit more advanced.  While [The EvMenu documentation](../../../Components/EvMenu.md) describe its functionality in more detail, we will give a quick overview of how it works here.
+_EvMenu_ 用於在 Evennia 中建立遊戲內選單。我們在[角色生成課程](./Beginner-Tutorial-Chargen.md)中已經使用了一個簡單的EvMenu。這次我們需要更先進一點。  雖然[EvMenu 檔案](../../../Components/EvMenu.md) 更詳細地描述了其功能，但我們將在此快速概述其工作原理。
 
-An EvMenu is made up of _nodes_, which are regular functions on this form (somewhat simplified here, there are more options):
+EvMenu 由 _nodes_ 組成，它們是此表單上的常規函式（這裡有些簡化，有更多選項）：
 
 ```python
 def node_somenodename(caller, raw_string, **kwargs):
@@ -557,11 +569,11 @@ def node_somenodename(caller, raw_string, **kwargs):
     return text, options
 ```
 
-So basically each node takes the arguments of `caller` (the one using the menu), `raw_string` (the empty string or what the user input on the _previous node_) and `**kwargs` which can be used to pass data from node to node. It returns `text` and `options`.
+因此，基本上每個節點都採用 `caller`（使用選單的節點）、`raw_string`（空字串或使用者在前一個節點上輸入的內容）和 `**kwargs` 引數，可用於在節點之間傳遞資料。它返回 `text` 和 `options`。
 
-The `text` is what the user will see when entering this part of the menu, such as "Choose who you want to attack!". The `options` is a list of dicts describing each option. They will appear as a multi-choice list below the node text (see the example at the top of this lesson page).
+`text`是使用者進入這部分選單時會看到的內容，例如「選擇你想要攻擊的人！」。 `options` 是描述每個選項的字典清單。它們將顯示為節點文字下方的多項選擇清單（請參閱本課程頁面頂部的範例）。
 
-When we create the EvMenu later, we will create a _node index_ - a mapping between a unique name and these "node functions". So something like this:
+當我們稍後建立 EvMenu 時，我們將建立一個_節點索引_ - 唯一名稱和這些「節點函式」之間的對應。所以像這樣：
 
 ```python
 # example of a EvMenu node index
@@ -573,11 +585,11 @@ When we create the EvMenu later, we will create a _node index_ - a mapping betwe
       "end": node_abort_menu,
     }
 ```
-Each `option` dict has a key `"goto"` that determines which node the player should jump to if they choose that option. Inside the menu, each node needs to be referenced with these names (like `"start"`, `"node1"` etc).
+每個 `option` 字典都有一個鍵 `"goto"` ，用於確定玩家選擇該選項時應跳到哪個節點。在選單內部，每個節點都需要用這些名稱來引用（如 `"start"`、`"node1"` 等）。
 
-The `"goto"` value of each option can either specify the name directly (like `"node1"`) _or_ it can be given as a tuple `(callable, {keywords})`. This `callable` is _called_ and is expected to in turn return the next node-name to use (like `"node1"`).
+每個選項的 `"goto"` 值可以直接指定名稱（如 `"node1"`）_或_它可以作為元組 `(callable, {keywords})` 給出。這個 `callable` 被稱為_並且預計會傳回下一個要使用的節點名稱（如 `"node1"`）。
 
-The `callable` (often called a "goto callable") looks very similar to a node function:
+`callable`（通常稱為「goto callable」）看起來與節點函式非常相似：
 
 ```python
 def _goto_when_choosing_option1(caller, raw_string, **kwargs):
@@ -585,14 +597,14 @@ def _goto_when_choosing_option1(caller, raw_string, **kwargs):
     return nodename  # also nodename, dict works
 ```
 
-```{sidebar} Separating node-functions from goto callables
-To make node-functions clearly separate from goto-callables, Evennia docs always prefix node-functions with `node_` and menu goto-functions with an underscore `_` (which is also making goto-functions 'private' in Python lingo).
+```{sidebar} 將節點函式與 goto 可呼叫函式分離
+為了使節點函式與 goto-callables 明顯分開，Evennia 檔案總是在節點函式前加上 `node_` 字首，並在選單 goto 函式前加上下劃線 `_`（這也使 goto 函式在 Python 術語中成為「私有」）。
 ```
-Here, `caller` is still the one using the menu and `raw_string` is the actual string you entered to choose this option. `**kwargs` is the keywords you added to the `(callable, {keywords})` tuple.
+這裡，`caller` 仍然是使用選單的字串，`raw_string` 是您輸入的用於選擇此選項的實際字串。 `**kwargs` 是您新增至 `(callable, {keywords})` 元組中的關鍵字。
 
-The goto-callable must return the name of the next node. Optionally, you can return both  `nodename, {kwargs}`. If you do the next node will get those kwargs as ingoing `**kwargs`. This way you can pass information from one node to the next. A special feature is that if `nodename` is returned as `None`, then the _current_ node will be _rerun_ again.
+goto-callable 必須傳回下一個節點的名稱。或者，您可以同時返回 `nodename, {kwargs}`。如果您這樣做，下一個節點將獲得這些 kwargs 作為傳入 `**kwargs`。透過這種方式，您可以將資訊從一個節點傳遞到下一個節點。一個特殊的功能是，如果 `nodename` 回傳為 `None`，則 _current_ 節點將再次_rerun_。
 
-Here's a (somewhat contrived) example of how the goto-callable and node-function hang together:
+這是一個（有點做作的）範例，說明瞭 goto-callable 和 node-function 如何結合在一起：
 
 ```
 # goto-callable
@@ -619,35 +631,37 @@ def node_somenodename(caller, raw_string, **kwargs):
     ]
 ```
 
-## Menu for Turnbased combat
+(menu-for-turnbased-combat)=
+## 回合製戰鬥選單
 
 
-Our combat menu will be pretty simple. We will have one central menu node with options indicating all the different actions of combat. When choosing an action in the menu, the player should be asked a series of question, each specifying one piece of information needed for that action. The last step will be the build this information into an `action-dict` we can queue with the combathandler.
+我們的戰鬥選單將非常簡單。我們將有一個中央選單節點，其中包含指示所有不同戰鬥動作的選項。當在選單中選擇一個操作時，應該向玩家提出一系列問題，每個問題都指定該操作所需的一條資訊。最後一步是將這些資訊建構到我們可以與戰鬥處理程式一起排隊的`action-dict`中。
 
-To understand the process, here's how the action selection will work (read left to right):
+若要了解流程，請瞭解操作選擇的工作原理（從左到右閱讀）：
 
-| In base node | step 1 | step 2 | step 3 | step 4 |
+| 在基節點中 | 步驟1 | 步驟2 | 步驟3 | 步驟4 |
 | --- | --- | --- | --- | --- |
-| select `attack` | select `target` | queue action-dict | - | - |
-| select `stunt - give advantage` | select `Ability`| select `allied recipient` | select `enemy target` | queue action-dict |
-| select `stunt - give disadvantage` | select `Ability` | select `enemy recipient` | select `allied target` | queue action-dict |
-| select `use item on yourself or ally` | select `item` from inventory | select `allied target` | queue action-dict | - |
-| select `use item on enemy` | select `item` from inventory | select `enemy target` | queue action-dict | - |
-| select `wield/swap item from inventory` | select `item` from inventory` | queue action-dict | - | - |
-| select `flee` | queue action-dict | - | - | - |
-| select `hold, doing nothing` | queue action-dict | - | - | - |
+| 選擇`attack` | 選擇`target` | 佇列動作字典 | - | - |
+| 選擇`stunt - give advantage` | 選擇`Ability`| 選擇`allied recipient` | 選擇`enemy target` | 佇列動作字典 |
+| 選擇`stunt - give disadvantage` | 選擇`Ability` | 選擇`enemy recipient` | 選擇`allied target` | 佇列動作字典 |
+| 選擇`use item on yourself or ally` | 從庫存中選擇`item` | 選擇`allied target` | 佇列動作字典 | - |
+| 選擇`use item on enemy` | 從庫存中選擇`item` | 選擇`enemy target` | 佇列動作字典 | - |
+| 選擇`wield/swap item from inventory` | 從庫存中選擇`item`` | 佇列動作字典 | - | - |
+| 選擇`flee` | 佇列動作字典 | - | - | - |
+| 選擇`hold, doing nothing` | 佇列動作字典 | - | - | - |
 
-Looking at the above table we can see that we have _a lot_ of re-use. The selection of allied/enemy/target/recipient/item represent nodes that can be shared by different actions.
+檢視上表，我們可以看到我們有_很多_重複使用。盟友/敵人/目標/接收者/物品的選擇代表可以被不同行動共享的節點。
 
-Each of these actions also follow a linear sequence, like the step-by step 'wizard' you see in some software. We want to be able to step back and forth in each sequence, and also abort the action if you change your mind along the way.
+每個操作也遵循線性順序，就像您在某些軟體中看到的逐步「嚮導」一樣。我們希望能夠在每個序列中來回移動，如果您在過程中改變主意，您也可以中止操作。
 
-After queueing the action, we should always go back to the base node where we will wait until the round ends and all actions are executed.
+對操作進行排隊後，我們應該始終返回到基本節點，在那裡我們將等待，直到回合結束並且所有操作都執行。
 
-We will create a few helpers to make our particular menu easy to work with.
+我們將建立一些幫助程式，使我們的特定選單易於使用。
 
-### The node index
+(the-node-index)=
+### 節點索引
 
-These are the nodes we need for our menu:
+這些是我們的選單所需的節點：
 
 ```python
 # not coded anywhere yet, just noting for reference
@@ -664,9 +678,10 @@ node_index = {
 }
 ```
 
-All callables are left as `None` since we haven't created them yet. But it's good to note down the expected names because we need them in order to jump from node to node. The important one to note is that `node_combat` will be the base node we should get back to over and over.
+所有可呼叫專案都保留為 `None`，因為我們還沒有建立它們。但最好記下預期的名稱，因為我們需要它們才能從一個節點跳到另一個節點。需要注意的重要一點是 `node_combat` 將是我們應該一遍又一遍地返回的基本節點。
 
-### Getting or setting the combathandler
+(getting-or-setting-the-combathandler)=
+### 取得或設定戰鬥處理程式
 
 ```python
 # in evadventure/combat_turnbased.py
@@ -684,11 +699,12 @@ def _get_combathandler(caller, turn_timeout=30, flee_time=3, combathandler_key="
     )
 ```
 
-We only add this to not have to write as much when calling this later. We pass `caller.location`, which is what retrieves/creates the combathandler on the current location. The `interval` is how often the combathandler (which is a [Script](../../../Components/Scripts.md)) will call its `at_repeat` method. We set the `flee_time` Attribute at the same time.
+我們新增這個只是為了以後呼叫它時不必寫那麼多。我們傳遞`caller.location`，這是在目前位置檢索/建立戰鬥處理程式的內容。 `interval` 是戰鬥處理程式（這是一個 [Script](../../../Components/Scripts.md)）呼叫其 `at_repeat` 方法的頻率。我們同時設定`flee_time` Attribute。
 
-### Queue an action
+(queue-an-action)=
+### 對操作進行排隊
 
-This is our first "goto function". This will be called to actually queue our finished action-dict with the combat handler. After doing that, it should return us to the base  `node_combat`.
+這是我們的第一個「goto 函式」。這將被呼叫以實際將我們完成的動作字典與戰鬥處理程式排隊。完成此操作後，它應該會返回到基址 `node_combat`。
 
 ```python
 # in evadventure/combat_turnbased.py
@@ -701,13 +717,14 @@ def _queue_action(caller, raw_string, **kwargs):
     return "node_combat"
 ```
 
-We make one assumption here - that `kwargs` contains the `action_dict` key with the action-dict ready to go.
+我們在這裡做出一個假設 - `kwargs` 包含 `action_dict` 鍵，並且 action-dict 已準備就緒。
 
-Since this is a goto-callable, we must return the next node to go to. Since this is the last step, we will always go back to the `node_combat` base node, so that's what we return.
+由於這是一個可呼叫的 goto，因此我們必須傳回要轉到的下一個節點。由於這是最後一步，我們總是會回到 `node_combat` 基節點，所以這就是我們返回的內容。
 
-### Rerun a node
+(rerun-a-node)=
+### 重新執行節點
 
-A special feature of goto callables is the ability to rerun the same node by returning `None`.
+goto 可呼叫物件的一個特殊功能是能夠透過傳回 `None` 來重新執行相同節點。
 
 ```python
 # in evadventure/combat_turnbased.py
@@ -718,11 +735,12 @@ def _rerun_current_node(caller, raw_string, **kwargs):
     return None, kwargs
 ```
 
-Using this in an option will rerun the current node, but will preserve the `kwargs` that were sent in.
+在選項中使用此選項將重新執行目前節點，但將保留傳送的`kwargs`。
 
-### Stepping through the wizard
+(stepping-through-the-wizard)=
+### 單步執行嚮導
 
-Our particular menu is very symmetric - you select an option and then you will just select a series of option before you come back. So we will make another goto-function to help us easily do this. To understand, let's first show how we plan to use this:
+我們的特殊選單非常對稱 - 您選擇一個選項，然後您在回來之前只需選擇一系列選項。因此，我們將建立另一個 goto 函式來幫助我們輕鬆地做到這一點。為了理解，我們首先展示我們計劃如何使用它：
 
 ```python
 # in the base combat-node function (just shown as an example)
@@ -740,11 +758,11 @@ options = [
 ]
 ```
 
-When the user chooses to use an item on an enemy, we will call `_step_wizard` with two keywords `steps` and `action_dict`. The first is the _sequence_ of menu nodes we need to guide the player through in order to build up our action-dict.
+當使用者選擇對敵人使用物品時，我們將使用兩個關鍵字`steps`和`action_dict`來呼叫`_step_wizard`。第一個是我們需要引導玩家透過的選單節點_序列_，以建立我們的動作字典。
 
-The latter is the `action_dict` itself. Each node will gradually fill in the `None` places in this dict until we have a complete dict and can send it to the [`_queue_action`](#queue-an-action) goto function we defined earlier.
+後者是 `action_dict` 本身。每個節點都會逐漸填入這個字典中的 `None` 位置，直到我們有一個完整的字典並且可以將其傳送到我們之前定義的 [`_queue_action`](#queue-an-action) goto 函式。
 
-Furthermore, we want the ability to go "back" to the previous node like this:
+此外，我們希望能夠像這樣「返回」到前一個節點：
 
 
 ```python
@@ -765,9 +783,9 @@ def some_node(caller, raw_string, **kwargs):
     # ...
 ```
 
-Note the use of `**` here. `{**dict1, **dict2}` is a powerful one-liner syntax to combine two dicts into one. This preserves (and passes on) the incoming `kwargs` and just adds a new key "step" to it. The end effect is similar to if we had done `kwargs["step"] = "back"` on a separate line (except we end up with a _new_ `dict` when using the `**`-approach).
+注意這裡使用`**`。 `{**dict1, **dict2}` 是一種強大的單行語法，可將兩個字典合併為一個。這會保留（並傳遞）傳入的 `kwargs` 並僅向其新增一個新的關鍵「步驟」。最終效果類似於我們在單獨的行上執行 `kwargs["step"] = "back"`（除非我們在使用 `**` 方法時最終得到 _new_ `dict`）。
 
-So let's implement a `_step_wizard` goto-function to handle this!
+因此，讓我們實作一個 `_step_wizard` goto 函式來處理這個問題！
 
 ```python
 # in evadventure/combat_turnbased.py
@@ -805,11 +823,11 @@ def _step_wizard(caller, raw_string, **kwargs):
 
 ```
 
-This depends on passing around `steps`, `step` and `istep` with the `**kwargs`.  If `step` is "back" then we will go back in the sequence of `steps` otherwise forward. We increase/decrease the `istep` key value to track just where we are.
+這取決於透過 `**kwargs` 傳遞 `steps`、`step` 和 `istep`。  如果 `step` 是“後退”，那麼我們將按 `steps` 的順序後退，否則向前。我們增加/減少 `istep` 鍵值來追蹤我們所在的位置。
 
-If we reach the end we call our `_queue_action` helper function directly. If we back up to the beginning we return to the base node.
+如果到達末尾，我們將直接呼叫 `_queue_action` 輔助函式。如果我們回到開頭，我們將返回到基本節點。
 
-We will make one final helper function, to quickly add the `back` (and `abort`) options to the nodes that need it:
+我們將建立一個最終輔助函式，以快速將 `back`（和 `abort`）選項新增至需要它的節點：
 
 ```python
 # in evadventure/combat_turnbased.py
@@ -833,17 +851,18 @@ def _get_default_wizard_options(caller, **kwargs):
     ]
 ```
 
-This is not a goto-function, it's just a helper that we will call to quickly add these extra options a node's option list and not have to type it out over and over.
+這不是一個 goto 函式，它只是一個幫助器，我們將呼叫它來快速將這些額外選項新增到節點的選項清單中，而不必一遍又一遍地鍵入它。
 
-As we've seen before, the `back` option will use the `_step_wizard` to step back in the wizard. The `abort` option will simply jump back to the main node, aborting the wizard.
+正如我們之前所看到的，`back` 選項將使用 `_step_wizard` 在嚮導中後退。 `abort` 選項將簡單地跳回主節點，中止精靈。
 
-The `_default` option is special. This option key tells EvMenu: "use this option if none of the other match". That is, if they enter an empty input or garbage, we will just re-display the node. We make sure pass along the `kwargs` though, so we don't lose any information of where we were in the wizard.
+`_default` 選項很特殊。此選項鍵告訴 EvMenu：「如果其他選項都不匹配，則使用此選項」。也就是說，如果他們輸入空輸入或垃圾，我們將重新顯示該節點。不過，我們確保傳遞 `kwargs`，這樣我們就不會失去我們在嚮導中所處位置的任何資訊。
 
-Finally we are ready to write our menu nodes!
+最後我們準備好要寫我們的選單節點了！
 
-### Choosing targets and recipients
+(choosing-targets-and-recipients)=
+### 選擇目標和接受者
 
-These nodes all work the same: They should present a list of suitable targets/recipients to choose from and then put that result in the action-dict as either `target` or `recipient` key.
+這些節點的工作方式都是相同的：它們應該提供合適的目標/收件者清單以供選擇，然後將結果作為 `target` 或 `recipient` 鍵放入操作字典中。
 
 ```{code-block} python
 :linenos:
@@ -888,20 +907,21 @@ def node_choose_allied_recipient(caller, raw_string, **kwargs):
 
 ```
 
-- **Line 11**: Here we use `combathandler.get_sides(caller)` to get the 'enemies' from the perspective of `caller` (the one using the menu).
-- **Line 13-31**: This is a loop over all enemies we found.
-    - **Line 15**:  We use `target.get_display_name(caller)`. This method (a default method on all Evennia `Objects`) allows the target to return a name while being aware of who's asking. It's what makes an admin see `Name (#5)` while a regular user just sees `Name`. If you didn't care about that, you could just do `target.key` here.
-    - **Line 18**: This line looks complex, but remember that `{**dict1, **dict2}` is a one-line way to merge two dicts together. What this does is to do this in three steps:
-        - First we add `action_dict` together with a dict `{"target": target}`. This has the same effect as doing `action_dict["target"] = target`, except we create a new dict out of the merger.
-        - Next we take this new merger and creates a new dict `{"action_dict": new_action_dict}`.
-        - Finally we merge this with the existing `kwargs` dict. The result is a new dict that now has the updated `"action_dict"` key pointing to an action-dict where `target` is set.
-- **Line 23**: We extend the `options` list with the default wizard options (`back`, `abort`). Since we made a helper function for this, this is only one line.
+- **第11行**：這裡我們使用`combathandler.get_sides(caller)`從`caller`（使用選單的那個）的角度來取得「敵人」。
+- **第 13-31 行**：這是我們發現的所有敵人的迴圈。
+    - **第 15 行**：我們使用 `target.get_display_name(caller)`。此方法（所有 Evennia `Objects` 上的預設方法）允許目標傳回名稱，同時知道是誰在詢問。這使得管理員看到 `Name (#5)`，而普通使用者只能看到 `Name`。如果你不關心這個，你可以在這裡做`target.key`。
+    - **第 18 行**：這一行看起來很複雜，但請記住 `{**dict1, **dict2}` 是一種將兩個字典合併在一起的單行方法。其作用是分三步驟完成：
+        - 首先，我們將 `action_dict` 與字典 `{"target": target}` 加在一起。這與 `action_dict["target"] = target` 具有相同的效果，只不過我們透過合併建立了一個新的字典。
+        - 接下來我們採用這個新的合併並建立一個新的字典`{"action_dict": new_action_dict}`。
+        - 最後我們將其與現有的 `kwargs` 字典合併。結果是一個新的字典，現在具有更新的 `"action_dict"` 鍵，指向設定了 `target` 的操作字典。
+- **第 23 行**：我們使用預設精靈選項（`back`、`abort`）擴充套件 `options` 清單。由於我們為此建立了一個輔助函式，因此這只是一行。
 
-Creating the three other needed nodes `node_choose_enemy_recipient`, `node_choose_allied_target` and `node_choose_allied_recipient` are following the same pattern; they just use either the `allies` or `enemies` return from `combathandler.get_sides(). It then sets either the `target` or `recipient` field in the `action_dict`. We leave these up to the reader to implement.
+建立另外三個所需的節點 `node_choose_enemy_recipient`、`node_choose_allied_target` 和 `node_choose_allied_recipient` 也遵循相同的模式；它們只是改用 `combathandler.get_sides()` 回傳的 `allies` 或 `enemies`，然後在 `action_dict` 中設定 `target` 或 `recipient` 欄位。我們把這部分留給讀者自行實作。
 
-### Choose an Ability
+(choose-an-ability)=
+### 選擇一種能力
 
-For Stunts, we need to be able to select which _Knave_ Ability (STR, DEX etc) you want to boost/foil.
+對於特技，我們需要能夠選擇您想要增強/挫敗的 _Knave_ 能力（STR、DEX 等）。
 
 ```python
 # in evadventure/combat_turnbased.py
@@ -941,9 +961,10 @@ def node_choose_ability(caller, raw_string, **kwargs):
 
 ```
 
-The principle is the same as for the target/recipient-setter nodes, except that we just provide a list of the abilities to choose from. We update the `stunt_type` and `defense_type` keys in the `action_dict`, as needed by the Stunt action.
+其原理與目標/接收者設定者節點相同，只是我們只提供可供選擇的能力清單。我們根據 Stunt 動作的需要更新 `action_dict` 中的 `stunt_type` 和 `defense_type` 鍵。
 
-### Choose an item to use or wield
+(choose-an-item-to-use-or-wield)=
+### 選擇要使用或揮舞的物品
 
 ```python
 # in evadventure/combat_turnbased.py
@@ -976,13 +997,14 @@ def node_choose_wield_item(caller, raw_string, **kwargs):
 
 ```
 
-Our [equipment handler](./Beginner-Tutorial-Equipment.md) has the very useful help method `.get_usable_objects_from_backpack`. We just call this to get a list of all the items we want to choose. Otherwise this node should look pretty familiar by now.
+我們的[裝置處理程式](./Beginner-Tutorial-Equipment.md)有非常有用的幫助方法`.get_usable_objects_from_backpack`。我們只是呼叫它來獲取我們想要選擇的所有專案的列表。否則這個節點現在看起來應該非常熟悉了。
 
-The `node_choose_wield_item` is very similar, except it uses `caller.equipment.get_wieldable_objects_from_backpack()` instead. We'll leave the implementation of this up to the reader.
+`node_choose_wield_item` 非常相似，只不過它使用 `caller.equipment.get_wieldable_objects_from_backpack()` 代替。我們將把這個的實作留給讀者。
 
-### The main menu node
+(the-main-menu-node)=
+### 主選單節點
 
-This ties it all together.
+這將它們聯絡在一起。
 
 ```python
 # in evadventure/combat_turnbased.py
@@ -1081,13 +1103,14 @@ def node_combat(caller, raw_string, **kwargs):
     return text, options
 ```
 
-This starts off the `_step_wizard` for each action choice. It also lays out the `action_dict` for every action, leaving `None` values for the fields that will be set by the following nodes.
+這從每個操作選擇的 `_step_wizard` 開始。它還為每個操作列出 `action_dict`，為將由以下節點設定的欄位留下 `None` 值。
 
-Note how we add the `"repeat"` key to some actions. Having them automatically repeat means the player doesn't have to insert the same action every time.
+請注意我們如何將 `"repeat"` 鍵新增到某些操作中。讓它們自動重複意味著玩家不必每次都插入相同的動作。
 
-## Attack Command
+(attack-command)=
+## 攻擊指令
 
-We will only need one single command to run the turnbased combat system. This is the `attack` command. Once you use it once, you will be in the menu.
+我們只需要一個指令來執行回合製戰鬥系統。這是`attack` 指令。一旦你使用它一次，你就會進入選單。
 
 
 ```python
@@ -1177,18 +1200,19 @@ class TurnCombatCmdSet(CmdSet):
         self.add(CmdTurnAttack())
 ```
 
-The `attack target` Command will determine if the target has health (only things with health can be attacked) and that the room allows fighting. If the target is a pc, it will check so PvP is allowed.
+`attack target`指令將確定目標是否有生命值（只有有生命值的物體才能被攻擊）以及房間是否允許戰鬥。如果目標是 PC，它會檢查是否允許 PvP。
 
-It then proceeds to either start up a new command handler or reuse a new one, while adding  the attacker and target to it. If the target was already in combat, this does nothing (same with the `.start_combat()` call).
+然後，它繼續啟動一個新的指令處理程式或重複使用一個新的指令處理程式，同時向其中新增攻擊者和目標。如果目標已經處於戰鬥狀態，則不會執行任何操作（與 `.start_combat()` 呼叫相同）。
 
-As we create the `EvMenu`, we pass it the "menu index" we talked to about earlier, now with the actual node functions in every slot.  We make the menu persistent so it survives a reload.
+當我們建立 `EvMenu` 時，我們將其傳遞給我們之前討論過的“選單索引”，現在每個槽中都有實際的節點功能。  我們使選單持久化，以便它在重新載入後仍然存在。
 
-To make the command available, add the `TurnCombatCmdSet` to the Character's default cmdset.
+要使該指令可用，請將 `TurnCombatCmdSet` 新增至角色的預設 cmdset 中。
 
 
-## Making sure the menu stops
+(making-sure-the-menu-stops)=
+## 確保選單停止
 
-The combat can end for a bunch of reasons. When that happens, we must make sure to clean up the menu so we go back normal operation. We will add this to the `remove_combatant` method on the combat handler (we left a TODO there before):
+戰鬥可能會因多種原因而結束。發生這種情況時，我們必須確保清理選單，以便恢復正常操作。我們將其新增到戰鬥處理程式的 `remove_combatant` 方法中（我們之前在那裡留下了 TODO）：
 
 ```python
 
@@ -1210,42 +1234,44 @@ class EvadventureTurnbasedCombatHandler(EvAdventureCombatBaseHandler):
 
 ```
 
-When the evmenu is active, it is avaiable on its user as `.ndb._evmenu` (see the EvMenu docs). When we are removed from combat, we use this to get the evmenu and call its `close_menu()` method to shut down the menu.
+當 evmenu 處於活動狀態時，使用者可以使用 `.ndb._evmenu`（請參閱 EvMenu 檔案）。當我們退出戰鬥時，我們使用它來獲取evmenu並呼叫它的`close_menu()`方法來關閉選單。
 
-Our turnbased combat system is complete!
+我們的回合製戰鬥系統已經完成！
 
 
-## Testing
-
-```{sidebar}
-See an example tests in `evennia/contrib/tutorials`, in  [evadventure/tests/test_combat.py](evennia.contrib.tutorials.evadventure.tests.test_combat) 
-```
-Unit testing of the Turnbased combat handler is straight forward, you follow the process of earlier lessons to test that each method on the handler returns what you expect with mocked inputs.
-
-Unit-testing the menu is more complex. You will find examples of doing this in [evennia.utils.tests.test_evmenu](github:main/evennia/utils/testss/test_evmenu.py).
-
-## A small combat test
-
-Unit testing the code is not enough to see that combat works. We need to also make a little 'functional' test to see how it works in practice.
-
-​This is what we need for a minimal test:
-
- - A room with combat enabled.
- - An NPC to attack (it won't do anything back yet since we haven't added any AI)
- - A weapon we can `wield`.
- - An item (like a potion) we can `use`.
+(testing)=
+## 測試
 
 ```{sidebar}
-You can find an example combat batch-code script in `evennia/contrib/tutorials/evadventure/`, in  [batchscripts/turnbased_combat_demo.py](github:evennia/contrib/tutorials/evadventure/batchscripts/turnbased_combat_demo.py)
+請參閱 `evennia/contrib/tutorials`、[evadventure/tests/test_combat.py](evennia.contrib.tutorials.evadventure.tests.test_combat) 中的範例測試
+```
+Turnbased 戰鬥處理程式的單元測試非常簡單，您可以按照前面課程的程式來測試處理程式上的每個方法是否返回您所期望的模擬輸入。
+
+對選單進行單元測試更加複雜。您可以在 [evennia.utils.tests.test_evmenu](github:main/evennia/utils/testss/test_evmenu.py) 中找到執行此操作的範例。
+
+(a-small-combat-test)=
+## 實戰小測試
+
+對程式碼進行單元測試不足以看出戰鬥是否有效。我們還需要進行一些「功能」測試，看看它在實踐中是如何運作的。
+
+這是我們進行最小測試所需的：
+
+ - 一個可以進行戰鬥的房間。
+ - NPC 進行攻擊（它不會做任何反擊，因為我們還沒有增加任何 AI）
+ - 我們可以`wield`的武器。
+ - 一個物品（例如藥水）我們可以`use`。
+
+```{sidebar}
+您可以在[batchscripts/turnbased_combat_demo.py](github:evennia/contrib/tutorials/evadventure/batchscripts/turnbased_combat_demo.py)中的`evennia/contrib/tutorials/evadventure/`中找到範例戰鬥批次程式碼script
 ```
 
-In [The Twitch combat lesson](./Beginner-Tutorial-Combat-Twitch.md) we used a [batch-command script](../../../Components/Batch-Command-Processor.md) to create the testing environment in game. This runs in-game Evennia commands in sequence. For demonstration  purposes we'll instead use a  [batch-code script](../../../Components/Batch-Code-Processor.md), which runs raw Python code in a repeatable way. A batch-code script is much more flexible than a batch-command script.
+在[Twitch實戰課](./Beginner-Tutorial-Combat-Twitch.md)中，我們使用了[批次指令script](../../../Components/Batch-Command-Processor.md)來創造遊戲中的測試環境。這將按順序執行遊戲中的 Evennia 指令。出於演示目的，我們將使用 [batch-code script](../../../Components/Batch-Code-Processor.md)，它以可重複的方式執行原始 Python 程式碼。批次程式碼 script 比批次指令 script 靈活得多。
 
-> Create a new subfolder `evadventure/batchscripts/` (if it doesn't already exist)
+> 建立一個新的子資料夾 `evadventure/batchscripts/`（如果它尚不存在）
 
-> Create a new Python module `evadventure/batchscripts/combat_demo.py`
+> 建立一個新的Python模組`evadventure/batchscripts/combat_demo.py`
 
-A batchcode file is a valid Python module. The only difference is that it has a `# HEADER` block and one or more `# CODE` sections. When the processor runs, the `# HEADER` part will be added on top of each `# CODE` part before executing that code block in isolation. Since you can run the file from in-game (including refresh it without reloading the server), this gives the ability to run longer Python codes on-demand.
+批次程式碼檔案是有效的 Python 模組。唯一的區別是它有一個 `# HEADER` 區塊和一個或多個 `# CODE` 部分。當處理器執行時，在單獨執行該程式碼區塊之前，`# HEADER` 部分將新增到每個 `# CODE` 部分的頂部。由於您可以在遊戲中執行該檔案（包括在不重新載入伺服器的情況下重新整理它），因此可以按需執行更長的 Python 程式碼。
 
 ```python
 # Evadventure (Turnbased) combat demo - using a batch-code file.
@@ -1310,20 +1336,21 @@ create_object(
 
 ```
 
-If editing this in an IDE, you may get errors on the `player = caller` line. This is because `caller` is not defined anywhere in this file. Instead `caller` (the one running the script) is injected by the `batchcode` runner.
+如果在 IDE 中編輯此內容，您可能會在 `player = caller` 行上收到錯誤。這是因為 `caller` 未在此檔案中的任何位置定義。相反，`caller`（執行script的那個）由`batchcode`執行器注入。
 
-But apart from the `# HEADER` and `# CODE` specials, this just a series of normal Evennia api calls.
+但除了 `# HEADER` 和 `# CODE` 特殊之外，這只是一系列正常的 Evennia api 呼叫。
 
-Log into the game with a developer/superuser account and run
+使用開發者/超級使用者帳戶登入遊戲並執行
 
     > batchcode evadventure.batchscripts.turnbased_combat_demo
 
-This should place you in the arena with the dummy (if not, check for errors in the output! Use `objects` and `delete` commands to list and delete objects if you need to start over.)
+這應該會將您置於與虛擬物件一起的競技場中（如果沒有，請檢查輸出中是否有錯誤！如果需要重新開始，請使用 `objects` 和 `delete` 指令列出並刪除物件。）
 
-You can now try `attack dummy` and should be able to pound away at the dummy (lower its health to test destroying it). If you need to fix something, use `q` to exit the menu and get access to the `reload` command (for the final combat, you can disable this ability by passing `auto_quit=False` when you create the `EvMenu`).
+現在您可以嘗試`attack dummy`，並且應該能夠猛擊假人（降低其生命值以測試摧毀它）。如果您需要修復某些內容，請使用 `q` 退出選單並存取 `reload` 指令（對於最終戰鬥，您可以在建立 `EvMenu` 時透過傳遞 `auto_quit=False` 來停用此功能）。
 
-## Conclusions
+(conclusions)=
+## 結論
 
-At this point we have covered some ideas on how to implement both twitch- and turnbased combat systems. Along the way you have been exposed to many concepts such as classes, scripts and handlers, Commands, EvMenus and more.
+至此，我們已經介紹了一些關於如何實現基於抽搐和回合的戰鬥系統的想法。在這個過程中，您已經接觸到了許多概念，例如類別、scripts 和處理程式、指令、EvMenus 等等。
 
-Before our combat system is actually usable, we need our enemies to actually fight back. We'll get to that next.
+在我們的戰鬥系統真正可用之前，我們需要敵人真正反擊。我們接下來會討論這個問題。

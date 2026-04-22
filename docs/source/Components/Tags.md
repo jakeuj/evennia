@@ -1,6 +1,7 @@
+(tags)=
 # Tags
 
-_Tags_ are short text lables one can 'attach' to objects in order to organize, group and quickly find out their properties, similarly to how you attach labels to your luggage.
+_標籤_是一種簡短的文字標籤，人們可以將其「附加」到物體上，以便對其進行組織、分組和快速查詢其屬性，類似於將標籤附加到行李上的方式。
 
 ```{code-block}
 :caption: In game 
@@ -30,7 +31,7 @@ class Sword(DefaultObject):
         
 ```
 
-In-game, tags are controlled by the default  `tag` command:
+在遊戲中，tags 由預設的 `tag` 指令控制：
 
      > tag Chair = furniture
      > tag Chair = furniture
@@ -40,25 +41,27 @@ In-game, tags are controlled by the default  `tag` command:
      Chair, Sofa, Table
      
 
-An Evennia entity can be tagged by any number of tags. Tags are more efficient than [Attributes](./Attributes.md) since on the database-side, Tags are _shared_ between all objects with that particular tag. A tag does not carry a value in itself; rather the existence of the tag itself is what is checked - a given object either has a given tag or not.
+Evennia 實體可以由任意數量的 tags 標記。 Tags 比 [屬性](./Attributes.md) 更有效，因為在資料庫端，Tags 在具有該特定 tag 的所有物件之間_共享_。 tag 本身不具有值；相反，檢查的內容是 tag 本身是否存在 - 給定的對像要麼具有給定的 tag，要麼沒有。
 
-In code, you manage Tags using the `TagHandler` (`.tags`) on typeclassed entities. You can also assign Tags on the class level through the `TagProperty` (one tag, one category per line) or the `TagCategoryProperty` (one category, multiple tags per line). Both of these use the `TagHandler` under the hood, they are just convenient ways to add tags already when you define your class. 
+在程式碼中，您可以使用型別分類實體上的 `TagHandler` (`.tags`) 來管理 Tags。您也可以透過 `TagProperty`（一個 tag，每行一個類別）或 `TagCategoryProperty`（一個類別，每行多個 tags）在類別層級上分配 Tags。這兩個都在底層使用了 `TagHandler`，它們只是在定義類別時新增 tags 的便捷方法。
 
-Above, the tags inform us that the `Sword` is both sharp and can be wielded. If that's all they do, they could just be a normal Python flag. When tags become important is if there are a lot of objects with different combinations of tags. Maybe you have a magical spell that dulls _all_ sharp-edged objects in the castle - whether sword, dagger, spear or kitchen knife! You can then just grab all objects with the `has_sharp_edge` tag. 
-Another example would be a weather script affecting all rooms tagged as `outdoors` or finding all characters tagged with the `belongs_to_fighter_guild` tag.
+上面的tags告訴我們`Sword`既鋒利又可以使用。如果這就是他們所做的一切，那麼他們可能只是一個普通的 Python 標誌。當tags變得重要時，如果有很多物件具有不同的tags組合。也許你有一個魔法咒語，可以讓城堡中所有鋒利的物體變鈍——無論是劍、匕首、矛還是菜刀！然後，您可以使用 `has_sharp_edge` tag 抓取所有物件。 
+另一個例子是天氣 script 影響所有標記為 `outdoors` 的房間或尋找標記為 `belongs_to_fighter_guild` tag 的所有字元。
 
-In Evennia, Tags are technically also used to implement `Aliases` (alternative names for objects) and `Permissions` (simple strings for [Locks](./Locks.md) to check for).
+在Evennia中，Tags在技術上也用於實現`Aliases`（物件的替代名稱）和`Permissions`（[Locks](./Locks.md)檢查的簡單字串）。
 
 
-## Working with Tags
+(working-with-tags)=
+## 與 Tags 一起工作
 
-### Searching for tags 
+(searching-for-tags)=
+### 正在搜尋 tags
 
-The common way to use tags (once they have been set) is find all objects tagged with a particular tag combination: 
+使用 tags （一旦設定）的常見方法是尋找用特定 tag 組合標記的所有物件：
 
     objs = evennia.search_tag(key=("foo", "bar"), category='mycategory')
 
-As shown above, you can also have tags without a category (category of `None`). 
+如上所示，您還可以有 tags 不含類別（`None` 的類別）。
 
 ```python
      import evennia
@@ -81,11 +84,11 @@ As shown above, you can also have tags without a category (category of `None`).
      accounts = evennia.search_tag_account("guestaccount")          
 ```
 
-> Note that searching for just "furniture" will only return the objects tagged with the "furniture" tag that has a category of `None`. We must explicitly give the category to get the "luxurious" furniture. 
+> 請注意，僅搜尋「傢俱」將僅傳回帶有「傢俱」tag 標記且類別為 `None` 的物件。我們必須明確給出類別才能獲得“豪華”傢俱。
 
-Using any of the `search_tag` variants will all return [Django Querysets](https://docs.djangoproject.com/en/4.1/ref/models/querysets/), including if you only have one match. You can treat querysets as lists and iterate over them, or continue building search queries with them.
+使用任何 `search_tag` 變體都會傳回 [Django 查詢集](https://docs.djangoproject.com/en/4.1/ref/models/querysets/)，包括如果您只有一個符合專案。您可以將查詢集視為列表並對其進行迭代，或者繼續使用它們來建立搜尋查詢。
 
-Remember when searching that not setting a category means setting it to `None` - this does *not* mean that category is undefined, rather `None` is considered the default, unnamed category.
+請記住，在搜尋時，不設定類別意味著將其設為 `None` - 這並不意味著類別未定義，而是 `None` 被視為預設的未命名類別。
 
 ```python
 import evennia 
@@ -102,16 +105,17 @@ objs = evennia.search_tag("foo", category="bar")
 objs = evennia.search_tag(category="bar")
 ```
 
-There is also an in-game command that deals with assigning and using ([Object-](./Objects.md)) tags:
+還有一個遊戲內指令處理分配和使用 ([Object-](./Objects.md)) tags：
 
      tag/search furniture
 
 
-### TagHandler 
+(taghandler)=
+### TagHandler
 
-This is  the main way to work with tags when you have the entry already. This handler sits on all typeclassed entities as `.tags` and you use `.tags.add()`, `.tags.remove()` and `.tags.has()` to manage Tags on the object. [See the api docs](evennia.typeclasses.tags.TagHandler) for more useful methods. 
+當您已經有了條目時，這是使用 tags 的主要方法。該處理程式作為 `.tags` 位於所有型別分類實體上，並且您使用 `.tags.add()`、`.tags.remove()` 和 `.tags.has()` 來管理物件上的 Tags。 [請參閱 api 檔案](evennia.typeclasses.tags.TagHandler) 以瞭解更多有用的方法。
 
-The TagHandler can be found on any of the base *typeclassed* objects, namely [Objects](./Objects.md), [Accounts](./Accounts.md), [Scripts](./Scripts.md) and [Channels](./Channels.md) (as well as their children). Here are some examples of use:
+TagHandler 可以在任何基本 *typeclassed* 物件上找到，分別是 [Objects](./Objects.md)、[Accounts](./Accounts.md)、[Scripts](./Scripts.md) 和 [Channels](./Channels.md)（及其子項）。以下是一些使用範例：
 
 ```python
      mychair.tags.add("furniture")
@@ -125,14 +129,15 @@ The TagHandler can be found on any of the base *typeclassed* objects, namely [Ob
      mychair.tags.clear()    
 ```
 
-Adding a new tag will either create a new Tag or re-use an already existing one. Note that there are _two_ "furniture" tags, one with a `None` category, and one with the "luxurious" category.
+新增的 tag 將建立新的 Tag 或重新使用已存在的Tag。請注意，有兩件「傢俱」tags，一件屬於 `None` 類別，一件屬於「豪華」類別。
 
-When using `remove`, the `Tag` is not deleted but are just disconnected from the tagged object. This makes for very quick operations. The `clear` method removes (disconnects) all Tags from the object.
+使用 `remove` 時，`Tag` 不會被刪除，而只是與標記物件斷開連線。這使得操作非常快速。 `clear` 方法從物件中刪除（斷開）所有 Tags。
 
 
-### TagProperty 
+(tagproperty)=
+### TagProperty
 
-This is used as a property when you create a new class: 
+當您建立新類別時，這將用作屬性：
 
 ```python
 from evennia import TagProperty 
@@ -142,13 +147,14 @@ class MyClass(Object):
     mytag = TagProperty(tagcategory)
 ```
 
-This will create a Tag named `mytag` and category `tagcategory` in the database. You'll be able to find it by `obj.mytag` but more useful you can find it with the normal Tag searching methods in the database. 
+這將在資料庫中建立一個名為 `mytag` 和類別 `tagcategory` 的 Tag。您將能夠透過 `obj.mytag` 找到它，但更有用的是，您可以使用資料庫中正常的 Tag 搜尋方法找到它。
 
-Note that if you were to delete this tag with `obj.tags.remove("mytag", "tagcategory")`, that tag will be _re-added_ to the object next time this property is accessed! 
+請注意，如果您要使用 `obj.tags.remove("mytag", "tagcategory")` 刪除此 tag，則下次造訪此屬性時，tag 將_重新新增_到物件中！
 
-### TagCategoryProperty 
+(tagcategoryproperty)=
+### TagCategoryProperty
 
-This is the inverse of `TagProperty`: 
+這是 `TagProperty` 的逆：
 
 ```python
 from evennia import TagCategoryProperty 
@@ -158,13 +164,13 @@ class MyClass(Object):
     tagcategory = TagCategroyProperty(tagkey1, tagkey2)
 ```
 
-The above example means you'll have two tags (`tagkey1` and `tagkey2`), each with the `tagcategory` category, assigned to this object. 
+上面的範例意味著您將有兩個 tags（`tagkey1` 和 `tagkey2`）分配給該物件，每個都有 `tagcategory` 類別。
 
-Note that similarly to how it works for `TagProperty`, if you were to delete these tags from the object with the `TagHandler` (`obj.tags.remove("tagkey1", "tagcategory")`, then these tags will be _re-added_ automatically next time the property is accessed. 
+請注意，與 `TagProperty` 的工作方式類似，如果您要從具有 `TagHandler`（`obj.tags.remove("tagkey1", "tagcategory")`）的物件中刪除這些 tags（`obj.tags.remove("tagkey1", "tagcategory")`），那麼這些 tags 將在下次造訪該屬性時自動_重新新增_。
 
-The reverse is however not true: If you were to _add_ a new tag of the same category to the object, via the `TagHandler`, then this property will include that in the list of returned tags. 
+但反之則不然：如果您要透過 `TagHandler` 將相同類別的新 tag 新增至物件，則此屬性將把它包含在傳回的 tags 清單中。
 
-If you want to 're-sync' the tags in the property with that in the database, you can use the `del` operation on it - next time the property is accessed, it will then only show the default keys you specify in it. Here's how it works: 
+如果您想將屬性中的 tags 與資料庫中的“重新同步”，可以對其使用 `del` 操作 - 下次訪問該屬性時，它將僅顯示您在其中指定的預設鍵。它的工作原理如下：
 
 ```python
 >>> obj.tagcategory 
@@ -186,34 +192,36 @@ If you want to 're-sync' the tags in the property with that in the database, you
 ["tagkey1", "tagkey2"]   # property/database now in sync 
 ```
 
-## Properties of Tags (and Aliases and Permissions)
+(properties-of-tags-and-aliases-and-permissions)=
+## Tags 的屬性（以及別名和許可權）
 
-Tags are *unique*. This means that there is only ever one Tag object with a given key and category.
+Tags 是*獨特的*。這意味著只有一個 Tag 物件具有給定的鍵和類別。
 
 ```{important}
-Not specifying a category (default) gives the tag a category of `None`, which is also considered a unique key + category combination. You cannot use `TagCategoryProperty` to set Tags with `None` categories, since the property name may not be `None`. Use the `TagHandler` (or `TagProperty`) for this.
+不指定類別（預設）會為 tag 提供 `None` 的類別，這也被視為唯一按鍵 + 類別組合。您不能使用 `TagCategoryProperty` 來設定 `None` 類別的 Tags，因為屬性名稱可能不是 `None`。為此，請使用`TagHandler`（或`TagProperty`）。
 
 ```
-When Tags are assigned to game entities, these entities are actually sharing the same Tag. This means that Tags are not suitable for storing information about a single object - use an
-[Attribute](./Attributes.md) for this instead. Tags are a lot more limited than Attributes but this also
-makes them very quick to lookup in the database - this is the whole point.
+當Tags被分配給遊戲實體時，這些實體實際上共享相同的Tag。這意味著 Tags 不適合儲存有關單一物件的資訊 - 使用
+[Attribute](./Attributes.md) 為此。 Tags 比屬性限制得多，但這也
+使它們能夠非常快速地在資料庫中找到 - 這就是重點。
 
-Tags have the following properties, stored in the database:
+Tags 具有以下屬性，儲存在資料庫中：
 
-- **key** - the name of the Tag. This is the main property to search for when looking up a Tag.
-- **category** - this category allows for retrieving only specific subsets of tags used for different purposes. You could have one category of tags for "zones", another for "outdoor locations", for example. If not given, the category will be `None`, which is also considered a separate, default, category.
-- **data** - this is an optional text field with information about the tag. Remember that Tags are shared between entities, so this field cannot hold any object-specific information. Usually it would be used to hold info about the group of entities the Tag is tagging - possibly used for contextual help like a tool tip. It is not used by default.
+- **key** - Tag 的名稱。這是尋找 Tag 時要搜尋的主要屬性。
+- **類別** - 此類別僅允許擷取用於不同目的的 tags 的特定子集。例如，您可以將 tags 的一個類別用於“區域”，另一個類別用於“室外位置”。如果未給出，類別將為 `None`，這也被視為單獨的預設類別。
+- **資料** - 這是一個可選文字欄位，其中包含有關 tag 的資訊。請記住，Tags 在實體之間共享，因此該欄位不能儲存任何特定於物件的資訊。通常，它將用於儲存有關 Tag 所標記的實體群組的資訊 - 可能用於上下文幫助，例如工具提示。預設不使用它。
 
-There are also two special properties. These should usually not need to be changed or set, it is used internally by Evennia to implement various other uses it makes of the `Tag` object:
+還有兩個特殊屬性。這些通常不需要更改或設定，Evennia 在內部使用它來實現 `Tag` 物件的各種其他用途：
 
-- **model** - this holds a *natural-key* description of the model object that this tag deals with, on the form *application.modelclass*, for example `objects.objectdb`. It used by the TagHandler of each entity type for correctly storing the data behind the  scenes.
-- **tagtype** - this is a "top-level category" of sorts for the inbuilt children of Tags, namely *Aliases* and *Permissions*. The Taghandlers using this special field are especially intended to free up the *category* property for any use you desire.
+- **模型** - 這包含tag 處理的模型物件的*自然鍵* 描述，格式為*application.modelclass*，例如`objects.objectdb`。它被每種實體型別的 TagHandler 用於在幕後正確儲存資料。
+- **tagtype** - 這是 Tags 的內建子級的“頂級類別”，即 *別名* 和 *許可權*。使用此特殊欄位的標記處理程式特別旨在釋放 *category* 屬性以供您想要的任何用途。
 
-## Aliases and Permissions
+(aliases-and-permissions)=
+## 別名和許可權
 
-Aliases and Permissions are implemented using normal TagHandlers that simply save Tags with a
-different `tagtype`. These handlers are named `aliases` and `permissions` on all Objects. They are
-used in the same way as Tags above:
+別名和許可權是使用正常的 TagHandlers 實現的，只需使用 a 即可節省 Tags
+不同`tagtype`。這些處理程式在所有物件上都被命名為 `aliases` 和 `permissions`。他們是
+使用方式與上面Tags相同：
 
 ```python
     boy.aliases.add("rascal")
@@ -223,4 +231,4 @@ used in the same way as Tags above:
     all_aliases = boy.aliases.all()
 ```
 
-and so on. Similarly to how `tag` works in-game, there is also the `perm` command for assigning permissions and `@alias` command for aliases.
+等等。與 `tag` 在遊戲中的工作方式類似，還有用於分配許可權的 `perm` 指令和用於別名的 `@alias` 指令。

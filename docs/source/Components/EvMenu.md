@@ -1,3 +1,4 @@
+(evmenu)=
 # EvMenu
 
 ```shell
@@ -13,14 +14,14 @@ You chose yes!
 Thanks for your answer. Goodbye!
 ```
 
-_EvMenu_ is used for generate branching multi-choice menus. Each menu 'node' can
-accepts specific options as input or free-form input. Depending what the player
-chooses, they are forwarded to different nodes in the menu.
+_EvMenu_ 用於產生分支多選選單。每個選單“節點”可以
+接受特定選項作為輸入或自由格式輸入。取決於玩家甚麼
+選擇後，它們將被轉發到選單中的不同節點。
 
-The `EvMenu` utility class is located in [evennia/utils/evmenu.py](evennia.utils.evmenu).
-It allows for easily adding interactive menus to the game; for example to implement Character creation, building commands or similar. Below is an example of offering NPC conversation choices:
+`EvMenu` 實用程式類別位於 [evennia/utils/evmenu.py](evennia.utils.evmenu)。
+它允許輕鬆地向遊戲新增互動式選單；例如，實現角色建立、建立指令或類似指令。下面是提供 NPC 對話選項的範例：
 
-This is how the example menu at the top of this page will look in code:
+這是本頁頂部的範例選單在程式碼中的外觀：
 
 ```python
 from evennia.utils import evmenu
@@ -53,31 +54,31 @@ evmenu.EvMenu(caller, {"start": node_question, "end": node_end})
 
 ```
 
-Note the call to `EvMenu` at the end; this immediately creates the menu for the
-`caller`. It also assigns the two node-functions to menu node-names `start` and
-`end`, which is what the menu then uses to reference the nodes.
+注意最後對`EvMenu`的呼叫；這會立即建立選單
+`caller`。它還將兩個節點功能分配給選單節點名稱 `start` 和
+`end`，這是選單用來引用節點的內容。
 
-Each node of the menu is a function that returns the text and a list of dicts
-describing the choices you can make on that node.
+選單的每個節點都是一個傳迴文字和字典列表的函式
+描述您可以在該節點上做出的選擇。
 
-Each option details what it should show (key/desc) as well as which node to go
-to (goto) next. The "goto" should be the name of the next node to go (if `None`,
-the same node will be rerun again).
+每個選項都詳細說明瞭應顯示的內容（鍵/描述）以及要顯示的節點
+到（轉到）下一個。 「goto」應該是下一個要轉到的節點的名稱（如果`None`，
+同一節點將再次重新執行）。
 
-Above, the `Abort` option gives the "end" node name just as a string whereas the
-yes/no options instead uses the callable `_handle_answer` but pass different
-arguments to it. `_handle_answer` then returns the name of the next node (this
-allows you to perform actions when making a choice before you move on to the
-next node the menu). Note that `_handle_answer` is _not_ a node in the menu,
-it's just a helper function.
+上面，`Abort` 選項給出了“結束”節點名稱作為字串，而
+yes/no 選項改為使用可呼叫 `_handle_answer` 但傳遞不同的
+對此的論據。 `_handle_answer` 然後返回下一個節點的名稱（這
+允許您在進行選擇之前執行操作
+選單的下一個節點）。請注意，`_handle_answer` 不是選單中的節點，
+它只是一個輔助函式。
 
-When choosing 'yes' (or 'no') what happens here is that `_handle_answer` gets
-called and echoes your choice before directing to the "end" node, which exits
-the menu (since it doesn't return any options).
+當選擇“是”（或“否”）時，會發生 `_handle_answer` 得到
+在定向到退出的「結束」節點之前呼叫並回顯您的選擇
+選單（因為它不返回任何選項）。
 
-You can also write menus using the [EvMenu templating language](#evmenu-templating-language). This
-allows you to use a text string to generate simpler menus with less boiler
-plate. Let's create exactly the same menu using the templating language:
+您也可以使用[EvMenu 範本語言](#evmenu-templating-language) 編寫選單。這個
+允許您使用文字字串產生更簡單的選單和更少的鍋爐
+板。讓我們使用模板語言來建立完全相同的選單：
 
 ```python
 from evennia.utils import evmenu
@@ -109,12 +110,12 @@ evmenu.template2menu(caller, menu_template, {"handle_answer": _handle_answer})
 
 ```
 
-As seen, the `_handle_answer` is the same, but the menu structure is
-described in the `menu_template` string. The `template2menu` helper
-uses the template-string and a mapping of callables (we must add
-`_handle_answer` here) to build a full EvMenu for us.
+如圖所示，`_handle_answer` 是相同的，但選單結構是
+`menu_template` 字串中描述。 `template2menu` 助手
+使用模板字串和可呼叫物件的對映（我們必須新增
+`_handle_answer` 此處）為我們建立完整的 EvMenu。
 
-Here's another menu example, where we can choose how to interact with an NPC:
+這是另一個選單範例，我們可以在其中選擇如何與 NPC 互動：
 
 ```
 The guard looks at you suspiciously.
@@ -163,18 +164,19 @@ def node_guard(caller, raw_string, **kwarg):
 
 ```
 
-Note that by skipping the `key` of the options, we instead get an
-(auto-generated) list of numbered options to choose from.
+請注意，透過跳過選項的`key`，我們會得到一個
+（自動產生）可供選擇的編號選項清單。
 
-Here the `_skill_check` helper will check (roll your stats, exactly what this
-means depends on your game) to decide if your approach succeeded. It may then
-choose to point you to nodes that continue the conversation or maybe dump you
-into combat!
+這裡 `_skill_check` 助理將檢查（滾動你的統計資料，這到底是什麼
+方法取決於您的遊戲）來決定您的方法是否成功。那麼可能
+選擇將您指向繼續對話的節點，或者可能轉儲您
+投入戰鬥！
 
 
-## Launching the menu
+(launching-the-menu)=
+## 啟動選單
 
-Initializing the menu is done using a call to the `evennia.utils.evmenu.EvMenu` class. This is the most common way to do so - from inside a [Command](./Commands.md):
+初始化選單是透過呼叫 `evennia.utils.evmenu.EvMenu` 類別來完成的。這是最常見的方法 - 從 [Command](./Commands.md) 內部：
 
 ```python
 # in, for example gamedir/commands/command.py
@@ -191,10 +193,10 @@ class CmdTestMenu(Command):
 
 ```
 
-When running this command, the menu will start using the menu nodes loaded from
-`mygame/world/mymenu.py`. See next section on how to define menu nodes.
+執行此指令時，選單將開始使用從載入的選單節點
+`mygame/world/mymenu.py`。請參閱下一節，瞭解如何定義選單節點。
 
-The `EvMenu` has the following optional callsign:
+`EvMenu` 有以下可選呼號：
 
 ```python
 EvMenu(caller, menu_data,
@@ -210,35 +212,36 @@ EvMenu(caller, menu_data,
 
 ```
 
- - `caller` (Object or Account): is a reference to the object using the menu. This object will get a new [CmdSet](./Command-Sets.md) assigned to it, for handling the menu.
- - `menu_data` (str, module or dict): is a module or python path to a module where the global-level functions will each be considered to be a menu node. Their names in the module will be the names by which they are referred to in the module. Importantly, function names starting with an underscore `_` will be ignored by the loader. Alternatively, this can be a direct mapping
-`{"nodename":function, ...}`.
- - `startnode` (str): is the name of the menu-node to start the menu at. Changing this means that you can jump into a menu tree at different positions depending on circumstance and thus possibly re-use menu entries.
- - `cmdset_mergetype` (str): This is usually one of "Replace" or "Union" (see [CmdSets](Command- Sets). The first means that the menu is exclusive - the user has no access to any other commands while in the menu. The Union mergetype means the menu co-exists with previous commands (and may overload them, so be careful as to what to name your menu entries in this case).
- - `cmdset_priority` (int): The priority with which to merge in the menu cmdset. This allows for advanced usage.
- - `auto_quit`, `auto_look`, `auto_help` (bool): If either of these are `True`, the menu automatically makes a `quit`, `look` or `help` command available to the user. The main reason why you'd want to turn this off is if  you want to use the aliases "q", "l" or "h" for something in your menu. The `auto_help` also activates the ability to have arbitrary "tool tips" in your menu node (see below), At least `quit` is highly recommend - if `False`, the menu *must* itself supply an "exit node" (a node without any options), or the user will be stuck in the menu until the server reloads (or eternally if the menu is `persistent`)!
- - `cmd_on_exit` (str): This command string will be executed right *after* the menu has closed down. From experience, it's useful to trigger a "look" command to make sure the user is aware of the change of state; but any command can be used. If set to `None`, no command will be triggered after exiting the menu.
- - `persistent` (bool) - if `True`, the menu will survive a reload (so the user will not be kicked
-   out by the reload - make sure they can exit on their own!)
- - `startnode_input` (str or (str, dict) tuple): Pass an input text or a input text + kwargs to the
-   start node as if it was entered on a fictional previous node. This can be very useful in order to
-   start a menu differently depending on the Command's arguments in which it was initialized.
- - `session` (Session): Useful when calling the menu from an [Account](./Accounts.md) in
-   `MULTISESSION_MODE` higher than 2, to make sure only the right Session sees the menu output.
- - `debug` (bool): If set, the `menudebug` command will be made available in the menu. Use it to
-   list the current state of the menu and use `menudebug <variable>` to inspect a specific state
-   variable from the list.
- - All other keyword arguments will be available as initial data for the nodes. They will be available in all nodes as properties on `caller.ndb._evmenu` (see below). These will also survive a `reload` if the menu is `persistent`.
+ - `caller`（物件或帳戶）：是使用選單對物件的引用。該物件將獲得分配給它的新的 [CmdSet](./Command-Sets.md)，用於處理選單。
+ - `menu_data`（str、module 或 dict）：是一個模組或模組的 python 路徑，其中全域級函式將被視為選單節點。它們在模組中的名稱將是在模組中引用它們的名稱。重要的是，以下劃線 `_` 開頭的函式名稱將被載入程式忽略。或者，這可以是直接對映
+`{"nodename":function,...}`。
+ - `startnode` (str)：是啟動選單的選單節點的名稱。更改此設定意味著您可以根據情況跳到不同位置的選單樹，從而可能重新使用選單專案。
+ - `cmdset_mergetype` (str)：這通常是「替換」或「聯合」之一（請參閱 [CmdSets](Command- Sets)。第一個表示選單是獨佔的 - 使用者在選單中無法存取任何其他指令。聯合合併型別表示選單與先前的指令共存（並且可能會使它們過載，因此在這種情況下要小心命名專案的名稱）。
+ - `cmdset_priority` (int)：在選單 cmdset 中合併的優先順序。這允許高階使用。
+ - `auto_quit`、`auto_look`、`auto_help`（布林值）：如果其中任何一個是 `True`，則選單會自動向使用者提供 `quit`、`look` 或 `help` 指令。您想要關閉此功能的主要原因是您想在選單中使用別名“q”、“l”或“h”。 `auto_help` 也會啟動在選單節點中具有任意「工具提示」的功能（見下文），強烈建議至少使用 `quit` - 如果 `False`，則選單 *必須* 本身提供一個「退出節點」（沒有任何選項的節點），否則使用者將卡在選單中，直到伺服器重新載入選單（或如果選單是 `persistent`，選單中！
+ - `cmd_on_exit` (str)：此指令字串將在選單關閉後立即執行。根據經驗，觸發「檢視」指令以確保使用者意識到狀態的變化很有用；但可以使用任何指令。如果設定為`None`，則退出選單後不會觸發任何指令。
+ - `persistent` (bool) - 如果`True`，選單將在重新載入後繼續存在（因此使用者不會被踢
+透過重新載入退出 - 確保他們可以自行退出！）
+ - `startnode_input` (str or (str, dict) tuple): 將輸入文字或輸入文字 + kwargs 傳遞給
+啟動節點，就好像它是在虛構的前一個節點上輸入的。這非常有用，以便
+   根據初始化選單的指令引數，以不同的方式啟動選單。
+ - `session` (Session): 當從[帳號](./Accounts.md)呼叫選單時有用
+`MULTISESSION_MODE` 高於 2，以確保只有正確的 Session 才能看到選單輸出。
+ - `debug`（布林）：如果設定，`menudebug` 指令將在選單中可用。用它來
+列出選單的目前狀態並使用 `menudebug <variable>` 檢查特定狀態
+   列表中的變數。
+ - 所有其他關鍵字引數將可用作節點的初始資料。它們將作為 `caller.ndb._evmenu` 上的屬性在所有節點中可用（見下文）。如果選單是`persistent`，這些也將保留`reload`。
 
-You don't need to store the EvMenu instance anywhere - the very act of initializing it will store it
-as `caller.ndb._evmenu` on the `caller`. This object will be deleted automatically when the menu
-is exited and you can also use it to store your own temporary variables for access throughout the
-menu. Temporary variables you store on a persistent `_evmenu` as it runs will
-*not* survive a `@reload`, only those you set as part of the original `EvMenu` call.
+您不需要將 EvMenu 例項儲存在任何地方 - 初始化它的行為本身就會儲存它
+作為 `caller` 上的 `caller.ndb._evmenu`。當選單出現時，該物件將自動刪除
+退出後，您還可以使用它來儲存自己的臨時變數，以便在整個過程中訪問
+選單。當它執行時，您儲存在永續性`_evmenu`上的臨時變數將
+*不會*在 `@reload` 中倖存，只有那些您設定為原始 `EvMenu` 呼叫一部分的內容。
 
-## The Menu nodes
+(the-menu-nodes)=
+## 選單節點
 
-The EvMenu nodes consist of functions on one of these forms.
+EvMenu 節點由這些表單之一上的函式組成。
 
 ```python
 def menunodename1(caller):
@@ -255,58 +258,62 @@ def menunodename3(caller, raw_string, **kwargs):
 
 ```
 
-> While all of the above forms are okay, it's recommended to stick to the third and last form since it gives the most flexibility. The previous forms are mainly there for backwards compatibility with  existing menus from a time when EvMenu was less able and may become deprecated at some time in the future.
+> 雖然上述所有形式都可以，但建議堅持使用第三種也是最後一種形式，因為它提供了最大的靈活性。以前的形式主要是為了向後相容現有的選單，當時 EvMenu 的能力較差，並且可能在將來的某個時候被棄用。
 
 
-### Input arguments to the node
+(input-arguments-to-the-node)=
+### 節點的輸入引數
 
- - `caller` (Object or Account): The object using the menu - usually a Character but could also be a Session or Account depending on where the menu is used.
- - `raw_string` (str): If this is given, it will be set to the exact text the user entered on the
-   *previous* node (that is, the command entered to get to this node). On the starting-node of the menu, this will be an empty string, unless `startnode_input` was set.
- - `kwargs` (dict): These extra keyword arguments are extra optional arguments passed to the node when the user makes a choice on the *previous* node. This may include things like status flags and details about which exact option was chosen (which can be impossible to determine from
-   `raw_string` alone). Just what is passed in `kwargs` is up to you when you create the previous node.
+ - `caller`（物件或帳戶）：使用選單的物件 - 通常是角色，但也可以是 Session 或帳戶，取決於使用選單的位置。
+ - `raw_string` (str)：如果給出了該值，它將被設定為使用者在
+*前一個*節點（即為到達此節點而輸入的指令）。在選單的起始節點上，這將是一個空字串，除非設定了`startnode_input`。
+ - `kwargs` (dict)：這些額外的關鍵字引數是當使用者在*前一個*節點上做出選擇時傳遞給節點的額外可選引數。這可能包括狀態標誌和有關選擇哪個確切選項的詳細資訊（這可能無法從
+`raw_string` 單獨）。 `kwargs` 中傳遞的內容取決於您建立前一個節點時的情況。
 
-### Return values from the node
+(return-values-from-the-node)=
+### 從節點傳回值
 
-Each node function must return two variables, `text` and `options`.
+每個節點函式必須傳回兩個變數，`text` 和 `options`。
 
 
-#### text
+(text)=
+#### 文字
 
-The `text` variable is either a string or a tuple. This is the simplest form: 
+`text` 變數是字串或元組。這是最簡單的形式：
 
 ```python
 text = "Node text"
 ```
 
-This is what will be displayed as text in the menu node when entering it. You can modify this dynamically in the node if you want. Returning a `None` node text text is allowed - this leads to a node with no text and only options.  
+這是進入選單節點時將顯示為文字的內容。如果需要，您可以在節點中動態修改它。允許返回 `None` 節點文字文字 - 這會導致節點沒有文字而只有選項。
 
 ```python
 text = ("Node text", "help text to show with h|elp")
 ```
 
-In this form, we also add an optional help text. If `auto_help=True` when initializing the EvMenu, the user will be able to use `h` or `help` to see this text when viewing this node. If the user were to provide a custom option overriding `h` or `help`, that will be shown instead.
+在這種形式中，我們還新增了可選的幫助文字。如果`auto_help=True`在初始化EvMenu時，使用者在檢視此節點時將能夠使用`h`或`help`看到此文字。如果使用者要提供覆蓋 `h` 或 `help` 的自訂選項，則會顯示該選項。
 
-If `auto_help=True` and no help text is provided, using `h|elp` will give a generic error message.
+如果 `auto_help=True` 且未提供幫助文字，則使用 `h|elp` 將給出一般錯誤訊息。
 
 ```python
 text = ("Node text", {"help topic 1": "Help 1", 
                       ("help topic 2", "alias1", ...): "Help 2", ...})
 ```
 
-This is 'tooltip' or 'multi-help category' mode. This also requires `auto_help=True` when initializing the EvMenu. By providing a `dict` as the second element of the `text` tuple, the user will be able to help about any of these topics. Use a tuple as key to add multiple aliases to the same help entry. This allows the user to get more detailed help text without leaving the given node. 
+這是「工具提示」或「多重幫助類別」模式。這在初始化EvMenu時也需要`auto_help=True`。透過提供 `dict` 作為 `text` 元組的第二個元素，使用者將能夠就這些主題中的任何主題提供協助。使用元組作為鍵將多個別名新增至相同幫助條目。這允許使用者在不離開給定節點的情況下獲得更詳細的幫助文字。
 
-Note that in 'tooltip' mode, the normal `h|elp` command won't work. The `h|elp` entry must be added manually in the dict. As an example, this would reproduce the normal help functionality: 
+請注意，在「工具提示」模式下，正常的 `h|elp` 指令將無法運作。 `h|elp` 條目必須手動新增到字典中。例如，這將重現正常的幫助功能：
 
 ```python
 text = ("Node text", {("help", "h"): "Help entry...", ...})
 ```
 
-#### options
+(options)=
+#### 選項
 
-The `options` list describe all the choices available to the user when viewing this node. If `options` is returned as `None`, it means that this node is an *Exit node* - any text is displayed and then the menu immediately exits, running the `exit_cmd` if given.
+`options` 清單描述了使用者在檢視此節點時可用的所有選擇。如果 `options` 作為 `None` 返回，則表示該節點是*退出節點* - 顯示任何文字，然後選單立即退出，執行 `exit_cmd`（如果給定）。
 
-Otherwise, `options` should be a list (or tuple) of dictionaries, one for each option. If only one option is available, a single dictionary can also be returned. This is how it could look:
+否則，`options` 應該是一個字典列表（或元組），每個選項一個。如果只有一個選項可用，也可以傳回單一字典。它看起來是這樣的：
 
 
 ```python
@@ -326,7 +333,7 @@ def node_test(caller, raw_string, **kwargs):
 
 ```
 
-This will produce a menu node looking like this:
+這將產生一個如下所示的選單節點：
 
 
 ```
@@ -338,13 +345,14 @@ Defend: Hold back and defend yourself
 
 ```
 
-##### option-key 'key'
+(option-key-key)=
+##### 選項鍵 'key'
 
-The option's `key` is what the user should enter in order to choose that option. If given as a tuple, the first string of that tuple will be what is shown on-screen while the rest are aliases for picking that option. In the above example, the user could enter "Attack" (or "attack", it's not case-sensitive), "a" or "att" in order to attack the goblin. Aliasing is useful for adding custom coloring to the choice. The first element of the aliasing tuple should then be the colored version, followed by a version without color - since otherwise the user would have to enter the color codes to select that choice.
+此選項的 `key` 是使用者應該輸入的內容才能選擇該選項。如果以元組形式給出，則該元組的第一個字串將是螢幕上顯示的內容，而其餘字串是用於選擇該選項的別名。在上面的例子中，使用者可以輸入“Attack”（或“attack”，不區分大小寫）、“a”或“att”來攻擊妖精。別名對於向選擇新增自訂顏色很有用。別名元組的第一個元素應該是彩色版本，後面是沒有顏色的版本 - 否則使用者將必須輸入顏色程式碼才能選擇該選項。
 
-Note that the `key` is *optional*. If no key is given, it will instead automatically be replaced
-with a running number starting from `1`. If removing the `key` part of each option, the resulting
-menu node would look like this instead:
+請注意，`key` 是*可選*。如果沒有給出金鑰，它將自動被替換
+流水號從 `1` 開始。如果刪除每個選項的 `key` 部分，則結果
+選單節點將如下所示：
 
 
 ```
@@ -356,9 +364,9 @@ ________________________________
 
 ```
 
-Whether you want to use a key or rely on numbers is mostly a matter of style and the type of menu.
+無論您想使用按鍵還是依賴數字，主要取決於選單的風格和型別。
 
-EvMenu accepts one important special `key` given only as `"_default"`. This key is used when a user enters something that does not match any other fixed keys. It is particularly useful for getting user input:
+EvMenu 接受僅作為 `"_default"` 給出的一個重要特殊 `key`。當使用者輸入與任何其他固定鍵不符的內容時，將使用此鍵。它對於獲取使用者輸入特別有用：
 
 ```python
 def node_readuser(caller, raw_string, **kwargs):
@@ -371,18 +379,20 @@ def node_readuser(caller, raw_string, **kwargs):
 
 ```
 
-A `"_default"` option does not show up in the menu, so the above will just be a node saying
-`"Please enter your name"`. The name they entered will appear as `raw_string` in the next node.
+`"_default"` 選項不會出現在選單中，因此上面只是一個節點
+`"Please enter your name"`。他們輸入的名稱將在下一個節點中顯示為 `raw_string`。
 
 
-#### option-key 'desc'
+(option-key-desc)=
+#### 選項鍵“desc”
 
-This simply contains the description as to what happens when selecting the menu option. For `"_default"` options or if the `key` is already long or descriptive, it is not strictly needed. But usually it's better to keep the `key` short and put more detail in `desc`.
+這僅包含有關選擇選單選項時發生的情況的描述。對於 `"_default"` 選項或如果 `key` 已經很長或具有描述性，則不是嚴格需要的。但通常最好保持 `key` 簡短並在 `desc` 中放置更多細節。
 
 
-#### option-key 'goto'
+(option-key-goto)=
+#### 選項鍵“轉到”
 
-This is the operational part of the option and fires only when the user chooses said option. Here are three ways to write it
+這是選項的操作部分，僅當使用者選擇所述選項時才會觸發。這裡有三種寫法
 
 ```python
 
@@ -411,33 +421,35 @@ def node_select(caller, raw_string, **kwargs):
 
 ```
 
-As seen above, `goto` could just be pointing to a single `nodename` string - the name of the node to go to. When given like this, EvMenu will look for a node named like this and call its associated function as
+如上所示，`goto` 可能只是指向單一 `nodename` 字串 - 要轉到的節點的名稱。當像這樣給出時， EvMenu 將尋找這樣命名的節點並呼叫其關聯函式：
 
 ```python
     nodename(caller, raw_string, **kwargs)
 ```
 
-Here, `raw_string` is always the input the user entered to make that choice and `kwargs` are the same as those `kwargs` that already entered the *current* node (they are passed on).
+這裡，`raw_string` 始終是使用者在做出選擇時輸入的輸入，`kwargs` 與已經進入 *目前* 節點的 `kwargs` 相同（它們被傳遞）。
 
-Alternatively the `goto` could point to a "goto-callable". Such callables are usually defined in the same module as the menu nodes and given names starting with `_` (to avoid being parsed as nodes themselves). These callables will be called the same as a node function - `callable(caller, raw_string, **kwargs)`, where `raw_string` is what the user entered on this node and `**kwargs` is forwarded from the node's own input.
+或者，`goto` 可以指向「goto-callable」。此類可呼叫專案通常在與選單節點相同的模組中定義，並給出以 `_` 開頭的名稱（以避免被解析為節點本身）。這些可呼叫函式的呼叫方式與節點函式相同 - `callable(caller, raw_string, **kwargs)`，其中 `raw_string` 是使用者在此節點上輸入的內容，`**kwargs` 是從節點自己的輸入轉發的。
 
-The `goto` option key could also point to a tuple `(callable, kwargs)` - this allows for customizing the kwargs passed into the goto-callable, for example you could use the same callable but change the kwargs passed into it depending on which option was actually chosen.
+`goto` 選項鍵也可以指向元組 `(callable, kwargs)` - 這允許自訂傳遞到 goto-callable 的 kwargs，例如，您可以使用相同的可呼叫函式，但根據實際選擇的選項變更傳遞到其中的 kwargs。
 
-The "goto callable" must either return a string `"nodename"` or a tuple `("nodename", mykwargs)`. This will lead to the next node being called as either `nodename(caller, raw_string, **kwargs)` or `nodename(caller, raw_string, **mykwargs)` - so this allows changing (or replacing) the options going into the next node depending on what option was chosen.
+「goto callable」必須傳回字串 `"nodename"` 或元組 `("nodename", mykwargs)`。這將導致下一個節點被稱為 `nodename(caller, raw_string, **kwargs)` 或 `nodename(caller, raw_string, **mykwargs)` - 因此這允許根據選擇的選項更改（或替換）進入下一個節點的選項。
 
-There is one important case - if the goto-callable returns `None` for a `nodename`, *the current node will run again*, possibly with different kwargs. This makes it very easy to re-use a node over and over, for example allowing different options to update some text form being passed and manipulated for every iteration.
-
-
-### Temporary storage
-
-When the menu starts, the EvMenu instance is stored on the caller as `caller.ndb._evmenu`. Through this object you can in principle reach the menu's internal state if you know what you are doing. This is also a good place to store temporary, more global variables that may be cumbersome to keep passing from node to node via the `**kwargs`. The `_evmnenu` will be deleted automatically when the menu closes, meaning you don't need to worry about cleaning anything up.
-
-If you want *permanent* state storage, it's instead better to use an Attribute on `caller`. Remember that this will remain after the menu closes though, so you need to handle any needed cleanup yourself.
+有一個重要的情況 - 如果 goto-callable 對於 `nodename` 返回 `None`，*當前節點將再次執行*，可能會使用不同的 kwargs。這使得一遍又一遍地重複使用節點變得非常容易，例如允許不同的選項來更新每次迭代傳遞和操作的某些文字表單。
 
 
-### Customizing Menu formatting
+(temporary-storage)=
+### 暫存
 
-The `EvMenu` display of nodes, options etc are controlled by a series of formatting methods on the `EvMenu` class. To customize these, simply create a new child class of `EvMenu` and override as needed. Here is an example:
+當選單啟動時，EvMenu 例項在呼叫方上儲存為 `caller.ndb._evmenu`。如果您知道自己在做什麼，則原則上可以透過此物件到達選單的內部狀態。這也是儲存臨時的、更多全域變數的好地方，這些變數透過 `**kwargs` 在節點之間傳遞可能會很麻煩。選單關閉時，`_evmnenu` 將自動刪除，這表示您無需擔心清理任何內容。
+
+如果您想要*永久*狀態儲存，最好在 `caller` 上使用 Attribute。請記住，選單關閉後它將保留，因此您需要自己處理任何所需的清理工作。
+
+
+(customizing-menu-formatting)=
+### 自訂選單格式
+
+`EvMenu` 節點、選項等的顯示由 `EvMenu` 類別上的一系列格式化方法控制。要自訂這些，只需建立 `EvMenu` 的新子類別並根據需要進行覆蓋即可。這是一個例子：
 
 ```python
 from evennia.utils.evmenu import EvMenu
@@ -497,27 +509,28 @@ class MyEvMenu(EvMenu):
         """
 
 ```
-See `evennia/utils/evmenu.py` for the details of their default implementations.
+有關其預設實現的詳細資訊，請參閱 `evennia/utils/evmenu.py`。
 
-## EvMenu templating language
+(evmenu-templating-language)=
+## EvMenu 範本語言
 
-In `evmenu.py` are two helper functions `parse_menu_template` and `template2menu` that is used to parse a _menu template_ string into an EvMenu:
+`evmenu.py` 中有兩個輔助函式 `parse_menu_template` 和 `template2menu`，用於將 _menu template_ 字串解析為 EvMenu：
 
     evmenu.template2menu(caller, menu_template, goto_callables)
 
-One can also do it in two steps, by generate a menutree and using that to call
-EvMenu normally:
+也可以分兩步完成，產生一個選單樹並使用它來呼叫
+EvMenu 通常：
 
     menutree = evmenu.parse_menu_template(caller, menu_template, goto_callables)
     EvMenu(caller, menutree)
 
-With this latter solution, one could mix and match normally created menu nodes
-with those generated by the template engine.
+使用後一種解決方案，可以混合和匹配正常建立的選單節點
+與模板引擎生成的那些。
 
-The `goto_callables` is a mapping `{"funcname": callable, ...}`, where each
-callable must be a module-global function on the form
-`funcname(caller, raw_string, **kwargs)` (like any goto-callable). The
-`menu_template` is a multi-line string on the following form:
+`goto_callables` 是一個對映 `{"funcname": callable,...}`，其中每個
+callable 必須是表單上的模組全域函式
+`funcname(caller, raw_string, **kwargs)`（就像任何 goto-callable 一樣）。的
+`menu_template` 是以下形式的多行字串：
 
 ```python
 menu_template = """
@@ -534,34 +547,35 @@ key3: desc3 -> node4
 """
 ```
 
-Each menu node is defined by a `## node <name>` containing the text of the node,
-followed by `## options` Also `## NODE` and `## OPTIONS` work. No python code
-logics is allowed in the template, this code is not evaluated but parsed. More
-advanced dynamic usage requires a full node-function.
+每個選單節點由包含該節點文字的 `## node <name>` 定義，
+其次是`## options` `## NODE` 和`## OPTIONS` 也有效。沒有Python程式碼
+模板中允許使用邏輯，該程式碼不會被評估，而是會被解析。更多
+進階動態使用需要完整的節點功能。
 
-Except for defining the node/options, `#` act as comments - everything following
-will be ignored by the template parser.
+除了定義節點/選項之外，`#` 充當註釋 - 以下內容
+將被模板解析器忽略。
 
-### Template Options
+(template-options)=
+### 模板選項
 
-The option syntax is
+選項語法是
 
     <key>: [desc ->] nodename or function-call
 
-The 'desc' part is optional, and if that is not given, the `->` can be skipped
-too:
+'desc' 部分是可選的，如果未給出，則可以跳過 `->`
+太：
 
     key: nodename
 
-The key can both be strings and numbers. Separate the aliases with `;`.
+鍵可以是字串和數字。以 `;` 分隔別名。
 
     key: node1
     1: node2
     key;k: node3
     foobar;foo;bar;f;b: node4
 
-Starting the key with the special letter `>` indicates that what follows is a
-glob/regex matcher.
+以特殊字母`>`開頭的鍵表示後面是
+glob/正規表示式匹配器。
 
     >: node1          - matches empty input
     > foo*: node1     - everything starting with foo
@@ -569,27 +583,28 @@ glob/regex matcher.
     > [0-9]+?: node4  - regex (all numbers)
     > *: node5        - catches everything else (put as last option)
 
-Here's how to call a goto-function from an option:
+以下是從選項呼叫 goto 函式的方法：
 
     key: desc -> myfunc(foo=bar)
 
-For this to work `template2menu` or `parse_menu_template` must be given a dict
-that includes `{"myfunc": _actual_myfunc_callable}`. All callables to be
-available in the template must be mapped this way. Goto callables act like
-normal EvMenu goto-callables and should have a callsign of
-`_actual_myfunc_callable(caller, raw_string, **kwargs)` and return the next node
-(passing dynamic kwargs into the next node does not work with the template
-- use the full EvMenu if you want advanced dynamic data passing).
+為此，必須給 `template2menu` 或 `parse_menu_template` 一個字典
+其中包括`{"myfunc": _actual_myfunc_callable}`。所有可呼叫物件都是
+模板中可用的內容必須以這種方式對應。 Goto 可呼叫的行為就像
+正常的 EvMenu goto-callables 並且應該有一個呼號
+`_actual_myfunc_callable(caller, raw_string, **kwargs)`並回傳下一個節點
+（將動態 kwargs 傳遞到下一個節點不適用於模板
+- 如果您想要進階動態資料傳遞，請使用完整的EvMenu）。
 
-Only no or named keywords are allowed in these callables. So
+這些可呼叫物件中只允許不使用或命名關鍵字。所以
 
     myfunc()         # OK
     myfunc(foo=bar)  # OK
     myfunc(foo)      # error!
 
-This is because these properties are passed as `**kwargs` into the goto callable.
+這是因為這些屬性作為 `**kwargs` 傳遞到 goto 可呼叫函式。
 
-### Templating example
+(templating-example)=
+### 模板化範例
 
 ```python
 from random import random
@@ -649,24 +664,26 @@ evmenu.template2menu(caller, template_string, goto_callables)
 
 ```
 
-## Asking for one-line input
+(asking-for-one-line-input)=
+## 要求單行輸入
 
-This describes two ways for asking for simple questions from the user. Using Python's `input`
-will *not* work in Evennia. `input` will *block* the entire server for *everyone* until that one
-player has entered their text, which is not what you want.
+這描述了向使用者詢問簡單問題的兩種方法。使用Python的`input`
+在 Evennia 中*不起作用*。 `input` 將為*所有人**阻止*整個伺服器，直到那個人
+玩家已輸入他們的文字，這不是您想要的。
 
-### The `yield` way
+(the-yield-way)=
+### `yield`方式
 
-In the `func` method of your Commands (only) you can use Python's built-in `yield` command to
-request input in a similar way to `input`. It looks like this:
+在指令的 `func` 方法中（僅），您可以使用 Python 的內建 `yield` 指令來
+以與 `input` 類似的方式請求輸入。它看起來像這樣：
 
 ```python
 result = yield("Please enter your answer:")
 ```
 
-This will send "Please enter your answer" to the Command's `self.caller` and then pause at that
-point. All other players at the server will be unaffected. Once caller enteres a reply, the code
-execution will continue and you can do stuff with the `result`. Here is an example:
+這會將「請輸入您的答案」傳送到指令的 `self.caller`，然後在此暫停
+點。伺服器上的所有其他玩家將不受影響。一旦呼叫者輸入回覆，程式碼
+執行將繼續，您可以使用 `result` 執行操作。這是一個例子：
 
 ```python
 from evennia import Command
@@ -679,34 +696,35 @@ class CmdTestInput(Command):
         self.caller.msg(f"You now entered {result2}.")
 ```
 
-Using `yield` is simple and intuitive, but it will only access input from `self.caller` and you
-cannot abort or time out the pause until the player has responded. Under the hood, it is actually
-just a wrapper calling `get_input` described in the following section.
+使用 `yield` 簡單直觀，但它只能存取來自 `self.caller` 的輸入，並且您
+在玩家做出回應之前，無法中止或逾時暫停。在幕後，它實際上是
+只是一個呼叫下一節中描述的 `get_input` 的包裝器。
 
-> Important Note: In Python you *cannot mix `yield` and `return <value>` in the same method*. It has
-> to do with `yield` turning the method into a
-> [generator](https://www.learnpython.org/en/Generators). A `return` without an argument works, you
-> can just not do `return <value>`. This is usually not something you need to do in `func()` anyway,
-> but worth keeping in mind.
+> 重要提示：在 Python 中，您*無法在相同方法中混合 `yield` 和 `return <value>`*。它有
+> 與 `yield` 將方法變成
+> [發電機](https://www.learnpython.org/en/Generators)。不含引數的 `return` 可以工作，你
+> 不能做`return <value>`。無論如何，這通常不是你需要在 `func()` 中做的事情，
+> 但值得記住。
 
-### The `get_input` way
+(the-get_input-way)=
+### `get_input`方式
 
-The evmenu module offers a helper function named `get_input`. This is wrapped by the `yield`
-statement which is often easier and more intuitive to use. But `get_input` offers more flexibility
-and power if you need it. While in the same module as `EvMenu`, `get_input` is technically unrelated
-to it. The `get_input` allows you to ask and receive simple one-line input from the user without
-launching the full power of a menu to do so. To use, call `get_input` like this:
+evmenu 模組提供了一個名為 `get_input` 的輔助函式。這是由 `yield` 包裹的
+語句使用起來通常更容易、更直覺。但 `get_input` 提供了更大的靈活性
+和電源（如果您需要的話）。雖然與 `EvMenu` 位於同一模組中，但 `get_input` 在技術上不相關
+到它。 `get_input` 允許您詢問並接收使用者的簡單一行輸入，而無需
+啟動選單的全部功能來執行此操作。要使用，請像這樣呼叫 `get_input`：
 
 ```python
 get_input(caller, prompt, callback)
 ```
 
-Here `caller` is the entity that should receive the prompt for input given as `prompt`. The
-`callback` is a callable `function(caller, prompt, user_input)` that you define to handle the answer
-from the user. When run, the caller will see `prompt` appear on their screens and *any* text they
-enter will be sent into the callback for whatever processing you want.
+這裡 `caller` 是應該接收 `prompt` 輸入提示的實體。的
+`callback` 是您定義用來處理答案的可呼叫 `function(caller, prompt, user_input)`
+來自使用者。執行時，呼叫者將看到 `prompt` 出現在他們的螢幕上以及他們的*任何*文字
+Enter 將被傳送到回呼中以進行您想要的任何處理。
 
-Below is a fully explained callback and example call:
+以下是完整解釋的回撥和範例呼叫：
 
 ```python
 from evennia import Command
@@ -733,7 +751,7 @@ def callback(caller, prompt, user_input):
 get_input(caller, "Write something! ", callback)
 ```
 
-This will show as
+這將顯示為
 
 ```
 Write something!
@@ -742,20 +760,21 @@ When asked 'Write something!', you answered 'Hello'.
 
 ```
 
-Normally, the `get_input` function quits after any input, but as seen in the example docs, you could
-return True from the callback to repeat the prompt until you pass whatever check you want.
+通常， `get_input` 函式在任何輸入後都會退出，但如範例檔案所示，您可以
+從回撥中返回 True 以重複提示，直到透過您想要的任何檢查。
 
-> Note: You *cannot* link consecutive questions by putting a new `get_input` call inside the
-> callback If you want that you should use an EvMenu instead (see the [Repeating the same
-> node](./EvMenu.md#example-repeating-the-same-node) example above). Otherwise you can either peek at the
-> implementation of `get_input` and implement your own mechanism (it's just using cmdset nesting) or
-> you can look at [this extension suggested on the mailing
-> list](https://groups.google.com/forum/#!category-topic/evennia/evennia-questions/16pi0SfMO5U).
+> 注意：您*不能*透過在問題中新增新的`get_input` 呼叫來連結連續的問題
+> 回撥 如果您希望您應該使用 EvMenu 代替（請參閱[重複相同
+> 節點](./EvMenu.md#example-repeating-the-same-node) 上面的範例）。否則您可以檢視
+> `get_input` 的實現並實現你自己的機制（它只是使用 cmdset 巢狀）或
+> 你可以看看[郵件中建議的這個擴充套件
+> 列表](https://groups.google.com/forum/#!category-topic/evennia/evennia-questions/16pi0SfMO5U)。
 
 
-#### Example: Yes/No prompt
+(example-yesno-prompt)=
+#### 範例：是/否提示
 
-Below is an example of a Yes/No prompt using the `get_input` function:
+以下是使用 `get_input` 函式的「是/否」提示的範例：
 
 ```python
 def yesno(caller, prompt, result):
@@ -774,10 +793,11 @@ def yesno(caller, prompt, result):
 get_input(caller, "Is Evennia great (Yes/No)?", yesno)
 ```
 
-## The `@list_node` decorator
+(the-list_node-decorator)=
+## `@list_node` 裝飾器
 
-The `evennia.utils.evmenu.list_node` is an advanced decorator for use with `EvMenu` node functions.
-It is used to quickly create menus for manipulating large numbers of items.
+`evennia.utils.evmenu.list_node` 是與 `EvMenu` 節點函式一起使用的高階裝飾器。
+它用於快速建立用於操作大量專案的選單。
 
 
 ```
@@ -793,8 +813,8 @@ ______________________________________________
 
 ```
 
-The menu will automatically create an multi-page option listing that one can flip through. One can
-inpect each entry and then select them with prev/next. This is how it is used:
+此選單將自動建立一個可以翻閱的多頁選項清單。一個可以
+檢查每個條目，然後使用上一個/下一個選擇它們。它的使用方式如下：
 
 
 ```python
@@ -818,22 +838,23 @@ def node_mylist(caller, raw_string, **kwargs):
 
 ```
 
-The `options` argument to `list_node` is either a list, a generator or a callable returning a list
-of strings for each option that should be displayed in the node.
+`list_node` 的 `options` 引數是清單、產生器或傳回清單的可呼叫函式
+應在節點中顯示的每個選項的字串。
 
-The `select` is a callable in the example above but could also be the name of a menu node. If a
-callable, the `menuchoice` argument holds the selection done and `available_choices` holds all the
-options available. The callable should return the menu to go to depending on the selection (or
-`None` to rerun the same node). If the name of a menu node, the selection will be passed as
-`selection` kwarg to that node.
+`select` 在上面的範例中是可呼叫的，但也可以是選單節點的名稱。如果一個
+可呼叫，`menuchoice` 引數儲存已完成的選擇，`available_choices` 儲存所有
+可用選項。可呼叫物件應根據選擇返回要轉到的選單（或
+`None` 重新執行相同節點）。如果是選單節點的名稱，則選擇將作為
+`selection` kwarg 到該節點。
 
-The decorated node itself should return `text` to display in the node. It must return at least an
-empty dictionary for its options. It returning options, those will supplement the options
-auto-created by the `list_node` decorator.
+裝飾節點本身應該會傳回 `text` 以顯示在節點中。它必須至少返回一個
+其選項為空字典。它會返回選項，這些選項將補充選項
+由 `list_node` 裝飾器自動建立。
 
-## Example Menus
+(example-menus)=
+## 選單範例
 
-Here is a diagram to help visualize the flow of data from node to node, including goto-callables in-between: 
+這是一個圖表，可協助視覺化從節點到節點的資料流，包括中間的 goto-callables：
 
 ```
         ┌─
@@ -887,30 +908,31 @@ callable│                                          │                        
         └─
 ```
 
-Above we create a very simple/stupid menu (in the `EvMenu` call at the end) where we map the node identifier `"node_A"` to the Python function `nodeA` and `"node_B"` to the function `nodeB`. 
+上面我們建立了一個非常簡單/愚蠢的選單（在最後的 `EvMenu` 呼叫中），我們將節點識別符號 `"node_A"` 對映到 Python 函式 `nodeA` 並將 `"node_B"` 對映到函式 `nodeB`。
 
-We start the menu in `"node_A"` where we get three options A, B and C.  Options A and B will route via a a goto-callable `_callback` that either multiples or adds the numbers 2 and 3 together before continuing to `"node_B"`. Option C routes directly to `"node_B"`, passing the number 5. 
+我們從 `"node_A"` 開始選單，我們得到三個選項 A、B 和 C。選項 A 和 B 將透過一個可呼叫的 `_callback` 進行路由，在繼續到 `"node_B"` 之前將數字 2 和 3 相乘或相加。選項 C 直接路由到 `"node_B"`，傳遞數字 5。
 
-In every step, we pass a dict which becomes the ingoing `**kwargs` in the next step. If we didn't pass anything (it's optional), the next step's `**kwargs` would just be empty.
+在每一步中，我們都會傳遞一個字典，該字典將在下一步中成為傳入的 `**kwargs` 。如果我們沒有傳遞任何內容（它是可選的），下一步的 `**kwargs` 將是空的。
 
-More examples:
+更多範例：
 
-- **[Simple branching menu](./EvMenu.md#example-simple-branching-menu)** - choose from options
-- **[Dynamic goto](./EvMenu.md#example-dynamic-goto)** - jumping to different nodes based on response
-- **[Set caller properties](./EvMenu.md#example-set-caller-properties)** - a menu that changes things
-- **[Getting arbitrary input](./EvMenu.md#example-get-arbitrary-input)** - entering text
-- **[Storing data between nodes](./EvMenu.md#example-storing-data-between-nodes)** - keeping states and
-information while in the menu
-- **[Repeating the same node](./EvMenu.md#example-repeating-the-same-node)** - validating within the node
-before moving to the next
-- **[Yes/No prompt](#example-yesno-prompt)** - entering text with limited possible responses
-(this is *not* using EvMenu but the conceptually similar yet technically unrelated `get_input`
-helper function accessed as `evennia.utils.evmenu.get_input`).
+- **[簡單分支選單](./EvMenu.md#example-simple-branching-menu)** - 從選項中選擇
+- **[動態跳轉](./EvMenu.md#example-dynamic-goto)** - 根據回應跳到不同節點
+- **[設定呼叫者屬性](./EvMenu.md#example-set-caller-properties)** - 可以更改內容的選單
+- **[取得任意輸入](./EvMenu.md#example-get-arbitrary-input)** - 輸入文字
+- **[在節點之間儲存資料](./EvMenu.md#example-storing-data-between-nodes)** - 保持狀態和
+選單中的資訊
+- **[重複相同節點](./EvMenu.md#example-repeating-the-same-node)** - 在節點內驗證
+在進入下一個之前
+- **[是/否提示](#example-yesno-prompt)** - 輸入可能回應有限的文字
+（這*不是*使用EvMenu，而是概念上相似但技術上不相關的`get_input`
+輔助函式以 `evennia.utils.evmenu.get_input` 的形式存取）。
 
 
-### Example: Simple branching menu
+(example-simple-branching-menu)=
+### 範例：簡單的分支選單
 
-Below is an example of a simple branching menu node leading to different other nodes depending on choice:
+以下是一個簡單的分支選單節點的範例，根據選擇導致不同的其他節點：
 
 ```python
 # in mygame/world/mychargen.py
@@ -931,7 +953,7 @@ EvMenu(caller, "world.mychargen", startnode="define_character")
 
 ```
 
-This will result in the following node display:
+這將導致以下節點顯示：
 
 ```
 What aspect of your character do you want
@@ -941,17 +963,18 @@ _________________________
 2: Change the description
 ```
 
-Note that since we didn't specify the "name" key, EvMenu will let the user enter numbers instead. In
-the following examples we will not include the `EvMenu` call but just show nodes running inside the
-menu. Also, since `EvMenu` also takes a dictionary to describe the menu, we could have called it
-like this instead in the example:
+請注意，由於我們沒有指定「name」鍵，EvMenu 將讓使用者輸入數字。在
+在下面的範例中，我們將不包含 `EvMenu` 呼叫，而僅顯示在
+選單。另外，由於 `EvMenu` 也使用字典來描述選單，因此我們可以將其稱為
+在範例中就像這樣：
 
 ```python
 EvMenu(caller, {"define_character": define_character}, startnode="define_character")
 
 ```
 
-### Example: Dynamic goto
+(example-dynamic-goto)=
+### 範例：動態跳轉
 
 ```python
 
@@ -970,16 +993,17 @@ def enter_guild:
     return text, options
 ```
 
-This simple callable goto will analyse what happens depending on who the `caller` is.  The
-`enter_guild` node will give you a choice of what to say to the guard. If you try to enter, you will
-end up in different nodes depending on (in this example) if you have the right [Tag](./Tags.md) set on
-yourself or not. Note that since we don't include any 'key's in the option dictionary, you will just
-get to pick between numbers.
+這個簡單的可呼叫 goto 將根據 `caller` 是誰來分析發生的情況。  的
+`enter_guild`節點會讓你選擇對守衛說些什麼。如果您嘗試進入，您將
+最終會出現在不同的節點中，這取決於（在本例中）您是否設定了正確的 [Tag](./Tags.md)
+無論你自己與否。請注意，由於我們在選項字典中不包含任何“鍵”，因此您只需
+可以在數字之間進行選擇。
 
-### Example: Set caller properties
+(example-set-caller-properties)=
+### 範例：設定呼叫者屬性
 
-Here is an example of passing arguments into the `goto` callable and use that to influence
-which node it should go to next:
+這是將引數傳遞到 `goto` 可呼叫函式並使用它來影響的範例
+下一個應該轉到哪個節點：
 
 ```python
 
@@ -1012,7 +1036,7 @@ def node_background(caller):
     return text, options
 ```
 
-This will give the following output:
+這將給出以下輸出：
 
 ```
 Kovash the magnificent experienced a traumatic event
@@ -1023,15 +1047,16 @@ betrayal: The betrayal of a trusted grown-up
 
 ```
 
-Note above how we use the `_set_attribute` helper function to set the attribute depending on the
-User's choice. In thie case the helper function doesn't know anything about what node called it - we
-even tell it which nodename it should return, so the choices leads to different paths in the menu.
-We could also imagine the helper function analyzing what other choices
+請注意上面我們如何使用 `_set_attribute` 輔助函式來設定 attribute 根據
+使用者的選擇。在這種情況下，輔助函式不知道任何關於哪個節點呼叫它的資訊 - 我們
+甚至告訴它應該返回哪個節點名，因此選擇會導致選單中的不同路徑。
+我們還可以想像輔助函式分析哪些其他選擇
 
 
-### Example: Get arbitrary input
+(example-get-arbitrary-input)=
+### 範例：取得任意輸入
 
-An example of the menu asking the user for input - any input.
+詢問使用者輸入的選單範例 - 任何輸入。
 
 ```python
 
@@ -1072,7 +1097,7 @@ def enter_name(caller, raw_string, **kwargs):
 
 ```
 
-This will display as
+這將顯示為
 
 ```
 Enter your character's name or <return> to abort.
@@ -1088,20 +1113,21 @@ Set name to Gandalf.
 
 ```
 
-Here we re-use the same node twice for reading the input data from the user. Whatever we enter will
-be caught by the `_default` option and passed into the helper function. We also pass along whatever
-name we have entered before. This allows us to react correctly on an "empty" input - continue to the
-node named `"node_background"` if we accept the input or go to an exit node if we presses Return
-without entering anything. By returning `None` from the helper function we automatically re-run the
-previous node, but updating its ingoing kwargs to tell it to display a different text.
+在這裡，我們重複使用同一節點兩次來讀取使用者的輸入資料。無論我們輸入什麼都會
+被 `_default` 選項捕獲並傳遞到輔助函式。我們也傳遞一切
+我們之前輸入過的名稱。這使我們能夠對“空”輸入做出正確反應 - 繼續
+如果我們接受輸入，則名為 `"node_background"` 的節點；如果按 Return 鍵，則轉到退出節點
+無需輸入任何內容。透過從輔助函式返回`None`，我們自動重新執行
+前一個節點，但更新其傳入的 kwargs 以告訴它顯示不同的文字。
 
 
 
-### Example: Storing data between nodes
+(example-storing-data-between-nodes)=
+### 範例：在節點之間儲存資料
 
-A convenient way to store data is to store it on the `caller.ndb._evmenu` which you can reach from
-every node. The advantage of doing this is that the `_evmenu` NAttribute will be deleted
-automatically when you exit the menu.
+儲存資料的一種便捷方法是將其儲存在您可以存取的`caller.ndb._evmenu`上
+每個節點。這樣做的好處是 `_evmenu` NAttribute 將被刪除
+退出選單時自動。
 
 ```python
 
@@ -1134,21 +1160,22 @@ def node_view_sheet(caller):
 
 ```
 
-Instead of passing the character sheet along from node to node through the `kwargs` we instead
-set it up temporarily on `caller.ndb._evmenu.charactersheet`. This makes it easy to reach from
-all nodes. At the end we look at it and, if we accept the character the menu will likely save the
-result to permanent storage and exit.
+我們不是透過 `kwargs` 將字元表從一個節點傳遞到另一個節點，而是
+暫時設定在`caller.ndb._evmenu.charactersheet`。這使得您可以輕鬆地從
+所有節點。最後我們檢視它，如果我們接受該字元，選單可能會儲存
+結果永久儲存並退出。
 
-> One point to remember though is that storage on `caller.ndb._evmenu` is not persistent across
-> `@reloads`. If you are using a persistent menu (using `EvMenu(..., persistent=True)` you should
-use
-> `caller.db` to store in-menu data like this as well. You must then yourself make sure to clean it
-> when the user exits the menu.
+> 但要記住的一點是 `caller.ndb._evmenu` 上的儲存不會持久存在
+> `@reloads`。如果您使用持久選單（使用 `EvMenu(..., persistent=True)` 您應該
+使用
+> `caller.db` 也可以像這樣儲存選單內資料。然後你必須自己確保清潔它
+> 當使用者退出選單時。
 
 
-### Example: Repeating the same node
+(example-repeating-the-same-node)=
+### 範例：重複相同的節點
 
-Sometimes you want to make a chain of menu nodes one after another, but you don't want the user to be able to continue to the next node until you have verified that what they input in the previous node is ok. A common example is a login menu:
+有時您想要一個接一個地建立一系列選單節點，但您不希望使用者能夠繼續到下一個節點，直到您驗證他們在前一個節點中輸入的內容正確為止。一個常見的例子是登入選單：
 
 
 ```python
@@ -1192,7 +1219,7 @@ def node_password(caller, raw_string, **kwargs):
 
 ```
 
-This will display something like
+這將顯示類似的內容
 
 
 ```
@@ -1221,16 +1248,17 @@ Password error. Try again.
 --------------------------
 ```
 
-And so on.
+等等。
 
-Here the goto-callables will return to the previous node if there is an error. In the case of
-password attempts, this will tick up the `nattempts` argument that will get passed on from iteration
-to iteration until too many attempts have been made.
+如果發生錯誤，goto-callables 將會回到前一個節點。如果是
+密碼嘗試，這將勾選將從迭代中傳遞的 `nattempts` 引數
+迭代，直到進行了太多次嘗試。
 
 
-### Defining nodes in a dictionary
+(defining-nodes-in-a-dictionary)=
+### 定義字典中的節點
 
-You can also define your nodes directly in a dictionary to feed into the `EvMenu` creator.
+您也可以直接在字典中定義節點以饋送到 `EvMenu` 建立者。
 
 ```python
 def mynode(caller):
@@ -1254,18 +1282,18 @@ EvMenu(caller, menu_data, startnode="node1")
 
 ```
 
-The keys of the dictionary become the node identifiers. You can use any callable on the right form
-to describe each node. If you use Python `lambda` expressions you can make nodes really on the fly.
-If you do, the lambda expression must accept one or two arguments and always return a tuple with two
-elements (the text of the node and its options), same as any menu node function.
+字典的鍵成為節點識別符號。您可以在正確的表單上使用任何可呼叫的
+來描述每個節點。如果您使用 Python `lambda` 表示式，您可以真正動態地建立節點。
+如果這樣做，則 lambda 表示式必須接受一個或兩個引數，並且始終傳回一個包含兩個引數的元組
+元素（節點的文字及其選項），與任何選單節點功能相同。
 
-Creating menus like this is one way to present a menu that changes with the circumstances - you
-could for example remove or add nodes before launching the menu depending on some criteria. The
-drawback is that a `lambda` expression [is much more
-limited](https://docs.python.org/2/tutorial/controlflow.html#lambda-expressions) than a full
-function - for example you can't use other Python keywords like `if` inside the body of the
-`lambda`.
+建立這樣的選單是呈現隨情況變化的選單的一種方法 - 您
+例如，可以根據某些條件在啟動功能表之前刪除或新增節點。的
+缺點是 `lambda` 表示式 [ 更
+有限](https://docs.python.org/2/tutorial/controlflow.html#lambda-expressions) 比完整
+函式 - 例如，您不能在函式體內使用其他 Python 關鍵字，例如 `if`
+`lambda`。
 
-Unless you are dealing with a relatively simple dynamic menu, defining menus with lambda's is
-probably more work than it's worth: You can create dynamic menus by instead making each node
-function more clever. See the [NPC shop tutorial](../Howtos/Tutorial-NPC-Merchants.md) for an example of this.
+除非您正在處理相對簡單的動態選單，否則使用 lambda 定義選單是
+可能比其價值更多的工作：您可以透過建立每個節點來建立動態選單
+功能更加巧妙。有關範例，請參閱 [NPC 商店教學](../Howtos/Tutorial-NPC-Merchants.md)。

@@ -1,28 +1,29 @@
-# FuncParser inline text parsing
+(funcparser-inline-text-parsing)=
+# FuncParser內嵌文字解析
 
-The [FuncParser](evennia.utils.funcparser.FuncParser) extracts and executes 'inline functions' embedded in a string on the form `$funcname(args, kwargs)`, executes the matching 'inline function' and replaces the call with the return from the call.  
+[FuncParser](evennia.utils.funcparser.FuncParser) 提取並執行嵌入在 `$funcname(args, kwargs)` 形式的字串中的“行內函數”，執行匹配的“行內函數”並將呼叫替換為呼叫的返回值。
 
-To test it, let's tell Evennia to apply the Funcparser on every outgoing message. This is disabled by default (not everyone needs this functionality). To activate, add to your settings file: 
+為了測試它，讓我們告訴 Evennia 在每個傳出訊息上應用 Funcparser。預設會停用此功能（並非每個人都需要此功能）。要啟用，請新增到您的設定檔：
 
-	FUNCPARSER_PARSE_OUTGOING_MESSAGES_ENABLED = True
+FUNCPARSER_PARSE_OUTGOING_MESSAGES_ENABLED = 正確
 
-After a reload, you can try this in-game 
+重新載入後，您可以在遊戲中嘗試此操作
 
 ```shell
 > say I got $randint(1,5) gold!
 You say "I got 3 gold!"
 ```
 
-To escape the inlinefunc (e.g. to explain to someone how it works, use `$$`)
+要轉義 inlinefunc（e.g。向某人解釋它是如何工作的，請使用 `$$`）
 
 ```{shell}
 > say To get a random value from 1 to 5, use $$randint(1,5).
 You say "To get a random value from 1 to 5, use $randint(1,5)."
 ```
 
-While `randint` may look and work just like `random.randint` from the standard Python library, it is _not_. Instead it's an `inlinefunc` named `randint` made available to Evennia (which in turn uses the standard library function). For security reasons, only functions explicitly assigned to be used as inlinefuncs are viable. 
+雖然 `randint` 的外觀和工作方式可能與標準 Python 庫中的 `random.randint` 類似，但它_不是_。相反，它是一個名為 `randint` 的 `inlinefunc`，可供 Evennia 使用（後者又使用標準函式庫函式）。出於安全原因，只有明確指定用作行內函數的函式才是可行的。
 
-You can apply the `FuncParser`  manually. The parser is initialized with the inlinefunc(s) it's supposed to recognize in that string. Below is an example of a parser only understanding a single `$pow` inlinefunc: 
+您可以手動應用`FuncParser`。解析器使用它應該在該字串中識別的 inlinefunc 進行初始化。下面是一個解析器只理解單一 `$pow` inlinefunc 的範例：
 
 ```python
 from evennia.utils.funcparser import FuncParser
@@ -36,39 +37,40 @@ def _power_callable(*args, **kwargs):
 parser = FuncParser({"pow": _power_callable})
 
 ```
-Next, just pass a string into the parser, containing `$func(...)` markers:
+接下來，只需將字串傳遞到解析器中，其中包含 `$func(...)` 標記：
 
 ```python
 parser.parse("We have that 4 x 4 x 4 is $pow(4, power=3).")
 "We have that 4 x 4 x 4 is 64."
 ```
 
-Normally the return is always converted to a string but you can also get the actual data type from the call:
+通常返回總是轉換為字串，但您也可以從呼叫中獲取實際的資料型別：
 
 ```python
 parser.parse_to_any("$pow(4)")
 16
 ```
 
-You don't have to define all your inline functions from scratch. In `evennia.utils.funcparser` you'll find ready-made dicts of inline-funcs you can import and plug into your parsers. See [default funcparser callables](#default-funcparser-callables) below for the defails. 
+您不必從頭開始定義所有行內函數。在 `evennia.utils.funcparser` 中，您將找到可以匯入並插入解析器的現成的內嵌函式字典。有關缺陷，請參閱下面的[預設 funcparser 可呼叫物件](#default-funcparser-callables)。
 
-## Working with FuncParser
+(working-with-funcparser)=
+## 與 FuncParser 一起工作
 
-The FuncParser can be applied to any string. Out of the box it's applied in a few situations:
+FuncParser 可以應用於任何字串。開箱即用，它適用於以下幾種情況：
 
-- _Outgoing messages_. All messages sent from the server is processed through FuncParser and every callable is provided the [Session](./Sessions.md) of the object receiving the message. This potentially allows a message to be modified on the fly to look different for different recipients.
-- _Prototype values_. A [Prototype](./Prototypes.md) dict's values are run through the parser such that every callable gets a reference to the rest of the prototype. In the Prototype ORM, this would allow builders to safely call functions to set non-string values to prototype values, get random values, reference
-  other fields of the prototype, and more.
-- _Actor-stance in messages to others_. In the [Object.msg_contents](evennia.objects.objects.DefaultObject.msg_contents) method, the outgoing string is parsed for special `$You()` and `$conj()` callables to decide if a given recipient
-  should see "You" or the character's name.
+- _傳出訊息_。從伺服器傳送的所有訊息都透過 FuncParser 進行處理，並且每個可呼叫物件都提供接收訊息的物件的 [Session](./Sessions.md)。這可能允許即時修改訊息，使不同的收件者看起來有所不同。
+- _原型值_。 [Prototype](./Prototypes.md) 字典的值透過解析器執行，以便每個可呼叫物件都獲得原型其餘部分的參考。在原型 ORM 中，這將允許建構者安全地呼叫函式將非字串值設為原型值、獲取隨機值、引用
+原型的其他領域等等。
+- _向他人傳達訊息時的演員立場_。在 [Object.msg_contents](evennia.objects.objects.DefaultObject.msg_contents) 方法中，將解析傳出字串以查詢特殊的 `$You()` 和 `$conj()` 可呼叫物件，以確定給定收件人是否
+應該看到“你”或角色的名字。
 
 ```{important}
 
-The inline-function parser is not intended as a 'softcode' programming language. It does not have things like loops and conditionals, for example. While you could in principle extend it to do very advanced things and allow builders a lot of power, all-out coding is something Evennia expects you to do in a proper text editor, outside of the game, not from inside it.
+內嵌函式解析器並非設計為「軟程式碼」程式語言。例如，它沒有迴圈和條件等內容。雖然原則上您可以擴充套件它來執行非常高階的操作並為構建者提供大量功能，但Evennia 希望您在遊戲外部而不是遊戲內部在適當的文字編輯器中進行全面編碼。
 ```
 
-You can apply inline function parsing to any string. The
-[FuncParser](evennia.utils.funcparser.FuncParser) is imported as `evennia.utils.funcparser`.
+您可以將行內函數解析套用至任何字串。的
+[FuncParser](evennia.utils.funcparser.FuncParser) 匯入為 `evennia.utils.funcparser`。
 
 ```python
 from evennia.utils import funcparser
@@ -82,43 +84,43 @@ parsed_string = parser.parse(input_string, raise_errors=False,
 parser = FuncParser(["game.myfuncparser_callables", "game.more_funcparser_callables"])
 ```
 
-Here, `callables` points to a collection of normal Python functions (see next section) for you to make
-available to the parser as you parse strings with it. It can either be
-- A `dict` of `{"functionname": callable, ...}`. This allows you to pick and choose exactly which callables
-  to include and how they should be named. Do you want a callable to be available under more than one name?
-  Just add it multiple times to the dict, with a different key.
-- A `module` or (more commonly) a `python-path` to a module. This module can define a dict
-  `FUNCPARSER_CALLABLES = {"funcname": callable, ...}` - this will be imported and used like the `dict` above.
-  If no such variable is defined, _every_ top-level function in the module (whose name doesn't start with
-  an underscore `_`) will be considered a suitable callable. The name of the function will be the `$funcname`
-  by which it can be called.
-- A `list` of modules/paths. This allows you to pull in modules from many sources for your parsing.
-- The `**default` kwargs are optional kwargs that will be passed to _all_
-  callables every time this parser is used - unless the user overrides it explicitly in
-  their call. This is great for providing sensible standards that the user can
-  tweak as needed.
+這裡，`callables` 指向普通 Python 函式的集合（請參閱下一節）供您製作
+當您用它解析字串時，解析器可以使用它。它可以是
+- `{"functionname": callable,...}` 的 `dict`。這使您可以準確選擇哪些可呼叫物件
+包括以及如何命名它們。您是否希望一個可呼叫物件可以在多個名稱下使用？
+  只需使用不同的鍵將其多次新增到字典中即可。
+- 模組的 `module` 或（較常見）`python-path`。這個模組可以定義一個字典
+`FUNCPARSER_CALLABLES = {"funcname": callable,...}` - 這將像上面的 `dict` 一樣被匯入和使用。
+  如果沒有定義這樣的變數，則模組中的_every_頂級函式（其名稱不以
+  底線 `_`) 將被視為合適的可呼叫物件。函式的名稱將是 `$funcname`
+  透過它可以被呼叫。
+- `list` 的模組/路徑。這允許您從多個來源提取模組進行解析。
+- `**default` kwargs 是可選的 kwargs，將傳遞給 _all_
+每次使用此解析器時都會呼叫 - 除非使用者在中明確覆蓋它
+  他們的電話。這對於提供使用者可以使用的合理標準非常有用
+  根據需要進行調整。
 
-`FuncParser.parse` takes further arguments, and can vary for every string parsed.
+`FuncParser.parse` 需要更多引數，並且對於每個解析的字串可能會有所不同。
 
-- `raise_errors` - By default, any errors from a callable will be quietly ignored and the result
-  will be that the failing function call will show verbatim. If `raise_errors` is set,
-  then parsing will stop and whatever exception happened will be raised. It'd be up to you to handle
-  this properly.
-- `escape` - Returns a string where every `$func(...)` has been escaped as `\$func()`.
-- `strip` - Remove all `$func(...)` calls from string (as if each returned `''`).
-- `return_str` - When `True` (default), `parser` always returns a string. If `False`, it may return
-  the return value of a single function call in the string. This is the same as using the `.parse_to_any`
-  method.
-- The `**reserved_keywords` are _always_ passed to every callable in the string.
-  They override any `**defaults` given when instantiating the parser and cannot
-  be overridden by the user - if they enter the same kwarg it will be ignored.
-  This is great for providing the current session, settings etc.
-- The `funcparser` and `raise_errors`
-  are always added as reserved keywords - the first is a
-  back-reference to the `FuncParser` instance and the second
-  is the `raise_errors` boolean given to `FuncParser.parse`.
+- `raise_errors` - 預設情況下，可呼叫的任何錯誤都會被悄悄忽略，結果
+失敗的函式呼叫將逐字顯示。如果設定了`raise_errors`，
+  然後解析將停止，並且將引發發生的任何異常。由你來處理
+  這個正確。
+- `escape` - 傳回一個字串，其中每個 `$func(...)` 已轉義為 `\$func()`。
+- `strip` - 從字串中刪除所有 `$func(...)` 呼叫（就好像每個呼叫都回傳 `''`）。
+- `return_str` - 當 `True`（預設）時，`parser` 始終傳回字串。如果`False`，可能會返回
+字串中單一函式呼叫的回傳值。這與使用 `.parse_to_any` 相同
+  方法。
+- `**reserved_keywords` 總是被傳遞給字串中的每個可呼叫物件。
+它們會覆蓋例項化解析器時給出的任何 `**defaults` 並且不能
+  被使用者覆蓋 - 如果他們輸入相同的 kwarg 它將被忽略。
+  這對於提供當前的 session、設定等非常有用。
+- `funcparser` 和 `raise_errors`
+總是新增為保留關鍵字 - 第一個是
+  向後引用 `FuncParser` 例項和第二個例項
+  是賦予 `FuncParser.parse` 的 `raise_errors` 布林值。
 
-Here's an example of using the default/reserved keywords:
+以下是使用預設/保留關鍵字的範例：
 
 ```python
 def _test(*args, **kwargs):
@@ -128,19 +130,20 @@ def _test(*args, **kwargs):
 parser = funcparser.FuncParser({"test": _test}, mydefault=2)
 result = parser.parse("$test(foo, bar=4)", myreserved=[1, 2, 3])
 ```
-Here the callable will be called as
+這裡可呼叫的將稱為
 
 ```python
 _test('foo', bar='4', mydefault=2, myreserved=[1, 2, 3],
       funcparser=<FuncParser>, raise_errors=False)
 ```
 
-The `mydefault=2` kwarg could be overwritten if we made the call as `$test(mydefault=...)` but `myreserved=[1, 2, 3]` will _always_ be sent as-is and will override a call `$test(myreserved=...)`.
-The `funcparser`/`raise_errors` kwargs are also always included as reserved kwargs.
+如果我們以 `$test(mydefault=...)` 進行呼叫，則 `mydefault=2` kwarg 可能會被覆蓋，但 `myreserved=[1, 2, 3]` 將_始終_按原樣傳送，並將覆蓋呼叫 `$test(myreserved=...)`。
+`funcparser`/`raise_errors` kwargs 也總是作為保留 kwargs 包含在內。
 
-## Defining custom callables
+(defining-custom-callables)=
+## 定義自訂可呼叫物件
 
-All callables made available to the parser must have the following signature:
+解析器可用的所有可呼叫物件必須具有以下簽名：
 
 ```python
 def funcname(*args, **kwargs):
@@ -148,38 +151,38 @@ def funcname(*args, **kwargs):
     return something
 ```
 
-> The `*args` and `**kwargs` must always be included. If you are unsure how `*args` and `**kwargs` work in Python, [read about them here](https://www.digitalocean.com/community/tutorials/how-to-use-args-and-kwargs-in-python-3).
+> 必須始終包含 `*args` 和 `**kwargs`。如果您不確定 `*args` 和 `**kwargs` 在 Python 中如何運作，[在此處閱讀有關它們](https://www.digitalocean.com/community/tutorials/how-to-use-args-and-kwargs-in-python-3)。
 
-The input from the innermost `$funcname(...)` call in your callable will always be a `str`. Here's
-an example of an `$toint` function; it converts numbers to integers.
+可呼叫物件中最裡面的 `$funcname(...)` 呼叫的輸入始終是 `str`。這是
+`$toint` 函式的範例；它將數字轉換為整數。
 
     "There's a $toint(22.0)% chance of survival."
 
-What will enter the `$toint` callable (as `args[0]`) is the _string_ `"22.0"`. The function is responsible for converting this to a number so that we can convert it to an integer. We must also properly handle invalid inputs (like non-numbers).
+將輸入 `$toint` 可呼叫（如 `args[0]`）的是 _string_ `"22.0"`。該函式負責將其轉換為數字，以便我們可以將其轉換為整數。我們還必須正確處理無效輸入（例如非數字）。
 
-If you want to mark an error, raise `evennia.utils.funcparser.ParsingError`. This stops the entire parsing of the string and may or may not raise the exception depending on what you set `raise_errors` to when you created the parser. 
+如果您想標記錯誤，請提出 `evennia.utils.funcparser.ParsingError`。這會停止字串的整個解析，並且可能會也可能不會引發異常，這取決於您在建立解析器時設定 `raise_errors` 的內容。
 
-However, if you _nest_ functions, the return of the innermost function may be something other than
-a string. Let's introduce the `$eval` function, which evaluates simple expressions using
-Python's `literal_eval` and/or `simple_eval`. It returns whatever data type it
-evaluates to.
+但是，如果您_巢狀_函式，則最內層函式的傳回值可能不是
+一個字串。讓我們介紹一下 `$eval` 函式，它使用以下方法計算簡單表示式
+Python 的 `literal_eval` 和/或 `simple_eval`。它會傳回任何資料型別
+評估為.
 
     "There's a $toint($eval(10 * 2.2))% chance of survival."
 
-Since the `$eval` is the innermost call, it will get a string as input - the string `"10 * 2.2"`.
-It evaluates this and returns the `float` `22.0`. This time the outermost `$toint` will be called with
-this `float` instead of with a string.
+由於 `$eval` 是最裡面的呼叫，因此它將獲取一個字串作為輸入 - 字串 `"10 * 2.2"`。
+它對此進行評估並返回 `float` `22.0`。這次最外面的 `$toint` 將被呼叫
+這個 `float` 而不是用字串。
 
-> It's important to safely validate your inputs since users may end up nesting your callables in any order. See the next section for useful tools to help with this.
+> 安全地驗證您的輸入非常重要，因為使用者最終可能會以任何順序巢狀您的可呼叫物件。請參閱下一節，以瞭解有助於解決此問題的有用工具。
 
-In these examples, the result will be embedded in the larger string, so the result of the entire parsing will be a string:
+在這些範例中，結果將嵌入到較大的字串中，因此整個解析的結果將是一個字串：
 
 ```python
   parser.parse(above_string)
   "There's a 22% chance of survival."
 ```
 
-However, if you use the `parse_to_any` (or `parse(..., return_str=False)`) and _don't add any extra string around the outermost function call_, you'll get the return type of the outermost callable back:
+但是，如果您使用`parse_to_any`（或`parse(..., return_str=False)`）並且_不要在最外層函式呼叫周圍新增任何額外的字串_，您將獲得最外層可回撥的返回型別：
 
 ```python
 parser.parse_to_any("$toint($eval(10 * 2.2)")
@@ -190,58 +193,60 @@ parser.parse_to_any("$toint($eval(10 * 2.2)%")
 "22%"
 ```
 
-### Escaping special character
+(escaping-special-character)=
+### 轉義特殊字元
 
-When entering funcparser callables in strings, it looks like a regular
-function call inside a string:
+當在字串中輸入 funcparser 可呼叫物件時，它看起來像常規的
+字串內的函式呼叫：
 
 ```python
 "This is a $myfunc(arg1, arg2, kwarg=foo)."
 ```
 
-Commas (`,`) and equal-signs (`=`) are considered to separate the arguments and
-kwargs. In the same way, the right parenthesis (`)`) closes the argument list.
-Sometimes you want to include commas in the argument without it breaking the
-argument list.
+逗號 (`,`) 和等號 (`=`) 被視為分隔引數並
+誇格斯。同樣，右括號 (`)`) 結束引數清單。
+有時你會想在引數中包含逗號而不破壞
+引數列表。
 
 ```python
 "The $format(forest's smallest meadow, with dandelions) is to the west."
 ```
 
-You can escape in various ways.
+你可以透過多種方式逃脫。
 
-- Prepending special characters like `,` and `=` with the escape character `\`
+- 在 `,` 和 `=` 等特殊字元前加入轉義字元 `\`
 
 ```python
 "The $format(forest's smallest meadow\, with dandelions) is to the west."
 ```
 
-- Wrapping your strings in double quotes. Unlike in raw Python, you
-can't escape with single quotes `'` since these could also be apostrophes (like
-`forest's` above). The result will be a verbatim string that contains
-everything but the outermost double quotes.
+- 將字串用雙引號引起來。與原始 Python 不同，你
+無法用單引號 `'` 轉義，因為這些也可能是撇號（例如
+`forest's` 以上）。結果將是一個逐字字串，其中包含
+除了最外面的雙引號之外的所有內容。
 
 ```python
 'The $format("forest's smallest meadow, with dandelions") is to the west.'
 ```
-- If you want verbatim double-quotes to appear in your string, you can escape
-  them with `\"` in turn.
+- 如果您希望逐字雙引號出現在字串中，您可以轉義
+他們依次與`\"`。
 
 ```python
 'The $format("forest's smallest meadow, with \"dandelions\"') is to the west.'
 ```
 
-### Safe convertion of inputs
+(safe-convertion-of-inputs)=
+### 輸入的安全轉換
 
-Since you don't know in which order users may use your callables, they should
-always check the types of its inputs and convert to the type the callable needs.
-Note also that when converting from strings, there are limits on what inputs you
-can support. This is because FunctionParser strings can be used by
-non-developer players/builders and some things (such as complex
-classes/callables etc) are just not safe/possible to convert from string
-representation.
+由於您不知道使用者可以按什麼順序使用您的可呼叫物件，因此他們應該
+始終檢查其輸入的型別並轉換為可呼叫所需的型別。
+另請注意，從字串轉換時，您輸入的內容有限制
+可以支援。這是因為 FunctionParser 字串可以被使用
+非開發者玩家/建造者和一些東西（例如複雜的
+類別/可呼叫物件等）只是不安全/不可能從字串轉換
+代表。
 
-In `evennia.utils.utils` is a helper called [safe_convert_to_types](evennia.utils.utils.safe_convert_to_types). This function automates the conversion of simple data types in a safe way:
+`evennia.utils.utils` 中有一個名為 [safe_convert_to_types](evennia.utils.utils.safe_convert_to_types) 的助手。此函式以安全的方式自動轉換簡單資料型別：
 
 ```python
 from evennia.utils.utils import safe_convert_to_types
@@ -259,109 +264,115 @@ def _process_callable(*args, **kwargs):
 
 ```
 
-In other words, in the callable `$process(expression, local, extra1=.., extra2=...)`, the first argument will be handled by the 'py' converter (described below), the second will passed through regular Python `str`, kwargs will be handled by `int` and `str` respectively. You can supply your own converter function as long as it takes one argument and returns the converted result.
+換句話說，在可呼叫的 `$process(expression, local, extra1=.., extra2=...)` 中，第一個引數將由 'py' 轉換器處理（如下所述），第二個引數將透過常規 Python `str` 傳遞，kwargs 將分別由 `int` 和 `str` 處理。您可以提供自己的轉換器函式，只要它接受一個引數並傳回轉換後的結果即可。
 
 ```python
 args, kwargs = safe_convert_to_type(
         (tuple_of_arg_converters, dict_of_kwarg_converters), *args, **kwargs)
 ```
 
-The special converter `"py"` will try to convert a string argument to a Python structure with the help of the following tools (which you may also find useful to experiment with on your own):
+特殊轉換器 `"py"` 將嘗試在以下工具的幫助下將字串引數轉換為 Python 結構（您可能會發現這些工具對於您自己的實驗很有用）：
 
-- [ast.literal_eval](https://docs.python.org/3.8/library/ast.html#ast.literal_eval) is an in-built Python function. It _only_ supports strings, bytes, numbers, tuples, lists, dicts, sets, booleans and `None`. That's it - no arithmetic or modifications of data is allowed. This is good for converting individual values and lists/dicts from the input line to real Python objects.
-- [simpleeval](https://pypi.org/project/simpleeval/) is a third-party tool included with Evennia. This allows for evaluation of simple (and thus safe) expressions. One can operate on numbers and strings with `+-/*` as well as do simple comparisons like `4 > 3` and more. It does _not_ accept more complex containers like lists/dicts etc, so this and `literal_eval` are complementary to each other.
+- [ast.literal_eval](https://docs.python.org/3.8/library/ast.html#ast.literal_eval) 是內建的 Python 函式。它_僅_支援字串、位元組、數字、元組、列表、字典、集合、布林值和`None`。就是這樣 - 不允許進行算術或資料修改。這對於將輸入行中的單一值和列表/字典轉換為真實的 Python 物件很有用。
+- [simleeval](https://pypi.org/project/simpleeval/) 是 Evennia 附帶的第三方工具。這允許評估簡單（因此安全）的表示式。人們可以使用 `+-/*` 對數字和字串進行操作，也可以進行簡單的比較，例如 `4 > 3` 等。它確實_不_接受更複雜的容器，例如列表/字典等，因此這和 `literal_eval` 是相互補充的。
 
 ```{warning}
-It may be tempting to run use Python's in-built ``eval()`` or ``exec()`` functions as converters since these are able to convert any valid Python source code to Python. NEVER DO THIS unless you really, really know that ONLY developers will ever modify the string going into the callable. The parser is intended for untrusted users (if you were trusted you'd have access to Python already). Letting untrusted users pass strings to ``eval``/``exec`` is a MAJOR security risk. It allows the caller to run arbitrary Python code on your server. This is the path to maliciously deleted hard drives. Just don't do it and sleep better at night.
+使用 Python 的內建 ``eval()`` 或 ``exec()`` 函式作為轉換器可能很誘人，因為它們能夠將任何有效的 Python 原始碼轉換為 Python。 NEVER DO THIS 除非你真的、真的知道 ONLY 開發人員會修改進入可呼叫的字串。此解析器適用於不受信任的使用者（如果您受信任，您就已經可以存取 Python）。讓不受信任的使用者將字串傳遞給 ``eval``/``exec`` 會帶來 MAJOR 的安全風險。它允許呼叫者在您的伺服器上執行任意 Python 程式碼。這是惡意刪除硬碟的路徑。只是不要這樣做，晚上睡得更好。
 ```
 
-## Default funcparser callables
+(default-funcparser-callables)=
+## 預設 funcparser 可呼叫物件
 
-These are some example callables you can import and add your parser. They are divided into global-level dicts in `evennia.utils.funcparser`. Just import the dict(s) and merge/add one or more to them when you create your `FuncParser` instance to have those callables be available.
+這些是一些可呼叫的範例，您可以匯入並新增解析器。它們被分為`evennia.utils.funcparser`的全域級字典。只需匯入字典並在建立 `FuncParser` 例項時合併/新增一個或多個字典即可使這些可呼叫專案可用。
 
+(evenniautilsfuncparserfuncparser_callables)=
 ### `evennia.utils.funcparser.FUNCPARSER_CALLABLES`
 
-These are the 'base' callables.
+這些是“基本”可呼叫項。
 
-- `$eval(expression)` ([code](evennia.utils.funcparser.funcparser_callable_eval)) - this uses `literal_eval` and `simple_eval` (see previous section) attemt to convert a string expression to a python object. This handles e.g. lists of literals `[1, 2, 3]` and simple expressions like `"1 + 2"`.
-- `$toint(number)` ([code](evennia.utils.funcparser.funcparser_callable_toint)) - always converts an output to an integer, if possible.
-- `$add/sub/mult/div(obj1, obj2)` ([code](evennia.utils.funcparser.funcparser_callable_add)) -
-  this adds/subtracts/multiplies and divides to elements together. While simple addition could be done with `$eval`, this could for example be used also to add two lists together, which is not possible with `eval`; for example `$add($eval([1,2,3]), $eval([4,5,6])) -> [1, 2, 3, 4, 5, 6]`.
-- `$round(float, significant)` ([code](evennia.utils.funcparser.funcparser_callable_round)) - rounds an input float into the number of provided significant digits. For example `$round(3.54343, 3) -> 3.543`.
-- `$random([start, [end]])` ([code](evennia.utils.funcparser.funcparser_callable_random)) - this works like the Python `random()` function, but will randomize to an integer value if both start/end are
-  integers. Without argument, will return a float between 0 and 1.
-- `$randint([start, [end]])` ([code](evennia.utils.funcparser.funcparser_callable_randint)) - works like the `randint()` python function and always returns an integer.
-- `$choice(list)` ([code](evennia.utils.funcparser.funcparser_callable_choice)) - the input will automatically be parsed the same way as `$eval` and is expected to be an iterable. A random element of this list will be returned.
-- `$pad(text[, width, align, fillchar])` ([code](evennia.utils.funcparser.funcparser_callable_pad)) - this will pad content. `$pad("Hello", 30, c, -)` will lead to a text centered in a 30-wide block surrounded by `-` characters.
-- `$crop(text, width=78, suffix='[...]')` ([code](evennia.utils.funcparser.funcparser_callable_crop)) - this will crop a text longer than the width, by default ending it with a `[...]`-suffix that also fits within the width. If no width is given, the client width or `settings.DEFAULT_CLIENT_WIDTH` will be used.
-- `$space(num)` ([code](evennia.utils.funcparser.funcparser_callable_space)) - this will insert `num` spaces.
-- `$just(string, width=40, align=c, indent=2)` ([code](evennia.utils.funcparser.funcparser_callable_justify)) - justifies the text to a given width, aligning it left/right/center or 'f' for full (spread text across width).
-- `$ljust` - shortcut to justify-left. Takes all other kwarg of `$just`.
-- `$rjust` - shortcut to right justify.
-- `$cjust` - shortcut to center justify.
-- `$clr(startcolor, text[, endcolor])` ([code](evennia.utils.funcparser.funcparser_callable_clr)) - color text. The color is given with one or two characters without the preceeding `|`. If no endcolor is given, the string will go back to neutral, so `$clr(r, Hello)` is equivalent to `|rHello|n`.
+- `$eval(expression)` ([code](evennia.utils.funcparser.funcparser_callable_eval)) - 這使用 `literal_eval` 和 `simple_eval` （請參閱上一節）嘗試將字串表示式轉換為 python 物件。這處理 e.g。文字清單 `[1, 2, 3]` 和簡單表示式如 `"1 + 2"`。
+- `$toint(number)` ([code](evennia.utils.funcparser.funcparser_callable_toint)) - 如果可能的話，始終將輸出轉換為整數。
+- `$add/sub/mult/div(obj1, obj2)` ([程式碼](evennia.utils.funcparser.funcparser_callable_add)) -
+這對元素進行加/減/乘和除。雖然可以使用 `$eval` 完成簡單的加法，但這也可以用於將兩個清單新增在一起，這是使用 `eval` 不可能實現的；例如`$add($eval([1,2,3]), $eval([4,5,6])) -> [1, 2, 3, 4, 5, 6]`。
+- `$round(float, significant)` ([程式碼](evennia.utils.funcparser.funcparser_callable_round)) - 將輸入浮點數四捨五入為提供的有效位數。例如`$round(3.54343, 3) -> 3.543`。
+- `$random([start, [end]])` ([code](evennia.utils.funcparser.funcparser_callable_random)) - 這與 Python `random()` 函式類似，但如果開始/結束都是隨機的，則會隨機化為整數值
+整數。如果沒有引數，將傳回 0 到 1 之間的浮點數。
+- `$randint([start, [end]])` ([code](evennia.utils.funcparser.funcparser_callable_randint)) - 與 `randint()` python 函式類似，並且始終傳回一個整數。
+- `$choice(list)` ([code](evennia.utils.funcparser.funcparser_callable_choice)) - 輸入將自動以與 `$eval` 相同的方式進行解析，並且預計是一個可迭代的。將傳回該清單的隨機元素。
+- `$pad(text[, width, align, fillchar])` ([程式碼](evennia.utils.funcparser.funcparser_callable_pad)) - 這將填入內容。 `$pad("Hello", 30, c, -)` 將產生一個以 30 寬區塊為中心的文字，周圍有 `-` 個字元。
+- `$crop(text, width=78, suffix='[...]')` ([code](evennia.utils.funcparser.funcparser_callable_crop)) - 這將裁剪比寬度長的文字，預設以也適合寬度的 `[...]` 字尾結尾。如果未給出寬度，則將使用用戶端寬度或 `settings.DEFAULT_CLIENT_WIDTH`。
+- `$space(num)` ([程式碼](evennia.utils.funcparser.funcparser_callable_space)) - 這將插入 `num` 空格。
+- `$just(string, width=40, align=c, indent=2)` ([code](evennia.utils.funcparser.funcparser_callable_justify)) - 將文字調整為給定寬度，左/右/中心對齊，或「f」完整對齊（跨寬度展開文字）。
+- `$ljust` - 左對齊的捷徑。接受 `$just` 的所有其他 kwarg。
+- `$rjust` - 右對齊的捷徑。
+- `$cjust` - 居中對齊的捷徑。
+- `$clr(startcolor, text[, endcolor])` ([程式碼](evennia.utils.funcparser.funcparser_callable_clr)) - 彩色文字。顏色由一兩個字元給出，前面不帶 `|`。如果沒有給出結束顏色，字串將恢復為中性，因此 `$clr(r, Hello)` 相當於 `|rHello|n`。
 
+(evenniautilsfuncparsersearching_callables)=
 ### `evennia.utils.funcparser.SEARCHING_CALLABLES`
 
-These are callables that requires access-checks in order to search for objects. So they require some extra reserved kwargs to be passed when running the parser:
+這些是需要存取檢查才能搜尋物件的可呼叫物件。因此，它們需要在執行解析器時傳遞一些額外的保留 kwargs：
 ```python
 
 parser.parse_to_any(string, caller=<object or account>, access="control", ...)
 
 ```
-The `caller` is required, it's the the object to do the access-check for. The `access` kwarg is the
- [lock type](./Locks.md) to check, default being `"control"`.
+`caller` 是必需的，它是要執行訪問檢查的物件。 `access` kwarg 是
+ [lock type](./Locks.md) 進行檢查，預設為`"control"`。
 
-- `$search(query,type=account|script,return_list=False)` ([code](evennia.utils.funcparser.funcparser_callable_search)) - this will look up and try to match an object by key or alias. Use the `type` kwarg to search for `account` or `script` instead. By default this will return nothing if there are more than one match; if `return_list` is `True` a list of 0, 1 or more matches will be returned instead.
-- `$obj(query)`, `$dbref(query)` - legacy aliases for `$search`.
-- `$objlist(query)` - legacy alias for `$search`, always returning a list.
+- `$search(query,type=account|script,return_list=False)` ([code](evennia.utils.funcparser.funcparser_callable_search)) - 這將尋找並嘗試透過鍵或別名來匹配物件。請使用 `type` kwarg 來搜尋 `account` 或 `script`。預設情況下，如果有多個符合項，則不會傳回任何內容；如果 `return_list` 是 `True`，則會傳回 0、1 或更多符合項的清單。
+- `$obj(query)`、`$dbref(query)` - `$search` 的舊別名。
+- `$objlist(query)` - `$search` 的舊別名，始終返回清單。
 
 
+(evenniautilsfuncparseractor_stance_callables)=
 ### `evennia.utils.funcparser.ACTOR_STANCE_CALLABLES`
 
-These are used to implement actor-stance emoting. They are used by the [DefaultObject.msg_contents](evennia.objects.objects.DefaultObject.msg_contents) method by default. You can read a lot more about this on the page
-[Change messages per receiver](../Concepts/Change-Message-Per-Receiver.md).
+這些用於實現演員立場情感。預設情況下，[DefaultObject.msg_contents](evennia.objects.objects.DefaultObject.msg_contents) 方法使用它們。您可以在頁面上閱讀更多相關資訊
+[更改每個接收者的訊息](../Concepts/Change-Message-Per-Receiver.md)。
 
-On the parser side, all these inline functions require extra kwargs be passed into the parser (done by `msg_contents` by default):
+在解析器方面，所有這些行內函數都需要將額外的 kwargs 傳遞到解析器中（預設由 `msg_contents` 完成）：
 
 ```python
 parser.parse(string, caller=<obj>, receiver=<obj>, mapping={'key': <obj>, ...})
 ```
 
-Here the `caller` is the one sending the message and `receiver` the one to see it. The `mapping` contains references to other objects accessible via these callables. 
+這裡 `caller` 是傳送訊息的人，`receiver` 是檢視訊息的人。 `mapping` 包含對可透過這些可呼叫物件存取的其他物件的參考。
 
-- `$you([key])` ([code](evennia.utils.funcparser.funcparser_callable_you)) -
-  if no `key` is given, this represents the `caller`, otherwise an object from `mapping`
-  will be used. As this message is sent to different recipients, the `receiver` will change and this will
-  be replaced either with the string `you` (if you and the receiver is the same entity) or with the
-  result of `you_obj.get_display_name(looker=receiver)`. This allows for a single string to echo differently
-  depending on who sees it, and also to reference other people in the same way.
-- `$You([key])` - same as `$you` but always capitalized.
-- `$conj(verb [,key])` ([code](evennia.utils.funcparser.funcparser_callable_conjugate)) - conjugates a verb
-  between 2nd person presence to 3rd person presence depending on who
-  sees the string. For example `"$You() $conj(smiles)".` will show as "You smile." and "Tom smiles." depending
-  on who sees it. This makes use of the tools in [evennia.utils.verb_conjugation](evennia.utils.verb_conjugation)
-  to do this, and only works for English verbs.
-- `$pron(pronoun [,options] [,key])` ([code](evennia.utils.funcparser.funcparser_callable_pronoun)) - Dynamically
-  map pronouns (like his, herself, you, its etc) between 1st/2nd person to 3rd person.
-- `$pconj(verb, [,key])` ([code](evennia.utils.funcparser.funcparser_callable_conjugate_for_pronouns)) - conjugates
-  a verb between 2nd and 3rd person, like `$conj`, but for pronouns instead of nouns to account for plural
-  gendering. For example `"$Pron(you) $pconj(smiles)"` will show to others as "He smiles" for a gender of "male", or
-  "They smile" for a gender of "plural".
+- `$you([key])` ([程式碼](evennia.utils.funcparser.funcparser_callable_you)) -
+如果沒有給出 `key`，則表示 `caller`，否則表示 `mapping` 中的物件
+  將被使用。由於此郵件傳送給不同的收件人，`receiver` 將發生變化，這將
+  替換為字串 `you`（如果您和接收者是同一實體）或替換為
+  `you_obj.get_display_name(looker=receiver)`的結果。這允許單一字串以不同的方式回顯
+  取決於誰看到它，並以同樣的方式引用其他人。
+- `$You([key])` - 與 `$you` 相同，但始終大寫。
+- `$conj(verb [,key])` ([程式碼](evennia.utils.funcparser.funcparser_callable_conjugate)) - 動詞變位
+第二人在場到第三人在場之間取決於誰
+  看到字串。例如`"$You() $conj(smiles)".`將顯示為「你微笑」。和“湯姆微笑”。取決於
+  關於誰看到它。這利用了 [evennia.utils.verb_conjugation](evennia.utils.verb_conjugation) 中的工具
+  這樣做，並且僅適用於英語動詞。
+- `$pron(pronoun [,options] [,key])` ([程式碼](evennia.utils.funcparser.funcparser_callable_pronoun)) - 動態
+在第一人稱/第二人稱到第三人稱之間對映代名詞（如他的、她自己的、你的、它的等）。
+- `$pconj(verb, [,key])` ([程式碼](evennia.utils.funcparser.funcparser_callable_conjugate_for_pronouns)) - 綴合物
+第二人稱和第三人稱之間的動詞，如 `$conj`，但用代名詞而不是名詞來表示複數
+  性別化。例如，對於“男性”性別，`"$Pron(you) $pconj(smiles)"` 將向其他人顯示為“他微笑”，或者
+  “他們微笑”代表“複數”性別。
 
 
+(evenniaprototypesprotfuncs)=
 ### `evennia.prototypes.protfuncs`
 
-This is used by the [Prototype system](./Prototypes.md) and allows for adding references inside the prototype. The funcparsing will happen before the spawn.
+這是由[原型系統](./Prototypes.md) 使用的，並允許在原型內新增引用。 funcparsing 將在生成之前發生。
 
-Available inlinefuncs to prototypes:
+原型可用的行內函數：
 
-- All `FUNCPARSER_CALLABLES` and `SEARCHING_CALLABLES` 
-- `$protkey(key)` - returns the value of another key within the same prototype. Note that the system will try to convert this to a 'real' value (like turning the string "3" into the integer 3), for security reasons, not all embedded values can be converted this way. Note however that you can do nested calls with inlinefuncs, including adding your own converters.
+- 全部 `FUNCPARSER_CALLABLES` 和 `SEARCHING_CALLABLES`
+- `$protkey(key)` - 傳回同一原型中另一個鍵的值。請注意，系統會嘗試將其轉換為「真實」值（例如將字串「3」轉換為整數 3），出於安全原因，並非所有嵌入值都​​可以透過這種方式轉換。但請注意，您可以使用 inlinefunc 進行巢狀呼叫，包括新增您自己的轉換器。
 
-### Example
+(example)=
+### 例子
 
-Here's an example of including the default callables together with two custom ones.
+以下是包含預設可呼叫物件和兩個自訂可呼叫物件的範例。
 
 ```python
 from evennia.utils import funcparser
@@ -390,11 +401,11 @@ result = parser.parse(string)
 
 ```
 
-Above we define two callables `_dashline` and `_uptime` and map them to names `"dashline"` and `"uptime"`,
-which is what we then can call as `$header` and `$uptime` in the string. We also have access to
-all the defaults (like `$toint()`).
+上面我們定義了兩個可呼叫物件 `_dashline` 和 `_uptime` 並將它們對應到名稱 `"dashline"` 和 `"uptime"`，
+這就是我們可以在字串中稱為 `$header` 和 `$uptime` 的內容。我們還可以訪問
+所有預設值（如 `$toint()`）。
 
-The parsed result of the above would be something like this:
+上面的解析結果會是這樣的：
 
     This is the current uptime:
     ------- 343 seconds -------

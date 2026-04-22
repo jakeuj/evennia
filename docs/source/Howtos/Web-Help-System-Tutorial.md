@@ -1,35 +1,37 @@
-# Web Help System Tutorial
+(web-help-system-tutorial)=
+# 網路幫助系統教學
 
 
-**Before doing this tutorial you will probably want to read the intro in the [Changing the Web page tutorial](./Web-Changing-Webpage.md).**  Reading the three first parts of the [Django tutorial](https://docs.djangoproject.com/en/4.0/intro/tutorial01/) might help as well.
+**在學習本教學之前，您可能需要閱讀 [更改網頁教學](./Web-Changing-Webpage.md) 中的介紹。 ** 閱讀 [Django 教學](https://docs.djangoproject.com/en/4.0/intro/tutorial01/) 的前三個部分也可能有所幫助。
 
-This tutorial will show you how to access the help system through your website.  Both help commands and regular help entries will be visible, depending on the logged-in user or an anonymous character.
+本教學將向您展示如何透過網站存取幫助系統。  幫助指令和常規幫助條目都將可見，具體取決於登入使用者或匿名角色。
 
-This tutorial will show you how to:
+本教學將向您展示如何：
 
-- Create a new page to add to your website.
-- Take advantage of a basic view and basic templates.
-- Access the help system on your website.
-- Identify whether the viewer of this page is logged-in and, if so, to what account.
+- 建立一個新頁面以新增到您的網站。
+- 利用基本檢視和基本模板。
+- 造訪您網站上的幫助系統。
+- 確定此頁面的檢視者是否已登入，如果已登入，則使用什麼帳戶登入。
 
-## Creating our app
+(creating-our-app)=
+## 建立我們的應用程式
 
-The first step is to create our new Django *app*.  An app in Django can contain pages and mechanisms: your website may contain different apps.  Actually, the website provided out-of-the-box by Evennia has already three apps: a "webclient" app, to handle the entire webclient, a "website" app to contain your basic pages, and a third app provided by Django to create a simple admin interface.  So we'll create another app in parallel, giving it a clear name to represent our help system.
+第一步是建立新的 Django *app*。  Django 中的應用程式可以包含頁面和機制：您的網站可能包含不同的應用程式。  實際上，Evennia 提供的開箱即用的網站已經有三個應用程式：一個「webclient」應用程式，用於處理整個 webclient，一個「網站」應用程式用於包含基本頁面，以及 Django 提供的第三個應用程式，用於建立一個簡單的管理介面。  因此，我們將並行建立另一個應用程式，為其指定一個清晰的名稱來代表我們的幫助系統。
 
-From your game directory, use the following commands:
+從您的遊戲目錄中，使用以下指令：
 
     cd web
     evennia startapp help_system
 
-This creates a new folder `help_system` in your `mygame/` folder. To keep things
-tidy, let's move it to the `web/` folder:
+這將在您的 `mygame/` 資料夾中建立一個新資料夾 `help_system`。為了保留東西
+整潔，讓我們將其移動到 `web/` 資料夾：
 
     mv help_system web  (linux)
     move help_system web  (windows)
 
-> Note: calling the app "help" would have been more explicit, but this name is already used by Django.
+> 注意：呼叫應用程式「help」會更明確，但 Django 已使用該名稱。
 
-We put the new app under `web/`t o keep all web-related things together, but you can organize however you like. Here's how the structure looks:
+我們將新應用程式放在 `web/` 下，以便將所有與網路相關的內容放在一起，但您可以按照自己的喜好進行組織。結構如下所示：
 
     mygame/
         ...
@@ -37,9 +39,9 @@ We put the new app under `web/`t o keep all web-related things together, but you
             help_system/
             ...
 
-The "web/help_system" directory contains files created by Django.  We'll use some of them, but if you want to learn more about them all, you should read [the Django tutorial](https://docs.djangoproject.com/en/4.1/intro/tutorial01/).
+“web/help_system”目錄包含Django所建立的檔案。  我們將使用其中的一些，但如果您想了解更多有關它們的資訊，您應該閱讀[Django 教學](https://docs.djangoproject.com/en/4.1/intro/tutorial01/)。
 
-There is a last thing to be done: your folder has been added, but Django doesn't know about it, it doesn't know it's a new app.  We need to tell it, and we do so by editing a simple setting.  Open your "server/conf/settings.py" file and add, or edit, these lines:
+還有最後一件事要做：您的資料夾已新增，但 Django 不知道它，它不知道這是一個新應用程式。  我們需要告訴它，我們透過編輯一個簡單的設定來做到這一點。  開啟“server/conf/settings.py”檔案並新增或編輯以下行：
 
 ```python
 # Web configuration
@@ -48,24 +50,26 @@ INSTALLED_APPS += (
 )
 ```
 
-You can start Evennia if you want, and go to your website, probably at [http://localhost:4001](http://localhost:4001) . You won't see anything different though: we added the app but it's fairly empty.
+如果需要，您可以啟動 Evennia，然後造訪您的網站，可能位於 [http://localhost:4001](http://localhost:4001) 。不過，您不會看到任何不同的東西：我們新增了應用程式，但它相當空。
 
-## Our new page
+(our-new-page)=
+## 我們的新頁面
 
-At this point, our new *app*  contains mostly empty files that you can explore.  In order to create a page for our help system, we need to add:
+此時，我們的新 *app* 大部分包含您可以探索的空檔。  為了為我們的幫助系統建立頁面，我們需要新增：
 
-- A *view*, dealing with the logic of our page.
-- A *template* to display our new page.
-- A new *URL* pointing to our page.
+- 一個*檢視*，處理我們頁面的邏輯。
+- 用於顯示新頁面的*模板*。
+- 一個新的 *URL* 指向我們的頁面。
 
-> We could get away by creating just a view and a new URL, but that's not a recommended way to work with your website.  Building on templates is so much more convenient.
+> 我們可以透過只建立一個檢視和一個新的 URL 來擺脫困境，但這不是推薦的使用您的網站的方式。  基於模板進行建置要方便得多。
 
-### Create a view
+(create-a-view)=
+### 建立檢視
 
-A *view* in Django is a simple Python function placed in the `views.py` file in your app.  It will
-handle the behavior that is triggered when a user asks for this information by entering a *URL* (the connection between *views* and *URLs* will be discussed later).
+Django 中的 *view* 是一個簡單的 Python 函式，放​​置在應用程式的 `views.py` 檔案中。  它將
+處理當使用者透過輸入 *URL* 請求此資訊時觸發的行為（*views* 和 *URLs* 之間的連線將在稍後討論）。
 
-So let's create our view.  You can open the `web/help_system/views.py` file and paste the following lines:
+那麼讓我們建立我們的檢視。  您可以開啟 `web/help_system/views.py` 檔案並貼上以下行：
 
 ```python
 from django.shortcuts import render
@@ -75,11 +79,12 @@ def index(request):
     return render(request, "help_system/index.html")
 ```
 
-Our view handles all code logic.  This time, there's not much: when this function is called, it will render the template we will now create.  But that's where we will do most of our work afterward.
+我們的檢視處理所有程式碼邏輯。  這次，沒有太多內容：當呼叫此函式時，它將呈現我們現在將建立的模板。  但這就是我們之後將完成大部分工作的地方。
 
-### Create a template
+(create-a-template)=
+### 建立模板
 
-The `render` function called into our *view* asks the *template* `help_system/index.html`.  The *templates* of our apps are stored in the app directory, "templates" sub-directory.  Django may have created the "templates" folder already.  If not, create it yourself.  In it, create another folder "help_system", and inside of this folder, create a file named "index.html".  Wow, that's some hierarchy.  Your directory structure (starting from `web`) should look like this:
+呼叫我們的*檢視*的`render`函式詢問*模板*`help_system/index.html`。  我們應用程式的「模板」儲存在應用程式目錄的「templates」子目錄中。  Django 可能已經建立了「templates」資料夾。  如果沒有，請自行建立。  在其中建立另一個資料夾“help_system”，並在此資料夾內建立一個名為“index.html”的檔案。  哇，這是一些層次結構。  您的目錄結構（從 `web` 開始）應如下所示：
 
     web/
         help_system/
@@ -88,7 +93,7 @@ The `render` function called into our *view* asks the *template* `help_system/in
                 help_system/
                     index.html
 
-Open the "index.html" file and paste in the following lines:
+開啟「index.html」檔案並貼上以下行：
 
 ```
 {% extends "base.html" %}
@@ -98,19 +103,20 @@ Open the "index.html" file and paste in the following lines:
 {% endblock %}
 ```
 
-Here's a little explanation line by line of what this template does:
+以下是此模板功能的逐行解釋：
 
-1. It loads the "base.html" *template*.  This describes the basic structure of all your pages, with a menu at the top and a footer, and perhaps other information like images and things to be present on each page.  You can create templates that do not inherit from "base.html", but you should have a good reason for doing so.
-2. The "base.html" *template* defines all the structure of the page.  What is left is to override some sections of our pages.  These sections are called *blocks*.  On line 2, we override the block named "blocktitle", which contains the title of our page.
-3. Same thing here, we override the *block* named "content", which contains the main content of our web page.  This block is bigger, so we define it on several lines.
-4. This is perfectly normal HTML code to display a level-2 heading.
-5. And finally we close the *block* named "content".
+1. 它載入“base.html”*模板*。  這描述了所有頁面的基本結構，頂部有一個選單和頁尾，也許還包括其他訊息，例如影象和每個頁面上顯示的內容。  您可以建立不繼承自「base.html」的模板，但您應該有這樣做的充分理由。
+2. 「base.html」*範本*定義了頁面的所有結構。  剩下的就是覆蓋我們頁面的某些部分。  這些部分稱為*塊*。  在第 2 行，我們覆蓋名為「blocktitle」的區塊，其中包含頁面的標題。
+3. 同樣的事情，我們覆蓋名為「內容」的*區塊*，其中包含網頁的主要內容。  該區塊較大，因此我們將其定義在幾行中。
+4. 這是顯示 2 級標題的完全正常的 HTML 程式碼。
+5. 最後我們關閉名為「內容」的*區塊*。
 
-### Create a new URL
+(create-a-new-url)=
+### 創造一個新的URL
 
-Last step to add our page: we need to add a *URL* leading to it... otherwise users won't be able to access it.  The URLs of our apps are stored in the app's directory `urls.py` file.
+新增頁面的最後一步：我們需要新增一個 *URL* 指向它...否則使用者將無法存取它。  我們的URLs的應用程式儲存在應用程式的目錄`urls.py`檔案中。
 
-Open the `web/help_system/urls.py` file (you might have to create it) and make it look like this:
+開啟 `web/help_system/urls.py` 檔案（您可能必須建立它）並使其如下所示：
 
 ```python
 # URL patterns for the help_system app
@@ -123,9 +129,9 @@ urlpatterns = [
 ]
 ```
 
-The `urlpatterns` variable is what Django/Evennia looks for to figure out how to direct a user entering an URL in their browser to the view-code you have written.
+`urlpatterns` 變數是 Django/Evennia 尋找的變數，以找出如何引導使用者在瀏覽器中輸入 URL 到您編寫的檢視程式碼。
 
-Last we need to tie this into the main namespace for your game.  Edit the file `mygame/web/urls.py`.  In it you will find the `urlpatterns` list again. Add a new `path` to the end of the list.
+最後，我們需要將其繫結到您遊戲的主名稱空間。  編輯檔案`mygame/web/urls.py`。  在其中您將再次找到 `urlpatterns` 清單。將新的 `path` 新增到清單末尾。
 
 ```python
 # mygame/web/urls.py
@@ -147,48 +153,51 @@ urlpatterns = [
 # [...]
 ```
 
-When a user will ask for a specific *URL* on your site, Django will:
+當使用者在您的網站上請求特定的 *URL* 時，Django 將：
 
-1. Read the list of custom patterns defined in "web/urls.py".  There's one pattern here, which describes to Django that all URLs beginning by 'help/' should be sent to the 'help_system' app.  The 'help/' part is removed.
-2. Then Django will check the "web.help_system/urls.py" file.  It contains only one URL, which is empty (`^$`).
+1. 讀取“web/urls.py”中定義的自訂模式清單。  這裡有一個模式，它向 Django 描述所有以 'help/' 開頭的 URLs 都應該傳送到 'help_system' 應用程式。  “幫助/”部分被刪除。
+2. 然後Django將檢查“web.help_system/urls.py”檔案。  它只包含一個 URL，它是空的 (`^$`)。
 
-In other words, if the URL is '/help/', then Django will execute our defined view.
+換句話說，如果URL是'/help/'，那麼Django就會執行我們定義的檢視。
 
-### Let's see it work
+(lets-see-it-work)=
+### 讓我們看看它的工作原理
 
-You can now reload or start Evennia.  Open a tab in your browser and go to [http://localhost:4001/help/](http://localhost:4001/help/) .  If everything goes well, you should see your new page... which isn't empty since Evennia uses our "base.html" *template*.  In the content of our page, there's only a heading that reads "help index".  Notice that the title of our page is "mygame - Help index" ("mygame" is replaced by the name of your game).
+現在您可以重新載入或啟動Evennia。  在瀏覽器中開啟一個選項卡並轉到 [http://localhost:4001/help/](http://localhost:4001/help/) 。  如果一切順利，您應該會看到新頁面...該頁面不為空，因為 Evennia 使用我們的“base.html”*模板*。  在我們頁面的內容中，只有一個標題為「幫助索引」。  請注意，我們頁面的標題是“mygame - 幫助索引”（“mygame”被替換為您的遊戲名稱）。
 
-From now on, it will be easier to move forward and add features.
+從現在開始，繼續前進和新增功能將變得更加容易。
 
-### A brief reminder
+(a-brief-reminder)=
+### 簡短提醒
 
-We'll be trying the following things:
+我們將嘗試以下幾件事：
 
-- Have the help of commands and help entries accessed online.
-- Have various commands and help entries depending on whether the user is logged in or not.
+- 獲得線上存取的指令和幫助條目的幫助。
+- 根據使用者是否登入，有各種指令和幫助條目。
 
-In terms of pages, we'll have:
+就頁面而言，我們將有：
 
-- One to display the list of help topics.
-- One to display the content of a help topic.
+- 其一用於顯示幫助主題清單。
+- 用於顯示幫助主題的內容。
 
-The first one would link to the second.
+第一個將連結到第二個。
 
-> Should we create two URLs?
+> 我們應該創造兩個URLs嗎？
 
-The answer is... maybe.  It depends on what you want to do.  We have our help index accessible through the "/help/" URL.  We could have the detail of a help entry accessible through "/help/desc" (to see the detail of the "desc" command).  The problem is that our commands or help topics may contain special characters that aren't to be present in URLs.  There are different ways around this problem.  I have decided to use a *GET variable* here, which would create URLs like this:
+答案是……也許吧。  這取決於你想做什麼。  我們可以透過「/help/」URL 存取幫助索引。  我們可以透過「/help/desc」存取幫助條目的詳細資訊（請參閱「desc」指令的詳細資訊）。  問題是我們的指令或幫助主題可能包含 URLs 中不存在的特殊字元。  解決這個問題有不同的方法。  我決定在這裡使用 *GET 變數*，這將建立 URLs ，如下所示：
 
     /help?name=desc
 
-If you use this system, you don't have to add a new URL:  GET and POST variables are accessible through our requests and we'll see how soon enough.
+如果您使用此係統，則不必新增新的 URL：GET 和 POST 變數可以透過我們的請求訪問，我們很快就會看到。
 
-## Handling logged-in users
+(handling-logged-in-users)=
+## 處理登入使用者
 
-One of our requirements is to have a help system tailored to our accounts.  If an account with admin access logs in, the page should display a lot of commands that aren't accessible to common users. And perhaps even some additional help topics.
+我們的要求之一是擁有適合我們帳戶的幫助系統。  如果具有管理員存取許可權的帳戶登入，頁面應該會顯示許多普通使用者無法存取的指令。甚至可能還有一些額外的幫助主題。
 
-Fortunately, it's fairly easy to get the logged in account in our view (remember that we'll do most of our coding there).  The *request* object, passed to our function, contains a `user` attribute. This attribute will always be there: we cannot test whether it's `None` or not, for instance.  But when the request comes from a user that isn't logged in, the `user` attribute will contain an anonymous Django user.  We then can use the `is_anonymous` method to see whether the user is logged-in or not.  Last gift by Evennia, if the user is logged in, `request.user` contains a reference to an account object, which will help us a lot in coupling the game and online system.
+幸運的是，在我們的檢視中取得登入帳戶相當容易（請記住，我們將在那裡完成大部分編碼）。  傳遞給我們的函式的 *request* 物件包含 `user` attribute。這個 attribute 將永遠存在：例如，我們無法測試它是否是 `None`。  但是，當請求來自未登入的使用者時，`user` attribute 將包含匿名 Django 使用者。  然後我們可以使用 `is_anonymous` 方法來檢視使用者是否登入。  最後Evennia贈送的，如果使用者登入了，`request.user`包含了一個帳戶物件的引用，這對於我們耦合遊戲和線上系統有很大的幫助。
 
-So we might end up with something like:
+所以我們最終可能會得到這樣的結果：
 
 ```python
 def index(request):
@@ -198,7 +207,7 @@ def index(request):
         character = user.character
 ```
 
-> Note: this code works when your MULTISESSION_MODE is set to 0 or 1.  When it's above, you would have something like:
+> 注意：當您的 MULTISESSION_MODE 設定為 0 或 1 時，此程式碼有效。當它位於上面時，您將看到類似以下內容的內容：
 
 ```python
 def index(request):
@@ -208,17 +217,17 @@ def index(request):
         character = user.characters[0]
 ```
 
-In this second case, it will select the first character of the account.
+在第二種情況下，它將選擇帳戶的第一個字元。
 
-But what if the user's not logged in?  Again, we have different solutions.  One of the most simple is to create a character that will behave as our default character for the help system.  You can create it through your game:  connect to it and enter:
+但是如果使用者沒有登入怎麼辦？  同樣，我們有不同的解決方案。  最簡單的方法之一是建立一個角色，該角色將充當幫助系統的預設角色。  您可以透過遊戲建立它：連線到它並輸入：
 
     @charcreate anonymous
 
-The system should answer:
+系統應該回答：
 
         Created new character anonymous. Use @ic anonymous to enter the game as this character.
 
-So in our view, we could have something like this:
+所以在我們看來，我們可以有這樣的東西：
 
 ```python
 from typeclasses.characters import Character
@@ -232,13 +241,14 @@ def index(request):
         character = Character.objects.get(db_key="anonymous")
 ```
 
-This time, we have a valid character no matter what:  remember to adapt this code if you're running in multisession mode above 1.
+這次，無論如何我們都有一個有效的字元：如果您在高於 1 的多會話模式下執行，請記住調整此程式碼。
 
-## The full system
+(the-full-system)=
+## 完整的系統
 
-What we're going to do is to browse through all commands and help entries, and list all the commands that can be seen by this character (either our 'anonymous' character, or our logged-in character).
+我們要做的是瀏覽所有指令和幫助條目，並列出該角色（無論是我們的「匿名」角色，還是我們的登入角色）可以看到的所有指令。
 
-The code is longer, but it presents the entire concept in our view.  Edit the "web/help_system/views.py" file and paste into it:
+程式碼較長，但它呈現了我們認為的整個概念。  編輯“web/help_system/views.py”檔案並貼上到其中：
 
 ```python
 from django.http import Http404
@@ -329,20 +339,21 @@ def _get_topics(character):
     return categories, topics
 ```
 
-That's a bit more complicated here, but all in all, it can be divided in small chunks:
+這裡有點複雜，但總而言之，它可以分成小塊：
 
-- The `index` function is our view:
-    - It begins by getting the character as we saw in the previous section.
-    - It gets the help topics (commands and help entries) accessible to this character.  It's another function that handles that part.
-    - If there's a *GET variable* "name" in our URL (like "/help?name=drop"), it will retrieve it.  If it's not a valid topic's name, it returns a *404*.  Otherwise, it renders the template called "detail.html", to display the detail of our topic.
-    - If there's no *GET variable* "name", render "index.html", to display the list of topics.
-- The `_get_topics` is a private function.  Its sole mission is to retrieve the commands a character can execute, and the help entries this same character can see.  This code is more Evennia-specific than Django-specific, it will not be detailed in this tutorial.  Just notice that all help topics are stored in a dictionary.  This is to simplify our job when displaying them in our templates.
+- `index` 函式是我們的觀點：
+    - 首先取得我們在上一節看到的角色。
+    - 它會取得該角色可以存取的幫助主題（指令和幫助條目）。  這是處理該部分的另一個函式。
+    - 如果我們的 URL 中有一個 *GET 變數*「name」（如「/help?name=drop」），它將檢索它。  如果它不是有效的主題名稱，則傳回 *404*。  否則，它會呈現名為“detail.html”的模板，以顯示我們主題的詳細資訊。
+    - 如果沒有*GET變數*“名稱”，則渲染“index.html”，以顯示主題清單。
+- `_get_topics` 是私有函式。  它的唯一任務是檢索角色可以執行的指令，以及該角色可以看到的幫助條目。  此程式碼比 Django 特定的程式碼更特定於 Evennia，本教學中不會對其進行詳細說明。  請注意，所有幫助主題都儲存在字典中。  這是為了簡化我們在模板中顯示它們時的工作。
 
-Notice that, in both cases when we asked to render a *template*, we passed to `render` a third argument which is the dictionary of variables used in our templates.  We can pass variables this way, and we will use them in our templates.
+請注意，在這兩種情況下，當我們要求渲染 *template* 時，我們都會向 `render` 傳遞第三個引數，它是模板中使用的變數字典。  我們可以透過這種方式傳遞變數，並且我們將在模板中使用它們。
 
-### The index template
+(the-index-template)=
+### 索引模板
 
-Let's look at our full "index" *template*.  You can open the "web/help_system/templates/help_sstem/index.html" file and paste the following into it:
+讓我們看看完整的“索引”*模板*。  您可以開啟“web/help_system/templates/help_sstem/index.html”檔案並將以下內容貼到其中：
 
 ```
 {% extends "base.html" %}
@@ -369,16 +380,17 @@ Let's look at our full "index" *template*.  You can open the "web/help_system/te
 {% endblock %}
 ```
 
-This template is definitely more detailed.  What it does is:
+這個模板肯定更詳細。  它的作用是：
 
-1. Browse through all categories.
-2. For all categories, display a level-2 heading with the name of the category.
-3. All topics in a category (remember, they can be either commands or help entries) are displayed in a table.  The trickier part may be that, when the loop is above 5, it will create a new line.  The table will have 5 columns at the most per row.
-4. For every cell in the table, we create a link redirecting to the detail page (see below).  The URL would look something like "help?name=say".  We use `urlencode` to ensure special characters are properly escaped.
+1. 瀏覽所有類別。
+2. 對於所有類別，顯示帶有類別名稱的 2 級標題。
+3. 類別中的所有主題（請記住，它們可以是指令或幫助條目）都顯示在表格中。  更棘手的部分可能是，當迴圈次數超過 5 時，它將建立一個新行。  該表每行最多有 5 列。
+4. 對於表中的每個單元格，我們建立一個重定向到詳細資訊頁面的連結（見下文）。  URL 看起來像「help?name=say」。  我們使用 `urlencode` 來確保特殊字元被正確轉義。
 
-### The detail template
+(the-detail-template)=
+### 詳細模板
 
-It's now time to show the detail of a topic (command or help entry).  You can create the file "web/help_system/templates/help_system/detail.html".  You can paste into it the following code:
+現在是時候顯示主題的詳細資訊（指令或幫助條目）。  您可以建立檔案“web/help_system/templates/help_system/detail.html”。  您可以將以下程式碼貼到其中：
 
 ```
 {% extends "base.html" %}
@@ -390,17 +402,19 @@ It's now time to show the detail of a topic (command or help entry).  You can cr
 {% endblock %}
 ```
 
-This template is much easier to read.  Some *filters* might be unknown to you, but they are just used to format here.
+這個模板更容易閱讀。  有些*過濾器*您可能不知道，但它們只是用來格式化的。
 
-### Put it all together
+(put-it-all-together)=
+### 把它們放在一起
 
-Remember to reload or start Evennia, and then go to [http://localhost:4001/help](http://localhost:4001/help/).  You should see the list of commands and topics accessible by all characters.  Try to login (click the "login" link in the menu of your website) and go to the same page again.  You should now see a more detailed list of commands and help entries.  Click on one to see its detail.
+請記住重新載入或啟動Evennia，然後轉到[http://localhost:4001/help](http://localhost:4001/help/)。  您應該看到所有角色都可以存取的指令和主題清單。  嘗試登入（點選網站選單中的「登入」連結）並再次前往同一頁面。  現在您應該看到更詳細的指令和幫助條目清單。  點選其中一項即可檢視其詳細資訊。
 
-## To improve this feature
+(to-improve-this-feature)=
+## 為了改進這個功能
 
-As always, a tutorial is here to help you feel comfortable adding new features and code by yourself. Here are some ideas of things to improve this little feature:
+像往常一樣，這裡的教學可以幫助您輕鬆地自行新增新功能和程式碼。以下是改進這個小功能的一些想法：
 
-- Links at the bottom of the detail template to go back to the index might be useful.
-- A link in the main menu to link to this page would be great... for the time being you have to enter the URL, users won't guess it's there.
-- Colors aren't handled at this point, which isn't exactly surprising.  You could add it though.
-- Linking help entries between one another won't be simple, but it would be great.  For instance, if you see a help entry about how to use several commands, it would be great if these commands were themselves links to display their details.
+- 詳細資訊範本底部用於返回索引的連結可能很有用。
+- 主選單中的連結到此頁面會很棒...暫時您必須輸入URL，使用者不會猜到它在那裡。
+- 此時尚未處理顏色，這並不奇怪。  不過你可以新增它。
+- 將幫助條目相互連結並不簡單，但這會很棒。  例如，如果您看到有關如何使用多個指令的幫助條目，如果這些指令本身是顯示其詳細資訊的連結，那就太好了。

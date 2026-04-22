@@ -1,32 +1,34 @@
-# Cooldowns
+(cooldowns)=
+# 冷卻時間
 
-Contribution by owllex, 2021
+owllex 的貢獻，2021 年
 
-Cooldowns are used to model rate-limited actions, like how often a
-character can perform a given action; until a certain time has passed their
-command can not be used again. This contrib provides a simple cooldown
-handler that can be attached to any typeclass. A cooldown is a lightweight persistent
-asynchronous timer that you can query to see if a certain time has yet passed.
+冷卻時間用於對速率限制的操作進行建模，例如
+角色可以執行給定的動作；直到過了一定的時間
+指令無法再次使用。這個contrib提供了一個簡單的冷卻時間
+可以附加到任何 typeclass 的處理程式。冷卻時間是輕量級的永續性
+非同步計時器，您可以查詢該計時器以檢視是否已經過了某個時間。
 
-Cooldowns are completely asynchronous and must be queried to know their
-state. They do not fire callbacks, so are not a good fit for use cases
-where something needs to happen on a specific schedule (use delay or
-a TickerHandler for that instead).
+冷卻時間是完全非同步的，必須查詢才能知道它們的冷卻時間
+狀態。它們不會觸發回撥，因此不太適合用例
+需要在特定時間表上發生某事（使用延遲或
+TickerHandler 代替）。
 
-See also the evennia [howto](../Howtos/Howto-Command-Cooldown.md) for more information
-about the concept.
+另請參閱 evennia [操作方法](../Howtos/Howto-Command-Cooldown.md) 以瞭解更多資訊
+關於這個概念。
 
-## Installation
+(installation)=
+## 安裝
 
-To use, simply add the following property to the typeclass definition of any
-object type that you want to support cooldowns. It will expose a new `cooldowns`
-property that persists data to the object's attribute storage. You can set this
-on your base `Object` typeclass to enable cooldown tracking on every kind of
-object, or just put it on your `Character` typeclass.
+要使用，只需將以下屬性新增至任何的 typeclass 定義中
+您想要支援冷卻時間的物件型別。它將暴露一個新的`cooldowns`
+將資料儲存到物件的 attribute 儲存的屬性。你可以這樣設定
+在你的基地 `Object` typeclass 上啟用每種型別的冷卻時間跟蹤
+物件，或只是將其放在您的 `Character` typeclass 上。
 
-By default the CooldownHandler will use the `cooldowns` property, but you can
-customize this if desired by passing a different value for the `db_attribute`
-parameter.
+預設 CooldownHandler 將使用 `cooldowns` 屬性，但您可以
+如果需要，可以透過為 `db_attribute` 傳遞不同的值來自訂此設定
+引數。
 
 ```python
 from evennia.contrib.game_systems.cooldowns import CooldownHandler
@@ -37,12 +39,13 @@ def cooldowns(self):
     return CooldownHandler(self, db_attribute="cooldowns")
 ```
 
-## Example
+(example)=
+## 例子
 
-Assuming you've installed cooldowns on your Character typeclasses, you can use a
-cooldown to limit how often you can perform a command. The following code
-snippet will limit the use of a Power Attack command to once every 10 seconds
-per character.
+假設你已經在你的角色typeclasses上安裝了冷卻時間，你可以使用
+冷卻時間來限制您執行指令的頻率。下面的程式碼
+程式碼片段會將強力攻擊指令的使用限制為每 10 秒一次
+每個字元。
 
 ```python
 class PowerAttack(Command):
@@ -58,5 +61,5 @@ class PowerAttack(Command):
 
 ----
 
-<small>This document page is generated from `evennia/contrib/game_systems/cooldowns/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\game_systems\cooldowns\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

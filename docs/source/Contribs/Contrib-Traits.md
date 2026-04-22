@@ -1,31 +1,34 @@
-# Traits
+(traits)=
+# 性狀
 
-Contribution by Griatch 2020, based on code by Whitenoise and Ainneve contribs, 2014
+Griatch 2020 貢獻，基於 Whitenoise 和 Ainneve contribs 的程式碼，2014 年
 
-A `Trait` represents a modifiable property on (usually) a Character. They can
-be used to represent everything from attributes (str, agi etc) to skills
-(hunting 10, swords 14 etc) and dynamically changing things like HP, XP etc.
-Traits differ from normal Attributes in that they track their changes and limit
-themselves to particular value-ranges. One can add/subtract from them easily and
-they can even change dynamically at a particular rate (like you being poisoned or
-healed).
+`Trait` 代表（通常）角色的可修改屬性。他們可以
+用來表示從屬性（力量、敏捷等）到技能的一切
+（狩獵 10，劍 14 等）和動態變化的東西，如 HP、XP 等。
+特徵與普通屬性的不同之處在於它們追蹤其變化和限制
+自己到特定的值範圍。人們可以輕鬆地新增/減去它們，並且
+它們甚至可以以特定的速率動態變化（例如你中毒了或
+痊癒了）。
 
-Traits use Evennia Attributes under the hood, making them persistent (they survive
-a server reload/reboot).
+特徵在幕後使用 Evennia 屬性，使它們持久化（它們能夠生存
+伺服器重新載入/重新啟動）。
 
-## Installation
+(installation)=
+## 安裝
 
-Traits are always added to a typeclass, such as the Character class.
+Traits 總是會新增到 typeclass 中，例如 Character 類別。
 
-There are two ways to set up Traits on a typeclass. The first sets up the `TraitHandler`
-as a property `.traits` on your class and you then access traits as e.g. `.traits.strength`.
-The other alternative uses a `TraitProperty`, which makes the trait available directly
-as e.g. `.strength`. This solution also uses the `TraitHandler`, but you don't need to
-define it explicitly. You can combine both styles if you like.
+有兩種方法可以在 typeclass 上設定 Traits。第一個設定`TraitHandler`
+作為類別上的屬性 `.traits`，然後您可以將特徵作為 e.g 存取。 `.traits.strength`。
+另一種選擇使用 `TraitProperty`，這使得特徵可以直接使用
+為e.g。 `.strength`。此解決方案也使用 `TraitHandler`，但您不需要
+明確定義它。如果您願意，可以將兩種風格結合起來。
 
-### Traits with TraitHandler
+(traits-with-traithandler)=
+### 具有 TraitHandler 的特徵
 
-Here's an example for adding the TraitHandler to the Character class:
+以下是將 TraitHandler 新增至 Character 類別的範例：
 
 ```python
 # mygame/typeclasses/objects.py
@@ -51,16 +54,17 @@ class Character(DefaultCharacter):
         self.traits.add("hunting", "Hunting Skill", trait_type="counter",
                         base=10, mod=1, min=0, max=100)
 ```
-When adding the trait, you supply the name of the property (`hunting`) along
-with a more human-friendly name ("Hunting Skill"). The latter will show if you
-print the trait etc. The `trait_type` is important, this specifies which type
-of trait this is (see below).
+新增特徵時，您可以提供屬性名稱 (`hunting`)
+有了一個更人性化的名字（“狩獵技能”）。後者將顯示如果您
+列印特徵等。 `trait_type` 很重要，這指定了哪種型別
+這就是特徵（見下文）。
 
+(traitproperties)=
 ### TraitProperties
 
-Using `TraitProperties` makes the trait available directly on the class, much like Django model
-fields. The drawback is that you must make sure that the name of your Traits don't collide with any
-other properties/methods on your class.
+使用 `TraitProperties` 使特徵可以直接在類別上可用，就像 Django 模型一樣
+欄位。缺點是你必須確保你的特質名稱不會與任何特質相衝突。
+您班級的其他屬性/方法。
 
 ```python
 # mygame/typeclasses/objects.py
@@ -78,25 +82,26 @@ class Object(DefaultObject):
     hunting = TraitProperty("Hunting Skill", trait_type="counter", base=10, mod=1, min=0, max=100)
 ```
 
-> Note that the property-name will become the name of the trait and you don't supply `trait_key`
-> separately.
+> 請注意，屬性名稱將成為特徵的名稱，並且您不提供`trait_key`
+> 分別地。
 
-> The `.traits` TraitHandler will still be created (it's used under the
-> hood. But it will only be created when the TraitProperty has been accessed at least once,
-> so be careful if mixing the two styles. If you want to make sure `.traits` is always available,
-> add the `TraitHandler` manually like shown earlier - the `TraitProperty` will by default use
-> the same handler (`.traits`).
+> `.traits` TraitHandler 仍將被建立（它在
+> 兜帽。但只有當 TraitProperty 至少被訪問一次時才會建立，
+> 所以混合兩種風格時要小心。如果您想確保 `.traits` 始終可用，
+> 如前所示手動新增 `TraitHandler` - 預設將使用 `TraitProperty`
+> 相同的處理程式 (`.traits`)。
 
-## Using traits
+(using-traits)=
+## 使用特質
 
-A trait are entities added to the traithandler (if you use `TraitProperty` the handler is just created under
-the hood) after which one can access it as a property on the handler (similarly to how you can do
-.db.attrname for Attributes in Evennia).
+特徵是新增到特徵處理程式中的實體（如果您使用`TraitProperty`，則處理程式剛剛在下面建立
+引擎蓋），之後可以將其作為處理程式上的屬性進行存取（類似於您可以執行的操作）
+.db.attrname 表示 Evennia 中的屬性）。
 
-All traits have a _read-only_ field `.value`. This is only used to read out results, you never
-manipulate it directly (if you try, it will just remain unchanged). The `.value` is calculated based
-on combining fields, like `.base` and `.mod` - which fields are available and how they relate to
-each other depends on the trait type.
+所有特徵都有一個_唯讀_欄位`.value`。這僅用於讀出結果，您永遠不會
+直接操作它（如果你嘗試，它只會保持不變）。 `.value` 的計算依據
+關於組合欄位，例如 `.base` 和 `.mod` - 哪些欄位可用以及它們如何關聯
+彼此取決於特質型別。
 
 ```python
 > obj.traits.strength.value
@@ -136,35 +141,37 @@ obj.traits.strength.value
 17
 ```
 
-### Relating traits to one another
+(relating-traits-to-one-another)=
+### 將特徵彼此關聯
 
-From a trait you can access its own Traithandler as `.traithandler`. You can
-also find another trait on the same handler by using the
-`Trait.get_trait("traitname")` method.
+從特徵中，您可以透過 `.traithandler` 存取自己的 Traithandler。你可以
+也可以使用以下方法在同一處理程式上找到另一個特徵
+`Trait.get_trait("traitname")`方法。
 
 ```python
 > obj.strength.get_trait("hp").value
 100
 ```
 
-This is not too useful for the default trait types - they are all operating
-independently from one another. But if you create your own trait classes, you
-can use this to make traits that depend on each other.
+這對於預設特徵型別來說不太有用——它們都在執行
+彼此獨立。但如果你創造自己的特質類別，你
+可以用它來創造相互依賴的特徵。
 
-For example, you could picture making a Trait that is the sum of the values of
-two other traits and capped by the value of a third trait. Such complex
-interactions are common in RPG rule systems but are by definition game specific.
+例如，您可以想像建立一個 Trait，它是以下值的總和
+其他兩個特徵並受到第三個特徵的值的限制。如此複雜
+互動在RPG規則系統中很常見，但根據定義是特定於遊戲的。
 
-See an example in the section about [making your own Trait classes](#expanding-with-your-own-traits).
+請參閱有關[建立您自己的 Trait 類別](#expanding-with-your-own-traits) 部分中的範例。
 
 
-## Trait types
+(trait-types)=
+## 性狀型別
 
-All default traits have a read-only `.value` property that shows the relevant or
-'current' value of the trait. Exactly what this means depends on the type of trait.
+所有預設特徵都有一個唯讀 `.value` 屬性，顯示相關或
+特徵的“當前”值。這到底意味著什麼取決於特質的型別。
 
-Traits can also be combined to do arithmetic with their .value, if both have a
-compatible type.
+特徵也可以組合起來用它們的.value 進行算術運算，如果兩者都有
+相容型別。
 
 ```python
 > trait1 + trait2
@@ -178,8 +185,8 @@ compatible type.
 5
 ```
 
-Two numerical traits can also be compared (bigger-than etc), which is useful in
-all sorts of rule-resolution.
+也可以比較兩個數字特徵（大於等），這在以下方面很有用
+各種規則解析。
 
 ```python
 
@@ -187,18 +194,19 @@ if trait1 > trait2:
     # do stuff
 ```
 
-### Trait
+(trait)=
+### 特徵
 
-A single value of any type.
+任何型別的單一值。
 
-This is the 'base' Trait, meant to inherit from if you want to invent
-trait-types from scratch (most of the time you'll probably inherit from some of
-the more advanced trait-type classes though).
+這是「基礎」特徵，如果你想發明就必須繼承
+從頭開始的特質型別（大多時候你可能會繼承一些
+不過更高階的特質型別類別）。
 
-Unlike other Trait-types, the single `.value` property of the base `Trait` can
-be editied. The value can hold any data that can be stored in an Attribute. If
-it's an integer/float you can do arithmetic with it, but otherwise this acts just
-like a glorified Attribute.
+與其他 Trait-types 不同，基礎 `Trait` 的單一 `.value` 屬性可以
+被編輯。該值可以儲存可以儲存在 Attribute 中的任何資料。如果
+它是一個整數/浮點數，你可以用它來做算術，但否則這只是
+就像一個榮耀的Attribute。
 
 
 ```python
@@ -211,13 +219,14 @@ like a glorified Attribute.
 "stringvalue"
 ```
 
-### Static trait
+(static-trait)=
+### 靜態特質
 
 `value = base + mod`
 
-The static trait has a `base` value and an optional `mod`-ifier. A typical use
-of a static trait would be a Strength stat or Skill value. That is, something
-that varies slowly or not at all, and which may be modified in-place.
+靜態特徵具有 `base` 值和可選的 `mod`-ifier。典型用途
+靜態特徵的屬性是力量統計或技能值。也就是說，某物
+變化緩慢或根本不變化，可以就地修改。
 
 ```python
 > obj.traits.add("str", "Strength", trait_type="static", base=10, mod=2)
@@ -234,7 +243,8 @@ that varies slowly or not at all, and which may be modified in-place.
 12
 ```
 
-### Counter
+(counter)=
+### 櫃檯
 
 
     min/unset     base    base+mod                       max/unset
@@ -243,11 +253,11 @@ that varies slowly or not at all, and which may be modified in-place.
                                              = current
                                              + mod
 
-A counter describes a value that can move from a base. The `.current` property
-is the thing usually modified. It starts at the `.base`. One can also add a
-modifier, which will both be added to the base and to current (forming
-`.value`).  The min/max of the range are optional, a boundary set to None will
-remove it. A suggested use for a Counter Trait would be to track skill values.
+計數器描述了可以從基數開始移動的值。 `.current` 屬性
+是通常修改的東西。它從 `.base` 開始。還可以新增一個
+修飾符，它將被新增到基礎和當前（形成
+`.value`）。  範圍的最小/最大是可選的，將邊界設為“無”將
+刪除它。反特徵的建議用途是追蹤技能值。
 
 ```python
 > obj.traits.add("hunting", "Hunting Skill", trait_type="counter",
@@ -269,19 +279,20 @@ remove it. A suggested use for a Counter Trait would be to track skill values.
 # TraitProperty constructor instead.
 ```
 
-Counters have some extra properties:
+計數器有一些額外的屬性：
 
+(descs)=
 #### .descs
 
-The `descs` property is a dict `{upper_bound:text_description}`. This allows for easily
-storing a more human-friendly description of the current value in the
-interval. Here is an example for skill values between 0 and 10:
+`descs` 屬性是一個字典 `{upper_bound:text_description}`。這允許輕鬆地
+在中儲存當前值的更人性化的描述
+間隔。以下是技能值介於 0 到 10 之間的範例：
 
     {0: "unskilled", 1: "neophyte", 5: "trained", 7: "expert", 9: "master"}
 
-The keys must be supplied from smallest to largest. Any values below the lowest and above the
-highest description will be considered to be included in the closest description slot.
-By calling `.desc()` on the Counter, you will get the text matching the current `value`.
+必須按照從最小到最大的順序提供金鑰。低於最低值和高於最低值的任何值
+最高的描述將被視為包含在最接近的描述槽中。
+透過在計數器上呼叫`.desc()`，您將獲得與當前`value`相符的文字。
 
 ```python
 # (could also have passed descs= to traits.add())
@@ -300,18 +311,19 @@ By calling `.desc()` on the Counter, you will get the text matching the current 
 "expert"
 ```
 
-#### .rate
+(rate)=
+#### 。速度
 
-The `rate` property defaults to 0. If set to a value different from 0, it
-allows the trait to change value dynamically. This could be used for example
-for an attribute that was temporarily lowered but will gradually (or abruptly)
-recover after a certain time. The rate is given as change of the current
-`.value` per-second, and this will still be restrained by min/max boundaries,
-if those are set.
+`rate` 屬性預設為 0。如果設定為不同於 0 的值，則
+允許特徵動態改變值。這可以用於例如
+對於暫時降低但會逐漸（或突然）的 attribute
+一定時間後恢復。速率作為電流的變化給出
+每秒`.value`，這仍然受到最小/最大邊界的限制，
+如果設定了這些。
 
-It is also possible to set a `.ratetarget`, for the auto-change to stop at
-(rather than at the min/max boundaries). This allows the value to return to
-a previous value.
+還可以設定 `.ratetarget`，以便自動變更停止於
+（而不是在最小/最大邊界）。這允許值返回到
+先前的值。
 
 ```python
 
@@ -339,16 +351,17 @@ a previous value.
 
 > obj.traits.hunting.rate = 0  # disable auto-change
 ```
-Note that when retrieving the `current`, the result will always be of the same
-type as the `.base` even `rate` is a non-integer value. So if `base` is an `int`
-(default), the `current` value will also be rounded the closest full integer.
-If you want to see the exact `current` value, set `base` to a float - you
-will then need to use `round()` yourself on the result if you want integers.
+請注意，檢索 `current` 時，結果將始終相同
+鍵入 `.base` 甚至 `rate` 都是非整數值。所以如果 `base` 是 `int`
+（預設），`current` 值也將四捨五入為最接近的完整整數。
+如果您想檢視確切的 `current` 值，請將 `base` 設定為浮點數 - 您
+如果您想要整數，則需要自己在結果上使用 `round()` 。
 
+(percent)=
 #### .percent()
 
-If both min and max are defined, the `.percent()` method of the trait will
-return the value as a percentage.
+如果同時定義了 min 和 max，則特徵的 `.percent()` 方法將
+以百分比形式傳回值。
 
 ```python
 > obj.traits.hunting.percent()
@@ -358,22 +371,23 @@ return the value as a percentage.
 71.0
 ```
 
-### Gauge
+(gauge)=
+### 測量
 
-This emulates a [fuel-] gauge that empties from a base+mod value.
+這模擬了從基本+mod值清空的[fuel-]儀表。
 
     min/0                                            max=base+mod
      |-----------------------X---------------------------|
                            value
                           = current
 
-The `.current` value will start from a full gauge. The .max property is
-read-only and is set by `.base` + `.mod`. So contrary to a `Counter`, the
-`.mod` modifier only applies to the max value of the gauge and not the current
-value. The minimum bound defaults to 0 if not set explicitly.
+`.current` 值將從滿量規開始。.max 屬性是
+只讀，由 `.base` + `.mod` 設定。因此與 `Counter` 相反，
+`.mod`修飾符僅適用於儀表的最大值，不適用於目前值
+值。如果未明確設定，最小界限預設為 0。
 
-This trait is useful for showing commonly depletable resources like health,
-stamina and the like.
+此特徵對於顯示通常會耗盡的資源（例如健康、
+體力之類的。
 
 ```python
 > obj.traits.add("hp", "Health", trait_type="gauge", base=100)
@@ -389,18 +403,19 @@ stamina and the like.
 80
 ```
 
-The Gauge trait is subclass of the Counter, so you have access to the same
-methods and properties where they make sense. So gauges can also have a
-`.descs` dict to describe the intervals in text, and can use `.percent()` to
-get how filled it is as a percentage etc.
+Gauge 特徵是 Counter 的子類，因此您可以存取相同的
+有意義的方法和屬性。所以儀表也可以有一個
+`.descs` dict 來描述文字中的間隔，並且可以使用 `.percent()` 來
+取得它的填充程度（百分比等）。
 
-The `.rate` is particularly relevant for gauges - useful for everything
-from poison slowly draining your health, to resting gradually increasing it.
+`.rate` 與儀表特別相關 - 對一切都很有用
+從毒藥慢慢耗盡你的生命值，到休息後逐漸增加你的生命值。
 
-## Expanding with your own Traits
+(expanding-with-your-own-traits)=
+## 根據自己的特質進行擴充套件
 
-A Trait is a class inhering from `evennia.contrib.rpg.traits.Trait` (or from one of
-the existing Trait classes).
+Trait 是繼承自 `evennia.contrib.rpg.traits.Trait` （或繼承自以下之一的類別）
+現有的 Trait 類）。
 
 ```python
 # in a file, say, 'mygame/world/traits.py'
@@ -421,17 +436,17 @@ class RageTrait(StaticTrait):
         self.mod = 0
 ```
 
-Above is an example custom-trait-class "rage" that stores a property "rage" on
-itself, with a default value of 0. This has all the functionality of a Trait -
-for example, if you do del on the `rage` property, it will be set back to its
-default (0). Above we also added some helper methods.
+上面是一個自訂特徵類別「rage」的範例，它將屬性「rage」儲存在
+本身，預設值為 0。這具有 Trait 的所有功能 -
+例如，如果您對 `rage` 屬性執行 del 操作，它將被設定回原來的狀態
+預設 (0)。上面我們也加入了一些輔助方法。
 
-To add your custom RageTrait to Evennia, add the following to your settings file
-(assuming your class is in mygame/world/traits.py):
+若要將自訂 RageTrait 新增至 Evennia，請將以下內容新增至您的設定檔中
+（假設你的班級在mygame/world/traits.py）：
 
     TRAIT_CLASS_PATHS = ["world.traits.RageTrait"]
 
-Reload the server and you should now be able to use your trait:
+重新載入伺服器，您現在應該可以使用您的特徵：
 
 ```python
 > obj.traits.add("mood", "A dark mood", rage=30, trait_type='rage')
@@ -439,9 +454,9 @@ Reload the server and you should now be able to use your trait:
 30
 ```
 
-Remember that you can use `.get_trait("name")` to access other traits on the
-same handler.  Let's say that the rage modifier is actually limited by
-the characters's current STR value times 3, with a max of 100:
+請記住，您可以使用 `.get_trait("name")` 來訪問
+相同的處理程式。  假設怒氣修正值實際上受到以下限制
+字元的目前 STR 值乘以 3，最大值為 100：
 
 ```python
 class RageTrait(StaticTrait):
@@ -450,16 +465,18 @@ class RageTrait(StaticTrait):
         self.mod = min(100, self.get_trait("STR").value * 3)
 ```
 
-# as TraitProperty
+(as-traitproperty)=
+# 如TraitProperty
 
 ```
 class Character(DefaultCharacter):
     rage = TraitProperty("A dark mood", rage=30, trait_type='rage')
 ```
 
-## Adding additional TraitHandlers
+(adding-additional-traithandlers)=
+## 增加額外的TraitHandlers
 
-Sometimes, it is easier to top-level classify traits, such as stats, skills, or other categories of traits you want to handle independantly of each other. Here is an example showing an example on the object typeclass, expanding on the first installation example:
+有時，對特徵進行頂層分類更容易，例如統計資料、技能或您想要彼此獨立處理的其他類別的特徵。以下範例顯示了物件 typeclass 上的範例，擴充套件了第一個安裝範例：
 
 ```python
 # mygame/typeclasses/objects.py
@@ -496,11 +513,11 @@ class Character(DefaultCharacter):
                         base=10, mod=1, min=0, max=100)
 ```
 
-> Rememebr that the `.get_traits()` method only works for accessing Traits within the
-_same_ TraitHandler.
+> 請記住，`.get_traits()` 方法僅適用於訪問
+_相同_TraitHandler。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/rpg/traits/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\rpg\traits\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

@@ -1,3 +1,4 @@
-# EvTable 
+(evtable)=
+# EvTable
 
-[Docstring in evennia/utils/evtable.py](evennia.utils.evtable)
+[evennia/utils/evtable.py 中的檔案字串](evennia.utils.evtable)

@@ -1,20 +1,23 @@
-# Procedurally generated Dungeon
+(procedurally-generated-dungeon)=
+# 程式生成的地下城
 
-The rooms that we discussed in the [lesson about Rooms](./Beginner-Tutorial-Rooms.md) are all _manually_ generated. That is, a human builder would have to sit down and spawn each room manually, either in-game or using code. 
+我們在[關於房間的課程](./Beginner-Tutorial-Rooms.md)中討論的房間都是_手動_生成的。也就是說，人類建造者必須坐下來手動產生每個房間，無論是在遊戲中還是使用程式碼。
 
-In this lesson we'll explore _procedural_ generation of the rooms making up our game's underground dungeon. Procedural means that its rooms are spawned automatically and semi-randomly as players explore, creating a different dungeon layout every time.
+在本課中，我們將探索構成遊戲地下城的房間的_程式_生成。程式性意味著它的房間會在玩家探索時自動和半隨機地生成，每次都會建立不同的地下城佈局。
 
-## Design Concept 
+(design-concept)=
+## 設計理念
 
-This describes how the procedural generation should work at a high level. It's important to understand this before we start writing code.
+這描述了程式生成應該如何在高階別上工作。在我們開始編寫程式碼之前理解這一點很重要。
 
-We will assume our dungeon exists on a 2D plane (x,y, no z directions). We will only use N,E,S,W compass directions, but there is no reason this design couldn't work with SE, NW etc, except that this could make it harder for the player to visualize. More possible directions also make it more likely to produce collisions and one-way exits (see below).
+我們假設我們的地下城存在於 2D 平面上（x，y，無 z 方向）。我們只會使用 N、E、S、W 羅盤方向，但這種設計沒有理由不能與 SE、NW 等一起使用，除了這可能會讓玩家更難想像。更多可能的方向也使其更有可能產生碰撞和單向出口（見下文）。
 
-This design is pretty simple, but just by playing with some of its settings, it can produce very different-feeling dungeon systems.
+這個設計非常簡單，但僅僅透過一些設定，它就可以產生非常不同感覺的地下城系統。
 
-### The starting room
+(the-starting-room)=
+### 起始房間
 
-The idea is that all players will descend down a well to get to the start of the dungeon. The bottom of the well is a statically created room that won't change.
+這個想法是所有玩家都會從井裡下降到地牢的起點。井的底部是一個靜態建立的房間，不會改變。
 
 ```{code-block}
 :caption: Starting room
@@ -38,16 +41,17 @@ Branch W ◄─┼─►     up▲     ◄─┼─► Branch E1
                  Branch S               
 ```
 
-The magic happens when you choose one of the exits from this room (except the one leading you back to the surface). Let's assume a PC descends down to the start room and moves `east`:
+當你選擇這個房間的出口之一（除了帶你回到地面的出口）時，奇蹟就會發生。我們假設 PC 下降到起始房間並移動 `east`：
 
-- The first person to go east will spawn a new "Dungeon branch" (Branch E1 in the diagram). This is a separate "instance" of dungeon compared to what would spawn if moving through any of the other exits. Rooms spawned within one dungeon branch will never overlap with that of another dungeon branch. 
-- A timer starts. While this timer is active, everyone going `east` will end up in Branch E1. This allows for players to team up and collaborate to take on a branch. 
-- After the timer runs out, everyone going `east` will instead end up in a _new_ Branch E2. This is a new branch that has no overlap with Branch E1. 
-- PCs in Branches E1 and E2 can always retreat `west` back to the starting room, but after the timer runs out this is now a one-way exit - they won't be able to return to their old branches if they do.
+- 第一個向東走的人會產生一個新的「地下城分支」（圖中的分支E1）。與穿過任何其他出口時生成的地下城相比，這是一個單獨的地下城「例項」。在一個地下城分支內生成的房間永遠不會與另一個地下城分支的房間重疊。
+- 計時器啟動。當此計時器處於活動狀態時，前往 `east` 的每個人最終都會到達分支 E1。這允許玩家組隊並協作來佔領一個分支。
+- 計時器耗盡後，前往 `east` 的每個人都將進入_new_分支 E2。這是一個與分支 E1 沒有重疊的新分支。
+- 分支 E1 和 E2 中的 PC 始終可以`west` 撤退到起始房間，但在計時器耗儘後，這現在是單向出口 - 如果他們這樣做，他們將無法返回到原來的分支。
 
-### Generating new branch rooms
+(generating-new-branch-rooms)=
+### 產生新的分支房間
 
-Each dungeon branch is itself tracking the layout of rooms belonging to this branch on an (X, Y) coordinate grid.
+每個地下城分支本身都會在（X，Y）座標網格上追蹤屬於該分支的房間佈局。
 
 ```{code-block}
 :caption: Creating the eastern branch and its first room
@@ -65,23 +69,23 @@ Each dungeon branch is itself tracking the layout of rooms belonging to this bra
                    ▼         
 ```
 
-The start room is always at coordinate `(0, 0)`.  
+起始房間始終位於座標`(0, 0)`。
 
-A dungeon room is only created when actually moving to it. In the above example, the PC moved `east` from the start room, which initiated a new dungeon branch. The branch also created a new room (room `A`) at coordinate `(1,0)`. In this case it (randomly) seeded this room with three exits `north`, `east` and `south`.
-Since this branch was just created, the exit back to the start room is still two-way.
+地牢房間只有在實際移動到它時才會建立。在上面的例子中，PC從起始房間移動了`east`，這啟動了一個新的地下城分支。該分支機構還在坐標`(1,0)`處建立了一個新房間（房間`A`）。在本例中，它（隨機）在該房間中播種了三個出口 `north`、`east` 和 `south`。
+由於這個分支剛剛建立，回到起始房間的出口仍然是雙向的。
 
-This is the procedure the dungeon branch follows when spawning a new room:
+這是地牢分支在生成新房間時遵循的程式：
 
-- It always creates an exit back to the room we came from.
-- It checks how many unexplored exits we have in the dungeon right now. That is, how many exits we haven't yet traversed. This number must never be zero unless we want a dungeon that can be 'finished'. The maximum number of unexplored exits open at any given time is a setting we can experiment with. A small max number leads to linear dungeon, a bigger number makes the dungeon sprawling and maze-like.
-- Outgoing exits (exits not leading back to where we came) are generated with the following rules:
-    - Randomly create between 0 and the number of outgoing exits allowed by the room and the branches' current budget of allowed open unexplored exits.
-    - Create 0 outgoing exits (a dead-end) only if this would leave at least one unexplored exit open somewhere in the dungeon branch.
-    - Do _not_ create an exit that would connect the exit to a previously generated room (so we prefer exits leading to new places rather than back to old ones)
-    - If a previously created exit end up pointing to a newly created room, this _is_ allowed, and is the only time a one-way exit will happen (example below). All other exits are always two-way exits. This also presents the only small chance of closing out a dungeon with no way to proceed but to return to the start.
-    - Never create an exit back to the start room (e.g. from another direction). The only way to get back to the start room is by back tracking.
+- 它總是建立一個返回我們原來房間的出口。
+- 它檢查目前地牢中有多少個未探索的出口。也就是說，我們還沒有走過多少個出口。這個數字絕對不能為零，除非我們想要一個可以「完成」的地下城。在任何給定時間開啟的未探索出口的最大數量是我們可以嘗試的設定。較小的最大數字會導致線性地牢，較大的數字會使地牢蔓延且像迷宮一樣。
+- 外出出口（不返回我們來的地方的出口）是根據以下規則產生的：
+    - 隨機建立 0 到房間允許的傳出出口數量以及分支目前允許開啟的未探索出口的預算。
+    - 只有當這會在地牢分支中的某處留下至少一個未探索的出口時，才建立 0 個傳出出口（死衚衕）。
+    - 不要建立一個將出口連線到先前生成的房間的出口（因此我們更喜歡通往新地點的出口而不是返回舊地點）
+    - 如果先前建立的出口最終指向新建立的房間，則這是允許的，並且是唯一一次發生單向出口（如下例）。所有其他出口始終是雙向出口。這也提供了關閉地牢的唯一小機會，除了返回起點之外無法繼續。
+    - 切勿建立返回起始房間的出口（e.g.從另一個方向）。返回起始房間的唯一方法是回溯。
 
-In the following examples, we assume the maximum number of unexplored exits allowed open at any time is set to 4. 
+在以下範例中，我們假設任何時間允許開啟的未探索出口的最大數量設定為 4。
 
 ```{code-block}
 :caption: After four steps in the eastern dungeon branch
@@ -105,12 +109,12 @@ In the following examples, we assume the maximum number of unexplored exits allo
               └─────────┘   └─────────┘   └─────────┘
 ```
 
-1. PC moves `east` from the start room. A new room `A` (coordinate `(1, 0)` ) is created. After a while the exit back to the start room becomes a one-way exit. The branch can have at most 4 unexplored exits, and the dungeon branch randomly adds three additional exits out of room `A`. 
-2. PC moves `south`. A new room `B` (`(1,-1)`) is created, with two random exits, which is as many as the orchetrator is allowed to create at this time (4 are now open). It also always creates an exit back to the previous room (`A`)
-3. PC moves `east` (coordinate (`(2, -1)`). A new room `C` is created. The  dungaon branch already has 3 exits unexplored, so it can only add one exit our of this room. 
-4. PC moves `east` (`(3, -1)`). While the dungeon branch still has a budget of one exit, it knows there are other unexplored exits elsewhere, and is allowed to randomly create 0 exits. This is a dead end. The PC must go back and explore another direction.
+1. PC 從起始房間移動 `east`。建立一個新房間 `A` （座標 `(1, 0)`）。一段時間後，返回起始房間的出口變成單向出口。該分支最多可以有4個未探索的出口，並且地下城分支在房間`A`之外隨機新增三個額外的出口。
+2. PC移動`south`。建立一個新房間 `B` (`(1,-1)`)，有兩個隨機出口，這是編排器此時允許建立的數量（現在開啟了 4 個）。它還總是建立返回前一個房間的出口 (`A`)
+3. PC移動`east`（座標（`(2, -1)`）。一個新房間`C`被建立。地下城分支已經有3個出口未探索，所以只能在這個房間增加一個出口。
+4. PC 移動 `east` (`(3, -1)`)。雖然地下城分支仍然有一個出口的預算，但它知道其他地方有其他未探索的出口，並且允許隨機建立 0 個出口。這是一個死衚衕。 PC必須回去探索另一個方向。
 
-Let's change the dungeon a bit to do another example: 
+讓我們稍微改變一下地牢來做另一個例子：
 
 ```{code-block}
 :caption: Looping around
@@ -135,7 +139,7 @@ Let's change the dungeon a bit to do another example:
 
 ```
 
-In this example the PC moved `east`, `south`, `east` but the exit out of room `C` is leading north, into a coordinate where `A` already has an exit pointing to. Going `north` here leads to the following: 
+在此範例中，PC 移動了 `east`、`south`、`east`，但房間 `C` 的出口朝北，進入 `A` 已經有出口指向的座標。在這裡使用 `north` 會導致以下結果：
 
 ```{code-block}
 :caption: Creation of a one-way exit
@@ -159,13 +163,13 @@ In this example the PC moved `east`, `south`, `east` but the exit out of room `C
               └─────────┘   └─────────┘
 ```
 
-As the PC moves `north`, the room `D` is created at `(2,0)`. 
+當 PC 移動 `north` 時，在 `(2,0)` 建立房間 `D`。
 
-While `C` to `D` get a two-way exit as normal, this creates a one-way exit from `A` to `D`. 
+雖然 `C` 到 `D` 正常情況下會獲得雙向出口，但這會建立從 `A` 到 `D` 的單向出口。
 
-Whichever exit leads to actually creating the room gets the two-way exit, so if the PC had walked back from `C` and created room `D` by going `east` from room `A`, then the one-way exit would be from room `C` instead.
+無論哪個出口導致實際建立房間，都會獲得雙向出口，因此，如果 PC 從 `C` 返回並透過從房間 `A` 前往 `east` 建立了房間 `D`，則單向出口將從房間 `C` 開始。
 
-> If the maximum allowed number of open unexplored exits is small, this case is the only situation where it's possible to 'finish' the dungeon (having no more unexplored exits to follow). We accept this as a case where the PCs just have to turn back and try another dungeon branch.
+> 如果開放的未探索出口的最大允許數量很小，則這種情況是唯一可以「完成」地牢的情況（沒有更多未探索的出口可跟隨）。我們接受這種情況，因為玩家只需要返回並嘗試另一個地下城分支。
 
 ```{code-block}
 :caption: Never link back to start room
@@ -189,49 +193,53 @@ Whichever exit leads to actually creating the room gets the two-way exit, so if 
 └─────────┘   └─────────┘   └─────────┘
 ```
 
-Here the PC moved `west` from room `B` creating room `E` at `(0, -1)`. 
+這裡PC從房間`B`移動了`west`，在`(0, -1)`建立了房間`E`。
 
-The dungeon branch never creates a link back to the start room, but it _could_ have created up to two new exits `west` and/or `south`. Since there's still an unexplored exit `north` from room `A`, the  branch is also allowed to randomly assign 0 exits, which is what it did here. 
+地牢分支永遠不會建立返回起始房間的連結，但它_可能_建立最多兩個新出口`west`和/或`south`。由於房間 `A` 仍有一個未探索的出口 `north`，因此分支也可以隨機分配 0 個出口，這就是它在這裡所做的。
 
-The PC needs to backtrack and go `north` from `A` to continue exploring this dungeon branch.
+PC需要從`A`原路返回並前往`north`才能繼續探索這個地下城分支。
 
-### Making the dungeon dangerous
+(making-the-dungeon-dangerous)=
+### 讓地牢變得危險
 
-A dungeon would not be interesting without peril! There needs to be monsters to slay, puzzles to solve and treasure to be had.
+如果沒有危險，地牢就不會有趣！需要有怪物要殺死，需要解決謎題，需要有寶藏。
 
-When PCs first enters a room, that room is marked as `not clear`. While a room is not cleared, the PCs _cannot use any of the unexplored exits out of that room_.  They _can_ still retreat back the way they came unless they become locked in combat, in which case they have to flee from that first. 
+當電腦第一次進入房間時，房間被標記為`not clear`。當房間未被清理時，電腦_不能使用該房間的任何未探索的出口_。  他們仍然可以原路撤退，除非他們陷入戰鬥，在這種情況下他們必須先逃離。
 
-Once PCs have overcome the challenge of the room (and probably earned some reward), will it change to `clear` .  A room can auto-clear if it is spawned empty or has no challenge meant to block the PCs (like a written hint for a puzzle elsewhere).
+一旦電腦克服了房間的挑戰（並可能獲得了一些獎勵），它會變成 `clear` 。  如果房間是空的或沒有旨在阻止 PC 的挑戰（例如其他地方的謎題的書面提示），則房間可以自動清除。
 
-Note that clear/non-clear only relates to the challenge associated with that room. Roaming monsters (see the [AI tutorial](./Beginner-Tutorial-AI.md)) can lead to combat taking place in previously 'cleared' rooms.
+請注意，清晰/不清晰僅與與該房間相關的挑戰有關。漫遊怪物（參見 [AI 教學](./Beginner-Tutorial-AI.md)）可能會導致戰鬥發生在先前「清理」的房間中。
 
-### Difficulty scaling
+(difficulty-scaling)=
+### 擴充難度
 
-```{sidebar} Risk and reward
-The concept of dungeon depth/difficulty works well together with limited resources. If healing is limited to what can be carried, this leads to players having to decide if they want to risk push deeper or take their current spoils and retreat back to the surface to recover.
+```{sidebar} 風險與報酬
+地牢深度/難度的概念與有限的資源配合得很好。如果治療僅限於可攜帶的東西，這會導致玩家必須決定是要冒險深入，還是拿走當前的戰利品並撤退到地表恢復。
 ```
 
-The "difficulty" of the dungeon is measured by the "depth" PCs have delved to. This is given as the _radial distance_ from the start room, rounded down, found by the good old [Pythagorean theorem](https://en.wikipedia.org/wiki/Pythagorean_theorem):
+地下城的「難度」是透過玩家探索的「深度」來衡量的。這是從起始房間開始的_徑向距離_，向下捨入，由古老的[畢達哥拉斯定理](https://en.wikipedia.org/wiki/Pythagorean_theorem) 得出：
 
     depth = int(math.sqrt(x**2 + y**2))
 
-So if you are in room `(1, 1)` you are at difficulty 1. Conversely at room coordinate `(4,-5)`  the difficulty is 6. Increasing depth should lead to tougher challenges but greater rewards.
+因此，如果您在房間 `(1, 1)` 中，您的難度為 1。相反，在房間座標 `(4,-5)` 中，難度為 6。增加深度應該會帶來更艱鉅的挑戰，但也會帶來更大的回報。
 
-## Start Implementation
+(start-implementation)=
+## 開始實施
 
-Let's implement the design now!
+現在就讓我們來實現設計吧！
 
 ```{sidebar}
-You can also find code examples of the dungeon generator at `evennia/contrib/tutorials`, in [evadventure/dungeon.py](evennia.contrib.tutorials.evadventure.dungeon).
+您也可以在 `evennia/contrib/tutorials` 的 [evadventure/dungeon.py](evennia.contrib.tutorials.evadventure.dungeon) 中找到地下城產生器的程式碼範例。
 ```
-> Create a new module `evadventure/dungeon.py`.
+> 建立一個新模組`evadventure/dungeon.py`。
 
-## Basic Dungeon rooms
+(basic-dungeon-rooms)=
+## 基本地城房間
 
-This is the fundamental element of the design, so let's start here.
+這是設計的基本元素，所以讓我們從這裡開始。
 
-Back in the [lesson about rooms](./Beginner-Tutorial-Rooms.md) we created a basic `EvAdventureRoom` typeclass. 
-We will expand on this for dungeon rooms.
+回到[關於房間的課程](./Beginner-Tutorial-Rooms.md)，我們建立了一個基本的`EvAdventureRoom` typeclass。 
+我們將在地牢房間中對此進行擴充套件。
 
 ```{code-block} python
 :linenos: 
@@ -284,24 +292,25 @@ class EvAdventureDungeonRoom(EvAdventureRoom):
             return "|rThe path forwards is blocked!|n"
 ```
 
-```{sidebar} Storing the room typeclass
-For this tutorial, we're keeping all dungeon-related code in one module. But one _could_ also argue that they belong in `evadventure/rooms.py` together with the other rooms. This is only a matter of how you want to organize things. Feel free to organize however you prefer for your own game.
+```{sidebar} 儲藏室typeclass
+在本教學中，我們將所有與地下城相關的程式碼保留在一個模組中。但也可以認為它們與其他房間一起屬於`evadventure/rooms.py`。這只是您想要如何組織事物的問題。您可以隨意組織自己的遊戲。
 ```
 
-- **Lines 14-15**: Dungeon rooms are dangerous, so unlike base EvAdventure rooms, we allow combat and death to happen in them.
-- **Line 17**: We store a reference to the dungeon branch so that we can access it during room creation if we want. This could be relevant if we want to know things about the dungeon branch as part of creating rooms.
-- **Line 18**: The xy coords will be simply stored as a tuple `(x,y)` on the room. 
+- **第 14-15 行**：地牢房間很危險，因此與基礎 EvAdventure 房間不同，我們允許戰鬥和死亡在其中發生。
+- **第 17 行**：我們儲存對地下城分支的引用，以便我們可以在房間建立期間存取它（如果需要）。如果我們想了解有關地下城分支的資訊作為建立房間的一部分，這可能是相關的。
+- **第 18 行**：xy 座標將簡單地儲存為房間中的元組 `(x,y)`。
 
-All other functionality is built to manage the "clear" state of the room. 
+所有其他功能都是為了管理房間的「乾淨」狀態而建造的。
 
-- **Line 29**: When we create the room Evennia will always call its `at_object_creation` hook. We make sure to add a add a [Tag](../../../Components/Tags.md) `not_clear` to it (category "dungeon_room" to avoid collisions with other systems).
-- **Line 32**: We will use the `.clear_room()` method to remove this Tag once the room's challenge is overcome. 
-- **Line 36** `.is_room_clear` is a convenient property for checking the tag. This hides the Tag so we don't need to worry about we track the clear-room state.
-- **Line 38** The `get_display_footer` is a standard Evennia hook for customizing the room's footer display. 
+- **第29行**：當我們建立房間Evennia時，總是會呼叫它的`at_object_creation`鉤子。我們確保為其新增 [Tag](../../../Components/Tags.md) `not_clear`（類別「dungeon_room」以避免與其他系統發生衝突）。
+- **第 32 行**：一旦克服了房間的挑戰，我們將使用 `.clear_room()` 方法刪除此 Tag。
+- **第 36 行** `.is_room_clear` 是檢查 tag 的便捷屬性。這隱藏了Tag，所以我們不需要擔心我們追蹤乾淨的房間狀態。
+- **第 38 行** `get_display_footer` 是一個標準的 Evennia 掛鉤，用於自訂房間的頁尾顯示。
 
-## Dungeon exits 
+(dungeon-exits)=
+## 地牢出口
 
-The dungeon exits are special in that we want the very act of traversing them to create the room on the other side. 
+地牢出口的特殊之處在於，我們希望透過穿越它們的行為來創造另一側的房間。
 
 ```python
 # in evadventure/dungeon.py 
@@ -337,19 +346,21 @@ class EvAdventureDungeonExit(DefaultExit):
 
 ```
 
-For now, we have not actually created the code for creating a new room in the branch, so we leave the `at_traverse` method un-implemented for now. This hook is what is called by Evennia when traversing the exit. 
+目前，我們還沒有實際建立在分支中建立新房間的程式碼，因此我們暫時保留 `at_traverse` 方法未實現。這個鉤子是Evennia在遍歷出口時所呼叫的。
 
-In the `at_object_creation` method we make sure to add a [Lock](../../../Components/Locks.md) of type "traverse", which will limit who can pass through this exit. We lock it with the [objlocktag](evennia.locks.lockfuncs.objloctag) Lock function. This checks if the accessed object (this exit)'s location (the dungeon room) has a tag "not_clear" with category "dungeon_room" on it. If it does, then the traversal _fails_. In other words, while the room is not cleared, this type of exit will not let anyone through. 
+在`at_object_creation`方法中，我們確保增加一個「traverse」型別的[Lock](../../../Components/Locks.md)，這將限制誰可以透過這個出口。我們使用 [objlocktag](evennia.locks.lockfuncs.objloctag) Lock 函式lock 它。這會檢查訪問物件（此出口）的位置（地牢房間）是否有 tag“not_clear”，其類別為“dungeon_room”。如果是，則遍歷_失敗_。也就是說，在房間沒有清理乾淨的情況下，這種出口不會讓任何人透過。
 
-The `at_failed_traverse` hook lets us customize the error message if a PC tries to use the exit before the room is cleared. 
+如果 PC 在房間被清理之前嘗試使用出口，`at_failed_traverse` 鉤子允許我們自訂錯誤訊息。
 
-## Dungeon Branch and the xy grid
+(dungeon-branch-and-the-xy-grid)=
+## 地下城分支和 xy 網格
 
-The dungeon branch is responsible for the structure of one instance of the dungeon.
+地牢分支負責地牢的一個例項的結構。
 
-### Grid coordinates and exit mappings
+(grid-coordinates-and-exit-mappings)=
+### 網格座標和退出對映
 
-Before we start, we need to establish some constants about our grid - the xy plane we will be placing our rooms on. 
+在開始之前，我們需要建立一些關於網格的常數 - 我們將放置房間的 xy 平面。
 
 ```python
 # in evadventure/dungeon.py 
@@ -387,13 +398,14 @@ _EXIT_GRID_SHIFT = {
 }
 ```
 
-In this tutorial we only allow NESW movement. You could easily add the NE, SE, SW, NW directions too if you wanted to. We make mappings for exit aliases (there is only one here, but there could be multiple per direction too). We also figure out the "reverse" directions so we'll easily be able to create a 'back exit' later. 
+在本教學中，我們僅允許 NESW 移動。如果您願意，您也可以輕鬆增加 NE、SE、SW、NW 方向。我們為出口別名進行對映（這裡只有一個，但每個方向也可以有多個）。我們還找出“反向”方向，以便稍後能夠輕鬆建立“後退”。
 
-The `_EXIT_GRID_SHIFT` mapping indicates how the (x,y) coordinate shifts if you are moving in the specified direction. So if you stand in `(4,2)` and move `south`, you'll end up in `(4,1)`. 
+`_EXIT_GRID_SHIFT` 對映指示如果您朝指定方向移動，(x,y) 座標如何移動。因此，如果您站在 `(4,2)` 並移動 `south`，您最終將處於 `(4,1)`。
 
-#### Base structure of the Dungeon branch script
+(base-structure-of-the-dungeon-branch-script)=
+#### 地下城分支的基礎結構script
 
-We will base this component off an Evennia [Script](../../../Components/Scripts.md) - these can be thought of game entities without a physical presence in the world. Scripts also have time-keeping properties.
+我們將這個元件基於 Evennia [Script](../../../Components/Scripts.md) - 這些可以被認為是在世界上沒有物理存在的遊戲實體。 Scripts 還具有計時屬性。
 
 ```{code-block} 
 :linenos: 
@@ -471,22 +483,23 @@ class EvAdventureDungeonBranch(DefaultScript):
         pass  # to be implemented
 ```
 
-This sets up useful properties needed for the branch and sketches out some methods we will implement below. 
+這設定了分支所需的有用屬性，並概述了我們將在下面實現的一些方法。
 
-The branch has several main responsibilities: 
-- Track how many un-explored exits are available (making sure to not exceed the maximum allowed). As PCs traverse these exits we must update appropriately.
-- Create new rooms when an unexplored exit is traversed. This room can in turn have outgoing exits. We must also track these rooms and exits so we can delete them later when the branch is cleaned up. 
-- The branch must also be able to delete itself, cleaning up all its resources and rooms.
+分支機構有幾項主要職責：
+- 追蹤有多少個未探索的出口可用（確保不超過允許的最大數量）。當 PC 穿過這些出口時，我們必須進行適當的更新。
+- 當穿過未探索的出口時建立新房間。這個房間又可以有出口。我們還必須追蹤這些房間和出口，以便稍後在清理分支時刪除它們。
+- 分支也必須能夠刪除自身，清理其所有資源和房間。
 
-Since the `register_exit_traversed` and `create_out_exit` are straightforward, we implement them right away. The only extra thing about exit creation is that it must make sure to register the new exit as 'un-visited' so the branch can track it.
+由於 `register_exit_traversed` 和 `create_out_exit` 很簡單，我們立即實施它們。關於出口建立的唯一額外的事情是，它必須確保將新出口註冊為“未訪問”，以便分支可以追蹤它。
 
-### A note about the room-generator
+(a-note-about-the-room-generator)=
+### 關於房間生成器的注意事項
 
-Of special note is the `room_generator` property of `EvAdventureDungeonBranch`. This will point to a function. We make this a plug-in since generating a room is something we will probably want to heavily customize as we create the game content - this is where we would generate our challenges, room descriptions etc. 
+特別值得注意的是 `EvAdventureDungeonBranch` 的 `room_generator` 屬性。這將指向一個函式。我們將其作為一個外掛，因為生成房間是我們在建立遊戲內容時可能需要大量自訂的內容 - 這是我們生成挑戰、房間描述等的地方。
 
-It makes sense that the room generator must have a link to the dungeon branch, the current expected difficulty (depth in our case) and the xy coordinates to create the room at. 
+房間生成器必須具有到地下城分支、當前預期難度（在我們的例子中為深度）以及建立房間的 xy 坐標的連結，這是有道理的。
 
-Here is an example of a very basic room generator that just maps depth to different room descriptions: 
+這是一個非常基本的房間生成器的範例，它僅將深度對映到不同的房間描述：
 
 ```
 # in evadventure/dungeon.py (could also be put with game content files)
@@ -536,22 +549,23 @@ def room_generator(dungeon_branch, depth, coords):
 
 ```
 
-There's a _lot_ of logic that can go into this function - depending on depth, coordinate or random chance we could generate all sorts of different rooms, and fill it with mobs, puzzles or what have you. Since we have access to the dungeon-branch object we could even change things in other rooms to make for really complex interactions (multi-room puzzles, anyone?).
+這個函式可以包含大量邏輯 - 根據深度、座標或隨機機會，我們可以產生各種不同的房間，並用小怪、謎題或其他東西填充它。由於我們可以存取地牢分支物件，我們甚至可以更改其他房間中的東西以實現真正複雜的互動（多房間謎題，有人嗎？）。
 
-This will come into play in [Part 4 of this tutorial](../Part4/Beginner-Tutorial-Part4-Overview.md), where we'll make use of the tools we are creating here to actually build the game world.
+這將在[本教學的第 4 部分](../Part4/Beginner-Tutorial-Part4-Overview.md) 中發揮作用，我們將利用我們在這裡建立的工具來實際建立遊戲世界。
 
-### Deleting a dungeon branch 
+(deleting-a-dungeon-branch)=
+### 刪除地下城分支
 
-We will want to be able to clean up a branch. There are many reasons for this: 
-- Once every PC has left the branch there is no way for them to return, so all that data is now just taking up space.
-- Branches are not meant to be permanent. So if players were to just stop exploring and sit around in the branch for a very long time, we should have a way to just force them back out.
+我們希望能夠清理一個分支。造成這種情況的原因有很多：
+- 一旦每個 PC 離開分支，他們就無法返回，因此所有資料現在只是佔用空間。
+- 分支機構並不意味著是永久性的。因此，如果玩家停止探索並在樹枝上呆了很長時間，我們應該有辦法迫使他們退出。
 
-In order for properly cleaning out characters inside this dungeon, we make a few assumptions:
-- When we create the dungeon branch, we give its script a unique identifier (e.g. something involving the current time).
-- When we start the dungeon branch, we tag that character with the branch's unique identifier. 
-- Similarly, when we create rooms inside this branch, we tag them with the branch's identifier.
+為了正確清理該地下城內的角色，我們做了一些假設：
+- 當我們建立地下城分支時，我們給它的script一個唯一的識別碼（e.g。涉及當前時間的東西）。
+- 當我們啟動地下城分支時，我們tag 該角色具有分支的唯一識別碼。
+- 同樣，當我們在該分支內建立房間時，我們使用分支的識別碼tag它們。
 
-If have done that it will be easy to find all characters and rooms associated with the branch in order to do this cleanup operation.
+如果這樣做了，將很容易找到與分支關聯的所有角色和房間，以便執行此清理操作。
 
 ```python
 # in evadventure/dungeon.py 
@@ -593,15 +607,16 @@ class EvAdventureDungeonBranch(DefaultScript):
 
 ```
 
-The `evennia.search.search_object_by_tag` is an in-built Evennia utility for finding objects tagged with a specific tag+category combination. 
+`evennia.search.search_object_by_tag` 是內建的 Evennia 實用程式，用於尋找以特定 tag+類別組合標記的物件。
 
-1. First we get the characters and move them safely to the start room, with a relevant message.
-2. Then we get all the rooms in the branch and delete them (exits will be deleted automatically).
-3. Finally we delete the branch itself. 
+1. 首先，我們取得角色並將它們安全地移動到起始房間，並附上相關訊息。
+2. 然後我們獲取分支中的所有房間並將其刪除（出口將自動刪除）。
+3. 最後我們刪除分支本身。
 
-### Creating a new dungeon room
+(creating-a-new-dungeon-room)=
+### 建立一個新的地牢房間
 
-This is the meat of the Dungeon branch's responsibilities. In this method we create the new room but also need to create exits leading back to where we came from as well as (randomly) generate exits to other parts of the dungeon. 
+這是地下城分支的主要職責。在這種方法中，我們建立新房間，但還需要建立返回我們來自的地方的出口，以及（隨機）產生通往地牢其他部分的出口。
 
 
 ```{code-block}
@@ -692,23 +707,24 @@ class EvAdventureDungeonBranch(DefaultScript):
         return new_room
 ```
 
-A lot to unpack here! 
+這裡有很多東西要解壓縮！
 
-- **Line 17**: We store the 'last updated' time as the current UTC timestamp. As we discussed in the deletion section just above we need to know if a branch has been 'idle' for a long time, and this helps track that. 
-- **Line 20**: The `from_exit` input is an Exit object (probably a `EvAdventureDungeonExit)` It is located in the 'source' location (where we start moving from).  On the subsequent lines we figure out the coordinates of the source and where we'd end up by moving in the direction suggested
-- **Line 28**: Pythagorean theorem!
-- **Line 30**: Here we call the `room_generator` plugin function we exemplified above to get the new room.
-- **Line 34**: We always create a back-exit the way we came. This _overrides_ the default dungeon exit lock with `"traverse:true()"`, meaning the PCs will always be able to go back the way they came.
-- **Line 44**: We could leave the `destination` field empty, but Evennia assumes exits have a `destination` field set when it displays things in the room etc. So to avoid having to change how rooms display things, this value should be set to _something_.  Since we don't want to create the actual destination yet we instead instead point the `destination` back to the current room. That is - if you could pass through this exit you'd end up in the same place. We'll use this below to identify non-explored exits.
-- **Line 55**: We only create new exits our 'budget' of unexplored exits allows it.
-- **Line 64**: On the line above we create a new list of all possible exits-directions the room can have (excluding the must-have back-exit). Here we shuffle this list in a random order. 
-- **Line 69**: In this loop we pop off the first element of the shuffled list (so this is a random direction). On the following lines we check so that this direction is not pointing to an already existing dungeon room, nor back to the start room. If all is good we call our exit-creation method on **Line 74**.
+- **第 17 行**：我們將「上次更新」時間儲存為目前 UTC 時間戳記。正如我們在上面的刪除部分中討論的那樣，我們需要知道分支是否已經「空閒」很長時間，這有助於追蹤。
+- **第 20 行**：`from_exit` 輸入是一個 Exit 物件（可能是 `EvAdventureDungeonExit)` 它位於「來源」位置（我們開始移動的位置）。在後續行中，我們計算出來源的座標以及按照建議的方向移動最終到達的位置
+- **第 28 行**：畢達哥拉斯定理！
+- **第30行**：這裡我們呼叫上面範例的`room_generator`外掛函式來取得新房間。
+- **第 34 行**：我們總是按照來時的方式建立一個後退出口。這_覆蓋_預設的地下城出口lock為`"traverse:true()"`，這意味著PC將始終能夠返回它們來時的方式。
+- **第 44 行**：我們可以將 `destination` 欄位留空，但 Evennia 假設出口在顯示房間等中的東西時設定了 `destination` 欄位。因此，為了避免必須更改房間顯示東西的方式，該值應設為 _something_。  由於我們不想建立實際的目的地，所以我們改為將 `destination` 指向當前房間。也就是說，如果你能透過這個出口，你最終會到達同一個地方。我們將在下面使用它來識別未探索的出口。
+- **第 55 行**：我們僅在未探索出口的「預算」允許的情況下建立新出口。
+- **第 64 行**：在上面的行中，我們建立了房間可以擁有的所有可能出口方向的新清單（不包括必須有的後退出口）。在這裡，我們以隨機順序打亂此列表。
+- **第 69 行**：在此迴圈中，我們彈出打亂列表的第一個元素（因此這是一個隨機方向）。在接下來的幾行中，我們檢查該方向是否指向已經存在的地牢房間，也不指向起始房間。如果一切順利，我們將在**第 74 行**呼叫我們的退出建立方法。
 
-In the end the outcome is a new room with at least one back-exit and 0 or more unexplored exits.
+最後的結果是一個新房間，至少有一個後退出口和 0 個或更多未探索的出口。
 
-## Back to the dungeon exit class 
+(back-to-the-dungeon-exit-class)=
+## 回到地牢出口等級
 
-Now that we have the tools, we can go back to the `EvAdventureDungeonExit` class to implement that `at_traverse` method we skipped before.
+現在我們有了工具，我們可以回到 `EvAdventureDungeonExit` 類別來實現我們之前跳過的 `at_traverse` 方法。
 
 ```python
 # in evadventure/dungeon.py 
@@ -737,17 +753,18 @@ class EvAdventureDungeonExit(DefaultExit):
 
 ```
 
-We get the `EvAdventureDungeonBranch` instance and check out if this current exit is pointing back to the current room. If you read line 44 in the previous section, you'll notice that this is the way to find if this exit is previously non-explored! 
+我們取得 `EvAdventureDungeonBranch` 例項並檢查目前出口是否指向目前房間。如果您閱讀了上一節中的第 44 行，您會注意到這是在尋找此出口之前是否未探索過的方法！
 
-If so, we call the dungeon branche's `new_room` to generate a new room and change this exit's `destination` to it. We also make sure to call  `.register_exit_traversed` to show that is exit is now 'explored'.
+如果是這樣，我們呼叫地牢分支的`new_room`來產生一個新房間，並將這個出口的`destination`更改為它。我們還確保呼叫 `.register_exit_traversed` 以表明現在已「探索」出口。
 
-We must also call the parent class' `at_traverse` using `super()` since that is what is actually moving the PC to the newly created location.
+我們還必須使用 `super()` 呼叫父類別'`at_traverse`，因為這實際上是將 PC 移至新建立的位置。
 
-## Starting room exits 
+(starting-room-exits)=
+## 起始房間出口
 
-We now have all the pieces for actually running a procedural dungeon branch once it's created. What's missing is the start room from which all branches originate. 
+我們現在擁有了在建立程式地下城分支後實際執行它的所有部分。缺少的是所有分支起源的起始房間。
 
-As described in the design, the room's exits will spawn new branches, but there should also be a time period while PCs will all end up in the same branch. So we need a special type of exit for those exits leading out of the starting room.
+如設計中所描述的，房間的出口會產生新的分支，但也應該有一個時間段，PC最終都會出現在同一個分支中。因此，我們需要一種特殊型別的出口來處理從起始房間出來的出口。
 
 ```{code-block} python
 :linenos:
@@ -788,21 +805,22 @@ class EvAdventureDungeonStartRoomExit(DefaultExit):
         super().at_traverse(traversing_object, target_location, **kwargs)
 ```
 
-This exit has everything it needs for creating a new dungeon branch. 
+這個出口擁有創造新的地下城分支所需的一切。
 
-- **Line 12**: Disconnects the exit from whatever it was connected to and links it back to the current room (a looping, worthless exit).
-- **Line 19**: The `at_traverse` is called when someone moves through this exit. We detect that special condition above (destination equal to current location) to determine that this exit is currently leading nowhere and we should create a new branch. 
-- **Line 22**: We create a new `EvAdventureDungeonBranch`and make sure to give it a unique `key` based on the current time. We also make sure to set its starting Attributes.
-- **Line 32**: When the player traverses this exit, the character gets tagged with the appropriate tag for this dungeon branch. This can be used by the deletion mechanism later.
+- **第 12 行**：斷開出口與其所連線的任何連線，並將其連結回當前房間（迴圈、無價值的出口）。
+- **第 19 行**：當有人穿過此出口時，將呼叫 `at_traverse`。我們偵測到上面的特殊條件（目的地等於當前位置）以確定該出口目前無處可去，我們應該建立一個新分支。
+- **第 22 行**：我們建立一個新的 `EvAdventureDungeonBranch` 並確保根據當前時間為其賦予唯一的 `key`。我們還確保設定其起始屬性。
+- **第 32 行**：當玩家穿過此出口時，角色會被標記為該地下城分支的相應 tag。這可以被稍後的刪除機制使用。
 
-## Utility scripts 
+(utility-scripts)=
+## 效用scripts
 
-Before we can create the starting room, we need two last utilities: 
+在建立起始房間之前，我們需要最後兩個實用程式：
 
-- A timer for regularly resetting exits out of the starting room (so they create new branches).
-- A repeating task for cleaning out old/idle dungeon branches.
+- 用於定期重置退出起始房間的計時器（因此它們會建立新的分支）。
+- 清理舊/閒置地牢分支的重複任務。
 
-Both of these scripts are expected to be created 'on' the start room, so `self.obj` will be the start room.
+這兩個 scripts 預計都會在起始房間「上」建立，因此 `self.obj` 將是起始房間。
 
 ```python
 # in evadventure/dungeon.py
@@ -832,7 +850,7 @@ class EvAdventureStartRoomResetter(DefaultScript):
                 exi.reset_exit()
 ```
 
-This script is very simple - it just loops over all the start-room exits and resets each exit 50% of the time.
+這個 script 非常簡單 - 它只是迴圈所有起始房間出口並重置每個出口 50% 的時間。
 
 ```python
 # in evadventure/dungeon.py
@@ -867,11 +885,12 @@ class EvAdventureDungeonBranchDeleter(DefaultScript):
 
 ```
 
-This script checks all branches and sees how long it was since they were last updated (that is, a new room created in them). If it's been too long, the branch will be deleted (which will dump all players back in the start room).
+這個 script 檢查所有分支並檢視自上次更新以來已經過去了多長時間（即在其中建立了一個新房間）。如果時間太長，分支將被刪除（這會將所有玩家轉回起始房間）。
 
-## Starting room
+(starting-room)=
+## 起始房間
 
-Finally, we need a class for the starting room. This room will need to be manually created, after which the branches should create themselves automatically.
+最後，我們需要為起始房間建立一個類別。此房間需要手動建立，之後分支應自動建立。
 
 ```python
 # in evadventure/dungeon.py
@@ -918,19 +937,20 @@ class EvAdventureDungeonStartRoom(EvAdventureDungeonRoom):
 
 ```
 
-All that is left for this room to do is to set up the scripts we created and make sure to clear out the branch tags of any object returning from a branch into this room. All other work is handled by the exits and the dungeon-branches.
+這個房間剩下要做的就是設定我們建立的scripts，並確保清除從分支返回到這個房間的任何物件的分支tags。所有其他工作均由出口和地牢分支處理。
 
-## Testing 
+(testing)=
+## 測試
 
 ```{sidebar}
-Examples of unit testing files are found at `evennia/contrib/tutorials/` in [evadventure/tests/test_dungeon.py](evennia.contrib.tutorials.evadventure.tests.test_dungeon).
+單元測試檔案的範例位於 [evadventure/tests/test_dungeon.py](evennia.contrib.tutorials.evadventure.tests.test_dungeon) 中的`evennia/contrib/tutorials/`。
 ```
 
-> Create `evadventure/tests/test_dungeon.py`.
+> 建立`evadventure/tests/test_dungeon.py`。
 
-Testing the procedural dungeon is best done both with unit tests and manually. 
+測試程式地下城最好透過單元測試和手動來完成。
 
-To test manually, it's simple to in-game do 
+要手動測試，在遊戲中進行很簡單
 
 ```shell
 > dig well:evadventure.dungeon.EvAdventureDungeonStartRoom = down,up
@@ -941,12 +961,13 @@ To test manually, it's simple to in-game do
 > create/drop west;w:evadventure.dungeon.EvAdventureDungeonStartRoomExit
 ```
     
-You should now be able to head out one of the exits and start exploring the dungeon! This is particularly useful once everything works a
+現在您應該能夠走出其中一個出口並開始探索地牢！一旦一切正常，這尤其有用
 
-To unit test, you create a start room and exits in code, and then emulate a character moving through the exits, making sure the results are as expected.  We leave this an exercise to the reader.
+為了進行單元測試，您需要在程式碼中建立一個起始房間和出口，然後模擬一個角色穿過出口，確保結果符合預期。  我們將這個練習留給讀者。
 
-## Conclusions 
+(conclusions)=
+## 結論
 
-This is only skimming the surface of the possibilities of procedural generation, but with relatively easy means one can create an infinitely growing dungeon for players to explore.  
+這只是程式生成可能性的表面，但透過相對簡單的方法，我們可以建立一個無限增長的地下城供玩家探索。
 
-It's also worth that this only touches on how to procedurally generate the dungeon structure. It doesn't yet have much _content_ to fill the dungeon with. We will get back to that in [Part 4](../Part4/Beginner-Tutorial-Part4-Overview.md), where we'll make use of the code we've created to create game content.
+值得一提的是，這僅涉及如何按程式生成地牢結構。它還沒有太多_內容_來填滿地牢。我們將在[第 4 部分](../Part4/Beginner-Tutorial-Part4-Overview.md) 中回到這一點，我們將利用我們建立的程式碼來建立遊戲內容。

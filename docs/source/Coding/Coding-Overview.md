@@ -1,9 +1,10 @@
-# Coding and development help
+(coding-and-development-help)=
+# 開發與程式撰寫
 
-This documentation aims to help you set up a sane development environment to
-make your game, also if you never coded before.
+本文件旨在協助您建立一個健全的開發環境
+製作你的遊戲，即使你以前從未編碼過。
 
-See also the [Beginner Tutorial](../Howtos/Beginner-Tutorial/Beginner-Tutorial-Overview.md).
+另請參閱[入門教學](../Howtos/Beginner-Tutorial/Beginner-Tutorial-Overview.md)。
 
 ```{toctree}
 :maxdepth: 2
@@ -18,7 +19,9 @@ Continuous-Integration.md
 Setting-up-PyCharm.md
 ```
 
-## Evennia Changelog
+(evennia-changelog)=
+<a id="evennia-changelog"></a>
+## Evennia 變更紀錄
 
 ```{toctree}
 :maxdepth: 2

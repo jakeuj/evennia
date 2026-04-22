@@ -1,43 +1,46 @@
-# Online Setup
+(online-setup)=
+# 線上設定
 
-Evennia development can be made without any Internet connection beyond fetching updates. However, at some point, you are likely to want to make your game visible online, either as part of opening it to the public or to allow other developers or beta testers access to it.
+除了取得更新之外，Evennia 無需任何 Internet 連線即可進行開發。然而，在某些時候，您可能希望讓您的遊戲線上可見，無論是作為向公眾開放遊戲的一部分，還是允許其他開發人員或 Beta 測試人員訪問它。
 
-## Connecting to Evennia over the Internet
+(connecting-to-evennia-over-the-internet)=
+## 透過 Internet 連線到 Evennia
 
-Accessing your Evennia server from the outside is not hard on its own. Any issues are usually due to the various security measures of your computer, network, or hosting service. These will generally (and correctly) block outside access to servers on your machine unless you tell them otherwise.  
+從外部存取您的 Evennia 伺服器本身並不困難。任何問題通常都是由於您的電腦、網路或託管服務的各種安全措施造成的。這些通常會（並且正確地）阻止外部存取您電腦上的伺服器，除非您另有說明。
 
-We will start by showing how to host your server on your own local computer. Even if you plan to
-host your "real" game on a remote host later, setting it up locally is useful practice. We cover
-remote hosting later in this document.
+我們將首先展示如何在您自己的本機電腦上託管伺服器。即使你打算
+稍後在遠端主機上託管「真正的」遊戲，在本地進行設定是有用的做法。我們涵蓋
+本文件後面的遠端託管。
 
-Out of the box, Evennia uses three ports for outward communication. If your computer has a firewall, these should be open for in/out communication (and only these, other ports used by Evennia are internal to your computer only).
+開箱即用，Evennia 使用三個連線埠進行向外通訊。如果您的電腦有防火牆，則應開啟這些埠以進行輸入/輸出通訊（並且只有這些埠，Evennia 使用的其他埠僅是您計算機的內部埠）。
 
- - `4000`, telnet, for traditional mud clients
- - `4001`, HTTP, for the website
- - `4002`, websocket, for the web client
+ - `4000`，telnet，用於傳統的 mud 使用者端
+ - `4001`、HTTP，用於網站
+ - `4002`，websocket，用於網頁客戶端
 
-Evennia will by default accept incoming connections on all interfaces (`0.0.0.0`), so in principle anyone knowing the ports to use and has the IP address to your machine should be able to connect to your game.
+預設情況下，Evennia 將接受所有介面 (`0.0.0.0`) 上的傳入連線，因此原則上任何知道要使用的連線埠並且擁有您電腦的 IP 位址的人都應該能夠連線到您的遊戲。
 
-```{sidebar} Closing the log view
-If you need to close the log-view, use `Ctrl-C`. Use just `evennia --log` on its own to start tailing the logs again.
+```{sidebar} 關閉日誌檢視
+如果需要關閉日誌檢視，請使用`Ctrl-C`。僅單獨使用 `evennia --log` 即可再次開始追蹤日誌。
 ```
- - Make sure Evennia is installed and that you have activated the virtualenv. Start the server with `evennia start --log`. The `--log` (or `-l`) will make sure that the logs are echoed to the terminal.
- - Make sure you can connect with your web browser to `http://localhost:4001` or, alternatively, `http://127.0.0.1:4001` which is the same thing. You should get your Evennia web site and be able to play the game in the web client. Also check so that you can connect with a mud client to host `localhost`, port `4000` or host `127.0.0.1`, port `4000`.
-- [Google for "my ip"](https://www.google.se/search?q=my+ip) or use any online service to figure out what your "outward-facing" IP address is. For our purposes, let's say your outward-facing IP is `203.0.113.0`.
- - Next try your outward-facing IP by opening `http://203.0.113.0:4001` in a browser. If this works, that's it! Also try telnet, with the server set to `203.0.113.0` and port `4000`. However, most likely it will *not* work. If so, read on.
- - If your computer has a firewall, it may be blocking the ports we need (it may also block telnet overall). If so, you need to open the outward-facing ports to in/out communication. See the manual/instructions for your firewall software on how to do this. To test you could also temporarily turn off your firewall entirely to see if that was indeed the problem.
- - Another common problem for not being able to connect is that you are using a hardware router (like a wifi router). The router sits 'between' your computer and the Internet. So the IP you find with Google is the *router's* IP, not that of your computer. To resolve this you need to configure your router to *forward* data it gets on its ports to the IP and ports of your computer sitting in your private network. How to do this depends on the make of your router; you usually configure it using a normal web browser. In the router interface, look for "Port forwarding" or maybe "Virtual server". If that doesn't work, try to temporarily wire your computer directly to the Internet outlet (assuming your computer has the ports for it). You'll need to check for your IP again. If that works, you know the problem is the router.
+ - 確保已安裝 Evennia 並且您已啟動 virtualenv。使用 `evennia start --log` 啟動伺服器。 `--log`（或`-l`）將確保日誌回顯到終端。
+ - 確保您可以使用網頁瀏覽器連線到 `http://localhost:4001` 或 `http://127.0.0.1:4001`（兩者是相同的）。您應該獲得 Evennia 網站並能夠在 Web 使用者端中玩遊戲。另請檢查以便您可以與 mud 使用者端連線到主機 `localhost`、連線埠 `4000` 或主機 `127.0.0.1`、連線埠 `4000`。
+- [Google 搜尋「我的 ip」](https://www.google.se/search?q=my+ip) 或使用任何線上服務來找出您的「向外」IP 地址。出於我們的目的，假設您的外向 IP 是 `203.0.113.0`。
+ - 接下來，透過在瀏覽器中開啟 `http://203.0.113.0:4001` 來嘗試面向外的 IP。如果這有效，那就這樣了！也可以嘗試 telnet，將伺服器設定為 `203.0.113.0`，連線埠設定為 `4000`。然而，它很可能“不起作用”。如果是這樣，請繼續閱讀。
+ - 如果您的電腦有防火牆，它可能會阻止我們需要的連線埠（也可能阻止整個 telnet）。如果是這樣，您需要開啟向外的連線埠以進行輸入/輸出通訊。有關如何執行此操作的資訊，請參閱防火牆軟體的手冊/說明。為了測試，您也可以暫時完全關閉防火牆，看看這是否確實是問題所在。
+ - 無法連線的另一個常見問題是您使用的是硬體路由器（如 WiFi 路由器）。路由器位於您的電腦和網際網路「之間」。因此，您透過 Google 找到的 IP 是*路由器的* IP，而不是您電腦的IP。要解決此問題，您需要將路由器設定為將其連線埠上獲得的資料「轉送」至 IP 以及位於您的專用網路中的電腦的連線埠。如何執行此操作取決於路由器的品牌；您通常使用普通的網頁瀏覽器對其進行設定。在路由器介面中，尋找“連線埠轉送”或“虛擬伺服器”。如果這不起作用，請嘗試暫時將您的電腦直接連線到 Internet 插座（假設您的電腦有相應的連線埠）。您需要再次檢查您的 IP。如果有效，表示問題出在路由器。
 
 ```{note}
-If you need to reconfigure a router, the router's Internet-facing ports do *not* have to have to have the same numbers as your computer's (and Evennia's) ports! For example, you might want to connect Evennia's outgoing port 4001 to an outgoing router port 80 - this is the port HTTP requests use and web browsers automatically look for - if you do that you could go to `http://203.0.113.0` without having to add the port at the end. This would collide with any other web services you are running through this router though.
+如果您需要重新設定路由器，則路由器的面向 Internet 的連線埠*不必*必須與您的電腦（和 Evennia）的連線埠具有相同的編號！例如，您可能想要將 Evennia 的傳出連線埠 4001 連線到傳出路由器連線埠 80 - 這是 HTTP 請求使用且 Web 瀏覽器自動尋找的連線埠 - 如果您這樣做，您可以前往 `http://203.0.113.0` 而無需在末尾新增連線埠。但這會與您透過該路由器執行的任何其他 Web 服務發生衝突。
 ```
 
-### Settings example
+(settings-example)=
+### 設定範例
 
-You can connect Evennia to the Internet without any changes to your settings. The default settings are easy to use but are not necessarily the safest. You can customize your online presence in your [settings file](./Settings.md#settings-file). To have Evennia recognize changed port settings, you have to do a full `evennia reboot` to also restart the Portal and not just the Server component.
+您可以將 Evennia 連線到 Internet，而無需更改您的設定。預設設定易於使用，但不一定是最安全的。您可以在[設定檔](./Settings.md#settings-file) 中自訂您的線上狀態。要讓 Evennia 識別更改的連線埠設定，您必須執行完整的 `evennia reboot` 來重新啟動 Portal 而不僅僅是伺服器元件。
 
-Below is an example of a simple set of settings, mostly using the defaults. Evennia will require access to five computer ports, of which three (only) should be open to the outside world. Below we
-continue to assume that our server address is `203.0.113.0`.
+下面是一組簡單設定的範例，大部分使用預設值。 Evennia 將需要存取五個電腦埠，其中三個（僅）應向外界開放。下面我們
+繼續假設我們的伺服器位址是`203.0.113.0`。
 
 ```python
 # in mygame/server/conf/settings.py
@@ -66,9 +69,10 @@ ALLOWED_HOSTS = [".mymudgame.com"]
 
 ```
 
-Read on for a description of the individual settings.
+請繼續閱讀各個設定的說明。
 
-### Telnet
+(telnet)=
+### 遠端登入
 
 ```python
 # Required. Change to whichever outgoing Telnet port(s)
@@ -81,9 +85,10 @@ TELNET_PORTS = [4000]
 TELNET_INTERFACES = ['0.0.0.0']
 ```
 
-The `TELNET_*` settings are the most important ones for getting a traditional base game going. Which IP addresses you have available depends on your server hosting solution (see the next sections). Some hosts will restrict which ports you are allowed you use so make sure to check.
+`TELNET_*` 設定是讓傳統基礎遊戲運作的最重要的設定。您可以使用哪些 IP 位址取決於您的伺服器代管解決方案（請參閱下一節）。有些主機會限制您可以使用的埠，因此請務必檢查。
 
-### Web server
+(web-server)=
+### 網路伺服器
 
 ```python
 # Required. This is a list of tuples
@@ -102,16 +107,17 @@ WEBSERVER_INTERFACES = ['0.0.0.0']
 ALLOWED_HOSTS = ['*']
 ```
 
-The web server is always configured with two ports at a time. The *outgoing* port (`4001` by
-default) is the port external connections can use. If you don't want users to have to specify the
-port when they connect, you should set this to `80` - this however only works if you are not running
-any other web server on the machine.
+Web 伺服器始終同時設定兩個連線埠。 *傳出*連線埠（`4001` 由
+default) 是外部連線可以使用的連線埠。如果您不希望使用者必須指定
+連線時的埠，您應該將其設定為 `80` - 但這僅在您未執行時才有效
+電腦上的任何其他 Web 伺服器。
 
-The *internal* port (`4005` by default) is used internally by Evennia to communicate between the
-Server and the Portal. It should not be available to the outside world. You usually only need to
-change the outgoing port unless the default internal port is clashing with some other program.
+*內部*連線埠（預設為 `4005`）由 Evennia 在內部使用，以在
+伺服器和Portal。它不應該向外界公開。通常你只需要
+更改傳出埠，除非預設內部埠與其他程式衝突。
 
-### Web client
+(web-client)=
+### 網頁客戶端
 
 ```python
 # Required. Change this to the main IP address of your server.
@@ -127,10 +133,11 @@ WEBSOCKET_CLIENT_URL = ""
 WEBSOCKET_CLIENT_PORT = 4002
 ```
 
-The websocket-based web client needs to be able to call back to the server, and these settings must be changed for it to find where to look. If it cannot find the server you will get an warning in your browser's Console (in the dev tools of the browser), and the client will revert to the AJAX-
-based of the client instead, which tends to be slower.
+基於 websocket 的 Web 使用者端需要能夠回呼伺服器，並且必須變更這些設定才能找到要尋找的位置。如果找不到伺服器，您將在瀏覽器的控制檯（在瀏覽器的開發工具中）中收到警告，並且使用者端將恢復到AJAX-
+相反，基於客戶端，這往往會更慢。
 
-### Other ports
+(other-ports)=
+### 其他港口
 
 ```python
 # Optional public facing. Only allows SSL connections (off by default).
@@ -145,32 +152,35 @@ SSH_INTERFACES = ['0.0.0.0']
 AMP_PORT = 4006
 ```
 
-The `AMP_PORT` is required to work, since this is the internal port linking Evennia's [Server and Portal](../Components/Portal-And-Server.md) components together. The other ports are encrypted ports that may be useful for custom protocols but are otherwise not used.
+需要`AMP_PORT` 才能運作，因為這是將Evennia 的[伺服器和Portal](../Components/Portal-And-Server.md) 元件連結在一起的內部連線埠。其他埠是加密埠，可能對自訂協定有用，但在其他情況下不會使用。
 
-### Lockdown mode
+(lockdown-mode)=
+### 鎖定模式
 
-When you test things out and check configurations you may not want players to drop in on you.
-Similarly, if you are doing maintenance on a live game you may want to take it offline for a while
-to fix eventual problems without risking people connecting. To do this, stop the server with
-`evennia stop` and add `LOCKDOWN_MODE = True` to your settings file. When you start the server
-again, your game will only be accessible from localhost.
+當您進行測試並檢查設定時，您可能不希望玩家打擾您。
+同樣，如果您正在對實時遊戲進行維護，您可能需要將其離線一段時間
+解決最終的問題，而不會給人們帶來連結的風險。為此，請停止伺服器
+`evennia stop` 並將 `LOCKDOWN_MODE = True` 新增到您的設定檔中。當你啟動伺服器時
+同樣，您的遊戲只能從本地主機存取。
 
-### Registering with the Evennia game directory
+(registering-with-the-evennia-game-directory)=
+### 正在向Evennia遊戲目錄註冊
 
-Once your game is online you should make sure to register it with the [Evennia Game Index](http://games.evennia.com/). Registering with the index will help  people find your server, drum up interest for your game and also shows people that Evennia is being used. You can do this even if you are just starting development - if you don't give any telnet/web address it will appear as _Not yet public_ and just be a teaser. If so, pick _pre-alpha_ as the development status.
+一旦您的遊戲上線，您應該確保使用 [Evennia 遊戲索引](http://games.evennia.com/) 註冊它。註冊索引將幫助人們找到您的伺服器，激發對您遊戲的興趣，也可以向人們表明 Evennia 正在被使用。即使您剛開始開發，您也可以這樣做 - 如果您不提供任何 telnet/web 地址，它將顯示為_尚未公開_並且只是一個預告片。如果是這樣，請選擇 _pre-alpha_ 作為開發狀態。
 
-To register, stand in your game dir, run
+要註冊，請站在您的遊戲目錄中，執行
 
     evennia connections
 
-and follow the instructions. See the [Game index page](./Evennia-Game-Index.md) for more details.
+並按照說明進行操作。更多詳情請參閱[遊戲索引頁](./Evennia-Game-Index.md)。
 
-## SSL and HTTPS
+(ssl-and-https)=
+## SSL 和 HTTPS
 
-SSL can be very useful for web clients. It will protect the credentials and gameplay of your users
-over a web client if they are in a public place, and your websocket can also be switched to WSS for the same benefit. SSL certificates used to cost money on a yearly basis, but there is now a program that issues them for free with assisted setup to make the entire process less painful.
+SSL 對於網路使用者端來說非常有用。它將保護使用者的憑證和遊戲玩法
+如果他們在公共場所，則透過 Web 使用者端進行，並且您的 Websocket 也可以切換到 WSS 以獲得相同的好處。 SSL 證書過去每年都要花錢，但現在有一個程式可以免費頒發證書並提供輔助設定，以使整個過程不那麼痛苦。
 
-Options that may be useful in combination with an SSL proxy:
+與 SSL 代理程式結合使用時可能有用的選項：
 
 ```
 # See above for the section on Lockdown Mode.
@@ -183,159 +193,166 @@ LOCKDOWN_MODE = True
 WEBSOCKET_CLIENT_URL = "wss://fqdn:4002"
 ```
 
-### Let's Encrypt
+(lets-encrypt)=
+### 讓我們加密
 
-[Let's Encrypt](https://letsencrypt.org) is a certificate authority offering free certificates to secure a website with HTTPS. To get started issuing a certificate for your web server using Let's Encrypt, see these links:
+[Let's Encrypt](https://letsencrypt.org) 是一家憑證授權單位，提供免費憑證以保護網站的HTTPS。若要開始使用 Let's Encrypt 為您的 Web 伺服器頒發證書，請參閱以下連結：
 
- - [Let's Encrypt - Getting Started](https://letsencrypt.org/getting-started/)
- - The [CertBot Client](https://certbot.eff.org/) is a program for automatically obtaining a certificate, use it and maintain it with your website.
+ - [Let's Encrypt - 入門](https://letsencrypt.org/getting-started/)
+ - [CertBot客戶端](https://certbot.eff.org/)是一個用於自動取得憑證、使用它並在您的網站上維護它的程式。
 
-Also, on Freenode visit the #letsencrypt channel for assistance from the community. For an additional resource, Let's Encrypt has a very active [community forum](https://community.letsencrypt.org/).
+此外，在 Freenode 上，請造訪 #letsencrypt 頻道以獲取社群的協助。對於額外的資源，Let's Encrypt 有一個非常活躍的[社群論壇](https://community.letsencrypt.org/)。
 
-[A blog where someone sets up Let's Encrypt](https://www.digitalocean.com/community/tutorials/how-to-secure-apache-with-let-s-encrypt-on-ubuntu-16-04)
+[某人設定 Let's Encrypt 的部落格](https://www.digitalocean.com/community/tutorials/how-to-secure-apache-with-let-s-encrypt-on-ubuntu-16-04)
 
-The only process missing from all of the above documentation is how to pass verification. This is how Let's Encrypt verifies that you have control over your domain (not necessarily ownership, it's Domain Validation (DV)). This can be done either with configuring a certain path on your web server or through a TXT record in your DNS. Which one you will want to do is a personal preference, but can also be based on your hosting choice. In a controlled/cPanel environment, you will most likely have to use DNS verification.
+上述所有檔案中唯一缺少的過程是如何透過驗證。這就是 Let's Encrypt 驗證您是否擁有對網域的控制權（不一定是所有權，而是網域驗證 (DV)）的方式。這可以透過在 Web 伺服器上設定特定路徑或透過 DNS 中的 TXT 記錄來完成。您想要做哪一個是個人喜好，但也可以基於您的託管選擇。在受控/cPanel 環境中，您很可能必須使用 DNS 驗證。
 
-### Relevant SSL Proxy Setup Information
+(relevant-ssl-proxy-setup-information)=
+### 相關 SSL 代理設定訊息
 
-- [Apache webserver configuration](./Config-Apache-Proxy.md) (optional)
-- [HAProxy Config](./Config-HAProxy.md)
+- [Apache webserver 設定](./Config-Apache-Proxy.md)（可選）
+- [HAProxy 設定](./Config-HAProxy.md)
 
 
-## Hosting Evennia from your own computer
+(hosting-evennia-from-your-own-computer)=
+## 從您自己的電腦託管 Evennia
 
-What we showed above is by far the simplest and probably cheapest option: Run Evennia on your own home computer. Moreover, since Evennia is its own web server, you don't need to install anything extra to have a website.
+我們上面展示的是迄今為止最簡單且可能最便宜的選項：在您自己的家用電腦上執行 Evennia。此外，由於 Evennia 是它自己的網頁伺服器，因此您不需要安裝任何額外的東西來擁有網站。
 
-**Advantages**
-- Free (except for internet costs and the electrical bill).
-- Full control over the server and hardware (it sits right there!).
-- Easy to set up.
-- Suitable for quick setups - e.g. to briefly show off results to your collaborators.
+**優點**
+- 免費（網路費用和電費除外）。
+- 完全控制伺服器和硬體（它就在那裡！）。
+- 易於設定。
+- 適合快速設定 - e.g。向您的合作者簡要地展示結果。
 
-**Disadvantages**
-- You need a good internet connection, ideally without any upload/download limits/costs.
-- If you want to run a full game this way, your computer needs to always be on. It could be noisy,
-and as mentioned, the electrical bill must be considered.
-- No support or safety - if your house burns down, so will your game. Also, you are yourself
-responsible for doing regular backups.
-- Potentially not as easy if you don't know how to open ports in your firewall or router.
-- Home IP numbers are often dynamically allocated, so for permanent online time you need to set up a DNS to always re-point to the right place (see below). - You are personally responsible for any use/misuse of your internet connection-- though unlikely (but not impossible) if running your server somehow causes issues for other customers on the network, goes against your ISP's terms of service (many ISPs insist on upselling you to a business- tier connection) or you are the subject of legal action by a copyright holder, you may find your main internet connection terminated as a consequence.
+**缺點**
+- 您需要良好的網際網路連線，最好沒有任何上傳/下載限制/費用。
+- 如果您想以這種方式執行完整的遊戲，您的電腦需要始終處於開啟狀態。可能會很吵，
+如前所述，必須考慮電費。
+- 沒有支援或安全 - 如果你的房子被燒毀，你的遊戲也會被燒毀。還有，你就是你自己
+負責定期進行備份。
+- 如果您不知道如何開啟防火牆或路由器中的埠，則可能沒那麼容易。
+- Home IP 號碼通常是動態分配的，因此對於永久線上時間，您需要設定 DNS 以始終重新指向正確的位置（請參閱下文）。 - 您個人應對您的網路連線的任何使用/誤用負責 - 儘管不太可能（但並非不可能），如果執行您的伺服器以某種方式給網路上的其他客戶帶來問題，違反您的 ISP 的服務條款（許多 ISPs 堅持將您升級到業務層連線），或者您是版權所有者採取法律行動的物件，您可能會因此發現您的主要網路。
 
-#### Setting up your own machine as a server
+(setting-up-your-own-machine-as-a-server)=
+#### 將您自己的機器設定為伺服器
 
-[The first section](./Online-Setup.md#connecting-to-evennia-over-the-internet) of this page describes how to do this and allow users to connect to the IP address of your machine/router.
+本頁的[第一部分](./Online-Setup.md#connecting-to-evennia-over-the-internet) 描述如何執行此操作並允許使用者連線到您的電腦/路由器的 IP 位址。
 
-A complication with using a specific IP address like this is that your home IP might not remain the
-same. Many ISPs (Internet Service Providers) allocates a *dynamic* IP to you which could change at
-any time. When that happens, that IP you told people to go to will be worthless. Also, that long
-string of numbers is not very pretty, is it? It's hard to remember and not easy to use in marketing
-your game. What you need is to alias it to a more sensible domain name - an alias that follows you
-around also when the IP changes.
+使用像這樣的特定 IP 地址的一個複雜問題是，您的家 IP 可能不再是
+一樣。許多ISPs（網際網路服務供應商）為您分配*動態*IP，該值可能會在以下時間發生變化
+任何時候。當這種情況發生時，你告訴人們去的IP將毫無價值。還有，那麼長
+一串數字不太漂亮，是嗎？難以記憶且不易用於行銷
+你的遊戲。您需要的是將其別名為更明智的網域 - 跟隨您的別名
+當 IP 發生變化時也是如此。
 
-1. To set up a domain name alias, we recommend starting with a free domain name from
-[FreeDNS](https://freedns.afraid.org/). Once you register there (it's free) you have access to tens
-of thousands domain names that people have "donated" to allow you to use for your own sub domain.
-For example, `strangled.net` is one of those available domains. So tying our IP address to
-`strangled.net` using the subdomain `evennia` would mean that one could henceforth direct people to
-`http://evennia.strangled.net:4001` for their gaming needs - far easier to remember!
-1. So how do we make this new, nice domain name follow us also if our IP changes? For this we need
-to set up a little program on our computer. It will check whenever our ISP decides to change our IP
-and tell FreeDNS that. There are many alternatives to be found from FreeDNS:s homepage, one that
-works on multiple platforms is [inadyn](http://www.inatech.eu/inadyn/). Get it from their page or,
-in Linux, through something like `apt-get install inadyn`.
-1. Next, you login to your account on FreeDNS and go to the
-[Dynamic](https://freedns.afraid.org/dynamic/) page. You should have a list of your subdomains. Click
-the `Direct URL` link and you'll get a page with a text message. Ignore that and look at the URL of
-the page. It should be ending in a lot of random letters. Everything after the question mark is your
-unique "hash". Copy this string.
-1. You now start inadyn with the following command (Linux):
+1. 要設定網域別名，我們建議從以下地址開始使用免費網域：
+[FreeDNS](https://freedns.afraid.org/)。一旦您在那裡註冊（免費），您就可以訪問數十個
+人們「捐贈」的數千個網域允許您將其用於您自己的子網域。
+例如，`strangled.net` 是這些可用域之一。所以將我們的 IP 位址繫結到
+`strangled.net` 使用子網域 `evennia` 意味著從此以後可以引導人們訪問
+`http://evennia.strangled.net:4001` 滿足他們的遊戲需求 - 更容易記住！
+1. 那麼，如果我們的 IP 發生變化，我們如何讓這個新的、漂亮的網域也跟著我們呢？為此我們需要
+在我們的電腦上設定一個小程式。每當我們的 ISP 決定更改我們的 IP 時它就會檢查
+並告訴FreeDNS。從 FreeDNS:s 主頁可以找到許多替代方案，其中之一是
+適用於多個平臺的是 [inadyn](http://www.inatech.eu/inadyn/)。從他們的頁面獲取，或者，
+在 Linux 中，透過類似 `apt-get install inadyn` 的方式。
+1. 接下來，您在 FreeDNS 上登入您的帳戶並前往
+[動態](https://freedns.afraid.org/dynamic/) 頁。您應該有一個子網域清單。點選
+`Direct URL` 連結，您將看到一個包含簡訊的頁面。忽略它並檢視 URL
+頁面。它應該以很多隨機字母結尾。問號後面的所有內容都是您的
+獨特的“雜湊”。複製該字串。
+1. 現在，您可以使用以下指令啟動 inadyn (Linux)：
 
     `inadyn --dyndns_system default@freedns.afraid.org -a <my.domain>,<hash> &`
 
- where `<my.domain>` would be `evennia.strangled.net` and `<hash>` the string of numbers we copied
-from FreeDNS. The `&` means we run in the background (might not  be valid in other operating
-systems). `inadyn` will henceforth check for changes every 60 seconds. You should put the `inadyn`
-command string in a startup script somewhere so it kicks into gear whenever your computer starts.
+其中 `<my.domain>` 是 `evennia.strangled.net` ，`<hash>` 是我們複製的數字字串
+從FreeDNS開始。 `&` 表示我們在背景執行（在其他操作中可能無效）
+系統）。 `inadyn` 此後將每 60 秒檢查一次更改。你應該把`inadyn`
+指令字串位於啟動 script 某處，以便每當您的電腦啟動時它就會啟動。
 
-## Hosting Evennia on a remote server
+(hosting-evennia-on-a-remote-server)=
+## 在遠端伺服器上託管 Evennia
 
-Your normal "web hotel" will probably not be enough to run Evennia. A web hotel is normally aimed at
-a very specific usage - delivering web pages, at the most with some dynamic content. The "Python
-scripts" they refer to on their home pages are usually only intended to be CGI-like scripts launched
-by their webserver. Even if they allow you shell access (so you can install the Evennia dependencies
-in the first place), resource usage will likely be very restricted. Running a full-fledged game
-server like Evennia will probably be shunned upon or be outright impossible.  If you are unsure,
-contact your web hotel and ask about their policy on you running third-party servers that will want
-to open custom ports.
+您的普通「網路飯店」可能不足以執行 Evennia。網路飯店通常旨在
+一個非常具體的用法 - 提供網頁，最多包含一些動態內容。 「蟒蛇
+他們在主頁上提到的“scripts”通常只是為了CGI-如scripts啟動
+按他們的webserver。即使它們允許您 shell 存取（因此您可以安裝 Evennia 依賴項
+首先），資源使用可能會受到很大限制。執行一個成熟的遊戲
+像 Evennia 這樣的伺服器可能會被避開或完全不可能。  如果您不確定，
+聯絡您的網路飯店並詢問他們對您執行第三方伺服器的政策
+開啟自訂連線埠。
 
-The options you probably need to look for are *shell account services*, *VPS:es* or *Cloud
-services*. A "Shell account" service means that you get a shell account on a server and can log in
-like any normal user. By contrast, a *VPS* (Virtual Private Server) service usually means that you
-get `root` access, but in a virtual machine. There are also *Cloud*-type services which allows for
-starting up multiple virtual machines and pay for what resources you use.
+您可能需要尋找的選項是 *shell 帳戶服務*、*VPS:es* 或 *雲
+服務*。 「Shell帳戶」服務表示您在伺服器上取得Shell帳戶並且可以登入
+像任何普通使用者一樣。相較之下，*VPS*（虛擬私人伺服器）服務通常意味著您
+獲得 `root` 存取許可權，但在虛擬機器中。還有*雲端*型別的服務，允許
+啟動多個虛擬機器並為您使用的資源付費。
 
-**Advantages**
-- Shell accounts/VPS/clouds offer more flexibility than your average web hotel - it's the ability to
-log onto a shared computer away from home.
-- Usually runs a Linux flavor, making it easy to install Evennia.
-- Support. You don't need to maintain the server hardware. If your house burns down, at least your
-game stays online. Many services guarantee a certain level of up-time and also do regular backups
-for you. Make sure to check, some offer lower rates in exchange for you yourself being fully
-responsible for your data/backups.
-- Usually offers a fixed domain name, so no need to mess with IP addresses.
-- May have the ability to easily deploy [docker](./Installation-Docker.md) versions of evennia
-and/or your game.
+**優點**
+- Shell 帳戶/VPS/雲端比一般的網路飯店提供更多的靈活性 - 它能夠
+登入遠離家鄉的共享電腦。
+- 通常執行 Linux 風格，使其易於安裝Evennia。
+- 支援。您無需維護伺服器硬體。如果你的房子被燒毀，至少你的
+遊戲保持線上。許多服務保證一定程度的正常運作時間並進行定期備份
+為了你。請務必檢查一下，有些提供較低的價格以換取您自己的充分體驗
+負責您的資料/備份。
+- 通常提供固定域名，因此無需弄亂 IP 地址。
+- 可能能夠輕鬆部署 evennia 的 [docker](./Installation-Docker.md) 版本
+和/或你的遊戲。
 
-**Disadvantages**
-- Might be pretty expensive (more so than a web hotel). Note that Evennia will normally need at
-least 100MB RAM and likely much more for a large production game.
-- Linux flavors might feel unfamiliar to users not used to ssh/PuTTy and the Linux command line.
-- You are probably sharing the server with many others, so you are not completely in charge. CPU
-usage might be limited. Also, if the server people decides to take the server down for maintenance,
-you have no choice but to sit it out (but you'll hopefully be warned ahead of time).
+**缺點**
+- 可能相當昂貴（比網路飯店貴）。請注意，Evennia 通常需要
+至少 100MB RAM，對於大型製作遊戲來說可能更多。
+- 對於不習慣 ssh/PuTTy 和 Linux 指令列的使用者來說，Linux 風格可能會感到陌生。
+- 您可能與許多其他人共用伺服器，因此您不能完全負責。 CPU
+使用可能會受到限制。另外，如果伺服器人員決定關閉伺服器進行維護，
+你別無選擇，只能袖手旁觀（但希望你會提前收到警告）。
 
-#### Installing Evennia on a remote server
+(installing-evennia-on-a-remote-server)=
+#### 在遠端伺服器上安裝 Evennia
 
-Firstly, if you are familiar with server infrastructure, consider using [Docker](Running-Evennia-in-
-Docker) to deploy your game to the remote server; it will likely ease installation and deployment.
-Docker images may be a little confusing if you are completely new to them though.
+首先，如果您熟悉伺服器基礎設施，可以考慮使用[Docker](Running-Evennia-in-
+Docker)將您的遊戲部署到遠端伺服器；它可能會簡化安裝和部署。
+如果您對 Docker 映像完全陌生，那麼它們可能會有點令人困惑。
 
-If not using docker, and assuming you know how to connect to your account over ssh/PuTTy, you should
-be able to follow the [Setup Quickstart](./Installation.md) instructions normally. You only need Python
-and GIT pre-installed; these should both be available on any servers (if not you should be able to
-easily ask for them to be installed). On a VPS or Cloud service you can install them yourself as
-needed.
+如果不使用 docker，並且假設您知道如何透過 ssh/PuTTy 連線到您的帳戶，您應該
+能夠正常按照[安裝快速入門](./Installation.md) 說明進行操作。你只需要Python
+並預裝GIT；這些都應該在任何伺服器上都可用（如果沒有，您應該能夠
+輕鬆要求安裝它們）。在 VPS 或雲端服務上，您可以自行安裝它們
+需要。
 
-If `virtualenv` is not available and you can't get it, you can download it (it's just a single file)
-from [the virtualenv pypi](https://pypi.python.org/pypi/virtualenv). Using `virtualenv` you can
-install everything without actually needing to have further `root` access. Ports might be an issue,
-so make sure you know which ports are available to use and reconfigure Evennia accordingly.
+如果`virtualenv`不可用且你無法取得它，你可以下載它（它只是一個檔案）
+來自[virtualenv pypi](https://pypi.python.org/pypi/virtualenv)。使用 `virtualenv` 你可以
+安裝所有內容，實際上不需要進一步的 `root` 存取許可權。連線埠可能是一個問題，
+因此，請確保您知道哪些連線埠可供使用，並相應地重新設定 Evennia。
 
-## Hosting options and suggestions
+(hosting-options-and-suggestions)=
+## 託管選項和建議
 
-To find commercial solutions, browse the web for "shell access", "VPS" or "Cloud services" in your
-region. You may find useful offers for "low cost" VPS hosting on [Low End Box][7]. The associated
-[Low End Talk][8] forum can be useful for health checking the many small businesses that offer
-"value" hosting, and occasionally for technical suggestions.
+要查詢商業解決方案，請瀏覽網頁以查詢“shell 訪問”、“VPS”或“雲端服務”
+地區。您可能會在 [Low End Box][7] 上找到「低成本」VPS 託管的有用優惠。相關的
+[低端談話][8] 論壇對於檢查許多小型企業提供的健康狀況很有用
+「價值」託管，偶爾提供技術建議。
 
-There are all sorts of services available. Below are some international suggestions offered by
-Evennia users:
+有各種可用的服務。以下是一些國際建議
+Evennia使用者：
 
-| Hosting name       |  Type          |  Lowest price  |  Comments |
+| 主機名稱       |  型別          |  最低價格  |  評論 |
 |---|---| ---| --- |
-| [silvren.com][1]   | Shell account | Free for MU*  | Private hobby provider so don't assume backups or expect immediate support. To ask for an account, connect with a MUD client to rostdev.mushpark.com, port 4201 and ask for "Jarin". |
-| [Digital Ocean][2] | VPS | $4/month | You can get a $50 credit if you use the referral link https://m.do.co/c/8f64fec2670c - if you do, once you've had it long enough to have paid $25 we will get that as a referral bonus to help Evennia development.|
-| [Amazon Web services][3] | Cloud | ~$5/month / on-demand | Free Tier first 12 months. Regions available around the globe.|
-| [Amazon Lightsail][9] | Cloud | $5/month | Free first month. AWS's "fixed cost" offering.|
-| [Azure App Services][12] | Cloud | Free | Free tier with limited regions for hobbyists. |
-| [Huawei Cloud][13] | Cloud | on demand | Similar to Amazon. Free 12-month tier with limited regions. |
-| [Heficed][5] | VPS & Cloud | $5/month | Multiple regions.  Cheapest for 1GB ram server is $5/month. |
-| [Scaleway][6] | Cloud | &euro;3/month / on-demand | EU based (Paris, Amsterdam). Smallest option provides 2GB RAM. |
-| [Prgmr][10] | VPS | $5/month | 1 month free with a year prepay. You likely want some experience with servers with this option as they don't have a lot of support.|
-| [Akami (formerly Linode)][11] | VPS | $5/month / on-demand | Multiple regions. Smallest option ($5/mo) provides 1GB RAM. Also offers cloud services. |
-| [Genesis MUD hosting][4] | Shell account | $8/month | Dedicated MUD host with very limited memory offerings. May run very old Python versions. Evennia needs *at least* the "Deluxe" package (50MB RAM) and probably *a lot* higher for a production game. While it's sometimes mentioned in a MUD context, this host is *not* recommended for Evennia.|
+| [silvren.com][1]   | 空殼帳戶 | 免費 MU*  | 私人愛好提供者，因此不要假裝置份或期望立即支援。若要要求帳戶，請使用 MUD 使用者端連線至 rostdev.mushpark.com、連線埠 4201 並要求「Jarin」。 |
+| [數位海洋][2] | VPS | 4 美元/月 | 如果您使用推薦連結https://m.do.co/c/8f64fec2670c，您可以獲得 50 美元的積分 - 如果您這樣做，一旦您擁有足夠長的時間支付 25 美元，我們將獲得該積分作為推薦獎金來幫助 Evennia 的發展。|
+| [亞馬遜網路服務][3] | 雲 | ~$5/月/按需 | 前 12 個月免費。全球可用區域。|
+| [亞馬遜 Lightsail][9] | 雲 | 5 美元/月 | 第一個月免費。 AWS 的「固定成本」產品。|
+| [Azure 應用服務][12] | 雲 | 自由的 | 業餘愛好者的免費套餐，區域有限。 |
+| [華為雲][13] | 雲 | 一經請求 | 類似亞馬遜。 12 個月免費套餐，區域有限。 |
+| [赫赫][5] | VPS & 雲 | 5 美元/月 | 多個地區。  1GB RAM 伺服器最便宜的是 5 美元/月。 |
+| [刻度][6] | 雲 | 3 歐元/月/按需 | EU 總部（巴黎、阿姆斯特丹）。最小選項提供 2GB RAM。 |
+| [程式][10] | VPS | 5 美元/月 | 預付一年，免費 1 個月。您可能需要一些使用此選項的伺服器的經驗，因為它們沒有太多支援。|
+| [Akami（原Linode）][11] | VPS | 5 美元/月/按需 | 多個地區。最小選項（5 美元/月）提供 1GB RAM。也提供雲端服務。 |
+| [創世紀 MUD 託管][4] | 空殼帳戶 | 8 美元/月 | 專用 MUD 主機提供的記憶體非常有限。可能執行非常舊的 Python 版本。 Evennia *至少*需要「豪華」包（50MB RAM），對於製作遊戲來說可能「高很多」。雖然有時會在 MUD 上下文中提及該主機，但「不」建議在 Evennia 中使用此主機。|
 
-*Please help us expand this list.*
+*請幫助我們擴充套件此列表。 *
 
 [1]: https://silvren.com
 [2]: https://www.digitalocean.com/pricing
@@ -352,15 +369,16 @@ Evennia users:
 [13]: https://activity.huaweicloud.com/intl/en-us/free_packages/index.html
 
 
-### Cloud9
+(cloud9)=
+### 雲9
 
-If you are interested in running Evennia in the online dev environment [Cloud9](https://c9.io/), you
-can spin it up through their normal online setup using the Evennia Linux install instructions. The
-one extra thing you will have to do is update `mygame/server/conf/settings.py` and add
-`WEBSERVER_PORTS = [(8080, 4001)]`. This will then let you access the web server and do everything
-else as normal.
+如果您有興趣線上上開發環境 [Cloud9](https://c9.io/) 中執行 Evennia，您
+可以使用 Evennia Linux 安裝說明透過正常的線上設定啟動它。的
+您需要做的另一件事是更新 `mygame/server/conf/settings.py` 並新增
+`WEBSERVER_PORTS = [(8080, 4001)]`。然後，您將可以存取網頁伺服器並執行所有操作
+其他一切正常。
 
-Note that, as of December 2017, Cloud9 was re-released by Amazon as a service within their AWS cloud
-service offering. New customers entitled to the 1 year AWS "free tier" may find it provides
-sufficient resources to operate a Cloud9 development environment without charge.
+請注意，截至 2017 年 12 月，Amazon 將 Cloud9 作為其 AWS 雲端中的服務重新發布
+提供的服務。有權享受 1 年 AWS「免費套餐」的新客戶可能會發現它提供
+有足夠的資源免費執行 Cloud9 開發環境。
 https://aws.amazon.com/cloud9/

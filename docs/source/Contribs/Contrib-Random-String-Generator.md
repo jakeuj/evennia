@@ -1,15 +1,17 @@
-# Pseudo-random generator and registry
+(pseudo-random-generator-and-registry)=
+# 偽隨機產生器和登錄檔
 
-Contribution by Vincent Le Goff (vlgeoff), 2017
+Vincent Le Goff (vlgeoff) 的貢獻，2017 年
 
-This utility can be used to generate pseudo-random strings of information
-with specific criteria.  You could, for instance, use it to generate
-phone numbers, license plate numbers, validation codes, in-game security 
-passwords and so on. The strings generated will be stored and won't be repeated.
+此實用程式可用於產生偽隨機資訊字串
+具有特定的標準。  例如，您可以使用它來生成
+電話號碼、車牌號碼、驗證碼、遊戲內安全
+密碼等。產生的字串將被儲存並且不會重複。
 
-## Usage Example
+(usage-example)=
+## 使用範例
 
-Here's a very simple example:
+這是一個非常簡單的例子：
 
 ```python
 
@@ -29,32 +31,33 @@ phone_generator.remove("555-981-2207")
 # The number can be generated again
 ```
 
-## Importing
+(importing)=
+## 輸入
 
-1. Import the `RandomStringGenerator` class from the contrib.
-2. Create an instance of this class taking two arguments:
-   - The name of the gemerator (like "phone number", "license plate"...).
-   - The regular expression representing the expected results.
-3. Use the generator's `all`, `get` and `remove` methods as shown above.
+1. 從 contrib 匯入 `RandomStringGenerator` 類別。
+2. 建立帶有兩個引數的此類別的例項：
+   - 發電機的名稱（如“電話號碼”、“車牌”...）。
+   - 表示預期結果的正規表示式。
+3. 使用生成器的 `all`、`get` 和 `remove` 方法，如上所示。
 
-To understand how to read and create regular expressions, you can refer to
-[the documentation on the re module](https://docs.python.org/2/library/re.html).
-Some examples of regular expressions you could use:
+若要了解如何讀取和建立正規表示式，可以參考
+[re 模組的文件](https://docs.python.org/2/library/re.html)。
+您可以使用的一些正規表示式範例：
 
-- `r"555-\d{3}-\d{4}"`: 555, a dash, 3 digits, another dash, 4 digits.
-- `r"[0-9]{3}[A-Z][0-9]{3}"`: 3 digits, a capital letter, 3 digits.
-- `r"[A-Za-z0-9]{8,15}"`: between 8 and 15 letters and digits.
+- `r"555-\d{3}-\d{4}"`：555，一個破折號，3 位數字，另一個破折號，4 位數字。
+- `r"[0-9]{3}[A-Z][0-9]{3}"`：3位數字，一個大寫字母，3位數字。
+- `r"[A-Za-z0-9]{8,15}"`：8 到 15 個字母和數字。
 - ...
 
-Behind the scenes, a script is created to store the generated information
-for a single generator.  The `RandomStringGenerator` object will also
-read the regular expression you give to it to see what information is
-required (letters, digits, a more restricted class, simple characters...)...
-More complex regular expressions (with branches for instance) might not be
-available.
+在幕後，建立了一個script來儲存產生的資訊
+對於單一發電機。  `RandomStringGenerator` 對像也會
+讀取您提供給它的正規表示式以檢視資訊是什麼
+必需（字母、數字、更受限制的類別、簡單字元...）...
+更複雜的正規表示式（例如帶有分支）可能不是
+可用。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/utils/random_string_generator/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\utils\random_string_generator\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

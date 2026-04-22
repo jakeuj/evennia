@@ -1,4 +1,5 @@
-# NPCs reacting to your presence
+(npcs-reacting-to-your-presence)=
+# NPCs 對你的出現做出反應
 
 
     > north 
@@ -9,14 +10,14 @@
     ------------------------------------
     Bandit gives you a menacing look!
 
-This tutorial shows the implementation of an NPC object that responds to characters entering their
-location. 
+本教學展示了 NPC 物件的實現，該物件響應輸入的字元
+位置。
 
-What we will need is the following:
+我們需要的是以下內容：
 
-- An NPC typeclass that can react when someone enters.
-- A custom [Room](../Components/Objects.md#rooms) typeclass that can tell the NPC that someone entered.
-- We will also tweak our default `Character` typeclass a little.
+- 當有人進入時可以做出反應的NPC typeclass。
+- 自訂[房間](../Components/Objects.md#rooms)typeclass，可以告訴NPC有人進入。
+- 我們也會稍微調整預設的`Character` typeclass。
 
 ```python
 # in mygame/typeclasses/npcs.py  (for example)
@@ -38,15 +39,15 @@ class NPC(Character):
             self.execute_cmd(f"say Greetings, {character}!")
 ```
 
-```{sidebar} Passing extra information
-Note that we don't use the `**kwargs` property here. This can be used to pass extra information into hooks in your game and would be used when you make custom move commands. For example, if you `run` into the room, you could inform all hooks by doing `obj.move_to(..., running=True)`. Maybe your librarian NPC should have a separate reaction for people running into their library!
+```{sidebar} 傳遞額外訊息
+請注意，我們此處不使用 `**kwargs` 屬性。這可用於將額外資訊傳遞到遊戲中的掛鉤中，並在您建立自訂移動指令時使用。例如，如果您`run`進入房間，您可以透過執行`obj.move_to(..., running=True)`通知所有鉤子。也許你的圖書館員NPC應該對跑進他們圖書館的人有單獨的反應！
 
-We make sure to pass the `**kwargs` from the standard `at_object_receive` hook below.
+我們確保從下面的標準 `at_object_receive` 掛鉤傳遞 `**kwargs`。
 ```
 
-Here we make a simple method on the `NPC`˙ called `at_char_entered`. We expect it to be called when a (player-)character enters the room. We don't actually set the `is_aggressive` [Attribute](../Components/Attributes.md) beforehand; we leave this up for the admin to activate in-game. if it's not set, the NPC is simply non-hostile. 
+這裡我們對`NPC`˙做了一個簡單的方法，稱為`at_char_entered`。我們期望當（玩家）角色進入房間時呼叫它。我們實際上並沒有預先設定`is_aggressive` [Attribute](../Components/Attributes.md)；我們將其留給管理員在遊戲中啟動。如果沒有設定，NPC 就是非敵對的。
 
-Whenever _something_ enters the `Room`, its [at_object_receive](DefaultObject.at_object_receive) hook will be called. So we should override it.
+每當_something_進入`Room`時，它的[at_object_receive](DefaultObject.at_object_receive)鉤子就會被呼叫。所以我們應該重寫它。
 
 
 ```python
@@ -70,25 +71,25 @@ class Room(ObjectParent, DefaultRoom):
 
 ```
 
-```{sidebar} Universal Object methods
-Remember that Rooms are `Objects`, and other Objects have these same hooks. So an `at_object_receive` hook will fire for you when you pick something up (making you 'receive' it). Or for a box when putting something inside it, for example.
+```{sidebar} 通用物件方法
+請記住，房間是`Objects`，其他物件也有這些相同的鉤子。因此，當你拿起某樣東西時，`at_object_receive` 鉤子會為你觸發（讓你「收到」它）。或例如在盒子裡放東西時。
 ```
-A currently puppeted Character will have an `.account` attached to it. We use that to know that the thing arriving is a Character. We then use Evennia's [utils.inherits_from](evennia.utils.utils.inherits_from) helper utility to get every NPC in the room can each of their newly created `at_char_entered` method.
+目前操縱的角色將附加一個 `.account`。我們用它來知道到達的東西是一個角色。然後，我們使用 Evennia 的 [utils.inherits_from](evennia.utils.utils.inherits_from) 輔助實用程式來取得房間中的每個 NPC 可以使用他們新建立的 `at_char_entered` 方法。
 
-Make sure to `reload`.
+確保`reload`。
 
-Let's create an NPC and make it aggressive. For the sake of this example, let's assume your name is "Anna" and that there is a room to the north of your current location.
+讓我們建立一個 NPC 並使其具有攻擊性。在本範例中，我們假設您的名字是“Anna”，並且您目前位置的北邊有一個房間。
 
     > create/drop Orc:typeclasses.npcs.NPC
     > north 
     > south 
     Orc says, Greetings, Anna!
 
-Now let's turn the orc aggressive. 
+現在讓獸人變得更具攻擊性。
 
     > set orc/is_aggressive = True 
     > north 
     > south 
     Orc says, Graah! Die, Anna!
 
-That's one easily aggravated Orc!
+這是一個容易激怒的獸人！

@@ -1,15 +1,17 @@
-# New Models
+(new-models)=
+# 新型號
 
-*Note: This is considered an advanced topic.*
+*注意：這被認為是一個高階主題。 *
 
-Evennia offers many convenient ways to store object data, such as via Attributes or Scripts. This is sufficient for most use cases. But if you aim to build a large stand-alone system, trying to squeeze your storage requirements into those may be more complex than you bargain for. Examples may be to store guild data for guild members to be able to change, tracking the flow of money across a game-wide economic system or implement other custom game systems that requires the storage of custom data in a quickly accessible way.
+Evennia 提供了許多方便的方法來儲存物件資料，例如透過屬性或Scripts。這對於大多數用例來說已經足夠了。但如果您的目標是建立一個大型獨立系統，嘗試將儲存需求壓縮到這些系統中可能會比您想像的更複雜。範例可能是儲存公會資料以便公會成員能夠更改、追蹤整個遊戲經濟系統中的資金流動或實現需要以快速存取的方式儲存自訂資料的其他自訂遊戲系統。
 
-Whereas [Tags](../Components/Tags.md) or [Scripts](../Components/Scripts.md) can handle many situations, sometimes things may be easier to handle by adding your own _database model_.
+雖然 [Tags](../Components/Tags.md) 或 [Scripts](../Components/Scripts.md) 可以處理許多情況，但有時透過新增您自己的_資料庫模型_可能會更容易處理。
 
-## Overview of database tables
+(overview-of-database-tables)=
+## 資料庫表格概述
 
-SQL-type databases (which is what Evennia supports) are basically highly optimized systems for
-retrieving text stored in tables. A table may look like this
+SQL-型別資料庫（這是Evennia支援的）基本上是高度最佳化的系統
+檢索儲存在表中的文字。表格可能看起來像這樣
 
 ```
      id | db_key    | db_typeclass_path          | db_permissions  ...
@@ -18,11 +20,11 @@ retrieving text stored in tables. A table may look like this
      2  |  Rock     | evennia.DefaultObject      | None            ...
 ```
 
-Each line is considerably longer in your database. Each column is referred to as a "field" and every row is a separate object. You can check this out for yourself. If you use the default sqlite3 database, go to your game folder and run
+資料庫中的每一行都相當長。每列稱為一個“欄位”，每行都是一個單獨的物件。你可以自己檢查一下。如果您使用預設的 sqlite3 資料庫，請前往您的遊戲資料夾並執行
 
      evennia dbshell
 
-You will drop into the database shell. While there, try:
+您將進入資料庫 shell。在那裡，嘗試：
 
      sqlite> .help       # view help
 
@@ -36,38 +38,40 @@ You will drop into the database shell. While there, try:
 
      sqlite> .exit
 
-Evennia uses [Django](https://docs.djangoproject.com), which abstracts away the database SQL manipulation and allows you to search and manipulate your database entirely in Python. Each database table is in Django represented by a class commonly called a *model* since it describes the look of the table. In Evennia, Objects, Scripts, Channels etc are examples of Django models that we then extend and build on.
+Evennia 使用 [Django](https://docs.djangoproject.com)，它抽象化了資料庫 SQL 操作，並允許您完全在 Python 中搜尋和操作資料庫。每個資料庫表在 Django 中都由一個通常稱為「模型」的類別表示，因為它描述了表的外觀。 Evennia、物件、Scripts、通道等是 Django 模型的範例，我們隨後對其進行擴充套件和建置。
 
-## Adding a new database table
+(adding-a-new-database-table)=
+## 新增新的資料庫表
 
-Here is how you add your own database table/models:
+以下是新增自己的資料庫表格/模型的方法：
 
-1. In Django lingo, we will create a new "application" - a subsystem under the main Evennia program. For this example we'll call it "myapp". Run the following (you need to have a working Evennia running before you do this, so make sure you have run the steps in [Setup Quickstart](Getting- Started) first):
+1. 用 Django 術語來說，我們將建立一個新的「應用程式」——主 Evennia 程式下的子系統。對於本範例，我們將其稱為“myapp”。執行以下指令（在執行此操作之前，您需要執行有效的 Evennia，因此請確保您已先執行 [安裝快速入門](Getting- Started) 中的步驟）：
 
         evennia startapp myapp
         mv myapp world  (linux)
         move myapp world   (windows)
 
-1. A new folder `myapp` is created. "myapp" will also be the name (the "app label") from now on. We move it into the `world/` subfolder here, but you could keep it in the root of your `mygame` if that makes more sense. 1. The `myapp` folder contains a few empty default files. What we are interested in for now is `models.py`. In `models.py` you define your model(s). Each model will be a table in the database. See the next section and don't continue until you have added the models you want.
-1. You now need to tell Evennia that the models of your app should be a part of your database scheme. Add this line to your `mygame/server/conf/settings.py`file (make sure to use the path where you put `myapp` and don't forget the comma at the end of the tuple):
+1. 將建立一個新資料夾 `myapp`。從現在開始，「myapp」也將是名稱（「應用程式標籤」）。我們將其移至此處的 `world/` 子資料夾中，但如果更有意義，您可以將其保留在 `mygame` 的根目錄中。 1. `myapp`資料夾包含一些空的預設檔。我們現在感興趣的是`models.py`。在 `models.py` 中您定義您的模型。每個模型將是資料庫中的一個表。請參閱下一部分，在新增所需模型之前不要繼續。
+1. 現在您需要告訴 Evennia 您的應用程式的模型應該是您的資料庫方案的一部分。將此行新增至您的 `mygame/server/conf/settings.py` 檔案（確保使用放置 `myapp` 的路徑，並且不要忘記元組末尾的逗號）：
 
     ```
     INSTALLED_APPS = INSTALLED_APPS + ("world.myapp", )
     ```
 
-1. From `mygame/`, run
+1. 從`mygame/`開始，執行
 
         evennia makemigrations myapp
         evennia migrate myapp
 
-This will add your new database table to the database. If you have put your game under version control (if not, [you should](../Coding/Version-Control.md)), don't forget to `git add myapp/*` to add all items
-to version control.
+這會將您的新資料庫表新增至資料庫。如果您已將遊戲置於版本控制之下（如果沒有，[您應該](../Coding/Version-Control.md)），請不要忘記 `git add myapp/*` 新增所有專案
+到版本控制。
 
-## Defining your models
+(defining-your-models)=
+## 定義你的模型
 
-A Django *model* is the Python representation of a database table. It can be handled like any other Python class. It defines *fields* on itself, objects of a special type. These become the "columns" of the database table. Finally, you create new instances of the model to add new rows to the database.
+Django *模型* 是資料庫表的 Python 表示。它可以像任何其他 Python 類別一樣處理。它在自身上定義了“欄位”，即特殊型別的物件。這些成為資料庫表的「列」。最後，您建立模型的新例項以將新行新增至資料庫。
 
-We won't describe all aspects of Django models here, for that we refer to the vast [Django documentation](https://docs.djangoproject.com/en/4.1/topics/db/models/) on the subject. Here is a (very) brief example:
+我們不會在這裡描述 Django 模型的所有方面，因為我們參考了有關該主題的大量 [Django 檔案](https://docs.djangoproject.com/en/4.1/topics/db/models/)。這是一個（非常）簡短的例子：
 
 ```python
 from django.db import models
@@ -83,33 +87,34 @@ class MyDataStore(models.Model):
                                             auto_now_add=True, db_index=True)
 ```
 
-We create four fields: two character fields of limited length and one text field which has no
-maximum length. Finally we create a field containing the current time of us creating this object.
+我們建立四個欄位：兩個有限長度的字元欄位和一個沒有長度的文字欄位
+最大長度。最後我們建立一個包含我們建立該物件的當前時間的欄位。
 
-> The `db_date_created` field, with exactly this name, is *required* if you want to be able to store instances of your custom model in an Evennia [Attribute](../Components/Attributes.md). It will automatically be set upon creation and can after that not be changed. Having this field will allow you to do e.g. `obj.db.myinstance = mydatastore`. If you know you'll never store your model instances in Attributes the `db_date_created` field is optional.
+> 如果您希望能夠將自訂模型的例項儲存在 Evennia [Attribute](../Components/Attributes.md) 中，則具有此名稱的 `db_date_created` 欄位是*必需的*。它會在建立時自動設定，之後就無法更改。擁有此欄位將允許您執行 e.g。 `obj.db.myinstance = mydatastore`。如果您知道永遠不會將模型例項儲存在屬性中，則 `db_date_created` 欄位是可選的。
 
-You don't *have* to start field names with `db_`, this is an Evennia convention. It's nevertheless recommended that you do use `db_`, partly for clarity and consistency with Evennia (if you ever want to share your code) and partly for the case of you later deciding to use Evennia's
-`SharedMemoryModel` parent down the line.
+您*必須*以 `db_` 開頭欄位名稱，這是 Evennia 約定。儘管如此，還是建議您使用 `db_`，部分是為了與 Evennia 保持清晰和一致（如果您想共享您的程式碼），部分是為了您以後決定使用 Evennia 的情況
+`SharedMemoryModel` 父級。
 
-The field keyword `db_index` creates a *database index* for this field, which allows quicker lookups, so it's recommended to put it on fields you know you'll often use in queries. The `null=True` and `blank=True` keywords means that these fields may be left empty or set to the empty string without the database complaining. There are many other field types and keywords to define them, see django docs for more info.
+欄位關鍵字`db_index`為此欄位建立一個*資料庫索引*，這樣可以更快地尋找，因此建議將其放在您知道在查詢中經常使用的欄位上。 `null=True` 和 `blank=True` 關鍵字意味著這些欄位可以留空或設定為空字串，而資料庫不會抱怨。還有許多其他欄位型別和關鍵字來定義它們，請參閱 django 檔案以獲取更多資訊。
 
-Similar to using [django-admin](https://docs.djangoproject.com/en/4.1/howto/legacy-databases/) you are able to do `evennia inspectdb` to get an automated listing of model information for an existing database.  As is the case with any model generating tool you should only use this as a starting
-point for your models.
+與使用 [django-admin](https://docs.djangoproject.com/en/4.1/howto/legacy-databases/) 類似，您可以執行 `evennia inspectdb` 來取得現有資料庫的模型資訊的自動清單。  與任何模型生成工具的情況一樣，您應該僅將其用作起點
+為您的模型點。
 
-## Referencing existing models and typeclasses
+(referencing-existing-models-and-typeclasses)=
+## 引用現有模型和typeclasses
 
-You may want to use `ForeignKey` or `ManyToManyField` to relate your new model to existing ones.
+您可能需要使用 `ForeignKey` 或 `ManyToManyField` 將新模型與現有模型關聯起來。
 
-To do this we need to specify the app-path for the root object type we want to store as a string (we must use a string rather than the class directly or you'll run into problems with models not having been initialized yet).
+為此，我們需要為要儲存為字串的根物件型別指定應用程式路徑（我們必須使用字串而不是直接使用類，否則您將遇到模型尚未初始化的問題）。
 
-- `"objects.ObjectDB"` for all [Objects](../Components/Objects.md) (like exits, rooms, characters etc)
-- `"accounts.AccountDB"` for [Accounts](../Components/Accounts.md).
-- `"scripts.ScriptDB"` for [Scripts](../Components/Scripts.md).
-- `"comms.ChannelDB"` for [Channels](../Components/Channels.md).
-- `"comms.Msg"` for [Msg](../Components/Msg.md) objects.
-- `"help.HelpEntry"` for [Help Entries](../Components/Help-System.md).
+- `"objects.ObjectDB"` 適用於所有[物件](../Components/Objects.md)（如出口、房間、角色等）
+- [帳戶](../Components/Accounts.md) `"accounts.AccountDB"`。
+- `"scripts.ScriptDB"` 為 [Scripts](../Components/Scripts.md)。
+- `"comms.ChannelDB"` 用於[頻道](../Components/Channels.md)。
+- `"comms.Msg"` 用於 [Msg](../Components/Msg.md) 物件。
+- `"help.HelpEntry"` 用於[幫助條目](../Components/Help-System.md)。
 
-Here's an example:
+這是一個例子：
 
 ```python
 from django.db import models
@@ -120,20 +125,21 @@ class MySpecial(models.Model):
     db_account = modeles.ForeignKey("accounts.AccountDB")
 ```
 
-It may seem counter-intuitive, but this will work correctly:
+這可能看起來違反直覺，但這將正確工作：
 
     myspecial.db_character = my_character  # a Character instance
     my_character = myspecial.db_character  # still a Character
 
-This works because when the `.db_character` field is loaded into Python, the entity itself knows that it's supposed to be a `Character` and loads itself to that form.
+這是有效的，因為當 `.db_character` 欄位載入到 Python 中時，實體本身知道它應該是 `Character` 並將其本身載入到該表單中。
 
-The drawback of this is that the database won't _enforce_ the type of object you store in the relation. This is the price we pay for many of the other advantages of the Typeclass system.
+這樣做的缺點是資料庫不會_強制_您儲存在關係中的物件型別。這是我們為 Typeclass 系統的許多其他優點所付出的代價。
 
-While the  `db_character` field fail if you try to store an `Account`, it will gladly accept any instance of a typeclass that inherits from `ObjectDB`, such as rooms, exits or other non-character Objects. It's up to you to validate that what you store is what you expect it to be.
+雖然如果您嘗試儲存 `Account`，`db_character` 欄位會失敗，但它會很樂意接受繼承自 `ObjectDB` 的 typeclass 的任何例項，例如房間、出口或其他非字元物件。由您來驗證您儲存的內容是否符合您的預期。
 
-## Creating a new model instance
+(creating-a-new-model-instance)=
+## 建立新的模型例項
 
-To create a new row in your table, you instantiate the model and then call its `save()` method:
+若要在表中建立新行，請例項化模型，然後呼叫其 `save()` 方法：
 
 ```python
      from evennia.myapp import MyDataStore
@@ -146,54 +152,55 @@ To create a new row in your table, you instantiate the model and then call its `
 
 ```
 
-Note that the `db_date_created` field of the model is not specified. Its flag `at_now_add=True` makes sure to set it to the current date when the object is created (it can also not be changed further after creation).
+請注意，模型的 `db_date_created` 欄位未指定。它的標誌 `at_now_add=True` 確保在建立物件時將其設為當前日期（建立後也不能進一步更改）。
 
-When you update an existing object with some new field value, remember that you have to save the object afterwards, otherwise the database will not update:
+當您使用某些新欄位值更新現有物件時，請記住之後必須儲存該物件，否則資料庫將不會更新：
 
 ```python
     my_datastore.db_key = "Larger Sword"
     my_datastore.save()
 ```
 
-Evennia's normal models don't need to explicitly save, since they are based on `SharedMemoryModel` rather than the raw django model. This is covered in the next section.
+Evennia 的普通模型不需要明確儲存，因為它們基於 `SharedMemoryModel` 而不是原始 django 模型。這將在下一節中介紹。
 
-## Using the `SharedMemoryModel` parent
+(using-the-sharedmemorymodel-parent)=
+## 使用 `SharedMemoryModel` 父級
 
-Evennia doesn't base most of its models on the raw `django.db.models.Model` but on the Evennia base model `evennia.utils.idmapper.models.SharedMemoryModel`. There are two main reasons for this:
+Evennia 的大部分模型並非基於原始 `django.db.models.Model`，而是基於 Evennia 基本模型 `evennia.utils.idmapper.models.SharedMemoryModel`。造成這種情況的主要原因有二：
 
-1. Ease of updating fields without having to explicitly call `save()`
-2. On-object memory persistence and database caching
+1. 無需顯式呼叫`save()`即可輕鬆更新欄位
+2. 物件記憶體永續性和資料庫快取
 
-The first (and least important) point means that as long as you named your fields `db_*`, Evennia will automatically create field wrappers for them. This happens in the model's [Metaclass](http://en.wikibooks.org/wiki/Python_Programming/Metaclasses) so there is no speed penalty for this. The name of the wrapper will be the same name as the field, minus the `db_` prefix. So the `db_key` field will have a wrapper property named `key`. You can then do:
+第一點（也是最不重要的一點）意味著只要您將欄位命名為 `db_*`，Evennia 就會自動為它們建立欄位包裝器。這種情況發生在模型的 [元類](http://en.wikibooks.org/wiki/Python_Programming/Metaclasses) 中，因此不會造成速度損失。包裝器的名稱將與欄位的名稱相同，減去 `db_` 字首。因此 `db_key` 欄位將有一個名為 `key` 的包裝屬性。然後你可以這樣做：
 
 ```python
     my_datastore.key = "Larger Sword"
 ```
 
-and don't have to explicitly call `save()` afterwards. The saving also happens in a more efficient way under the hood, updating only the field rather than the entire model using django optimizations. Note that if you were to manually add the property or method `key` to your model, this will be used instead of the automatic wrapper and allows you to fully customize access as needed.
+且之後不必明確呼叫 `save()` 。儲存也在後臺以更有效的方式進行，使用 django 最佳化僅更新欄位而不是整個模型。請注意，如果您要手動將屬性或方法 `key` 新增至模型中，則將使用它而不是自動包裝器，並允許您根據需要完全自訂存取。
 
-To explain the second and more important point, consider the following example using the default Django model parent:
+為瞭解釋第二個也是更重要的一點，請考慮以下使用預設 Django 模型父級的範例：
 
 ```python
     shield = MyDataStore.objects.get(db_key="SmallShield")
     shield.cracked = True # where cracked is not a database field
 ```
 
-And then in another function you do
+然後在另一個函式你做
 
 ```python
     shield = MyDataStore.objects.get(db_key="SmallShield")
     print(shield.cracked)  # error!
 ```
 
-The outcome of that last print statement is *undefined*! It could *maybe* randomly work but most likely you will get an `AttributeError` for not finding the `cracked` property. The reason is that `cracked` doesn't represent an actual field in the database. It was just added at run-time and thus Django don't care about it. When you retrieve your shield-match later there is *no* guarantee you will get back the *same Python instance* of the model where you defined `cracked`, even if you search for the same database object.
+最後一個印出語句的結果是*未定義*！它可能*也許*隨機工作，但很可能您會因為找不到 `cracked` 屬性而得到 `AttributeError`。原因是`cracked`並不代表資料庫中的實際欄位。它只是在執行時新增的，因此 Django 不關心它。當您稍後檢索遮蔽匹配時，即使您搜尋相同的資料庫物件，也*不*保證您將獲得定義 `cracked` 的模型的*相同的 Python 例項*。
 
-Evennia relies heavily on on-model handlers and other dynamically created properties. So rather than using the vanilla Django models, Evennia uses `SharedMemoryModel`, which levies something called *idmapper*. The idmapper caches model instances so that we will always get the *same* instance back after the first lookup of a given object. Using idmapper, the above example would work fine and you could retrieve your `cracked` property at any time - until you rebooted when all non-persistent data goes.
+Evennia 嚴重依賴模型處理程式和其他動態建立的屬性。因此，Evennia 使用 `SharedMemoryModel`，而不是使用普通的 Django 模型，這會徵收名為 *idmapper* 的東西。 idmapper 快取模型例項，以便我們在第一次查詢給定物件後始終獲得*相同的*例項。使用 idmapper，上面的範例可以正常工作，您可以隨時檢索 `cracked` 屬性 - 直到所有非永續性資料消失後重新啟動。
 
-Using the idmapper is both more intuitive and more efficient *per object*; it leads to a lot less
-reading from disk. The drawback is that this system tends to be more memory hungry *overall*. So if you know that you'll *never* need to add new properties to running instances or know that you will create new objects all the time yet rarely access them again (like for a log system), you are probably better off making "plain" Django models rather than using `SharedMemoryModel` and its idmapper.
+使用 idmapper 對於*每個物件*來說更直觀、更有效率；它會減少很多
+從磁碟讀取。缺點是該系統*總體*往往更需要記憶體。因此，如果您知道您 *永遠* 不需要向正在執行的例項新增新屬性，或者知道您將一直建立新物件但很少再次訪問它們（就像日誌系統一樣），那麼您最好製作「普通」Django 模型，而不是使用 `SharedMemoryModel` 及其 idmapper。
 
-To use the idmapper and the field-wrapper functionality you just have to have your model classes inherit from `evennia.utils.idmapper.models.SharedMemoryModel` instead of from the default `django.db.models.Model`:
+要使用 idmapper 和欄位包裝器功能，您只需讓模型類別繼承自 `evennia.utils.idmapper.models.SharedMemoryModel` 而不是預設的 `django.db.models.Model`：
 
 ```python
 from evennia.utils.idmapper.models import SharedMemoryModel
@@ -208,9 +215,10 @@ class MyDataStore(SharedMemoryModel):
                                             auto_now_add=True, db_index=True)
 ```
 
-## Searching for your models
+(searching-for-your-models)=
+## 搜尋您的型號
 
-To search your new custom database table you need to use its database *manager* to build a *query*. Note that even if you use `SharedMemoryModel` as described in the previous section, you have to use the actual *field names* in the query, not the wrapper name (so `db_key` and not just `key`).
+要搜尋新的自訂資料庫表，您需要使用其資料庫*管理器*來建立*查詢*。請注意，即使您按照上一節所述使用 `SharedMemoryModel`，您也必須在查詢中使用實際的*欄位名稱*，而不是包裝器名稱（因此 `db_key` 而不僅僅是 `key`）。
 
 ```python
      from world.myapp import MyDataStore
@@ -226,4 +234,4 @@ To search your new custom database table you need to use its database *manager* 
         self.caller.msg(match.db_text)
 ```
 
-See the [Beginner Tutorial lesson on Django querying](../Howtos/Beginner-Tutorial/Part1/Beginner-Tutorial-Django-queries.md) for a lot more information about querying the database.
+有關查詢資料庫的更多資訊，請參閱[Django 查詢入門教學](../Howtos/Beginner-Tutorial/Part1/Beginner-Tutorial-Django-queries.md)。

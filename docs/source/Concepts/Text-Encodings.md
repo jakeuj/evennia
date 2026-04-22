@@ -1,66 +1,68 @@
-# Text Encodings
+(text-encodings)=
+# 文字編碼
 
 
-Evennia is a text-based game server. This makes it important to understand how
-it actually deals with data in the form of text.
+Evennia 是基於文字的遊戲伺服器。這使得了解如何
+它實際上以文字形式處理資料。
 
-Text *byte encodings* describe how a string of text is actually stored in the
-computer - that is, the particular sequence of bytes used to represent the
-letters of your particular alphabet. A common encoding used in English-speaking
-languages is the *ASCII* encoding. This describes the letters in the English
-alphabet (Aa-Zz) as well as a bunch of special characters. For describing other
-character sets (such as that of other languages with other letters than
+文字*位元組編碼*描述了文字字串實際上如何儲存在
+計算機 - 即用於表示的特定位元組序列
+您特定字母表中的字母。英語常用的編碼
+語言是 *ASCII* 編碼。這描述了英文字母
+字母 (Aa-Zz) 以及一堆特殊字元。用於描述其他
+字元集（例如其他語言的字元集
     English), sets with names such as *Latin-1*, *ISO-8859-3* and *ARMSCII-8*
-are used. There are hundreds of different byte encodings in use around the
-world.
+被使用。有數百種不同的位元組編碼在使用
+世界。
 
-A string of letters in a byte encoding is represented with the `bytes` type.
-In contrast to the byte encoding is the *unicode representation*. In Python
-this is the `str` type. The unicode is an internationally agreed-upon table
-describing essentially all available letters you could ever want to print.
-Everything from English to Chinese alphabets and all in between. So what
-Evennia (as well as Python and Django) does is to store everything in Unicode
-internally, but then converts the data to one of the encodings whenever
-outputting data to the user.
+位元組編碼中的字母串以 `bytes` 型別表示。
+與位元組編碼相反的是*unicode 表示*。在Python中
+這是 `str` 型別。 unicode 是國際商定的表
+基本上描述了您可能想要列印的所有可用字母。
+從英文字母到中文字母以及介於兩者之間的所有內容。那又怎樣
+Evennia（以及Python和Django）所做的是以Unicode儲存所有內容
+內部，但隨後將資料轉換為其中一種編碼
+輸出資料給使用者。
 
-An easy memory aid is that `bytes` are what are sent over the network wire. At
-all other times, `str` (unicode) is used. This means that we must convert
-between the two at the points where we send/receive network data.
+一個簡單的輔助記憶方法是 `bytes` 是透過網路線傳送的內容。在
+所有其他時間，都使用 `str` (unicode)。這意味著我們必須轉換
+在我們傳送/接收網路資料的點處的兩者之間。
 
-The problem is that when receiving a string of bytes over the network it's
-impossible for Evennia to guess which encoding was used - it's just a bunch of
-bytes! Evennia must know the encoding in order to convert back and from the
-correct unicode representation.
+問題是當透過網路接收一串位元組時
+Evennia 不可能猜測使用了哪種編碼 - 它只是一堆
+位元組！ Evennia 必須知道編碼才能轉換回來
+正確的 unicode 表示。
 
-## How to customize encodings
+(how-to-customize-encodings)=
+## 如何自訂編碼
 
-As long as you stick to the standard ASCII character set (which means the
-normal English characters, basically) you should not have to worry much
-about this section.
+只要您堅持標準 ASCII 字元集（這意味著
+基本上是正常的英文字元）你不必太擔心
+關於本節。
 
-If you want to build your game in another language however, or expect your
-users to want to use special characters not in ASCII, you need to consider
-which encodings you want to support.
+但是，如果您想用另一種語言建立遊戲，或者期望您的
+使用者想要使用ASCII以外的特殊字元，需要考慮
+您想要支援哪些編碼。
 
-As mentioned, there are many, many byte-encodings used around the world. It
-should be clear at this point that Evennia can't guess but has to assume or
-somehow be told which encoding you want to use to communicate with the server.
-Basically the encoding used by your client must be the same encoding used by
-the server. This can be customized in two complementary ways.
+如前所述，世界各地使用了很多很多位元組編碼。它
+此時應該清楚 Evennia 無法猜測但必須假設或
+以某種方式被告知您想要使用哪種編碼與伺服器進行通訊。
+基本上，您的用戶端使用的編碼必須與
+伺服器。這可以透過兩種互補的方式進行客製化。
 
-1. Point users to the default `@encoding` command or the `@options` command.
-   This allows them to themselves set which encoding they (and their client of
-   choice) uses.  Whereas data will remain stored as unicode strings internally in
-   Evennia, all data received from and sent to this particular player will be
-   converted to the given format before transmitting.
-1. As a back-up, in case the user-set encoding translation is erroneous or
-   fails in some other way, Evennia will fall back to trying with the names
-   defined in the settings variable `ENCODINGS`. This is a list of encoding
-   names Evennia will try, in order, before giving up and giving an encoding
-   error message.
+1. 將使用者指向預設的 `@encoding` 指令或 `@options` 指令。
+這允許他們自己設定他們（以及他們的用戶端）的編碼
+   選擇）用途。  而資料將在內部以 unicode 字串形式儲存
+   Evennia，從該特定玩家接收並傳送到該特定玩家的所有資料都將被
+   在傳輸之前轉換為給定的格式。
+1. 作為備份，以防使用者設定的編碼翻譯錯誤或
+以其他方式失敗，Evennia 將回退到嘗試名稱
+   在設定變數 `ENCODINGS` 中定義。這是一個編碼列表
+   名稱 Evennia 將在放棄並給出編碼之前按順序嘗試
+   錯誤訊息。
 
-Note that having to try several different encodings every input/output adds
-unneccesary overhead. Try to guess the most common encodings you players will
-use and make sure these are tried first. The International *UTF-8* encoding is
-what Evennia assumes by default (and also what Python/Django use normally). See
-the Wikipedia article [here](https://en.wikipedia.org/wiki/Text_encodings) for more help.
+請注意，每個輸入/輸出都必須嘗試幾種不同的編碼
+不必要的開銷。試著猜測玩家最常用的編碼
+使用並確保首先嘗試這些。國際 *UTF-8* 編碼是
+預設 Evennia 假設的內容（也是 Python/Django 通常使用的內容）。參見
+維基百科文章[此處](https://en.wikipedia.org/wiki/Text_encodings) 以獲得更多幫助。

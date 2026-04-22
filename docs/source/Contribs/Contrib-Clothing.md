@@ -1,27 +1,29 @@
-# Clothing
+(clothing)=
+# 衣服
 
-Contribution by Tim Ashley Jenkins, 2017
+蒂姆·阿什利·詹金斯 (Tim Ashley Jenkins) 貢獻，2017 年
 
-Provides a typeclass and commands for wearable clothing. These 
-look of these clothes are appended to the character's description when worn.
+提供 typeclass 和可穿戴服裝的指令。這些
+這些衣服的外觀會附加到角色穿著時的描述中。
 
-Clothing items, when worn, are added to the character's description
-in a list. For example, if wearing the following clothing items:
+服裝物品在穿著時會新增到角色的描述中
+在一個清單中。例如，如果穿著以下服裝：
 
     a thin and delicate necklace
     a pair of regular ol' shoes
     one nice hat
     a very pretty dress
 
-Would result in this added description: 
+會產生這樣的附加描述：
 
     Tim is wearing one nice hat, a thin and delicate necklace,
     a very pretty dress and a pair of regular ol' shoes.
 
-## Installation
+(installation)=
+## 安裝
 
-To install, import this module and have your default character
-inherit from ClothedCharacter in your game's `characters.py` file:
+若要安裝，請匯入此模組並使用預設字元
+從遊戲的 `characters.py` 檔案中的 ClothedCharacter 繼承：
 
 ```python
 
@@ -31,8 +33,8 @@ class Character(ClothedCharacter):
 
 ```
 
-And then add `ClothedCharacterCmdSet` in your character set in
-`mygame/commands/default_cmdsets.py`:
+然後在你的字元集中新增`ClothedCharacterCmdSet`
+`mygame/commands/default_cmdsets.py`：
 
 ```python
 
@@ -48,16 +50,17 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
 
 ```
 
-## Usage
+(usage)=
+## 用法
 
-Once installed, you can use the default builder commands to create clothes
-with which to test the system:
+安裝後，您可以使用預設的建構器指令來建立衣服
+用於測試系統：
 
     create a pretty shirt : evennia.contrib.game_systems.clothing.ContribClothing
     set shirt/clothing_type = 'top'
     wear shirt
 
-A character's description may look like this:
+角色的描述可能如下所示：
 
     Superuser(#1)
     This is User #1.
@@ -65,14 +68,14 @@ A character's description may look like this:
     Superuser is wearing one nice hat, a thin and delicate necklace,
     a very pretty dress and a pair of regular ol' shoes.
 
-Characters can also specify the style of wear for their clothing - I.E.
-to wear a scarf 'tied into a tight knot around the neck' or 'draped
-loosely across the shoulders' - to add an easy avenue of customization.
-For example, after entering:
+角色也可以指定其服裝的穿著風格 - I.E.
+戴一條圍巾“在脖子上打一個緊結”或“披在身上”
+寬鬆地跨在肩上——增加了一種簡單的客製化方式。
+例如，輸入後：
 
     wear scarf draped loosely across the shoulders
 
-The garment appears like so in the description:
+這件衣服在描述中是這樣的：
 
     Superuser(#1)
     This is User #1.
@@ -80,19 +83,20 @@ The garment appears like so in the description:
     Superuser is wearing a fanciful-looking scarf draped loosely
     across the shoulders.
 
-Items of clothing can be used to cover other items, and many options
-are provided to define your own clothing types and their limits and
-behaviors. For example, to have undergarments automatically covered
-by outerwear, or to put a limit on the number of each type of item
-that can be worn. The system as-is is fairly freeform - you
-can cover any garment with almost any other, for example - but it
-can easily be made more restrictive, and can even be tied into a
-system for armor or other equipment.
+衣服可以用來遮蓋其他物品，而且有很多選擇
+提供定義您自己的服裝型別及其限制和
+行為。例如，自動覆蓋內衣
+透過外套，或對每種型別的物品數量進行限制
+可以穿的。系統本身是相當自由的 - 你
+例如，可以用幾乎任何其他衣服覆蓋任何衣服 - 但它
+可以很容易地變得更加嚴格，甚至可以繫結到
+裝甲或其他裝置的系統。
 
-## Configuration
+(configuration)=
+## 設定
 
-The contrib has several optional configurations which you can define in your `settings.py`
-Here are the settings and their default values.
+contrib 有幾個可選設定，您可以在 `settings.py` 中定義它們
+以下是設定及其預設值。
 
 ```python
 # Maximum character length of 'wear style' strings, or None for unlimited.
@@ -138,5 +142,5 @@ CLOTHING_TYPE_CANT_COVER_WITH = ["jewelry"]
 
 ----
 
-<small>This document page is generated from `evennia/contrib/game_systems/clothing/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\game_systems\clothing\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

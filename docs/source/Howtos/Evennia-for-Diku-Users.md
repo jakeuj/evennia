@@ -1,41 +1,44 @@
-# Evennia for Diku Users
+(evennia-for-diku-users)=
+# 迪庫使用者Evennia
 
 
-Evennia represents a learning curve for those who used to code on
-[Diku](https://en.wikipedia.org/wiki/DikuMUD) type MUDs. While coding in Python is easy if you
-already know C, the main effort is to get rid of old C programming habits. Trying to code Python the
-way you code C will not only look ugly, it will lead to less optimal and harder to maintain code.
-Reading Evennia example code is a good way to get a feel for how different problems are approached
-in Python.
+Evennia 代表了曾經在上面寫程式碼的人的學習曲線
+[Diku](https://en.wikipedia.org/wiki/DikuMUD) 輸入MUDs。雖然用 Python 編碼很容易，但如果你
+已經瞭解C，主要努力是改掉舊的C程式設計習慣。嘗試編寫 Python 程式碼
+你用 C 寫的程式碼不僅看起來很難看，而且會導致程式碼不太最佳化並且更難維護。
+閱讀 Evennia 範例程式碼是瞭解如何解決不同問題的好方法
+在Python中。
 
-Overall, Python offers an extensive library of resources, safe memory management and excellent
-handling of errors. While Python code does not run as fast as raw C code does, the difference is not
-all that important for a text-based game. The main advantages of Python are an extremely fast
-development cycle and easy ways to create game systems. Doing the same with C can take many times
-more code and be harder to make stable and maintainable.
+總的來說，Python 提供了廣泛的資源庫、安全的記憶體管理和優秀的
+錯誤的處理。雖然 Python 程式碼的執行速度不如原始 C 程式碼，但差異並不在於
+對於基於文字的遊戲來說這一切都很重要。 Python 的主要優點是速度極快
+開發週期和建立遊戲系統的簡單方法。對 C 執行同樣的操作可能需要多次
+程式碼越多，就越難穩定和維護。
 
-## Core Differences
+(core-differences)=
+## 核心差異
 
-- As mentioned, the main difference between Evennia and a Diku-derived codebase is that Evennia is
-written purely in Python. Since Python is an interpreted language there is no compile stage. It is
-modified and extended by the server loading Python modules at run-time. It also runs on all computer
-platforms Python runs on (which is basically everywhere).
-- Vanilla Diku type engines save their data in custom *flat file* type storage solutions. By
-contrast, Evennia stores all game data in one of several supported SQL databases. Whereas flat files
-have the advantage of being easier to implement, they (normally) lack many expected safety features
-and ways to effectively extract subsets of the stored data. For example, if the server loses power
-while writing to a flatfile it may become corrupt and the data lost. A proper database solution is
-not susceptible to this - at no point is the data in a state where it cannot be recovered. Databases
-are also highly optimized for querying large data sets efficiently.
+- 如前所述，Evennia 和 Diku 派生的程式碼庫之間的主要區別在於 Evennia 是
+純粹用Python編寫。由於Python是一種解釋性語言，因此沒有編譯階段。它是
+由伺服器在執行時載入Python模組來修改和擴充。它也可以在所有計算機上執行
+Python 執行的平臺（基本上無所不在）。
+- Vanilla Diku 型別引擎將其資料儲存在自訂*平面檔案*型別儲存解決方案中。經過
+相反，Evennia 將所有遊戲資料儲存在多個支援的 SQL 資料庫之一中。而平面檔案
+具有更容易實施的優點，但它們（通常）缺乏許多預期的安全功能
+以及有效提取儲存資料子集的方法。例如，如果伺服器斷電
+寫入平面檔案時，它可能會損壞並且資料遺失。正確的資料庫解決方案是
+不受此影響 - 資料在任何時候都不會處於無法恢復的狀態。資料庫
+也針對高效查詢大型資料集進行了高度最佳化。
 
-## Some Familiar Things
+(some-familiar-things)=
+## 一些熟悉的事情
 
-Diku expresses the character object referenced normally by:
+Diku 表示通常引用的字元物件：
 
-`struct char ch*` then all character-related fields can be accessed by `ch->`. In Evennia, one must
-pay attention to what object you are using, and when you are accessing another through back-
-handling, that you are accessing the right object. In Diku C, accessing character object is normally
-done by:
+`struct char ch*`則`ch->`可以存取所有與字元相關的欄位。在Evennia中，必須
+注意您正在使用的物件，以及當您透過背景存取另一個物件時
+處理，您正在存取正確的物件。在Diku C中，存取角色物件通常是
+完成者：
 
 ```c
 /* creating pointer of both character and room struct */
@@ -49,10 +52,10 @@ void(struct char ch*, struct room room*){
 }
 ```
 
-As an example for creating Commands in Evennia via the `from evennia import Command` the character
-object that calls the command is denoted by a class property as `self.caller`. In this example
-`self.caller` is essentially the 'object' that has called the Command, but most of the time it is an
-Account object. For a more familiar Diku feel, create a variable that becomes the account object as:
+作為透過 `from evennia import Command` 字元在 Evennia 中建立指令的範例
+呼叫該指令的物件由類別屬性表示為 `self.caller`。在這個例子中
+`self.caller` 本質上是呼叫指令的“物件”，但大多數時候它是一個
+帳戶物件。為了獲得更熟悉的 Diku 感覺，建立一個成為帳戶物件的變數，如下所示：
 
 ```python
 #mygame/commands/command.py
@@ -75,8 +78,8 @@ class CmdMyCmd(Command):
 
 ```
 
-As mentioned above, care must be taken what specific object you are working with. If focused on a
-room object and you need to access the account object:
+如上所述，必須注意您正在處理的具體物件。如果專注於一個
+room 物件，您需要存取 account 物件：
 
 ```python
 #mygame/typeclasses/room.py
@@ -101,21 +104,22 @@ class MyRoom(DefaultRoom):
 ```
 
 
-## Emulating Evennia to Look and Feel Like A Diku/ROM
+(emulating-evennia-to-look-and-feel-like-a-dikurom)=
+## 模仿 Evennia 使其外觀和感覺像 Diku/ROM
 
-To emulate a Diku Mud on Evennia some work has to be done before hand. If there is anything that all
-coders and builders remember from Diku/Rom days is the presence of VNUMs. Essentially all data was
-saved in flat files and indexed by VNUMs for easy access. Evennia has the ability to emulate VNUMS
-to the extent of categorising rooms/mobs/objs/trigger/zones[...] into vnum ranges.
+要在 Evennia 上模擬 Diku Mud，必須事先完成一些工作。如果有什麼事情都是
+程式設計師和建構者從 Diku/Rom 時代就記得 VNUMs 的存在。基本上所有資料都是
+儲存在平面檔案中並按 VNUMs 建立索引以便於存取。 Evennia有能力模仿VNUMS
+達到將 rooms/mobs/objs/trigger/zones[...] 分類到 vnum 範圍的程度。
 
-Evennia has objects that are called Scripts. As defined, they are the 'out of game' instances that
-exist within the mud, but never directly interacted with. Scripts can be used for timers, mob AI,
-and even stand alone databases.
+Evennia 具有名為 Scripts 的物件。根據定義，它們是「遊戲外」例項
+存在於泥漿中，但從未直接與之相互作用。 Scripts可用於計時器，生物AI，
+甚至獨立的資料庫。
 
-Because of their wonderful structure all mob, room, zone, triggers, etc.. data can be saved in
-independently created global scripts.
+由於其奇妙的結構，所有生物、房間、區域、觸發器等..資料都可以儲存在
+獨立建立全域scripts。
 
-Here is a sample mob file from a Diku Derived flat file.
+這是來自 Diku Derived 平面檔案的範例 mob 檔案。
 
 ```text
 #0
@@ -146,14 +150,14 @@ BareHandAttack: 12
 E
 T 95
 ```
-Each line represents something that the MUD reads in and does something with it. This isn't easy to
-read, but let's see if we can emulate this as a dictionary to be stored on a database script created
-in Evennia.
+每行代表 MUD 讀入的內容並對其執行某些操作。這並不容易
+閱讀，但讓我們看看是否可以將其模擬為儲存在已建立的資料庫 script 上的字典
+在Evennia中。
 
-First, let's create a global script that does absolutely nothing and isn't attached to anything. You
-can either create this directly in-game with the @py command or create it in another file to do some
-checks and balances if for whatever reason the script needs to be created again. It
-can be done like so:
+首先，讓我們建立一個絕對不執行任何操作且不附加任何內容的全域 script。你
+可以使用 @py 指令直接在遊戲中建立它，也可以在另一個檔案中建立它來執行一些操作
+檢查和平衡是否出於某種原因需要再次建立 script。它
+可以這樣做：
 
 ```python
 from evennia import create_script
@@ -162,8 +166,8 @@ mob_db = create_script("typeclasses.scripts.DefaultScript", key="mobdb",
                        persistent=True, obj=None)
 mob_db.db.vnums = {}
 ```
-Just by creating a simple script object and assigning it a 'vnums' attribute as a type dictionary.
-Next we have to create the mob layout..
+只需建立一個簡單的 script 物件並為其分配一個 'vnums' attribute 作為型別字典即可。
+接下來我們必須建立生物佈局..
 
 ```python
 # vnum : mob_data
@@ -183,14 +187,14 @@ mob_vnum_1 = {
 mob_db.db.vnums[1] = mob_vnum_1
 ```
 
-This is a very 'caveman' example, but it gets the idea across. You can use the keys in the
-`mob_db.vnums` to act as the mob vnum while the rest contains the data.
+這是一個非常「穴居人」的例子，但它傳達了這個想法。您可以使用中的按鍵
+`mob_db.vnums` 充當 mob vnum，而其餘部分則包含資料。
 
-Much simpler to read and edit. If you plan on taking this route, you must keep in mind that by
-default evennia 'looks' at different properties when using the `look` command for instance. If you
-create an instance of this mob and make its `self.key = 1`, by default evennia will say:
+閱讀和編輯更加簡單。如果您打算走這條路線，您必須記住，
+例如，當使用 `look` 指令時，預設 evennia “檢視”不同的屬性。如果你
+建立該生物的一個例項並使其`self.key = 1`，預設為evennia會說：
 
-`Here is : 1`
+`Here is: 1`
 
-You must restructure all default commands so that the mud looks at different properties defined on
-your mob.
+您必須重構所有預設指令，以便 mud 檢視定義在
+你的暴民。

@@ -1,5 +1,6 @@
-# In-game Shops
+(in-game-shops)=
+# 遊戲內商店
 
 ```{warning}
-This part of the Beginner tutorial is still being developed.
+初學者教學的這一部分仍在開發中。
 ```

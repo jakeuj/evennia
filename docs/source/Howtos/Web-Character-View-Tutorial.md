@@ -1,36 +1,37 @@
-# Web Character View Tutorial
+(web-character-view-tutorial)=
+# 網頁角色檢視教學
 
 
-**Before doing this tutorial you will probably want to read the intro in [Changing The Web Page tutorial](./Web-Changing-Webpage.md).**
+**在學習本教學之前，您可能需要閱讀[更改網頁教學](./Web-Changing-Webpage.md) 中的介紹。 **
 
-In this tutorial we will create a web page that displays the stats of a game character. For this, and all other pages we want to make specific to our game, we'll need to create our own Django "app". We'll call our app `character`, since it will be dealing with character information. From your game dir, run
+在本教學中，我們將建立一個顯示遊戲角色統計資料的網頁。為此，以及我們想要針對我們的遊戲製作的所有其他頁面，我們需要建立我們自己的 Django「應用程式」。我們將呼叫我們的應用程式`character`，因為它將處理字元資訊。從你的遊戲目錄執行
 
     evennia startapp character
 
-This will create a new directory named `character` inside `mygame`. To keep
-things tidy, let's move it into the `web/` subdirectory.
+這將在 `mygame` 內建立一個名為 `character` 的新目錄。為了保留
+東西整理好了，讓我們將其移動到 `web/` 子目錄中。
 
     mv character web  (linux/mac)
     move character web  (windows)
 
-We put it in `web/` to keep things tidy, but you could place it wherever you
-like. It contains all basic files that a Django app needs.
+我們將其放在 `web/` 中以保持整潔，但您可以將其放在任何位置
+喜歡。它包含 Django 應用程式所需的所有基本檔案。
 
-Note that we will not edit all files in this new directory, many of the generated files are outside the scope of this tutorial.
+請注意，我們不會編輯這個新目錄中的所有檔案，許多產生的檔案超出了本教學的範圍。
 
-In order for Django to find our new web app, we'll need to add it to the `INSTALLED_APPS` setting. Evennia's default installed apps are already set, so in `server/conf/settings.py`, we'll just extend them:
+為了讓 Django 找到我們的新 Web 應用程式，我們需要將其新增到 `INSTALLED_APPS` 設定中。 Evennia 的預設安裝應用程式已設定，因此在 `server/conf/settings.py` 中，我們將擴充套件它們：
 
 ```python
 INSTALLED_APPS += ('web.character',)
 ```
 
-> Note: That end comma is important. It makes sure that Python interprets the addition as a tuple instead of a string.
+> 注意：結尾逗號很重要。它確保 Python 將加法解釋為元組而不是字串。
 
-The first thing we need to do is to create a *view* and an *URL pattern* to point to it. A view is a
-function that generates the web page that a visitor wants to see, while the URL pattern lets Django know what URL should trigger the view. The pattern may also provide some information of its own as we shall see.
+我們需要做的第一件事是建立一個*檢視*和一個指向它的*URL模式*。一個檢視是一個
+產生訪客想要檢視的網頁的函式，而 URL 模式讓 Django 知道什麼 URL 應該觸發檢視。正如我們將看到的，該模式還可以提供其自身的一些資訊。
 
-Here is our `character/urls.py` file (**Note**: you may have to create this file if a blank one
-wasn't generated for you):
+這是我們的 `character/urls.py` 檔案（**注意**：如果是空白檔案，您可能需要建立此檔案
+不是為您產生的）：
 
 ```python
 # URL patterns for the character app
@@ -43,19 +44,19 @@ urlpatterns = [
 ]
 ```
 
-This file contains all of the URL patterns for the application. The `url` function in the
-`urlpatterns` list are given three arguments. The first argument is a pattern-string used to
-identify which URLs are valid. Patterns are specified as *regular expressions*. Regular expressions are used to match strings and are written in a special, very compact, syntax. A detailed description of regular expressions is beyond this tutorial but you can learn more about them [here](https://docs.python.org/2/howto/regex.html). For now, just accept that this regular expression requires that the visitor's URL looks something like this:
+該檔案包含應用程式的所有 URL 模式。 `url` 函式在
+`urlpatterns` 列表給出了三個引數。第一個引數是一個模式字串，用於
+確定哪些 URLs 是有效的。模式被指定為*正規表示式*。正規表示式用於匹配字串，並以特殊的、非常緊湊的語法編寫。正規表示式的詳細描述超出了本教學的範圍，但您可以[此處](https://docs.python.org/2/howto/regex.html)瞭解有關它們的更多資訊。現在，只需接受此正規表示式要求訪客的 URL 看起來像這樣：
 
 ````
 sheet/123/
 ````
 
-That is, `sheet/` followed by a number, rather than some other possible URL pattern. We will interpret this number as object ID. Thanks to how the regular expression is formulated, the pattern recognizer stores the number in a variable called `object_id`. This will be passed to the view (see below). We add the imported view function (`sheet`) in the second argument. We also add the `name` keyword to identify the URL pattern itself. You should always name your URL patterns, this makes them easy to refer to in html templates using the `{% url %}` tag (but we won't get more into that in this tutorial).
+也就是說，`sheet/` 後面跟著一個數字，而不是其他一些可能的 URL 模式。我們將把這個數字解釋為物件ID。由於正規表示式的製定方式，模式識別器將數字儲存在名為 `object_id` 的變數中。這將被傳遞到檢視（見下文）。我們在第二個引數中新增匯入的檢視函式（`sheet`）。我們也新增 `name` 關鍵字來識別 URL 模式本身。您應該始終命名您的 URL 模式，這使得可以使用 `{% url %}` tag 在 html 模板中輕鬆引用它們（但我們不會在本教學中對此進行更多介紹）。
 
-> Security Note: Normally, users do not have the ability to see object IDs within the game (it's restricted to superusers only). Exposing the game's object IDs to the public like this enables griefers to perform what is known as an [account enumeration attack](http://www.sans.edu/research/security-laboratory/article/attacks-browsing) in the efforts of hijacking your superuser account. Consider this: in every Evennia installation, there are two objects that we can *always* expect to exist and have the same object IDs-- Limbo (#2) and the superuser you create in the beginning (#1). Thus, the griefer can get 50% of the information they need to hijack the admin account (the admin's username) just by navigating to `sheet/1`!
+> 安全說明：通常，使用者無法在遊戲中檢視物件 ID（僅限超級使用者）。像這樣向公眾公開遊戲的物件 ID 使得惡意破壞者能夠執行所謂的[帳號列舉攻擊](http://www.sans.edu/research/security-laboratory/article/attacks-browsing)，以劫持您的超級使用者帳號。考慮一下：在每個 Evennia 安裝中，我們*總是*期望存在兩個物件，並且具有相同的物件 ID - Limbo (#2) 和您在開始時建立的超級使用者 (#1)。因此，惡意破壞者只需導航到 `sheet/1` 即可獲得劫持管理員帳戶（管理員的使用者名稱）所需的 50% 資訊！
 
-Next we create `views.py`, the view file that `urls.py` refers to.
+接下來我們建立`views.py`，`urls.py` 引用的檢視檔案。
 
 ```python
 # Views for our character app
@@ -79,12 +80,12 @@ def sheet(request, object_id):
     return render(request, 'character/sheet.html', {'character': character})
 ```
 
-As explained earlier, the URL pattern parser in `urls.py` parses the URL and passes `object_id` to our view function `sheet`. We do a database search for the object using this number. We also make sure such an object exists and that it is actually a Character. The view function is also handed a `request` object. This gives us information about the request, such as if a logged-in user viewed it - we won't use that information here but it is good to keep in mind.
+如前所述，`urls.py` 中的 URL 模式解析器解析 URL 並將 `object_id` 傳遞給我們的檢視函式 `sheet`。我們使用該編號在資料庫中搜尋該物件。我們還確保這樣的物件存在並且它實際上是一個角色。檢視函式也被傳遞了一個 `request` 物件。這為我們提供了有關請求的資訊，例如登入使用者是否檢視了該請求 - 我們不會在此處使用該資訊，但最好記住。
 
-On the last line, we call the `render` function. Apart from the `request` object, the `render`
-function takes a path to an html template and a dictionary with extra data you want to pass into said template. As extra data we pass the Character object we just found. In the template it will be available as the variable "character".
+在最後一行，我們呼叫 `render` 函式。除了 `request` 物件之外，`render`
+函式採用一個 html 模板的路徑和一個字典，其中包含要傳遞到所述模板的額外資料。作為額外資料，我們傳遞剛剛找到的 Character 物件。在模板中，它將作為變數“字元”使用。
 
-The html template is created as `templates/character/sheet.html` under your `character` app folder. You may have to manually create both `template` and its subfolder `character`. Here's the template to create:
+html 模板在您的 `character` 應用程式資料夾下建立為 `templates/character/sheet.html`。您可能必須手動建立 `template` 及其子資料夾 `character`。這是要建立的模板：
 
 ````html
 {% extends "base.html" %}
@@ -135,19 +136,19 @@ The html template is created as `templates/character/sheet.html` under your `cha
 {% endblock %}
 ````
 
-In Django templates, `{% ... %}` denotes special in-template "functions" that Django understands. The `{{ ... }}` blocks work as "slots". They are replaced with whatever value the code inside the block returns.
+在 Django 模板中，`{%... %}` 表示 Django 理解的特殊模板內「函式」。 `{{... }}` 塊用作“槽”。它們將被替換為區塊內程式碼返回的任何值。
 
-The first line, `{% extends "base.html" %}`, tells Django that this template extends the base template that Evennia is using. The base template is provided by the theme. Evennia comes with the open-source third-party theme `prosimii`. You can find it and its `base.html` in
-`evennia/web/templates/prosimii`. Like other templates, these can be overwritten.
+第一行 `{% extends "base.html" %}` 告訴 Django 該模板擴充套件了 Evennia 正在使用的基本模板。基本模板由主題提供。 Evennia 附帶開源第三方主題 `prosimii`。您可以在以下位置找到它及其 `base.html`
+`evennia/web/templates/prosimii`。與其他模板一樣，這些模板可以被覆蓋。
 
-The next line is `{% block content %}`. The `base.html` file has `block`s, which are placeholders
-that templates can extend. The main block, and the one we use, is named `content`.
+下一行是`{% block content %}`。 `base.html` 檔案有 `block`s，它們是佔位符
+模板可以擴充。我們使用的主區塊被命名為 `content`。
 
-We can access the `character` variable anywhere in the template because we passed it in the `render` call at the end of `view.py`. That means we also have access to the Character's `db` attributes, much like you would in normal Python code. You don't have the ability to call functions with arguments in the template-- in fact, if you need to do any complicated logic, you should do it in `view.py` and pass the results as more variables to the template. But you still have a great deal of flexibility in how you display the data.
+我們可以在模板中的任何位置訪問 `character` 變數，因為我們在 `view.py` 末尾的 `render` 呼叫中傳遞了它。這意味著我們還可以存取角色的 `db` 屬性，就像在普通的 Python 程式碼中一樣。您無法在模板中使用引數呼叫函式——事實上，如果您需要執行任何複雜的邏輯，您應該在 `view.py` 中執行，並將結果作為更多變數傳遞給模板。但您在顯示資料的方式上仍然具有很大的靈活性。
 
-We can do a little bit of logic here as well. We use the `{% for %} ... {% endfor %}` and `{% if %} ... {% else %} ... {% endif %}` structures to change how the template renders depending on how many skills the user has, or if the user is approved (assuming your game has an approval system).
+我們也可以在這裡做一些邏輯。我們使用 `{% for %}... {% endfor %}` 和 `{% if %}... {% else %}... {% endif %}` 結構來根據使用者擁有的技能數量或使用者是否獲得批准（假設您的遊戲有批准系統）來更改模板的呈現方式。
 
-The last file we need to edit is the master URLs file. This is needed in order to smoothly integrate the URLs from your new `character` app with the URLs from Evennia's existing pages. Find the file `web/website/urls.py` and update its `patterns` list as follows:
+我們需要編輯的最後一個檔案是主URLs 檔案。這是為了將新 `character` 應用程式中的 URLs 與 Evennia 現有頁面中的 URLs 順利整合所必需的。找到檔案 `web/website/urls.py` 並更新其 `patterns` 列表，如下所示：
 
 ```python
 # web/website/urls.py
@@ -158,13 +159,13 @@ urlpatterns = [
    ]
 ```
 
-Now reload the server with `evennia reload` and visit the page in your browser. If you haven't
-changed your defaults, you should be able to find the sheet for character `#1` at
+現在使用 `evennia reload` 重新載入伺服器並在瀏覽器中造訪該頁面。如果你還沒有
+更改了預設值，您應該能夠在以下位置找到字元 `#1` 的工作表
 `http://localhost:4001/character/sheet/1/`
 
-Try updating the stats in-game and refresh the page in your browser. The results should show immediately.
+嘗試更新遊戲中的統計資料並重新整理瀏覽器中的頁面。結果應該立即顯示。
 
-As an optional final step, you can also change your character typeclass to have a method called 'get_absolute_url'.
+作為可選的最後一步，您還可以將角色 typeclass 變更為具有名為「get_absolute_url」的方法。
 ```python
 # typeclasses/characters.py
 
@@ -173,8 +174,8 @@ As an optional final step, you can also change your character typeclass to have 
         from django.urls import reverse
         return reverse('character:sheet', kwargs={'object_id':self.id})
 ```
-Doing so will give you a 'view on site' button in the top right of the Django Admin Objects
-changepage that links to your new character sheet, and allow you to get the link to a character's page by using `{{ object.get_absolute_url }}` in any template where you have a given object.
+這樣做會在 Django 管理物件的右上角顯示一個「現場檢視」按鈕
+連結到新角色表的變更頁面，並允許您在具有給定物件的任何範本中使用 `{{ object.get_absolute_url }}` 來取得角色頁面的連結。
 
-*Now that you've made a basic page and app with Django, you may want to read the full Django tutorial to get a better idea of what it can do. [You can find Django's tutorial
-here](https://docs.djangoproject.com/en/4.1/intro/tutorial01/).*
+*現在您已經使用 Django 製作了基本頁面和應用程式，您可能需要閱讀完整的 Django 教學以更好地瞭解它的功能。 [你可以找到Django的教學
+這裡](https://docs.djangoproject.com/en/4.1/intro/tutorial01/).*

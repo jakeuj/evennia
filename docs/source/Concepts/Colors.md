@@ -1,210 +1,215 @@
-# Colors
+(colors)=
+# 顏色
 
-> Note that the Documentation does not display colour the way it would look on the screen.
+> 請注意，檔案不會按照螢幕上顯示的方式顯示顏色。
 
-Color can be a very useful tool for your game. It can be used to increase readability and make your
-game more appealing visually.
+顏色對於您的遊戲來說是一個非常有用的工具。它可用於增加可讀性並使您的
+遊戲在視覺上更具吸引力。
 
-Remember however that, with the exception of the webclient, you generally don't control the client used to connect to the game.  There is, for example, one special tag meaning "yellow". But exactly *which* hue of yellow is actually displayed on the user's screen depends on the settings of their particular mud client. They could even swap the colours around or turn them off altogether if so desired. Some clients don't even support color - text games are also played with special reading equipment by people who are blind or have otherwise diminished eyesight.
+但請記住，除了 webclient 之外，您通常無法控制用於連線到遊戲的使用者端。  例如，有一個特殊的 tag 意思是「黃色」。但使用者螢幕上實際顯示的「哪種」黃色色調取決於其特定的 mud 使用者端的設定。如果需要的話，他們甚至可以交換顏色或完全關閉它們。有些客戶甚至不支援彩色文字遊戲，盲人或視力下降的人也可以使用特殊的閱讀裝置來玩文字遊戲。
 
-So a good rule of thumb is to use colour to enhance your game but don't *rely* on it to display
-critical information. The default `screenreader` command will automatically turn off all color for a user (as well as clean up many line decorations etc). Make sure your game is still playable and understandable with this active.
+因此，一個好的經驗法則是使用顏色來增強遊戲，但不要「依賴」它來顯示
+關鍵訊息。預設的 `screenreader` 指令將自動關閉使用者的所有顏色（以及清理許多線條裝飾等）。確保您的遊戲透過此活動仍然可以玩並且可以理解。
 
-Evennia supports two color standards: 
+Evennia 支援兩種顏色標準：
 
-- `ANSI` - 16 foreground colors + 8  background colors. Widely supported. 
-- `Xterm256` - 128 RGB colors, 32 greyscales. Not always supported in old clients. Falls back to ANSI.
-- `Truecolor` - 24B RGB colors using hex notation. Not supported by many clients. Falls back to `XTerm256`.
+- `ANSI` - 16 種前景色 + 8 種背景色。得到廣泛支援。
+- `Xterm256` - 128 RGB 顏色，32 灰階。舊用戶端並不總是支援。回落到ANSI。
+- `Truecolor` - 24B RGB 顏色使用十六進位表示法。沒有得到很多客戶的支援。回落到`XTerm256`。
 
-To see which colours your client support, use the default `color` command. This will list all
-available colours for ANSI and Xterm256, as well as a selection of True color codes along with the codes you use for them. The central ansi/xterm256 parser is located in  [evennia/utils/ansi.py](evennia.utils.ansi), the true color one in [evennia/utils/true/hex_colors.py](evennia.utils.hex_colors).
+若要檢視您的使用者端支援哪些顏色，請使用預設的 `color` 指令。這將列出所有
+ANSI 和 Xterm256 的可用顏色，以及一系列真彩色程式碼以及您使用的程式碼。中央 ansi/xterm256 解析器位於 [evennia/utils/ansi.py](evennia.utils.ansi)，真彩色解析器位於 [evennia/utils/true/hex_colors.py](evennia.utils.hex_colors)。
 
-## ANSI colours and symbols
+(ansi-colours-and-symbols)=
+## ANSI顏色和符號
 
-Evennia supports the `ANSI` standard for text. This is by far the most supported MUD-color standard, available in all but the most ancient mud clients. 
+Evennia 支援文字的 `ANSI` 標準。這是迄今為止最受支援的 MUD- 顏色標準，除了最古老的泥漿用戶端之外的所有用戶端都可用。
 
-To colour your text you put special tags in it. Evennia will parse these and convert them to the
-correct markup for the client used. If the user's client/console/display supports ANSI colour, they
-will see the text in the specified colour, otherwise the tags will be stripped (uncolored text).
+若要為文字著色，請在其中加入特殊的tags。 Evennia 將解析這些並將它們轉換為
+所使用的用戶端的正確標記。如果使用者的用戶端/控制檯/顯示器支援 ANSI 顏色，則他們
+將看到指定顏色的文字，否則 tags 將被刪除（無色文字）。
 
-For the webclient, Evennia will translate the codes to CSS tags.
+對於webclient，Evennia 會將程式碼轉換為CSS tags。
 
-| Tag   | Effect                                                                                                                                                           |     |
+| Tag   | 影響                                                                                                                                                           |     |
 | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
-| \|n   | end all color formatting, including background colors.                                                                                                           |     |
-| \|r   | bright red foreground color                                                                                                                                      |     |
-| \|g   | bright green foreground color                                                                                                                                    |     |
-| \|y   | bright yellow foreground color                                                                                                                                   |     |
-| \|b   | bright blue foreground color                                                                                                                                     |     |
-| \|m   | bright magentaforeground color                                                                                                                                   |     |
-| \|c   | bright cyan foreground color                                                                                                                                     |     |
-| \|w   | bright white foreground color                                                                                                                                    |     |
-| \|x   | bright black (dark grey) foreground color                                                                                                                        |     |
-| \|R   | normal red foreground color                                                                                                                                      |     |
-| \|G   | normal green foreground color                                                                                                                                    |     |
-| \|Y   | normal yellow foreground color                                                                                                                                   |     |
-| \|B   | normal blue foreground color                                                                                                                                     |     |
-| \|M   | normal magentaforeground color                                                                                                                                   |     |
-| \|C   | normal cyan foreground color                                                                                                                                     |     |
-| \|W   | normal white (light grey) foreground color                                                                                                                       |     |
-| \|X   | normal black foreground color                                                                                                                                    |     |
-| \|\[# | background colours, e.g. \|\[c for bright cyan background and \|\[C a normal cyan background.                                                                    |     |
-| \|!#  | foreground color that inherits brightness from previous tags. Always uppcase, like \|!R                                                                          |     |
-| \|h   | make any following foreground ANSI colors bright (for Xterm256/true color makes the font bold if client supports it). Use with \|!#. Technically, \|h\|G == \|g. |     |
-| \|H   | negates the effects of \|h                                                                                                                                       |     |
-| \|u   | underline font (not supported in Evennia webclient)                                                                                                              |     |
-| \|U   | negates the effects of \|u                                                                                                                                       |     |
-| \|i   | italic font (not supported in Evennia webclient)                                                                                                                 |     |
-| \|I   | negates the effects of \|i                                                                                                                                       |     |
-| \|s   | strikethrough font (not supported in Evennia webclient)                                                                                                          |     |
-| \|S   | negates the effects of \|s                                                                                                                                       |     |
-| \|/   | line break. Use instead of Python \\n when adding strings from in-game.                                                                                          |     |
-| \|-   | tab character when adding strings in-game. Can vay per client, so usually better with spaces.                                                                    |     |
-| \|_   | a space. Only needed to avoid auto-cropping at the end of a in-game input                                                                                        |     |
-| \|*   | invert the current text/background colours, like a marker. See note below.                                                                                       |     |
+| \|n   | 結束所有顏色格式，包括背景顏色。                                                                                                           |     |
+| \|r   | 亮紅色前景色                                                                                                                                      |     |
+| \|克   | 亮綠色前景色                                                                                                                                    |     |
+| \|y   | 亮黃色前景色                                                                                                                                   |     |
+| \|乙   | 明亮的藍色前景色                                                                                                                                     |     |
+| \|米   | 明亮的洋紅色前景色                                                                                                                                   |     |
+| \|c   | 亮青色前景色                                                                                                                                     |     |
+| \|w   | 明亮的白色前景色                                                                                                                                    |     |
+| \|x   | 亮黑色（深灰色）前景色                                                                                                                        |     |
+| \|右   | 正常的紅色前景色                                                                                                                                      |     |
+| \|G   | 正常的綠色前景色                                                                                                                                    |     |
+| \|是   | 正常的黃色前景色                                                                                                                                   |     |
+| \|乙   | 正常的藍色前景色                                                                                                                                     |     |
+| \|中號   | 正常洋紅色前景色                                                                                                                                   |     |
+| \|C   | 正常青色前景色                                                                                                                                     |     |
+| \|瓦   | 正常白色（淺灰色）前景色                                                                                                                       |     |
+| \|X   | 正常的黑色前景色                                                                                                                                    |     |
+| \|\[# | 背景顏色，e.g。 \|\[c 表示亮青色背景，\|\[C 正常的青色背景。                                                                    |     |
+| \|!#  | 繼承先前 tags 亮度的前景色。總是大寫，例如 \|!R                                                                          |     |
+| \|小時   | 使任何以下前景 ANSI 顏色變亮（對於 Xterm256/真彩色，如果用戶端支援，則使字型加粗）。與 \ 一起使用|!#.從技術上來說，\|小時\|G==\|g。 |     |
+| \|H   | 否定 \ 的影響|小時                                                                                                                                       |     |
+| \|你   | 底線字型（Evennia webclient 不支援）                                                                                                              |     |
+| \|U   | 否定 \ 的影響|你                                                                                                                                       |     |
+| \|我   | 斜體字型（Evennia webclient 不支援）                                                                                                                 |     |
+| \|我   | 否定 \ 的影響|我                                                                                                                                       |     |
+| \|s   | 刪除線字型（Evennia webclient 不支援）                                                                                                          |     |
+| \|S   | 否定 \ 的影響|s                                                                                                                                       |     |
+| \|/   | 換行。從遊戲中新增字串時，請使用而不是 Python \\n。                                                                                          |     |
+| \|-   | 在遊戲中新增字串時製表符。可能因客戶而異，所以通常最好有空間。                                                                    |     |
+| \|_   | 一個空間。只需要避免在遊戲輸入結束時自動裁剪                                                                                        |     |
+| \|*   | 反轉目前文字/背景顏色，就像標記一樣。請參閱下面的註釋。                                                                                       |     |
 
-Here is an example of the tags in action:
+以下是 tags 的實際操作範例：
 
      |rThis text is bright red.|n This is normal text.
      |RThis is a dark red text.|n This is normal text.
      |[rThis text has red background.|n This is normal text.
      |b|[yThis is bright blue text on yellow background.|n This is normal text.
 
-Note: The ANSI standard does not actually support bright backgrounds like `|[r` - the standard
-only supports "normal" intensity backgrounds.  To get around this Evennia implements these as [Xterm256 colours](#xterm256-colours) behind the scenes. If the client does not support
-Xterm256 the ANSI colors will be used instead and there will be no visible difference between using upper- and lower-case background tags.
+注意：ANSI 標準實際上並不支援像 `|[r` - 標準那樣的明亮背景
+僅支援“正常”強度背景。  為瞭解決這個問題，Evennia 在幕後將它們實現為 [Xterm256 顏色](#xterm256-colours)。如果用戶端不支援
+Xterm256 將使用 ANSI 顏色，並且使用大寫和小寫背景 tags 之間不會有明顯差異。
 
-If you want to display an ANSI marker as output text (without having any effect), you need to escape it by preceding its `|` with another `|`:
+如果要將 ANSI 標記顯示為輸出文字（沒有任何效果），則需要透過在其 `|` 前面加上另一個 `|` 來轉義它：
 
 ```
 say The ||r ANSI marker changes text color to bright red.
 ```
 
-This will output the raw `|r` without any color change. This can also be necessary if you are doing
-ansi art that uses `|` with a letter directly following it.
+這將輸出原始`|r`，沒有任何顏色變化。如果您正在這樣做，這也可能是必要的
+ansi art 使用 `|` 並緊跟其後的字母。
 
-Use the command
+使用指令
 
     color ansi
 
-to get a list of all supported ANSI colours and the tags used to produce them.
+取得所有支援的 ANSI 顏色以及用於產生它們的 tags 的清單。
 
-A few additional ANSI codes are supported:
+支援一些額外的 ANSI 程式碼：
 
 
-### Caveats of `|*`
+(caveats-of)=
+### `|*` 的注意事項
 
-The `|*` tag (inverse video) is an old ANSI standard and should usually not be used for more than to
-mark short snippets of text. If combined with other tags it comes with a series of potentially
-confusing behaviors:
+`|*` tag（反向影片）是舊的 ANSI 標準，通常不應用於超過
+標記簡短的文字片段。如果與其他 tags 結合使用，它會帶來一系列潛在的
+令人困惑的行為：
 
-* The `|*` tag will only work once in a row:, ie: after using it once it won't have an effect again
-until you declare another tag. This is an example:
+* `|*` tag 只會連續使用一次：即：使用一次後就不再有效果
+直到你宣告另一個tag。這是一個例子：
 
     ```
     Normal text, |*reversed text|*, still reversed text.
     ```
 
-  that is, it will not reverse to normal at the second `|*`. You need to reset it manually:
+即第二個`|*`時不會反轉正常。您需要手動重置它：
 
     ```
     Normal text, |*reversed text|n, normal again.
     ```
 
-*  The `|*` tag does not take "bright" colors into account:
+*  `|*` tag 不考慮「明亮」顏色：
 
     ```
     |RNormal red, |hnow brightened. |*BG is normal red.
     ```
 
-  So `|*` only considers the 'true' foreground color, ignoring any highlighting. Think of the bright
-state (`|h`) as something like like `<strong>` in HTML: it modifies the _appearance_ of a normal
-foreground color to match its bright counterpart, without changing its normal color.
-* Finally, after a `|*`, if the previous background was set to a dark color (via `|[`), `|!#`) will
-actually change the background color instead of the foreground:
+因此 `|*` 僅考慮「真實」前景色，忽略任何突出顯示。想想光明
+狀態（`|h`）類似於HTML中的`<strong>`：它修改了正常的_外觀_
+前景色與其明亮的對應顏色相匹配，而不改變其正常顏色。
+* 最後，在`|*`之後，如果先前的背景設定為深色（透過`|[`），`|!#`）將會
+實際上改變背景顏色而不是前景：
 
     ```
     |*reversed text |!R now BG is red.
     ```
-For a detailed explanation of these caveats, see the [Understanding Color Tags](../Howtos/Tutorial\-Understanding\-Color\-Tags.md) 
-tutorial. But most of the time you might be better off to simply avoid `|*` and mark your text
-manually instead.
+有關這些注意事項的詳細說明，請參閱[瞭解顏色 Tags](../Howtos/Tutorial-Understanding-Color-Tags.md)
+教學。但大多數時候，您可能最好簡單地避免 `|*` 並標記您的文字
+手動代替。
 
-## Xterm256 Colours
+(xterm256-colours)=
+## Xterm256 顏色
 
 ```{sidebar}
-See the [Understanding Color Tags](../Howtos/Tutorial\-Understanding\-Color\-Tags.md) tutorial, for more on the use of ANSI color tags and the pitfalls of mixing ANSI and Xterms256 color tags in the same context.
+請參閱[瞭解顏色 Tags](../Howtos/Tutorial-Understanding-Color-Tags.md) 教學，以瞭解有關 ANSI 顏色 tags 的使用以及在同一上下文中混合 ANSI 和 Xterms256 顏色 tags 的缺陷的更多資訊。
 ```
-The _Xterm256_ standard is a colour scheme that supports 256 colours for text and/or background. It can be combined freely with ANSI colors (above), but some ANSI tags don't affect Xterm256 tags. 
+_Xterm256_ 標準是支援 256 種顏色的文字和/或背景顏色的配色方案。它可以與ANSI顏色（上面）自由組合，但有些ANSI tags不影響Xterm256 tags。
 
-While this offers many more possibilities than traditional ANSI colours, be wary that too many text
-colors will be confusing to the eye. Also, not all clients support Xterm256 - these will instead see
-the closest equivalent ANSI color. You can mix Xterm256 tags with ANSI tags as you please.
+雖然這比傳統的 ANSI 顏色提供了更多的可能性，但要注意太多的文字
+顏色會讓眼睛感到困惑。此外，並非所有用戶端都支援 Xterm256 - 這些用戶端會看到
+最接近的等效 ANSI 顏色。您可以根據需要將 Xterm256 tags 與 ANSI tags 混合使用。
 
-| Tag | Effect | 
+| Tag | 影響 | 
 | ---- | ---- | 
-| \|### | foreground RGB (red/green/blue), each from 0 to 5. | 
-| \|\[### | background RGB | 
-| \|=# | a-z foreground greyscale, where `a` is black and `z` is white. | 
-| \|\[=#| a-z background greyscale
+| \|### | 前景RGB（紅/綠/藍），每個從0到5。 | 
+| \|\[### | 背景RGB | 
+| \|=# | a-z 前景灰度，其中 `a` 為黑色，`z` 為白色。 | 
+| \|\[=#| a-z 背景灰階
 
-Some examples: 
+一些例子：
 
-| Tag | Effect | 
+| Tag | 影響 | 
 | ---- | ---- | 
-| \|500 | bright red | 
-| \|050 | bright green | 
-| \|005 | bright blue | 
-| \|520 | red + a little green = orange | 
-|\|555 |  pure white foreground | 
-|\|230 | olive green foreground | 
-|\|\[300 | text with a dark red background | 
-|\|005\|\[054 | dark blue text on a bright cyan background |
-|\|=a | greyscale foreground, equal to black |
-| \|=m | greyscale foreground, midway between white and black.
-| \|=z | greyscale foreground, equal to white | 
-| \|\[=m | greyscale background | 
+| \|500 | 鮮紅色 | 
+| \|050 | 亮綠色 | 
+| \|005 | 亮藍色 | 
+| \|520 | 紅色+一點綠色=橘色 | 
+|\|555 |  純白色前景 | 
+|\|230 | 橄欖綠前景 | 
+|\|\[300 | 深紅色背景的文字 | 
+|\|005\|\[054 | 亮青色背景上的深藍色文字 |
+|\|=a | 灰階前景，等於黑色 |
+| \|=m |灰階前景，介於白色與黑色之間。
+| \|=z | 灰階前景，等於白色 | 
+| \|\[=米 | 灰階背景 | 
 
-Xterm256 don't use bright/normal intensity like ANSI does; intensity is just varied by increasing/decreasing  all RGB values by the same amount.
+Xterm256 不像 ANSI 那樣使用明亮/正常強度；強度只是透過將所有 RGB 值增加/減少相同的量來改變。
 
-If you have a client that supports Xterm256, you can use
+如果你有支援Xterm256的用戶端，你可以使用
 
     color xterm256
 
-to get a table of all the 256 colours and the codes that produce them. If the table looks broken up
-into a few blocks of colors, it means Xterm256 is not supported and ANSI are used as a replacement. You can use the `options` command to see if xterm256 is active for you. This depends on if your client told Evennia what it supports - if not, and you know what your client supports, you may have to activate some features manually.
+取得包含所有 256 種顏色以及產生這些顏色的程式碼的表格。如果桌子看起來破碎了
+分成幾塊顏色，表示不支援Xterm256，使用ANSI作為替代。您可以使用 `options` 指令檢視 xterm256 是否對您有效。這取決於您的客戶是否告訴 Evennia 它支援什麼 - 如果沒有，並且您知道您的客戶支援什麼，您可能必須手動啟動某些功能。
 
-## 24-bit Colors (True color)
+(24-bit-colors-true-color)=
+## 24 位元顏色（真彩色）
 
 ```{sidebar}
-See the [Wikipedia entry on web colors](https://en.wikipedia.org/wiki/Web_colors) for more detailed information on this color format.
+有關此顏色格式的更多詳細資訊，請參閱[有關網頁顏色的維基百科條目](https://en.wikipedia.org/wiki/Web_colors)。
 ```
 
-Some clients support 24-bit colors. This is also called [true color](https://en.wikipedia.org/wiki/Color_depth#True_color_(24-bit)).
-Not all clients support true color, they will instead see the closest equivalent. It's important to bear in mind that things may look quite different from what you intended if you use subtle gradations in true color and it's viewed with a client that doesn't support true color.
-The hexadecimal color codes used here are the same ones used in web design.
+某些用戶端支援 24 位元顏色。這也稱為[真彩色](https://en.wikipedia.org/wiki/Color_depth#True_color_(24-bit))。
+並非所有用戶端都支援真彩色，他們會看到最接近的等效顏色。重要的是要記住，如果您在真彩色中使用微妙的漸變並且在不支援真彩色的用戶端上檢視，則事情看起來可能與您的預期完全不同。
+這裡使用的十六進位顏色程式碼與網頁設計中使用的相同。
 
-| Tag | Effect | 
+| Tag | 影響 | 
 | -------- | ---- | 
-| \|#$$$$$$ | foreground RGB (red/green/blue), 6-digit hexadecimal format, where $ = 0-F | 
-| \|\[#$$$$$$ | background RGB | 
-| \|#$$$ | foreground RGB (red/green/blue), 3-digit hexadecimal format. | 
-| \|\[#$$$ | background RGB | 
+| \|#$$$$$$ | 前景RGB（紅/綠/藍），6位十六進位格式，其中$ = 0-F | 
+| \|\[#$$$$$$ | 背景RGB | 
+| \|#$$$ | 前景RGB（紅/綠/藍），3 位十六進位格式。 | 
+| \|\[#$$$ | 背景RGB | 
 
-Some 6-digit examples: 
+一些 6 位數字的範例：
 
-| Tag | Effect | 
+| Tag | 影響 | 
 | -------- | ---- | 
-| \|#ff0000 | bright red foreground| 
-| \|#00ff00 | bright green foreground| 
-| \|#0000ff | bright blue foreground| 
-| \|#\[ff0000 | bright red background| 
+| \|#ff0000 | 明亮的紅色前景| 
+| \|#00ff00 | 明亮的綠色前景| 
+| \|#0000ff | 明亮的藍色前景| 
+| \|#\[ff0000 | 明亮的紅色背景| 
 
-Some 3-digit examples: 
+一些 3 位數範例：
 
-| Tag | Effect | 
+| Tag | 影響 | 
 | ---- | ---- | 
-| \|#f00 | bright red foreground| 
-| \|#0f0 | bright green foreground| 
-| \|#00f | bright blue foreground| 
-| \|\[#f00 | bright red background| 
+| \|#f00 | 明亮的紅色前景| 
+| \|#0f0 | 明亮的綠色前景| 
+| \|#00f | 明亮的藍色前景| 
+| \|\[#f00 | 明亮的紅色背景| 

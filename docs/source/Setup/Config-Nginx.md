@@ -1,14 +1,16 @@
-# Configuring NGINX for Evennia with SSL
+(configuring-nginx-for-evennia-with-ssl)=
+# 為 Evennia 設定 NGINX 和 SSL
 
-[Nginx](https://nginx.org/en/) is a proxy server; you can put it between Evennia and the outside world to serve your game over encrypted connections. Another alternative is [HAProxy](./Config-HAProxy.md). 
+[Nginx](https://nginx.org/en/)是代理伺服器；您可以將其放在 Evennia 和外界之間，透過加密連線為您的遊戲提供服務。另一個選擇是[HAProxy](./Config-HAProxy.md)。
 
-> This is NOT a full set-up guide! It assumes you know how to get your own `Letsencrypt` certificates, that you already have nginx installed, and that you are familiar with Nginx configuration files. **If you don't already use nginx,** you are probably better off using the [guide for using HAProxy](./Config-HAProxy.md) instead.
+> 這是NOT完整的設定指南！它假設您知道如何取得自己的 `Letsencrypt` 證書，您已經安裝了 nginx，並且熟悉 Nginx 設定檔。 **如果您尚未使用 nginx，** 您最好使用[使用 HAProxy 的指南](./Config-HAProxy.md)。
 
-## SSL on the website and websocket
+(ssl-on-the-website-and-websocket)=
+## SSL 在網站和 websocket 上
 
-Both the website and the websocket should be accessed through your normal HTTPS port, so they should be defined together.
+網站和 websocket 都應該透過您正常的 HTTPS 連線埠訪問，因此它們應該一起定義。
 
-For nginx, here is an example configuration, using Evennia's default ports:
+對於 nginx，這是一個範例設定，使用 Evennia 的預設連線埠：
 ```
 server {
 	server_name example.com;
@@ -44,11 +46,11 @@ server {
 }
 ```
 
-This proxies the websocket connection through the `/ws` location, and the root location to the website.
+這將透過 `/ws` 位置以及網站的根位置代理 websocket 連線。
 
-For Evennia, here is an example settings configuration that would go with the above nginx configuration, to go in your production server's `server/conf/secret_settings.py`
+對於 Evennia，這裡是一個範例設定設定，將與上述 nginx 設定一起使用，以進入生產伺服器的 `server/conf/secret_settings.py`
 
-> The `secret_settings.py` file is not included in `git` commits and is to be used for secret stuff. Putting your production-only settings in this file allows you to continue using default access points for local development, making your life easier.
+> `secret_settings.py` 檔案不包含在 `git` 提交中，並且用於秘密內容。透過將僅用於生產的設定放入此檔案中，您可以繼續使用預設存取點進行本地開發，從而使您的生活更輕鬆。
 
 ```python
 SERVER_HOSTNAME = "example.com"
@@ -57,15 +59,16 @@ WEBSOCKET_CLIENT_URL = "wss://example.com/ws"
 # Turn off all external connections
 LOCKDOWN_MODE = True
 ```
-This makes sure that evennia uses the correct URI for websocket connections. Setting `LOCKDOWN_MODE` on will also prevents any external connections directly to Evennia's ports, limiting it to connections through the nginx proxies.
+這可確保 evennia 使用正確的 URI 進行 Websocket 連線。將 `LOCKDOWN_MODE` 設為 on 還將阻止任何直接到 Evennia 連線埠的外部連線，將其限制為透過 nginx 代理的連線。
 
-## Telnet SSL
+(telnet-ssl)=
+## 遠端登入SSL
 
-> This will proxy ALL telnet access through nginx! If you want players to connect directly to Evennia's telnet ports instead of going through nginx, leave `LOCKDOWN_MODE` off and use a different SSL implementation, such as activating Evennia's internal telnet SSL port (see `settings.SSL_ENABLED` and `settings.SSL_PORTS` in  [default settings file](./Settings-Default.md)). 
+> 這將透過 nginx 代理程式 ALL telnet 存取！如果您希望玩家直接連線到Evennia的telnet連線埠而不是透過nginx，請保留`LOCKDOWN_MODE`關閉並使用不同的SSL實現，例如啟動Evennia的內部telnet SSL連線埠（請參閱[預設設定檔](./Settings-Default.md)中的`settings.SSL_ENABLED`和`settings.SSL_PORTS`）。
 
-If you've only used nginx for websites, telnet is slightly more complicated. You need to set up stream parameters in your primary configuration file - e.g. `/etc/nginx/nginx.conf` - which default installations typically will not include.
+如果您只在網站上使用過 nginx，那麼 telnet 會稍微複雜一些。您需要在主設定檔中設定流引數 - e.g。 `/etc/nginx/nginx.conf` - 預設安裝通常不包括。
 
-We chose to parallel the `http` structure for `stream`, adding conf files to `streams-available` and having them symlinked in `streams-enabled`, the same as other sites.
+我們選擇並行 `stream` 的 `http` 結構，將 conf 檔案新增至 `streams-available` 並將它們符號連結到 `streams-enabled`，與其他網站相同。
 
 ```
 stream {
@@ -73,11 +76,11 @@ stream {
 	include /etc/nginx/streams-enabled/*;
 }
 ```
-Then of course you need to create the required folders in the same location as your other nginx configurations:
+當然，您需要在與其他 nginx 設定相同的位置建立所需的資料夾：
 
     $ sudo mkdir conf.streams.d streams-available streams-enabled
 
-An example configuration file for the telnet connection - using an arbitrary external port of `4040` - would then be:
+telnet 連線的範例設定檔 - 使用任意外部連線埠 `4040` - 將是：
 ```
 server {
 	listen [::]:4040 ssl;
@@ -92,11 +95,12 @@ server {
 	set_real_ip_from $realip_remote_addr:$realip_remote_port
 }
 ```
-Players can now connect with telnet+SSL to your server at `example.com:4040` - but *not* to the internal connection of `4000`.
+玩家現在可以使用 telnet+SSL 連線到位於 `example.com:4040` 的伺服器 - 但*不能*連線到 `4000` 的內部連線。
 
-> ***IMPORTANT: With this configuration, the default front page will be WRONG.*** You will need to change the `index.html` template and update the telnet section (NOT the telnet ssl section!) to display the correct information.
+> ***IMPORTANT：使用此設定，預設首頁將為 WRONG。 *** 您將需要更改 `index.html` 範本並更新 telnet 部分（NOT telnet ssl 部分！）以顯示正確的資訊。
 
 
-## Don't Forget!
+(dont-forget)=
+## 不要忘記！
 
-`certbot` will automatically renew your certificates for you, but nginx won't see them without reloading. Make sure to set up a monthly cron job to reload your nginx service to avoid service interruptions due to expired certificates.
+`certbot` 會自動為你更新你的證書，但 nginx 在不重新載入的情況下不會看到它們。確保設定每月的 cron 作業來重新載入 nginx 服務，以避免因憑證過期而導致服務中斷。

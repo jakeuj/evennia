@@ -1,27 +1,29 @@
-# Talkative NPC example
+(talkative-npc-example)=
+# 多嘴NPC示例
 
-Contribution by Griatch 2011. Updated by grungies1138, 2016
+Griatch 2011 年貢獻。由 grungies1138 更新，2016 年
 
-This is an example of a static NPC object capable of holding a simple menu-driven
-conversation. Suitable for example as a quest giver or merchant.
+這是一個靜態 NPC 物件的範例，能夠容納簡單的選單驅動
+談話。例如適合作為任務提供者或商人。
 
-## Installation
+(installation)=
+## 安裝
 
-Create the NPC by creating an object of typeclass `contrib.tutorials.talking_npc.TalkingNPC`,
-For example:
+透過建立 typeclass `contrib.tutorials.talking_npc.TalkingNPC` 的物件來建立 NPC，
+例如：
 
     create/drop John : contrib.tutorials.talking_npc.TalkingNPC
 
-Use `talk` in the same room as the NPC to start a conversation.
+在與 NPC 相同的房間中使用 `talk` 開始對話。
 
-If there are many talkative npcs in the same room you will get to choose which
-one's talk command to call (Evennia handles this automatically).
+如果同一個房間裡有很多說話的NPC，你可以選擇哪一個
+一個人的通話指令（Evennia 自動處理此問題）。
 
-This use of EvMenu is very simplistic; See EvMenu for a lot more complex
-possibilities.
+EvMenu的這種用法非常簡單；請參閱 EvMenu 以瞭解更複雜的情況
+的可能性。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/tutorials/talking_npc/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\tutorials\talking_npc\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

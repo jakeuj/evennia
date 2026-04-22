@@ -1,189 +1,194 @@
-# Understanding Color Tags
+(understanding-color-tags)=
+# 瞭解顏色Tags
 
-This tutorial aims at dispelling confusions regarding the use of color tags within Evennia.
+本教學旨在消除有關在 Evennia 內使用顏色 tags 的混亂。
 
-Correct understanding of this topic requires having read the  Evennia's color tags. Here we'll explain by examples the reasons behind the unexpected (or apparently incoherent) behaviors of some color tags, as mentioned _en passant_ in the [Colors](../Concepts/Colors.md) page.
+正確理解本主題需要閱讀Evennia的顏色tags。在這裡，我們將透過範例解釋某些顏色tags的意外（或明顯不連貫）行為背後的原因，如[顏色](../Concepts/Colors.md)頁面中_en passant_所述。
 
-All you'll need for this tutorial is access to a running instance of Evennia via a color-enabled
-client. The examples provided are just commands that you can type in your client.
+對於本教學，您所需要的只是透過啟用顏色的存取 Evennia 的執行例項
+客戶。提供的範例只是您可以在用戶端中鍵入的指令。
 
-## Evennia, ANSI and Xterm256
+(evennia-ansi-and-xterm256)=
+## Evennia、ANSI 和 Xterm256
 
-All modern MUD clients support colors; nevertheless, the standards to which all clients abide dates
-back to old day of terminals, and when it comes to colors we are dealing with ANSI and Xterm256
-standards.
+所有現代 MUD 用戶端都支援顏色；儘管如此，所有客戶都遵守的標準
+回到終端的舊時代，當談到顏色時，我們正在處理 ANSI 和 Xterm256
+標準。
 
-Evennia handles transparently, behind the scenes, all the code required to enforce these
-standards—so, if a user connects with a client which doesn't support colors, or supports only ANSI
-(16 colors), Evennia will take all due steps to ensure that the output will be adjusted to look
-right at the client side.
+Evennia 在幕後透明地處理執行這些操作所需的所有程式碼
+標準 - 因此，如果使用者連線的使用者端不支援顏色，或僅支援 ANSI
+（16 種顏色），Evennia 將採取所有適當的步驟來確保將輸出調整為看起來
+就在用戶端。
 
-As for you, the developer, all you need to care about is knowing how to correctly use the color tags
-within your MUD. Most likely, you'll be adding colors to help pages, descriptions, automatically
-generated text, etc.
+對於開發者來說，你只需要關心如何正確使用顏色tags
+在你的MUD之內。最有可能的是，您將自動新增顏色來幫助頁面、描述
+產生的文字等
 
-You are free to mix together ANSI and Xterm256 color tags, but you should be aware of a few
-pitfalls. ANSI and Xterm256 coexist without conflicts in Evennia, but in many ways they don't «see»
-each other: ANSI-specific color tags will have no effect on Xterm-defined colors, as we shall see
-here.
+您可以自由地將 ANSI 和 Xterm256 顏色 tags 混合在一起，但您應該注意一些
+陷阱。 ANSI 和 Xterm256 在 Evennia 中共存，沒有衝突，但在很多方面它們“看不到”
+彼此：ANSI特定顏色tags對Xterm定義的顏色沒有影響，我們會看到
+在這裡。
 
+(ansi)=
 ## ANSI
 
-ANSI has a set of 16 colors, to be more precise: ANSI has 8 basic colors which come in _dark_ and
-_bright_ flavours—with _dark_ being _normal_. The colors are: red, green, yellow, blue, magenta,
-cyan, white and black. White in its dark version is usually referred to as gray, and black in its
-bright version as darkgray. Here, for sake of simplicity they'll be referred to as dark and bright:
-bright/dark black, bright/dark white.
+ANSI 有一組 16 種顏色，更準確地說：ANSI 有 8 種基本顏色，其中有 _dark_ 和
+_明亮_口味——_深色_為_正常_。顏色有：紅、綠、黃、藍、洋紅、
+青色、白色和黑色。深色版本的白色通常被稱為灰色，而黑色版本通常被稱為灰色。
+亮色版本為深灰色。在這裡，為了簡單起見，它們將被稱為黑暗和明亮：
+亮/深黑、亮/深白。
 
-The default colors of MUD clients is normal (dark) white on normal black (ie: gray on black).
+MUD 使用者端的預設顏色是普通（深）白色配普通黑色（即：黑色配灰色）。
 
-It's important to grasp that in the ANSI standard bright colors apply only to text (foreground), not
-to background. Evennia allows to bypass this limitation via Xterm256, but doing so will impact the
-behavior of ANSI tags, as we shall see.
+重要的是要理解，在 ANSI 標準中，明亮的顏色僅適用於文字（前景），而不適用於
+到背景。 Evennia 允許透過 Xterm256 繞過此限制，但這樣做會影響
+ANSI tags 的行為，正如我們將看到的。
 
-Also, it's important to remember that the 16 ANSI colors are a convention, and the final user can
-always customize their appearance—he might decide to have green show as red, and dark green as blue,
-etc.
+另外，重要的是要記住 16 ANSI 顏色是約定，終端使用者可以
+總是定製它們的外觀——他可能決定將綠色顯示為紅色，將深綠色顯示為藍色，
+等等
 
+(xterm256)=
 ## Xterm256
 
-The 16 colors of ANSI should be more than enough to handle simple coloring of text. But when an
-author wants to be sure that a given color will show as he intended it, she might choose to rely on
-Xterm256 colors.
+ANSI 的 16 種顏色應該足以處理簡單的文字著色。但是當一個
+作者希望確保給定的顏色能夠按照他的意圖顯示，她可能會選擇依賴
+Xterm256 顏色。
 
-Xterm256 doesn't rely on a palette of named colors, it instead represent colors by their values. So,
-a red color could be `|[500` (bright and pure red), or `|[300` (darker red), and so on.
+Xterm256 不依賴命名顏色的調色盤，而是透過顏色值來表示顏色。所以，
+紅色可以是`|[500`（明亮的純紅色），或`|[300`（深紅色），等等。
 
-## ANSI Color Tags in Evennia
+(ansi-color-tags-in-evennia)=
+## ANSI Evennia 中的顏色 Tags
 
->   NOTE: for ease of reading, the examples contain extra white spaces after the
->   color tags (eg: `|g green |b blue` ). This is done only so that it's easier
->   to see the tags separated from their context; it wouldn't be good practice
->   in real-life coding.
+> NOTE：為了方便閱讀，範例在後麵包含額外的空格
+> 顏色tags（例如：`|g green |b blue`）。這樣做只是為了更容易
+> 檢視 tags 與其上下文的分離；這不是一個好的做法
+> 在現實生活中的編碼中。
 
-Let's proceed by examples. In your MUD client type:
+讓我們繼續舉例。在您的 MUD 使用者端中輸入：
 
 
     say Normal |* Negative
 
-Evennia should output the word "Normal" normally (ie: gray on black) and "Negative" in reversed
-colors (ie: black on gray).
+Evennia 應該正常輸出單字“Normal”（即：黑色上的灰色）和相反的“Negative”
+顏色（即：灰色上的黑色）。
 
-This is pretty straight forward, the `|*` ANSI *invert* tag switches between foreground and
-background—from now on, **FG** and **BG** shorthands will be used to refer to foreground and
-background.
+這非常簡單， `|*` ANSI *invert* tag 在前景和前景之間切換
+背景－從現在開始，**FG** 和 **BG** 簡寫將用於指稱前景和
+背景。
 
-But take mental note of this: `|*` has switched *dark white* and *dark black*.
+但請記住這一點：`|*` 已切換*深白色*和*深黑色*。
 
-Now try this:
+現在試試這個：
 
     say |w Bright white FG |* Negative
 
-You'll notice that the word "Negative" is not black on white, it's darkgray on gray. Why is this?
-Shouldn't it be black text on a white BG? Two things are happening here.
+你會注意到「Negative」這個字不是白底黑字，而是灰色的深灰色。這是為什麼呢？
+不應該是白底黑字BG嗎？這裡發生了兩件事。
 
-As mentioned, ANSI has 8 base colors, the dark ones. The bright ones are achieved by means of
-*highlighting* the base/dark/normal colors, and they only apply to FG.
+如前所述，ANSI 有 8 種基色，即深色。明亮的人是透過以下方式實現的
+*突出顯示*基礎/深色/正常顏色，它們僅適用於FG。
 
-What happened here is that when we set the bright white FG with `|w`, Evennia translated this into
-the ANSI sequence of Highlight On + White FG. In terms of Evennia's color tags, it's as if we typed:
+這裡發生的事情是，當我們用 `|w` 設定亮白色 FG 時，Evennia 將其轉換為
+高亮顯示 + 白色 FG 的 ANSI 序列。就Evennia的顏色tags而言，就好像我們輸入了：
 
 
     say |h|!W Bright white FG |* Negative
 
-Furthermore, the Highlight-On property (which only works for BG!) is preserved after the FG/BG
-switch, this being the reason why we see black as darkgray: highlighting makes it *bright black*
-(ie: darkgray).
+此外，Highlight-On 屬性（僅適用於 BG！）在 FG/BG 之後保留
+開關，這就是我們將黑色視為深灰色的原因：突出顯示使其*亮黑色*
+（即：深灰色）。
 
-As for the BG being also grey, that is normal—ie: you are seeing *normal white* (ie: dark white =
-gray). Remember that since there are no bright BG colors, the ANSI `|*` tag will transpose any FG
-color in its normal/dark version. So here the FG's bright white became dark white in the BG! In
-reality, it was always normal/dark white, except that in the FG is seen as bright because of the
-highlight tag behind the scenes.
+至於 BG 也是灰色的，這是正常的，即：您看到*正常白色*（即：深白色 =
+灰色）。請記住，由於沒有明亮的 BG 顏色，ANSI `|*` tag 將轉置任何 FG
+正常/深色版本的顏色。所以這裡FG的亮白色在BG變成深白色了！在
+現實中，它總是正常/深白色，除了在 FG 中由於
+突出幕後tag。
 
-Let's try the same thing with some color:
+讓我們用一些顏色來嘗試同樣的事情：
 
     say |m |[G Bright Magenta on Dark Green |* Negative
 
-Again, the BG stays dark because of ANSI rules, and the FG stays bright because of the implicit `|h`
-in `|m`.
+同樣，由於 ANSI 規則，BG 保持黑暗，並且由於隱式 `|h`，FG 保持明亮
+在`|m`中。
 
-Now, let's see what happens if we set a bright BG and then invert—yes, Evennia kindly allows us to
-do it, even if it's not within ANSI expectations.
+現在，讓我們看看如果我們設定一個明亮的BG然後反轉會發生什麼——是的，Evennia允許我們
+去做吧，即使它不在 ANSI 的預期之內。
 
     say |[b Dark White on Bright Blue |* Negative
 
-Before color inversion, the BG does show in bright blue, and after inversion (as expected) it's
-*dark white* (gray). The bright blue of the BG survived the inversion and gave us a bright blue FG.
-This behavior is tricky though, and not as simple as it might look.
+在顏色反轉之前，BG 確實顯示為亮藍色，而在反轉之後（如預期），它是
+*深白色*（灰色）。 BG 的亮藍色在反轉後倖存下來，並為我們提供了亮藍色 FG。
+但這種行為很棘手，並不像看起來那麼簡單。
 
-If the inversion were to be pure ANSI, the bright blue would have been accounted just as normal
-blue, and should have converted to normal blue in the FG (after all, there was no highlighting on).
-The fact is that in reality this color is not bright blue at all, it just an Xterm version of it!
+如果反演是純粹的ANSI，則亮藍色將被視為正常
+藍色，並且應該在 FG 中轉換為普通藍色（畢竟沒有突出顯示）。
+事實上，實際上這種顏色根本不是亮藍色，它只是它的 Xterm 版本！
 
-To demonstrate this, type:
+為了示範這一點，請輸入：
 
     say |[b Dark White on Bright Blue |* Negative |H un-bright
 
-The `|H` Highlight-Off tag should have turned *dark blue* the last word; but it didn't because it
-couldn't: in order to enforce the non-ANSI bright BG Evennia turned to Xterm, and Xterm entities are
-not affected by ANSI tags!
+`|H` 高亮關閉 tag 應該變成*深藍色*最後一個詞；但事實並非如此，因為它
+不能：為了強制使用非 ANSI 的亮背景色，Evennia 轉而使用 Xterm，而 Xterm 實體
+不受 ANSI tags 影響！
 
-So, we are getting at the heart of all confusions and possible odd-behaviors pertaining color tags
-in Evennia: apart from Evennia's translations from- and to- ANSI/Xterm, the two systems are
-independent and transparent to each other.
+因此，我們正在瞭解與顏色有關的所有混亂和可能的奇怪行為的核心tags
+在Evennia中：除了Evennia從ANSI/Xterm到ANSI/Xterm的翻譯之外，這兩個系統是
+彼此獨立透明。
 
-The bright blue of the previous example was just an Xterm representation of the ANSI standard blue.
-Try to change the default settings of your client, so that blue shows as some other color, you'll
-then realize the difference when Evennia is sending a true ANSI color (which will show up according
-to your settings) and when instead it's sending an Xterm representation of that color (which will
-show up always as defined by Evennia).
+上一個範例的亮藍色只是 ANSI 標準藍色的 Xterm 表示。
+嘗試更改用戶端的預設設定，使藍色顯示為其他顏色，您將
+然後意識到當 Evennia 傳送真實的 ANSI 顏色時的差異（將根據
+到您的設定），而當它傳送該顏色的 Xterm 表示時（這將
+始終按照 Evennia 的定義顯示）。
 
-You'll have to keep in mind that the presence of an Xterm BG or FG color might affect the way your
-tags work on the text. For example:
+您必須記住，Xterm BG 或 FG 顏色的存在可能會影響您的方式
+tags 處理文字。例如：
 
     say |[b Bright Blue BG |* Negative |!Y Dark Yellow |h not bright
 
-Here the `|h` tag no longer affects the FG color. Even though it was changed via the `|!` tag, the
-ANSI system is out-of-tune because of the intrusion of an Xterm color (bright blue BG, then moved to
-FG with `|*`).
+這裡 `|h` tag 不再影響 FG 顏色。即使它是透過 `|!` tag 更改的，
+ANSI 由於 Xterm 顏色的侵入（亮藍色 BG，然後移至
+FG 與 `|*`）。
 
-All unexpected ANSI behaviours are the result of mixing Xterm colors (either on purpose or either
-via bright BG colors). The `|n` tag will restore things in place and ANSI tags will respond properly
-again. So, at the end is just an issue of being mindful when using Xterm colors or bright BGs, and
-avoid wild mixing them with ANSI tags without normalizing (`|n`) things again.
+所有意外的 ANSI 行為都是混合 Xterm 顏色的結果（無論是故意的還是
+透過明亮的BG顏色）。 `|n` tag 會將內容恢復到位，ANSI tags 將正確回應
+再次。所以，最後只是一個在使用 Xterm 顏色或明亮的 BG 時要小心的問題，並且
+避免將它們與 ANSI tags 混合而不再次標準化（`|n`）。
 
-Try this:
+試試這個：
 
     say |[b Bright Blue BG |* Negative |!R Red FG
 
-And then:
+進而：
 
     say |[B Dark Blue BG |* Negative |!R Red BG??
 
-In this second example the `|!` changes the BG color instead of the FG! In fact, the odd behavior is
-the one from the former example, non the latter. When you invert FG and BG with `|*` you actually
-inverting their references. This is why the last example (which has a normal/dark BG!) allows `|!`
-to change the BG color. In the first example, it's again the presence of an Xterm color (bright blue
-BG) which changes the default behavior.
+在第二個範例中，`|!` 更改了 BG 顏色，而不是 FG！事實上，奇怪的行為是
+前一個例子中的一個，而不是後一個例子中的一個。當你用 `|*` 反轉 FG 和 BG 時，你實際上
+顛倒他們的參考。這就是為什麼最後一個範例（具有正常/深色BG！）允許`|!`
+更改 BG 顏色。在第一個範例中，再次出現 Xterm 顏色（亮藍色
+BG) 這會更改預設行為。
 
-Try this:
+試試這個：
 
 `say Normal |* Negative |!R Red BG`
 
-This is the normal behavior, and as you can see it allows `|!` to change BG color after the
-inversion of FG and BG.
+這是正常行為，正如您所看到的，它允許 `|!` 在
+FG 和 BG 的反轉。
 
-As long as you have an understanding of how ANSI works, it should be easy to handle color tags
-avoiding the pitfalls of Xterm-ANSI promisquity.
+只要您瞭解 ANSI 的工作原理，處理顏色就應該很容易tags
+避免 Xterm-ANSI 混合的陷阱。
 
-One last example:
+最後一個例子：
 
 `say Normal |* Negative |* still Negative`
 
-Shows that `|*` only works once in a row and will not (and should not!) revert back if used again.
-Nor it will have any effect until the `|n` tag is called to "reset" ANSI back to normal. This is how
-it is meant to work.
+表明 `|*` 只能連續工作一次，並且如果再次使用則不會（也不應該！）恢復。
+在呼叫 `|n` tag 將 ANSI「重設」回正常狀態之前，它也不會產生任何影響。就是這樣
+它是為了工作。
 
-ANSI operates according to a simple states-based mechanism, and it's important to understand the positive effect of resetting with the `|n` tag, and not try to
-push it over the limit, so to speak.
+ANSI 根據簡單的基於狀態的機制執行，重要的是要了解使用 `|n` tag 重置的積極效果，而不是嘗試
+可以這麼說，將其推向極限。

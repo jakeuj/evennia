@@ -1,22 +1,24 @@
-# Slow Exit
+(slow-exit)=
+# 緩慢退出
 
-Contribution by Griatch 2014
+Griatch 2014 年的貢獻
 
-An example of an Exit-type that delays its traversal. This simulates
-slow movement, common in many games. The contrib also
-contains two commands, `setspeed` and `stop` for changing the movement speed
-and abort an ongoing traversal, respectively.
+延遲其遍歷的退出型別的範例。這模擬了
+緩慢的移動，在許多遊戲中很常見。 contrib 也
+包含兩個指令，`setspeed` 和 `stop` 用於改變移動速度
+並分別中止正在進行的遍歷。
 
-## Installation:
+(installation)=
+## 安裝：
 
-To try out an exit of this type, you could connect two existing rooms
-using something like this:
+要嘗試這種型別的出口，您可以連線兩個現有房間
+使用這樣的東西：
 
     @open north:contrib.grid.slow_exit.SlowExit = <destination>
 
-To make this your new default exit, modify `mygame/typeclasses/exits.py`
-to import this module and change the default `Exit` class to inherit
-from `SlowExit` instead.
+若要使其成為新的預設出口，請修改 `mygame/typeclasses/exits.py`
+匯入此模組並將預設的 `Exit` 類別變更為繼承
+從 `SlowExit` 開始。
 
 ```
 # in mygame/typeclasses/exits.py
@@ -28,7 +30,7 @@ class Exit(SlowExit):
 
 ```
 
-To get the ability to change your speed and abort your movement, import
+若要獲得改變速度並中止移動的能力，請匯入
 
 ```python
 # in mygame/commands/default_cmdsets.py
@@ -43,25 +45,26 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
 
 ```
 
-simply import and add CmdSetSpeed and CmdStop from this module to your
-default cmdset (see tutorials on how to do this if you are unsure).
+只需將此模組中的 CmdSetSpeed 和 CmdStop 匯入並新增到您的
+預設cmdset（如果您不確定，請參閱有關如何執行此操作的教學）。
 
-To try out an exit of this type, you could connect two existing rooms using
-something like this:
+要嘗試這種型別的出口，您可以使用以下指令連線兩個現有房間
+像這樣的東西：
 
     @open north:contrib.grid.slow_exit.SlowExit = <destination>
 
 
-## Notes:
+(notes)=
+## 筆記：
 
-This implementation is efficient but not persistent; so incomplete
-movement will be lost in a server reload. This is acceptable for most
-game types - to simulate longer travel times (more than the couple of
-seconds assumed here), a more persistent variant using Scripts or the
-TickerHandler might be better.
+這種實現是高效的，但不持久；如此不完整
+伺服器重新載入時移動將會遺失。這對大多數人來說是可以接受的
+遊戲型別 - 模擬更長的旅行時間（超過幾個
+此處假定秒），使用 Scripts 或的更持久的變體
+TickerHandler 可能會更好。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/grid/slow_exit/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\grid\slow_exit\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

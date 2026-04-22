@@ -1,4 +1,5 @@
-# NPC merchants
+(npc-merchants)=
+# NPC商戶
 
 ```
 *** Welcome to ye Old Sword shop! ***
@@ -9,14 +10,15 @@ _________________________________________________________
 3. Excalibur (100 gold)
 ```
 
-This will introduce an NPC able to sell things. In practice this means that when you interact with them you'll get shown a _menu_ of choices. Evennia  provides the [EvMenu](../Components/EvMenu.md) utility to easily create in-game menus. 
+這將引入 NPC 能夠出售東西。實際上，這意味著當您與他們互動時，您會看到一個_選單_選擇。 Evennia 提供 [EvMenu](../Components/EvMenu.md) 實用程式來輕鬆建立遊戲內選單。
 
-We will store all the merchant's wares in their inventory. This means that they may stand in an actual shop room, at a market or wander the road.  We will also use 'gold' as an example currency.  
-To enter the shop, you'll just need to stand in the same room and use the `buy/shop` command.
+我們會將商家的所有商品存放在他們的庫存中。這意味著他們可能站在實際的商店房間、市場或漫步在路上。  我們還將使用“黃金”作為示例貨幣。  
+要進入商店，你只需要站在同一個房間並使用`buy/shop`指令。
 
-## Making the merchant class 
+(making-the-merchant-class)=
+## 打造商人階級
 
-The merchant will respond to you giving the `shop` or `buy` command in their presence. 
+商家將在他們面前回應您發出 `shop` 或 `buy` 指令。
 
 ```python
 # in for example mygame/typeclasses/merchants.py 
@@ -59,21 +61,22 @@ class NPCMerchant(Object):
 
 ```
 
-We could also have put the commands in a separate module, but for compactness, we put it all with the merchant typeclass. 
+我們也可以將指令放在單獨的模組中，但為了緊湊性，我們將其全部放在商家 typeclass 中。
 
-Note that we make the merchant an `Object`! Since we don't give them any other commands, it makes little sense to let them be a `Character`.
+請注意，我們將商家設為`Object`！由於我們沒有給他們任何其他指令，所以讓他們成為 `Character` 沒有意義。
 
-We make a very simple `shop`/`buy` Command and make sure to add it on the merchant in its own cmdset. 
+我們製作一個非常簡單的 `shop`/`buy` 指令，並確保將其新增至商家自己的 cmdset 指令。
 
-We initialize `EvMenu` on the `shopper` but we haven't created any `menunodes` yet, so this will not actually do much at this point. It's important that we we pass `shopname`, `shopkeeper` and `wares` into the menu, it means they will be made available as properties on the EvMenu instance - we will be able to access them from inside the menu.
+我們在 `shopper` 上初始化 `EvMenu`，但我們還沒有建立任何 `menunodes`，所以此時實際上不會做太多事情。重要的是，我們將 `shopname`、`shopkeeper` 和 `wares` 傳遞到選單中，這意味著它們將作為 EvMenu 例項上的屬性提供 - 我們將能夠從選單內部存取它們。
 
-## Coding the shopping menu
+(coding-the-shopping-menu)=
+## 編寫購物選單程式碼
 
-[EvMenu](../Components/EvMenu.md) splits the menu into _nodes_ represented by Python functions. Each node represents a stop in the menu where the user has to make a choice. 
+[EvMenu](../Components/EvMenu.md) 將選單拆分為由 Python 函式表示的_節點_。每個節點代表選單中的一個站點，使用者必須在其中做出選擇。
 
-For simplicity, we'll code the shop interface above the `NPCMerchant` class in the same module.
+為簡單起見，我們將在同一模組中的 `NPCMerchant` 類別上方編寫商店介面。
 
-The start node of the shop named "ye Old Sword shop!" will look like this if there are only 3 wares to sell: 
+商店的起始節點名為「老劍店！」如果只有 3 件商品可供出售，將如下所示：
 
 ```
 *** Welcome to ye Old Sword shop! ***
@@ -117,11 +120,11 @@ def node_shopfront(caller, raw_string, **kwargs):
     return text, options
 ```
 
-Inside the node we can access the menu on the caller as `caller.ndb._evmenu`. The extra keywords we passed into `EvMenu` are available on this menu instance. Armed with this we can easily present a shop interface. Each option will become a numbered choice on this screen. 
+在節點內部，我們可以透過 `caller.ndb._evmenu` 存取呼叫方的選單。我們傳遞到 `EvMenu` 的額外關鍵字在此選單例項上可用。有了這個，我們就可以輕鬆呈現商店介面。每個選項都將成為該畫面上的編號選項。
 
-Note how we pass the `ware` with each option and label it `selected_ware`. This will be accessible in the next node's `**kwargs` argument
+請注意我們如何透過每個選項傳遞 `ware` 並將其標記為 `selected_ware`。這將可以在下一個節點的 `**kwargs` 引數中訪問
 
-If a player choose one of the wares, they should be able to inspect it. Here's how it should look if they selected `1` in ye Old Sword shop:
+如果玩家選擇其中一件商品，他們應該能夠檢查它。如果他們在 Old Sword 商店中選擇了 `1`，情況應該是這樣的：
 
 ```
 You inspect A rusty sword:
@@ -133,19 +136,19 @@ __________________________________________________________
 2. Look for something else.
 ```
 
-If you buy, you'll see
+如果你買了就會看到
 
 ```
 You pay 5 gold and purchase A rusty sword!
 ```
-or
+或者
 ```
 You cannot afford 5 gold for A rusty sword!
 ```
 
-Either way you should end up back at the top level of the shopping menu again and can continue browsing or quit the menu with `quit`. 
+無論哪種方式，您最終都應該再次回到購物選單的頂層，並可以繼續瀏覽或使用 `quit` 退出選單。
 
-Here's how it looks in code:
+程式碼如下：
 
 ```python
 # in mygame/typeclasses/merchants.py 
@@ -188,9 +191,9 @@ def node_inspect_and_buy(caller, raw_string, **kwargs):
     return text, options
 ```
 
-In this node we grab the `selected_ware` from `kwargs` - this we pased along from the option on the previous node. We display its description and value. If the user buys, we reroute through the `_buy_item` helper function (this is not a node, it's just a callable that must return the name of the next node to go to.). In `_buy_item` we check if the buyer can affort the ware, and if it can we move it to their inventory. Either way, this method returns `shop_front` as the next node. 
+在這個節點中，我們從 `kwargs` 獲取 `selected_ware` - 這是我們從前一個節點上的選項傳遞過來的。我們顯示它的描述和值。如果使用者購買，我們將透過 `_buy_item` 輔助函式重新路由（這不是一個節點，它只是一個必須傳回要轉到的下一個節點的名稱的可呼叫函式。）。在`_buy_item`中，我們檢查買家是否可以購買該商品，如果可以，我們會將其移至他們的庫存中。無論哪種方式，此方法都會傳回 `shop_front` 作為下一個節點。
 
-We have been referring to two nodes here: `"shopfront"` and `"inspect_and_buy"` , we should map them to the code in the menu. Scroll down to the `NPCMerchant` class in the same module and find that unfinished `open_shop` method again: 
+我們在這裡引用了兩個節點：`"shopfront"` 和 `"inspect_and_buy"` ，我們應該將它們對應到選單中的程式碼。向下捲動到同一模組中的 `NPCMerchant` 類，再次找到未完成的 `open_shop` 方法：
 
 
 ```python
@@ -221,14 +224,15 @@ class NPCMerchant(Object):
 ```
 
 
-We now added the nodes to the Evmenu under their right labels. The merchant is now ready! 
+現在，我們將節點新增到其正確標籤下的 Evmenu 中。商家現在已經準備好了！
 
 
-## The shop is open for business!
+(the-shop-is-open-for-business)=
+## 本店已開始營業！
 
-Make sure to `reload`.
+確保`reload`。
 
-Let's try it out by creating the merchant and a few wares in-game. Remember that we also must create some gold get this economy going. 
+讓我們透過在遊戲中建立商人和一些商品來嘗試。請記住，我們也必須創造一些黃金來推動經濟發展。
 
 ```
 > set self/gold = 8
@@ -245,7 +249,7 @@ Let's try it out by creating the merchant and a few wares in-game. Remember that
 > set rowboat/desc = It's not going anywhere fast.
 ```
 
-Note that a builder without any access to Python code can now set up a personalized merchant with just in-game commands.  With the shop all set up, we just need to be in the same room to start consuming! 
+請注意，無法存取 Python 程式碼的建構者現在只需使用遊戲內指令即可設定個人化商家。  商店設定完畢後，我們只需要在同一個房間就可以開始消費了！
 
 ```
 > buy

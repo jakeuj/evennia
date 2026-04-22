@@ -1,83 +1,89 @@
-# Web Character Generation
+(web-character-generation)=
+# 網頁角色生成
 
 
-## Introduction
+(introduction)=
+## 介紹
 
-This tutorial will create a simple web-based interface for generating a new in-game Character. Accounts will need to have first logged into the website (with their `AccountDB` account). Once finishing character generation the Character will be created immediately and the Accounts can then log into the game and play immediately (the Character will not require staff approval or anything like that). This guide does not go over how to create an AccountDB on the website with the right permissions to transfer to their web-created characters.
+本教學將建立一個簡單的基於 Web 的介面，用於產生新的遊戲角色。帳戶需要先登入網站（使用其 `AccountDB` 帳戶）。一旦完成角色生成，角色將立即建立，然後帳戶可以登入遊戲並立即玩（角色不需要工作人員批准或類似的東西）。本指南不會介紹如何在網站上建立 AccountDB 並具有正確的許可權來傳輸到其網路建立的角色。
 
-It is probably most useful to set `AUTO_CREATE_CHARACTER_WITH_ACCOUNT = False` so that all player characters can be created through this.
+設定 `AUTO_CREATE_CHARACTER_WITH_ACCOUNT = False` 可能是最有用的，這樣所有玩家角色都可以透過它建立。
 
-You should have some familiarity with how Django sets up its Model Template View framework. You need to understand what is happening in the basic [Web Character View tutorial](./Web-Character-View-Tutorial.md). If you don’t understand the listed tutorial or have a grasp of Django basics, please look at the [Django tutorial](https://docs.djangoproject.com/en/4.1/intro/) to get a taste of what Django does, before throwing Evennia into the mix (Evennia shares its API and attributes with the website interface). This guide will outline the format of the models, views, urls, and html templates needed.
+您應該熟悉 Django 如何設定其模型模板檢視框架。您需要了解基本的[網頁角色檢視教學](./Web-Character-View-Tutorial.md)中發生了什麼。如果您不理解列出的教學或掌握 Django 基礎知識，請先檢視 [Django 教學](https://docs.djangoproject.com/en/4.1/intro/) 以瞭解 Django 的功能，然後再將 Evennia 加入其中（Evennia 與網站介面共享其 API 和屬性）。本指南將概述所需的模型、檢視、url 和 html 範本的格式。
 
-## Pictures
+(pictures)=
+## 圖片
 
-Here are some screenshots of the simple app we will be making.
+以下是我們將製作的簡單應用程式的一些螢幕截圖。
 
-Index page, with no character application yet done:
-
-***
-![Index page, with no character application yet done.](https://lh3.googleusercontent.com/-57KuSWHXQ_M/VWcULN152tI/AAAAAAAAEZg/kINTmVlHf6M/w425-h189-no/webchargen_index2.gif)
-***
-
-Having clicked the "create" link you get to create your character (here we will only have name and background, you can add whatever is needed to fit your game):
+索引頁，尚未完成字元應用：
 
 ***
-![Character creation.](https://lh3.googleusercontent.com/-ORiOEM2R_yQ/VWcUKgy84rI/AAAAAAAAEZY/B3CBh3FHii4/w607-h60-no/webchargen_creation.gif)
+![索引頁，尚未完成字元應用。 ](https://lh3.googleusercontent.com/-57KuSWHXQ_M/VWcULN152tI/AAAAAAAAEZg/kINTmVlHf6M/w425-h189-no/webchargen_index2.gif)
 ***
 
-Back to the index page. Having entered our character application (we called our character "TestApp") you see it listed:
+點選“建立”連結後，您可以建立角色（這裡我們只有名稱和背景，您可以新增適合您的遊戲所需的任何內容）：
 
 ***
-![Having entered an application.](https://lh6.googleusercontent.com/-HlxvkvAimj4/VWcUKjFxEiI/AAAAAAAAEZo/gLppebr05JI/w321-h194-no/webchargen_index1.gif)
+![角色建立。 ](https://lh3.googleusercontent.com/-ORiOEM2R_yQ/VWcUKgy84rI/AAAAAAAAEZY/B3CBh3FHii4/w607-h60-no/webchargen_creation.gif)
 ***
 
-We can also view an already written character application by clicking on it - this brings us to the *detail* page:
+返回索引頁。輸入我們的角色應用程式（我們將角色稱為“TestApp”）後，您會看到它列出：
 
 ***
-![Detail view of character application.](https://lh6.googleusercontent.com/-2m1UhSE7s_k/VWcUKfLRfII/AAAAAAAAEZc/UFmBOqVya4k/w267-h175-no/webchargen_detail.gif)
+![已提交申請。 ](https://lh6.googleusercontent.com/-HlxvkvAimj4/VWcUKjFxEiI/AAAAAAAAEZo/gLppebr05JI/w321-h194-no/webchargen_index1.gif)
 ***
 
-## Installing an App
+我們還可以透過點選檢視已編寫的角色應用程式 - 這會將我們帶到*詳細*頁面：
 
-Assuming your game is named "mygame", navigate to your `mygame/` directory, and type:
+***
+![角色應用的詳細檢視。 ](https://lh6.googleusercontent.com/-2m1UhSE7s_k/VWcUKfLRfII/AAAAAAAAEZc/UFmBOqVya4k/w267-h175-no/webchargen_detail.gif)
+***
+
+(installing-an-app)=
+## 安裝應用程式
+
+假設您的遊戲名為“mygame”，導航到您的 `mygame/` 目錄，然後輸入：
 
     cd web
     evennia startapp chargen
 
-This will initialize a new Django app we choose to call "chargen" in `mygame/web/`. We put it under `web/` to keep all web stuff together, but you can organize however you like. It is directory containing some basic starting things Django needs. 
+這將初始化一個新的 Django 應用程式，我們選擇在 `mygame/web/` 中呼叫“chargen”。我們將其放在 `web/` 下，以將所有網路內容放在一起，但您可以按照自己的喜好進行組織。它是包含 Django 需要的一些基本啟動內容的目錄。
 
-Next, navigate to `mygame/server/conf/settings.py` and add or edit the following line to make Evennia (and Django) aware of our new app:
+接下來，導航到 `mygame/server/conf/settings.py` 並新增或編輯以下行以使 Evennia（和 Django）瞭解我們的新應用程式：
 
     INSTALLED_APPS += ('web.chargen',)
 
-After this, we will get into defining our *models* (the description of the database storage),
-*views* (the server-side website content generators), *urls* (how the web browser finds the pages) and *templates* (how the web page should be structured).
+之後，我們將開始定義我們的*模型*（資料庫儲存的描述），
+*檢視*（伺服器端網站內容產生器）、*urls*（網頁瀏覽器如何尋找頁面）和*範本*（網頁應如何建置）。
 
-### Installing - Checkpoint:
+(installing-checkpoint)=
+### 安裝 - 檢查點：
 
-* you should have a folder named `chargen` or whatever you chose in your mygame/web/ directory
-* you should have your application name added to your INSTALLED_APPS in `settings.py`
+* 你應該有一個名為 `chargen` 的資料夾或你在 mygame/web/ 目錄中選擇的任何資料夾
+* 您應該將應用程式名稱新增到 `settings.py` 中的 INSTALLED_APPS
 
-## Create Models
+(create-models)=
+## 建立模型
 
-Models are created in `mygame/web/chargen/models.py`.
+模型在 `mygame/web/chargen/models.py` 中建立。
 
-A [Django database model](../Concepts/Models.md) is a Python class that describes the database storage of the
-data you want to manage. Any data you choose to store is stored in the same database as the game and you have access to all the game's objects here.
+[Django 資料庫模型](../Concepts/Models.md) 是一個 Python 類，描述了資料庫儲存
+您想要管理的資料。您選擇儲存的任何資料都儲存在與遊戲相同的資料庫中，並且您可以在此處存取遊戲的所有物件。
 
-We need to define what a character application actually is. This will differ from game to game so for this tutorial we will define a simple character sheet with the following database fields:
+我們需要定義角色應用程式實際上是什麼。這因遊戲而異，因此在本教學中，我們將使用以下資料庫欄位定義一個簡單的角色表：
 
-* `app_id` (AutoField): Primary key for this character application sheet.
-* `char_name` (CharField): The new character's name.
-* `date_applied` (DateTimeField): Date that this application was received.
-* `background` (TextField): Character story background.
-* `account_id` (IntegerField): Which account ID does this application belong to? This is an
-AccountID from the AccountDB object.
-* `submitted` (BooleanField): `True`/`False` depending on if the application has been submitted yet.
+* `app_id` (AutoField)：此字元應用程式表的主鍵。
+* `char_name` (CharField)：新角色的名字。
+* `date_applied` (DateTimeField)：收到此申請的日期。
+* `background` (TextField)：人物故事背景。
+* `account_id` (IntegerField)：此應用程式屬於哪個帳戶ID？這是一個
+來自 AccountDB 物件的 AccountID。
+* `submitted` (BooleanField): `True`/`False` 取決於申請是否已提交。
 
-> Note: In a full-fledged game, you’d likely want them to be able to select races, skills, attributes and so on.
+> 注意：在成熟的遊戲中，您可能希望他們能夠選擇種族、技能、屬性等。
 
-Our `models.py` file should look something like this:
+我們的 `models.py` 檔案應該如下所示：
 
 ```python
 # in mygame/web/chargen/models.py
@@ -93,27 +99,30 @@ class CharApp(models.Model):
     submitted = models.BooleanField(default=False)
 ```
 
-You should consider how you are going to link your application to your account. For this tutorial, we are using the account_id attribute on our character application model in order to keep track of which characters are owned by which accounts. Since the account id is a primary key in Evennia, it is a good candidate, as you will never have two of the same IDs in Evennia. You can feel free to use anything else, but for the purposes of this guide, we are going to use account ID to join the character applications with the proper account.
+您應該考慮如何將您的應用程式連結到您的帳戶。在本教學中，我們在角色應用程式模型上使用 account_id attribute 來追蹤哪些角色屬於哪些帳戶。由於帳戶 ID 是 Evennia 中的主鍵，因此它是一個很好的候選者，因為在 Evennia 中永遠不會有兩個相同的 ID。您可以隨意使用其他任何內容，但出於本指南的目的，我們將使用帳戶 ID 透過正確的帳戶加入角色應用程式。
 
-### Model - Checkpoint:
+(model-checkpoint)=
+### 型號 - 檢查點：
 
-* you should have filled out `mygame/web/chargen/models.py` with the model class shown above (eventually adding fields matching what you need for your game).
+* 您應該使用上面顯示的模型類別填寫`mygame/web/chargen/models.py`（最終新增與您的遊戲所需匹配的欄位）。
 
-## Create Views
+(create-views)=
+## 建立檢視
 
-*Views* are server-side constructs that make dynamic data available to a web page. We are going to add them to `mygame/web/chargen.views.py`. Each view in our example represents the backbone of a
-specific web page. We will use three views and three pages here:
+*檢視*是伺服器端結構，使動態資料可用於網頁。我們將把它們新增到`mygame/web/chargen.views.py`。我們範例中的每個檢視都代表了一個
+具體網頁。我們將在這裡使用三個檢視和三個頁面：
 
-* The index (managing `index.html`). This is what you see when you navigate to
-`http://yoursite.com/chargen`.
-* The detail display sheet (manages `detail.html`). A page that passively displays the stats of a given Character.
-* Character creation sheet (manages `create.html`). This is the main form with fields to fill in.
+* 指數（管理`index.html`）。這是您導航到時看到的內容
+`http://yoursite.com/chargen`。
+* 詳細顯示表（管理`detail.html`）。被動顯示給定角色統計資料的頁面。
+* 角色建立表（管理`create.html`）。這是需要填寫欄位的主表單。
 
-### *Index* view
+(index-view)=
+### *索引*檢視
 
-Let’s get started with the index first.
+我們先從索引開始。
 
-We’ll want characters to be able to see their created characters so let’s
+我們希望角色能夠看到他們創造的角色，所以讓我們
 
 ```python
 # file mygame/web/chargen.views.py
@@ -130,14 +139,15 @@ def index(request):
     return render(request, 'chargen/index.html', context)
 ```
 
-### *Detail* view
+(detail-view)=
+### *詳細*檢視
 
-Our detail page will have pertinent character application information our users can see. Since this is a basic demonstration, our detail page will only show two fields:
+我們的詳細資訊頁面將包含使用者可以看到的相關角色應用資訊。由於這是一個基本演示，因此我們的詳細資訊頁面將僅顯示兩個欄位：
 
-* Character name
-* Character background
+* 角色名稱
+* 人物背景
 
-We will use the account ID again just to double-check that whoever tries to check our character page is actually the account who owns the application.
+我們將再次使用帳戶 ID 只是為了再次檢查嘗試檢查我們的角色頁面的人實際上是擁有該應用程式的帳戶。
 
 ```python
 # file mygame/web/chargen.views.py
@@ -153,11 +163,12 @@ def detail(request, app_id):
     return render(request, 'chargen/detail.html', context)
 ```
 
-## *Creating* view
+(creating-view)=
+## *建立*檢視
 
-Predictably, our *create* function will be the most complicated of the views, as it needs to accept information from the user, validate the information, and send the information to the server. Once the form content is validated will actually create a playable Character.
+可以預見的是，我們的 *create* 函式將是最複雜的檢視，因為它需要接受來自使用者的資訊，驗證訊息並將訊息傳送到伺服器。一旦表單內容被驗證，將實際建立一個可玩的角色。
 
-The form itself we will define first. In our simple example we are just looking for the Character's name and background. This form we create in `mygame/web/chargen/forms.py`:
+我們將首先定義表單本身。在我們的簡單範例中，我們只是尋找角色的名稱和背景。我們在`mygame/web/chargen/forms.py`中建立這個表單：
 
 ```python
 # file mygame/web/chargen/forms.py
@@ -169,7 +180,7 @@ class AppForm(forms.Form):
     background = forms.CharField(label='Background')
 ```
 
-Now we make use of this form in our view.
+現在我們在我們看來利用了這種形式。
 
 ```python
 # file mygame/web/chargen/views.py
@@ -222,19 +233,19 @@ def creating(request):
     return render(request, 'chargen/create.html', {'form': form})
 ```
 
-> Note also that we basically create the character using the Evennia API, and we grab the proper permissions from the `AccountDB` object and copy them to the character object. We take the user permissions attribute and turn that list of strings into a string object in order for the create_object function to properly process the permissions.
+> 另請注意，我們基本上使用 Evennia API 建立角色，並從 `AccountDB` 物件取得適當的許可權並將其複製到角色物件。我們取得使用者許可權 attribute 並將該字串清單轉換為字串物件，以便 create_object 函式正確處理許可權。
 
-Most importantly, the following attributes must be set on the created character object:
+最重要的是，必須在建立的角色物件上設定以下屬性：
 
-* Evennia [permissions](../Components/Permissions.md) (copied from the `AccountDB`).
-* The right `puppet` [locks](../Components/Locks.md) so the Account can actually play as this Character later.
-* The relevant Character [typeclass](../Components/Typeclasses.md)
-* Character name (key)
-* The Character's home room location (`#2` by default)
+* Evennia [許可權](../Components/Permissions.md)（從`AccountDB`複製）。
+* 右側的`puppet` [鎖定](../Components/Locks.md)，以便該帳戶稍後可以實際扮演該角色。
+* 相關字元[typeclass](../Components/Typeclasses.md)
+* 角色名稱（鍵）
+* 角色的家庭房間位置（預設為`#2`）
 
-Other attributes are strictly speaking optional, such as the `background` attribute on our character. It may be a good idea to decompose this function and create a separate _create_character function in order to set up your character object the account owns. But with the Evennia API, setting custom attributes is as easy as doing it in the meat of your Evennia game directory.
+其他屬性嚴格來說是可選的，例如我們角色上的`background` attribute。分解此函式並建立一個單獨的 _create_character 函式可能是一個好主意，以便設定帳戶擁有的角色物件。但使用 Evennia API，設定自訂屬性就像在 Evennia 遊戲目錄中一樣簡單。
 
-After all of this, our `views.py` file should look like something like this:
+完成所有這些之後，我們的 `views.py` 檔案應該如下所示：
 
 ```python
 # file mygame/web/chargen/views.py
@@ -306,15 +317,17 @@ def creating(request):
     return render(request, 'chargen/create.html', {'form': form})
 ```
 
-### Create Views - Checkpoint:
+(create-views-checkpoint)=
+### 建立檢視 - 檢查點：
 
-* you’ve defined a `views.py` that has an index, detail, and creating functions.
-* you’ve defined a forms.py with the `AppForm` class needed by the `creating` function of `views.py`.
-* your `mygame/web/chargen` directory should now have a `views.py` and `forms.py` file
+* 您已經定義了一個具有索引、詳細資訊和建立函式的 `views.py`。
+* 您已使用 `views.py` 的 `creating` 函式所需的 `AppForm` 類別定義了 forms.py。
+* 您的 `mygame/web/chargen` 目錄現在應該有 `views.py` 和 `forms.py` 檔案
 
-## Create URLs
+(create-urls)=
+## 建立URLs
 
-URL patterns helps redirect requests from the web browser to the right views. These patterns are created in `mygame/web/chargen/urls.py`.
+URL 模式有助於將來自 Web 瀏覽器的請求重新導向到正確的檢視。這些模式是在 `mygame/web/chargen/urls.py` 中建立的。
 
 ```python
 # file mygame/web/chargen/urls.py
@@ -332,9 +345,9 @@ urlpatterns = [
 ]
 ```
 
-You could change the format as you desire. To make it more secure, you could remove app_id from the "detail" url, and instead just fetch the account’s applications using a unifying field like account_id to find all the character application objects to display.
+您可以根據需要變更格式。為了使其更安全，您可以從「詳細」URL 中刪除 app_id，而只需使用 account_id 等統一欄位來獲取帳戶的應用程式，以查詢要顯示的所有角色應用程式物件。
 
-To add this to our website, we must also update the main `mygame/website/urls.py` file; this will help tying our new chargen app in with the rest of the website. `urlpatterns` variable, and change it to include:
+要將其新增至我們的網站，我們還必須更新主 `mygame/website/urls.py` 檔案；這將有助於將我們的新 Chargen 應用程式與網站的其餘部分結合。 `urlpatterns` 變數，並將其更改為包括：
 
 ```python
 # in file mygame/website/urls.py
@@ -348,24 +361,27 @@ urlpatterns = [
 
 ```
 
-### URLs - Checkpoint:
+(urls-checkpoint)=
+### URLs - 檢查點：
 
-* You’ve created a `urls.py` file in the `mygame/web/chargen` directory
-* You have edited the main `mygame/web/urls.py` file to include urls to the `chargen` directory.
+* 您已在 `mygame/web/chargen` 目錄中建立了 `urls.py` 檔案
+* 您已編輯主 `mygame/web/urls.py` 檔案以包含 `chargen` 目錄的 URL。
 
-## HTML Templates
+(html-templates)=
+## HTML 模板
 
-So we have our url patterns, views, and models defined. Now we must define our HTML templates that the actual user will see and interact with. For this tutorial we us the basic *prosimii* template that comes with Evennia.
+這樣我們就定義了 url 模式、檢視和模型。現在我們必須定義實際使用者將看到並與之互動的 HTML 範本。在本教學中，我們使用 Evennia 附帶的基本 *prosimii* 範本。
 
-Take note that we use `user.is_authenticated` to make sure that the user cannot create a character without logging in.
+請注意，我們使用 `user.is_authenticated` 來確保使用者在未登入的情況下無法建立角色。
 
-These files will all go into the `/mygame/web/chargen/templates/chargen/` directory.
+這些檔案將全部進入`/mygame/web/chargen/templates/chargen/`目錄。
 
+(indexhtml)=
 ### index.html
 
-This HTML template should hold a list of all the applications the account currently has active. For this demonstration, we will only list the applications that the account has submitted. You could easily adjust this to include saved applications, or other types of applications if you have different kinds.
+此 HTML 範本應包含該帳戶目前處於活動狀態的所有應用程式的清單。在本次演示中，我們將僅列出該帳戶已提交的申請。您可以輕鬆調整它以包括已儲存的應用程式或其他型別的應用程式（如果您有不同型別的應用程式）。
 
-Please refer back to `views.py` to see where we define the variables these templates make use of.
+請回傳 `views.py` 檢視我們在哪裡定義這些範本使用的變數。
 
 ```html
 <!-- file mygame/web/chargen/templates/chargen/index.html-->
@@ -389,9 +405,10 @@ Please refer back to `views.py` to see where we define the variables these templ
 {% endblock %}
 ```
 
+(detailhtml)=
 ### detail.html
 
-This page should show a detailed character sheet of their application. This will only show their name and character background. You will likely want to extend this to show many more fields for your game. In a full-fledged character generation, you may want to extend the boolean attribute of submitted to allow accounts to save character applications and submit them later.
+此頁面應顯示其應用程式的詳細特徵表。這只會顯示他們的名字和角色背景。您可能希望擴充套件它以顯示遊戲的更多欄位。在成熟的角色生成中，您可能需要擴充套件提交的布林值attribute，以允許帳戶儲存角色申請並稍後提交。
 
 ```html
 <!-- file mygame/web/chargen/templates/chargen/detail.html-->
@@ -414,9 +431,10 @@ This page should show a detailed character sheet of their application. This will
 {% endblock %}
 ```
 
+(createhtml)=
 ### create.html
 
-Our create HTML template will use the Django form we defined back in views.py/forms.py to drive the majority of the application process. There will be a form input for every field we defined in `forms.py`, which is handy. We have used POST as our method because we are sending information to the server that will update the database. As an alternative, GET would be much less secure. You can read up on documentation elsewhere on the web for GET vs. POST.
+我們的建立 HTML 範本將使用我們在 views.py/forms.py 中定義的 Django 表單來驅動大部分應用程式程式。我們在`forms.py`中定義的每個欄位都會有表單輸入，這很方便。我們使用 POST 作為我們的方法，因為我們將資訊傳送到將更新資料庫的伺服器。作為替代方案，GET 的安全性會低得多。您可以在網路上其他地方閱讀 GET 與 POST 的檔案。
 
 ```html
 <!-- file mygame/web/chargen/templates/chargen/create.html-->
@@ -436,13 +454,15 @@ Our create HTML template will use the Django form we defined back in views.py/fo
 {% endblock %}
 ```
 
-### Templates - Checkpoint:
+(templates-checkpoint)=
+### 模板 - 檢查點：
 
-* Create a `index.html`, `detail.html` and `create.html` template in your `mygame/web/chargen/templates/chargen` directory
+* 在您的 `mygame/web/chargen/templates/chargen` 目錄中建立 `index.html`、`detail.html` 和 `create.html` 模板
 
-## Activating your new character generation
+(activating-your-new-character-generation)=
+## 啟動你的新角色生成
 
-After finishing this tutorial you should have edited or created the following files:
+完成本教學後，您應該已經編輯或建立了以下檔案：
 
 ```bash
 mygame/web/website/urls.py
@@ -454,37 +474,40 @@ mygame/web/chargen/templates/chargen/create.html
 mygame/web/chargen/templates/chargen/detail.html
 ```
 
-Once you have all these files stand in your `mygame/`folder and run:
+將所有這些檔案放入 `mygame/` 資料夾後，執行：
 
 ```bash
 evennia makemigrations
 evennia migrate
 ```
 
-This will create and update the models. If you see any errors at this stage, read the traceback carefully, it should be relatively easy to figure out where the error is.
+這將建立並更新模型。如果您在此階段看到任何錯誤，請仔細閱讀回溯，應該相對容易找出錯誤所在。
 
-Login to the website (you need to have previously registered an Player account with the game to do this). Next you navigate to `http://yourwebsite.com/chargen` (if you are running locally this will be something like `http://localhost:4001/chargen` and you will see your new app in action.
+登入網站（您需要事先在遊戲中註冊玩家帳戶才能執行此操作）。接下來，您導航到`http://yourwebsite.com/chargen`（如果您在本地執行，這將類似於`http://localhost:4001/chargen`，您將看到正在執行的新應用程式。
 
-This should hopefully give you a good starting point in figuring out how you’d like to approach your own web generation. The main difficulties are in setting the appropriate settings on your newly created character object. Thankfully, the Evennia API makes this easy.
+希望這能為您提供一個良好的起點，幫助您瞭解如何實現自己的網路世代。主要的困難在於對新建立的角色物件進行適當的設定。值得慶幸的是，Evennia API 使這變得容易。
 
-## Adding a no CAPCHA reCAPCHA on your character generation
+(adding-a-no-capcha-recapcha-on-your-character-generation)=
+## 在您的角色生成中新增 no CAPCHA reCAPCHA
 
-As sad as it is, if your server is open to the web, bots might come to visit and take advantage of your open form to create hundreds, thousands, millions of characters if you give them the opportunity.  This section shows you how to use the [No CAPCHA
-reCAPCHA](https://www.google.com/recaptcha/intro/invisible.html) designed by Google.  Not only is it easy to use, it is user-friendly... for humans.  A simple checkbox to check, except if Google has some suspicion, in which case you will have a more difficult test with an image and the usual text inside.  It's worth pointing out that, as long as Google doesn't suspect you of being a robot, this is quite useful, not only for common users, but to screen-reader users, to which reading inside of an image is pretty difficult, if not impossible.  And to top it all, it will be so easy to add in your website.
+可悲的是，如果您的伺服器向網路開放，機器人可能會來存取並利用您的開放表單來建立數百、數千、數百萬個字元（如果您給它們機會）。  本節向您展示如何使用[否CAPCHA
+reCAPCHA](https://www.google.com/recaptcha/intro/invisible.html) 由 Google 設計。  它不僅易於使用，而且對人類來說是使用者友好的。  一個簡單的核取方塊來檢查，除非谷歌有一些懷疑，在這種情況下，你將有一個更困難的測試，其中包含影象和通常的文字。  值得指出的是，只要谷歌不懷疑你是機器人，這就非常有用，不僅對於普通使用者，而且對於螢幕閱讀器使用者來說，閱讀影象內部即使不是不可能，也是相當困難的。  最重要的是，將其新增到您的網站中將非常容易。
 
-### Step 1: Obtain a SiteKey and secret from Google
+(step-1-obtain-a-sitekey-and-secret-from-google)=
+### 第 1 步：從 Google 取得 SiteKey 和機密
 
-The first thing is to ask Google for a way to safely authenticate your website to their service.  To do it, we need to create a site key and a secret.  Go to [https://www.google.com/recaptcha/admin](https://www.google.com/recaptcha/admin) to create such a site key.  It's quite easy when you have a Google account.
+第一件事是向 Google 詢問一種方法來安全地驗證您的網站的服務。  為此，我們需要建立一個網站金鑰和一個秘密。  前往 [https://www.google.com/recaptcha/admin](https://www.google.com/recaptcha/admin) 建立這樣的網站金鑰。  當您擁有 Google 帳戶時，這很容易。
 
-When you have created your site key, save it safely.  Also copy your secret key as well.  You should find both information on the web page.  Both would contain a lot of letters and figures.
+建立網站金鑰後，請安全儲存。  也要複製您的金鑰。  您應該在網頁上找到這兩個資訊。  兩者都包含大量字母和數字。
 
-### Step 2: installing and configuring the dedicated Django app
+(step-2-installing-and-configuring-the-dedicated-django-app)=
+### 第 2 步：安裝和設定專用 Django 應用程式
 
-Since Evennia runs on Django, the easiest way to add our CAPCHA and perform the proper check is to install the dedicated Django app.  Quite easy:
+由於 Evennia 在 Django 上執行，因此新增 CAPCHA 並執行正確檢查的最簡單方法是安裝專用的 Django 應用程式。  很簡單：
 
     pip install django-nocaptcha-recaptcha
 
-And add it to the installed apps in your settings.  In your `mygame/server/conf/settings.py`, you might have something like this:
+並將其新增到設定中已安裝的應用程式中。  在你的`mygame/server/conf/settings.py`中，你可能有這樣的東西：
 
 ```python
 # ...
@@ -494,7 +517,7 @@ INSTALLED_APPS += (
 )
 ```
 
-Don't close the setting file just yet.  We have to add in the site key and secret key.  You can add them below:
+暫時不要關閉設定檔。  我們必須新增網站金鑰和秘密金鑰。  您可以在下面新增它們：
 
 ```python
 # NoReCAPCHA site key
@@ -503,9 +526,10 @@ NORECAPTCHA_SITE_KEY = "PASTE YOUR SITE KEY HERE"
 NORECAPTCHA_SECRET_KEY = "PUT YOUR SECRET KEY HERE"
 ```
 
-### Step 3: Adding the CAPCHA to our form
+(step-3-adding-the-capcha-to-our-form)=
+### 步驟 3：將 CAPCHA 加入我們的表單中
 
-Finally we have to add the CAPCHA to our form.  It will be pretty easy too.  First, open your `web/chargen/forms.py` file.  We're going to add a new field, but hopefully, all the hard work has been done for us.  Update at your convenience, You might end up with something like this:
+最後我們必須將 CAPCHA 加入我們的表單。  這也會很容易。  首先，開啟您的`web/chargen/forms.py` 檔案。  我們將新增一個新欄位，但希望所有艱苦的工作都已為我們完成。  在您方便的時候更新，您最終可能會得到這樣的結果：
 
 ```python
 from django import forms
@@ -517,17 +541,17 @@ class AppForm(forms.Form):
     captcha = NoReCaptchaField()
 ```
 
-As you see, we added a line of import (line 2) and a field in our form.
+如您所看到的，我們在表單中新增了一行匯入（第 2 行）和一個欄位。
 
-And lastly, we need to update our HTML file to add in the Google library.  You can open
-`web/chargen/templates/chargen/create.html`.  There's only one line to add:
+最後，我們需要更新 HTML 檔案以新增到 Google 庫中。  你可以開啟
+`web/chargen/templates/chargen/create.html`。  只需要新增一行：
 
 ```html
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 ```
 
-And you should put it at the bottom of the page.  Just before the closing body would be good, but for the time being, the base page doesn't provide a footer block, so we'll put it in the content block.  Note that it's not the best place, but it will work.  In the end, your
-`web/chargen/templates/chargen/create.html` file should look like this:
+你應該把它放在頁面的底部。  就在結束正文之前就好了，但目前基礎頁面不提供頁尾區塊，因此我們將其放在內容區塊中。  請注意，這不是最好的地方，但它會起作用。  最後，你的
+`web/chargen/templates/chargen/create.html` 檔案應如下所示：
 
 ```html
 {% extends "base.html" %}
@@ -546,4 +570,4 @@ And you should put it at the bottom of the page.  Just before the closing body w
 {% endblock %}
 ```
 
-Reload and open [http://localhost:4001/chargen/create](http://localhost:4001/chargen/create/) and you should see your beautiful CAPCHA just before the "submit" button.  Try not to check the checkbox to see what happens.  And do the same while checking the checkbox!
+重新載入並開啟 [http://localhost:4001/chargen/create](http://localhost:4001/chargen/create/)，您應該在「提交」按鈕之前看到漂亮的 CAPCHA。  盡量不要選中該核取方塊來看看會發生什麼。  並在選中復選框時執行相同的操作！

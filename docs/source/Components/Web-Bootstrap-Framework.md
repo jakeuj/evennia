@@ -1,47 +1,51 @@
-# Bootstrap frontend framework
+(bootstrap-frontend-framework)=
+# Bootstrap前端框架
 
-Evennia's default web page uses a framework called [Bootstrap](https://getbootstrap.com/). This framework is in use across the internet - you'll probably start to recognize its influence once you learn some of the common design patterns. This switch is great for web developers, perhaps like yourself, because instead of wondering about setting up different grid systems or what custom class another designer used, we have a base, a bootstrap, to work from. Bootstrap is responsive by default, and comes with some default styles that Evennia has lightly overrode to keep some of the same colors and styles you're used to from the previous design.
+Evennia 的預設網頁使用名為 [Bootstrap](https://getbootstrap.com/) 的框架。該框架在網際網路上廣泛使用 - 一旦您學習了一些常見的設計模式，您可能會開始認識到它的影響。這個開關對於 Web 開發人員（也許像您一樣）來說非常有用，因為我們不必考慮設定不同的網格系統或其他設計人員使用的自定義類，而是有一個基礎，一個載入程式，可以用來工作。 Bootstrap 預設是響應式的，並附帶了一些預設樣式，Evennia 已稍微覆蓋這些預設樣式，以保留您在先前的設計中習慣的一些相同的顏色和樣式。
 
-e, a brief overview of Bootstrap follows. For more in-depth info, please
-read [the documentation](https://getbootstrap.com/docs/4.0/getting-started/introduction/).
+e，Bootstrap 的簡要概述如下。如需瞭解更深入的資訊，請
+閱讀[檔案](https://getbootstrap.com/docs/4.0/getting-started/introduction/)。
 
-## Grid system
+(grid-system)=
+## 網格系統
 
-Other than the basic styling Bootstrap includes, it also includes [a built in layout and grid system](https://getbootstrap.com/docs/4.0/layout/overview/). 
+除了 Bootstrap 包含的基本樣式外，它還包含[內建的佈局和網格系統](https://getbootstrap.com/docs/4.0/layout/overview/)。
 
-### The container
+(the-container)=
+### 容器
 
-The first part of the grid system is [the container](https://getbootstrap.com/docs/4.0/layout/overview/#containers).
+網格系統的第一部分是[容器](https://getbootstrap.com/docs/4.0/layout/overview/#containers)。
 
-The container is meant to hold all your page content. Bootstrap provides two types: fixed-width and
-full-width. Fixed-width containers take up a certain max-width of the page - they're useful for limiting the width on Desktop or Tablet platforms, instead of making the content span the width of the page.
+此容器用於儲存所有頁面內容。 Bootstrap提供兩種：固定寬度和
+全形。固定寬度容器佔用一定的頁面最大寬度 - 它們對於限制桌面或平板電腦平臺上的寬度非常有用，而不是使內容跨越頁面的寬度。
 
 ```
 <div class="container">
     <!--- Your content here -->
 </div>
 ```
-Full width containers take up the maximum width available to them - they'll span across a wide-
-screen desktop or a smaller screen phone, edge-to-edge.
+全寬容器佔據了它們可用的最大寬度 - 它們將跨越很寬的寬度 -
+螢幕桌面或較小螢幕的手機，邊緣到邊緣。
 ```
 <div class="container-fluid">
     <!--- This content will span the whole page -->
 </div>
 ```
 
-### The grid
+(the-grid)=
+### 網格
 
-The second part of the layout system is [the grid](https://getbootstrap.com/docs/4.0/layout/grid/).
+佈局系統的第二部分是[網格](https://getbootstrap.com/docs/4.0/layout/grid/)。
 
-This is the bread-and-butter of the layout of Bootstrap - it allows you to change the size of elements depending on the size of the screen, without writing any media queries. We'll briefly go over it - to learn more, please read the docs or look at the source code for Evennia's home page in your browser. 
+這是 Bootstrap 佈局的基礎 - 它允許您根據螢幕的大小更改元素的大小，而無需編寫任何媒體查詢。我們將簡要回顧一下 - 要了解更多資訊，請閱讀文件或在瀏覽器中檢視 Evennia 主頁的原始碼。
 
-> Important! Grid elements should be in a .container or .container-fluid. This will center the
-contents of your site.
+> 重要的！網格元素應位於.container 或.container-fluid 中。這將使
+您網站的內容。
 
-Bootstrap's grid system allows you to create rows and columns by applying classes based on breakpoints. The default breakpoints are extra small, small, medium, large, and extra-large. If you'd like to know more about these breakpoints, please [take a look at the documentation for
-them.](https://getbootstrap.com/docs/4.0/layout/overview/#responsive-breakpoints)
+Bootstrap 的網格系統可讓您透過套用基於斷點的類別來建立行和列。預設斷點為特小、小、中、大和特大。如果您想了解有關這些斷點的更多資訊，請[檢視以下檔案]
+他們。 ](https://getbootstrap.com/docs/4.0/layout/overview/#responsive-breakpoints)
 
-To use the grid system, first create a container for your content, then add your rows and columns like so:
+要使用網格系統，首先為您的內容建立一個容器，然後新增行和列，如下所示：
 ```
 <div class="container">
     <div class="row">
@@ -57,10 +61,10 @@ To use the grid system, first create a container for your content, then add your
     </div>
 </div>
 ```
-This layout would create three equal-width columns.
+此佈局將建立三個等寬的列。
 
-To specify your sizes - for instance, Evennia's default site has three columns on desktop and
-tablet, but reflows to single-column on smaller screens. Try it out!
+要指定您的大小 - 例如，Evennia 的預設網站在桌面上有三列，
+平板電腦，但在較小的螢幕上回流為單列。嘗試一下！
 ```
 <div class="container">
     <div class="row">
@@ -79,41 +83,46 @@ tablet, but reflows to single-column on smaller screens. Try it out!
     </div>
 </div>
 ```
-This layout would be 4 columns on large screens, 2 columns on medium screens, and 1 column on
-anything smaller. 
+此佈局在大螢幕上為 4 列，在中型螢幕上為 2 列，在大螢幕上為 1 列。
+任何更小的東西。
 
-To learn more about Bootstrap's grid, please [take a look at the
-docs](https://getbootstrap.com/docs/4.0/layout/grid/)
-I
-## General Styling elements
+要了解有關 Bootstrap 網格的更多資訊，請[檢視
+檔案](https://getbootstrap.com/docs/4.0/layout/grid/)
+我
+(general-styling-elements)=
+## 一般樣式元素
 
-Bootstrap provides base styles for your site. These can be customized through CSS, but the default
-styles are intended to provide a consistent, clean look for sites.
+Bootstrap 為您的網站提供基本樣式。這些可以透過CSS自訂，但是預設的
+樣式旨在為網站提供一致、乾淨的外觀。
 
-### Color
-Most elements can be styled with default colors. [Take a look at the documentation](https://getbootstrap.com/docs/4.0/utilities/colors/) to learn more about these colors
-- suffice to say, adding a class of text-* or bg-*, for instance, text-primary, sets the text color
-or background color.
+(color)=
+### 顏色
+大多數元素都可以使用預設顏色設定樣式。 [檢視檔案](https://getbootstrap.com/docs/4.0/utilities/colors/) 以瞭解有關這些顏色的更多資訊
+- 可以說，加入一類text-*或bg-*，例如text-primary，設定文字顏色
+或背景顏色。
 
-### Borders
+(borders)=
+### 邊框
 
-Simply adding a class of 'border' to an element adds a border to the element. For more in-depth
-info, please [read the documentation on borders.](https://getbootstrap.com/docs/4.0/utilities/borders/).
+只需在元素中新增“border”類別即可為該元素新增邊框。為了更深入
+資訊，請[閱讀有關邊框的文件。 ](https://getbootstrap.com/docs/4.0/utilities/borders/)。
 ```
 <span class="border border-dark"></span>
 ```
-You can also easily round corners just by adding a class.
+您也可以透過新增類別來輕鬆圓角。
 ```
 <img src="..." class="rounded" />
 ```
 
-### Spacing
-Bootstrap provides classes to easily add responsive margin and padding. Most of the time, you might like to add margins or padding through CSS itself - however these classes are used in the default Evennia site. [Take a look at the docs](https://getbootstrap.com/docs/4.0/utilities/spacing/) to
-learn more.
+(spacing)=
+### 間距
+Bootstrap 提供了一些類別來輕鬆新增響應式邊距和填充。大多數時候，您可能希望透過 CSS 本身新增邊距或填充 - 但是這些類別在預設的 Evennia 網站中使用。 [檢視檔案](https://getbootstrap.com/docs/4.0/utilities/spacing/)
+瞭解更多。
 
-### Buttons
+(buttons)=
+### 按鈕
 
-[Buttons](https://getbootstrap.com/docs/4.0/components/buttons/) in Bootstrap are very easy to use - button styling can be added to `<button>`, `<a>`, and `<input>` elements.
+Bootstrap 中的[按鈕](https://getbootstrap.com/docs/4.0/components/buttons/) 非常容易使用 - 可以將按鈕樣式新增至 `<button>`、`<a>` 和 `<input>` 元素。
 ```
 <a class="btn btn-primary" href="#" role="button">I'm a Button</a>
 <button class="btn btn-primary" type="submit">Me too!</button>
@@ -122,12 +131,13 @@ learn more.
 <input class="btn btn-primary" type="reset" value="Button as Well">
 ```
 
-### Cards
+(cards)=
+### 牌
 
-[Cards](https://getbootstrap.com/docs/4.0/components/card/) provide a container for other elements
-that stands out from the rest of the page. The "Accounts", "Recently Connected", and "Database
-Stats" on the default webpage are all in cards. Cards provide quite a bit of formatting options -
-the following is a simple example, but read the documentation or look at the site's source for more.
+[Cards](https://getbootstrap.com/docs/4.0/components/card/) 為其他元素提供容器
+從頁面的其餘部分中脫穎而出。 “帳戶”、“最近連線”和“資料庫”
+預設網頁上的「統計資料」全部以卡片形式顯示。卡片提供了相當多的格式化選項 -
+以下是一個簡單的範例，但請閱讀檔案或檢視網站的原始程式碼以瞭解更多資訊。
 ```
 <div class="card">
   <div class="card-body">
@@ -139,11 +149,12 @@ the following is a simple example, but read the documentation or look at the sit
 </div>
 ```
 
-### Jumbotron
+(jumbotron)=
+### 超大螢幕
 
-[Jumbotrons](https://getbootstrap.com/docs/4.0/components/jumbotron/) are useful for featuring an
-image or tagline for your game. They can flow with the rest of your content or take up the full
-width of the page - Evennia's base site uses the former.
+[大螢幕](https://getbootstrap.com/docs/4.0/components/jumbotron/) 對於展示
+您的遊戲的影象或標語。它們可以與您的其餘內容一起流動或佔據全部內容
+頁面寬度 - Evennia 的基本網站使用前者。
 ```
 <div class="jumbotron jumbotron-fluid">
   <div class="container">
@@ -153,12 +164,14 @@ width of the page - Evennia's base site uses the former.
 </div>
 ```
 
-### Forms
+(forms)=
+### 表格
 
-[Forms](https://getbootstrap.com/docs/4.0/components/forms/) are highly customizable with Bootstrap.
-For a more in-depth look at how to use forms and their styles in your own Evennia site, please read
-over [the web character gen tutorial.](../Howtos/Web-Character-Generation.md)
+[表單](https://getbootstrap.com/docs/4.0/components/forms/) 可以使用 Bootstrap 進行高度自訂。
+若想更深入瞭解如何在您自己的 Evennia 網站中使用表單及其樣式，請閱讀
+結束[網頁角色生成教學](../Howtos/Web-Character-Generation.md)
 
-## Further reading
+(further-reading)=
+## 進一步閱讀
 
-Bootstrap also provides a huge amount of utilities, as well as styling and content elements. To learn more about them, please [read the Bootstrap docs](https://getbootstrap.com/docs/4.0/getting- started/introduction/) or read one of our other web tutorials.
+Bootstrap 還提供了大量實用程式，以及樣式和內容元素。要了解有關它們的更多資訊，請[閱讀 Bootstrap 檔案](https://getbootstrap.com/docs/4.0/getting- started/introduction/) 或閱讀我們的其他網路教學之一。

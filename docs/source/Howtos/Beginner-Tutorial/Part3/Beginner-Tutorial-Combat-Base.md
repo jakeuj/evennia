@@ -1,28 +1,30 @@
-# Combat base framework
+(combat-base-framework)=
+# 作戰基地框架
 
-Combat is core to many games. Exactly how it works is very game-dependent. In this lesson we will build a framework to implement two common flavors: 
+戰鬥是許多遊戲的核心。其具體運作方式很大程度取決於遊戲。在本課中，我們將建立一個框架來實現兩種常見的風格：
 
-- "Twitch-based" combat ([specific lesson here](./Beginner-Tutorial-Combat-Twitch.md)) means that you perform a combat action by entering a command, and after some delay (which may depend on your skills etc), the action happens. It's called 'twitch' because actions often happen fast enough that changing your strategy may involve some element of quick thinking and a 'twitchy trigger finger'. 
-- "Turn-based" combat ([specific lesson here](./Beginner-Tutorial-Combat-Turnbased.md)) means that players input actions in clear turns. Timeout for entering/queuing your actions is often much longer than twitch-based style. Once everyone made their choice (or the timeout is reached), everyone's action happens all at once, after which the next turn starts. This style of combat requires less player reflexes. 
+- 「基於抽搐的」戰鬥（[此處的特定課程](./Beginner-Tutorial-Combat-Twitch.md)）意味著您透過輸入指令來執行戰鬥動作，並在一段延遲後（這可能取決於您的技能等），該動作發生。之所以稱為“抽搐”，是因為行動通常發生得足夠快，以至於改變策略可能需要快速思考和“抽動扳機手指”。
+- 「回合製」戰鬥（[具體教訓]（./Beginner-Tutorial-Combat-Turnbased.md））意味著玩家以清晰的回合輸入動作。輸入/排隊操作的超時通常比基於抽搐的風格長得多。一旦每個人都做出了選擇（或達到超時），每個人的行動都會立即發生，然後在下一回合開始。這種戰鬥方式需要較少的玩家反應。
 
-We will design a base combat system that supports both styles. 
+我們將設計一個支援這兩種風格的基礎戰鬥系統。
 
-- We need a `CombatHandler` to track the progress of combat. This will be a [Script](../../../Components/Scripts.md). Exactly how this works (and where it is stored) will be a bit different between Twitch- and Turnbased combat. We will create its common framework in this lesson.
-- Combat are divided into _actions_. We want to be able to easily extend our combat with more possible actions. An action needs Python code to show what actually happens when the action is performed. We will define such code in `Action` classes. 
-- We also need a way to describe a _specific instance_ of a given action. That is, when we do an "attack" action, we need at the minimum to know who is being attacked. For this will we use Python `dicts` that we will refer to as `action_dicts`.
+- 我們需要`CombatHandler`來追蹤戰鬥進度。這將是 [Script](../../../Components/Scripts.md)。 Twitch 戰鬥和回合製戰鬥的具體工作方式（以及存放位置）會有所不同。我們將在本課中建立其通用框架。
+- 戰鬥分為_動作_。我們希望能夠透過更多可能的行動輕鬆擴充套件我們的戰鬥。操作需要 Python 程式碼來顯示執行操作時實際發生的情況。我們將在`Action`類別中定義這樣的程式碼。
+- 我們還需要一種方法來描述給定操作的_特定例項_。也就是說，當我們做出「攻擊」動作時，我們至少需要知道誰在被攻擊。為此，我們將使用 Python `dicts`，我們稱之為 `action_dicts`。
 
-## CombatHandler 
+(combathandler)=
+## CombatHandler
 
-> Create a new module `evadventure/combat_base.py`
+> 建立一個新模組`evadventure/combat_base.py`
 
 ```{sidebar}
-Under `evennia/contrib/tutorials/evadventure/`, in [combat_base.py](evennia.contrib.tutorials.evadventure.combat_base) you'll find a complete implementation of the base combat module.
+在 `evennia/contrib/tutorials/evadventure/` 下的 [combat_base.py](evennia.contrib.tutorials.evadventure.combat_base) 中，您將找到基本戰鬥模組的完整實作。
 ```
-Our "Combat Handler" will handle the administration around combat. It needs to be _persistent_ (even is we reload the server your combat should keep going). 
+我們的「戰鬥處理程式」將負責戰鬥方面的管理。它需要是_持久的_（即使我們重新載入伺服器，你的戰鬥也應該繼續進行）。
 
-Creating the CombatHandler is a little of a catch-22 - how it works depends on how Actions and Action-dicts look. But without having the CombatHandler, it's hard to know how to design Actions and Action-dicts. So we'll start with its general structure and fill out the details later in this lesson. 
+建立 CombatHandler 有點像第 22 條軍規 - 它的工作原理取決於 Actions 和 Action-dicts 的外觀。但如果沒有 CombatHandler，就很難知道如何設計 Actions 和 Action-dicts。因此，我們將從其總體結構開始，並在本課後面填寫詳細資料。
 
-Below, methods with `pass` will be filled out this lesson while those raising `NotImplementedError` will be different for Twitch/Turnbased combat and will be implemented in their respective lessons following this one.
+下面，帶有 `pass` 的方法將在本課中填寫，而那些提高 `NotImplementedError` 的方法將在 Twitch/回合製戰鬥中有所不同，並將在本課之後的各自課程中實施。
 
 ```python 
 # in evadventure/combat_base.py 
@@ -144,15 +146,16 @@ class EvAdventureCombatBaseHandler(DefaultSCript):
 
 ```
 
-The Combat Handler is a [Script](../../../Components/Scripts.md). Scripts are typeclassed entities, which means that they are persistently stored in the database. Scripts can optionally be stored "on" other objects (such as on Characters or Rooms) or be 'global' without any such connection. While Scripts has an optional timer component, it is not active by default and Scripts are commonly used just as plain storage. Since Scripts don't have an in-game existence, they are great for storing data on 'systems' of all kinds, including our combat. 
+戰鬥處理程式是[Script](../../../Components/Scripts.md)。 Scripts 是型別分類實體，這意味著它們永續性地儲存在資料庫中。 Scripts 可以選擇儲存在其他物件「上」（例如角色或房間），或在沒有任​​何此類連線的情況下儲存為「全域」。雖然 Scripts 有一個可選的計時器元件，但預設情況下它不處於活動狀態，並且 Scripts 通常用作普通儲存。由於 Scripts 在遊戲中不存在，因此它們非常適合在各種「系統」上儲存資料，包括我們的戰鬥。
 
-Let's implement the generic methods we need.
+讓我們實作我們需要的通用方法。
 
-### CombatHandler.get_or_create_combathandler 
+(combathandlerget_or_create_combathandler)=
+### CombatHandler。 get_or_create_combathandler
 
-A helper method for quickly getting the combathandler for an ongoing combat and combatant. 
+一種快速獲取正在進行的戰鬥和戰鬥人員的戰鬥處理程式的輔助方法。
 
-We expect to create the script "on" an object (which one we don't know yet, but we expect it to be a typeclassed entity). 
+我們期望在一個物件「上」建立script（我們還不知道哪個物件，但我們期望它是一個型別分類的實體）。
 
 ```python
 # in evadventure/combat_base.py
@@ -202,23 +205,24 @@ class EvAdventureCombatBaseHandler(DefaultScript):
 
 ```
 
-This helper method uses `obj.scripts.get()` to find if the combat script already exists 'on' the provided `obj`. If not, it will create it using Evennia's [create_script](evennia.utils.create.create_script) function. For some extra speed we cache the handler as `obj.ndb.combathandler` The `.ndb.` (non-db) means that handler is cached only in memory. 
+此輔助方法使用 `obj.scripts.get()` 來查詢戰鬥 script 是否已經存在於所提供的 `obj` 上。如果沒有，它將使用 Evennia 的 [create_script](evennia.utils.create.create_script) 函式來建立它。為了獲得額外的速度，我們將處理程式快取為 `obj.ndb.combathandler` `.ndb.`（非資料庫）意味著處理程式僅快取在記憶體中。
 
-```{sidebar} Checking .id (or .pk)
-When getting it from cache, we make sure to also check if the combathandler we got has a database `.id` that is not `None` (we could also check `.pk`, stands for "primary key") . If it's `None`, this means the database entity was deleted and we just got its cached python representation from memory - we need to recreate it.
+```{sidebar} 檢查.id（或.pk）
+當從快取中獲取它時，我們確保也檢查我們獲得的戰鬥處理程式是否有一個不是 `None` 的資料庫 `.id` （我們還可以檢查 `.pk`，代表「主鍵」）。如果是 `None`，這表示資料庫實體已被刪除，我們剛剛從記憶體中獲取了其快取的 Python 表示形式 - 我們需要重新建立它。
 ```
 
-`get_or_create_combathandler` is decorated to be a [classmethod](https://docs.python.org/3/library/functions.html#classmethod), meaning it should be used on the handler class directly (rather than on an _instance_ of said class). This makes sense because this method actually should return the new instance. 
+`get_or_create_combathandler` 被修飾為 [classmethod](https://docs.python.org/3/library/functions.html#classmethod)，這意味著它應該直接在處理程式類別上使用（而不是在所述類別的例項上）。這是有道理的，因為該方法實際上應該傳回新例項。
 
-As a class method we'll need to call this directly on the class, like this: 
+作為類別方法，我們需要直接在類別上呼叫它，如下所示：
 
 ```python
 combathandler = EvAdventureCombatBaseHandler.get_or_create_combathandler(combatant)
 ```
 
-The result will be a new handler _or_ one that was already defined.
+結果將會是一個新的處理程式或一個已定義的處理程式。
 
 
+(combathandlermsg)=
 ### CombatHandler.msg
 
 ```python 
@@ -270,14 +274,14 @@ class EvAdventureCombatBaseHandler(DefaultScript):
 ```
 
 ```{sidebar}
-The `self.obj` property of a Script is the entity on which the Script 'sits'. If set on a Character, `self.obj` will be that Character. If on a room, it'd be that room. For a global script, `self.obj` is `None`. 
+Script 的 `self.obj` 屬性是 Script “所在”的實體。如果在角色上設定，`self.obj` 將是該角色。如果在一個房間裡，那就是那個房間。對於全域 script，`self.obj` 是 `None`。
 ```
 
-We saw the `location.msg_contents()` method before in the [Weapon class of the Objects lesson](./Beginner-Tutorial-Objects.md#weapons). Its purpose is to take a string on the form `"$You() do stuff against $you(key)"` and make sure all sides see a string suitable just to them. Our `msg()` method will by default broadcast the message to everyone in the room. 
+我們之前在[物件課的武器類](./Beginner-Tutorial-Objects.md#weapons)中看到了`location.msg_contents()`方法。其目的是獲取 `"$You() do stuff against $you(key)"` 形式的字串，並確保各方都能看到適合自己的字串。預設情況下，我們的 `msg()` 方法會將訊息廣播給房間中的每個人。 
 <div style="clear: right;"></div>
 
 
-You'd use it like this:
+你會這樣使用它：
 ```python
 combathandler.msg(
 	f"$You() $conj(throw) {item.key} at $you({target.key}).", 
@@ -286,23 +290,24 @@ combathandler.msg(
 )
 ```
 
-If combatant is `Trickster`, `item.key` is "a colorful ball" and `target.key` is "Goblin", then 
+如果戰鬥者是`Trickster`，`item.key`是“綵球”，`target.key`是“哥布林”，那麼
 
-The combatant would see: 
+戰鬥者會看到：
 
     You throw a colorful ball at Goblin.
 
-The Goblin sees 
+哥布林看見了
 
-	Trickster throws a colorful ball at you.
+騙子丟一個彩色的球給你。
 
-Everyone else in the room sees 
+房間裡的其他人都看到了
 
-	Trickster throws a colorful ball at Goblin.
+騙子向哥布林丟了一個彩色球。
 
-### Combathandler.get_combat_summary 
+(combathandlerget_combat_summary)=
+### 戰鬥人員。 get_combat_summary
 
-We want to be able to show a nice summary of the current combat: 
+我們希望能夠展示當前戰鬥的精彩總結：
 
 
 ```shell
@@ -369,30 +374,32 @@ class EvAdventureCombatBaseHandler(DefaultScript):
 
 ```
 
-This may look complex, but the complexity is only in figuring out how to organize three columns, especially how to to adjust to the two sides on each side of the `vs` are roughly vertically aligned. 
+這看起來可能很複雜，但複雜之處僅在於弄清楚如何組織三列，尤其是如何調整到兩側的`vs`大致垂直對齊。
 
-- **Line 15** : We make use of the `self.get_sides(combatant)` method which we haven't actually implemented yet. This is because turn-based and twitch-based combat will need different ways to find out what the sides are. The `allies` and `enemies` are lists. 
-- **Line 17**: The `combatant` is not a part of the `allies` list (this is how we defined `get_sides` to work), so we insert it at the top of the list (so they show first on the left-hand side). 
-- **Lines 21, 22**: We make use of the `.hurt_level` values of all living things (see the [LivingMixin of the Character lesson](./Beginner-Tutorial-Characters.md)).
-- **Lines 28-39**: We determine how to vertically center the two sides by adding empty lines above and below the content.
-- **Line 41**: The [Evtable](../../../Components/EvTable.md) is an Evennia utility for making, well, text tables. Once we are happy with the columns, we feed them to the table and let Evennia do the rest. It's worth to explore `EvTable` since it can help you create all sorts of nice layouts.
+- **第 15 行**：我們使用了 `self.get_sides(combatant)` 方法，但我們尚未實際實現。這是因為基於回合和基於抽搐的戰鬥需要不同的方式來找出雙方是誰。 `allies` 和 `enemies` 是清單。
+- **第 17 行**：`combatant` 不是 `allies` 清單的一部分（這就是我們定義 `get_sides` 的工作方式），因此我們將其插入清單的頂部（因此它們首先顯示在左側）。
+- **第 21、22 行**：我們利用所有生物的 `.hurt_level` 值（請參閱[角色課程的LivingMixin](./Beginner-Tutorial-Characters.md)）。
+- **第28-39行**：我們透過在內容的上方和下方新增空行來確定如何使兩側垂直居中。
+- **第 41 行**：[Evtable](../../../Components/EvTable.md) 是一個用於製作文字表的 Evennia 實用程式。一旦我們對這些列感到滿意，我們就把它們輸入到表中，然後讓 Evennia 完成剩下的工作。 `EvTable` 值得探索，因為它可以幫助您建立各種漂亮的佈局。
 
-## Actions 
+(actions)=
+## 行動
 
-In EvAdventure we will only support a few common combat actions, mapping to the equivalent rolls and checks used in _Knave_. We will design our combat framework so that it's easy to expand with other actions later. 
+在EvAdventure中，我們將只支援一些常見的戰鬥動作，對映到_Knave_中使用的等效擲骰和檢定。我們將設計我們的戰鬥框架，以便以後可以輕鬆地透過其他動作進行擴充套件。
 
-- `hold` - The simplest action. You just lean back and do nothing. 
-- `attack` - You attack a given `target` using your currently equipped weapon. This will become a roll of STR or WIS against the targets' ARMOR. 
-- `stunt` - You make a 'stunt', which in roleplaying terms would mean you tripping your opponent, taunting or otherwise trying to gain the upper hand without hurting them. You can do this to give yourself (or an ally) _advantage_ against a `target` on the next action. You can also give a `target` _disadvantage_ against you or an ally for their next action.
-- `use item` - You make use of a `Consumable` in your inventory. When used on yourself, it'd normally be something like a healing potion. If used on an enemy it could be a firebomb or a bottle of acid. 
-- `wield` - You wield an item. Depending on what is being wielded, it will be wielded in different ways: A helmet will be placed on the head, a piece of armor on the chest. A sword will be wielded in one hand, a shield in another. A two-handed axe will use up two hands. Doing so will move whatever was there previously to the backpack. 
-- `flee` - You run away/disengage. This action is only applicable in turn-based combat (in twitch-based combat you just move to another room to flee). We will thus wait to define this action until the [Turnbased combat lesson](./Beginner-Tutorial-Combat-Turnbased.md).
+- `hold` - 最簡單的操作。你只是向後靠，什麼都不做。
+- `attack` - 你使用目前裝備的武器攻擊給定的`target`。這將成為針對目標ARMOR的STR或WIS擲骰。
+- `stunt` - 你做了一個“特技”，用角色扮演的術語來說，這意味著你絆倒你的對手，嘲諷或以其他方式試圖在不傷害他們的情況下佔據上風。您可以這樣做，為自己（或盟友）在下一步行動中提供_優勢_`target`。您也可以針對您或盟友的下一步給予 `target` _disadvantage_。
+- `use item` - 您使用庫存中的`Consumable`。當對自己使用時，它通常就像治療藥水一樣。如果對敵人使用，它可能是燃燒彈或一瓶酸。
+- `wield` - 你擁有一件物品。根據所使用的物品，它會以不同的方式使用：頭盔會戴在頭上，一件盔甲會戴在胸前。一隻手揮舞著劍，另一手揮舞著盾牌。雙手斧頭會用掉兩隻手。這樣做會將之前的所有內容移至揹包中。
+- `flee` - 你逃跑/脫離。此動作僅適用於回合製戰鬥（在基於抽搐的戰鬥中，您只需移動到另一個房間即可逃離）。因此，我們將等到[回合製戰鬥課程](./Beginner-Tutorial-Combat-Turnbased.md)後再定義此動作。
 
-## Action dicts 
+(action-dicts)=
+## 行動指令
 
-To pass around the details of an attack (the second point above), we will use a `dict`. A `dict` is simple and also easy to save in an `Attribute`. We'll call this the `action_dict` and here's what we need for each action. 
+為了傳遞攻擊的詳細資訊（上面的第二點），我們將使用 `dict`。 `dict` 很簡單，也很容易儲存在 `Attribute` 中。我們稱之為 `action_dict`，這是每個操作所需的內容。
 
-> You don't need to type these out anywhere, it's listed here for reference. We will use these dicts when calling `combathandler.queue_action(combatant, action_dict)`.
+> 您無需在任何地方輸入這些內容，此處列出以供參考。我們將在呼叫 `combathandler.queue_action(combatant, action_dict)` 時使用這些字典。
 
 ```python 
 hold_action_dict = {
@@ -427,9 +434,9 @@ flee_action_dict = {
 }
 ```
 
-Apart from the `stunt` action, these dicts are all pretty simple. The `key` identifes the action to perform and the other fields identifies the minimum things you need to know in order to resolve each action. 
+除了 `stunt` 操作之外，這些指令都非常簡單。 `key` 標識要執行的操作，其他欄位標識解決每個操作所需瞭解的最少內容。
 
-We have not yet written the code to set these dicts, but we will assume that we know who is performing each of these actions. So if `Beowulf` attacks `Grendel`, Beowulf is not himself included in the attack dict: 
+我們還沒有編寫程式碼來設定這些指令，但我們假設我們知道誰在執行這些操作。因此，如果 `Beowulf` 攻擊 `Grendel`，貝奧武夫本人並不包含在攻擊字典中：
 
 ```python
 attack_action_dict = { 
@@ -438,7 +445,7 @@ attack_action_dict = {
 }
 ```
 
-Let's explain the longest action dict, the `Stunt` action dict in more detail as well. In this example, The `Trickster` is performing a _Stunt_ in order to help his friend `Paladin` to gain an INT- _advantage_ against the `Goblin` (maybe the paladin is preparing to cast a spell of something). Since `Trickster` is doing the action, he's not showing up in the dict:
+讓我們更詳細地解釋最長的動作字典，即 `Stunt` 動作字典。在此範例中，`Trickster` 正在表演_特技_，以幫助他的朋友 `Paladin` 獲得 INT- _優勢_ 對抗 `Goblin`（也許聖武士正準備施展某種咒語）。由於 `Trickster` 正在執行該操作，因此他沒有出現在字典中：
 
 ```python 
 stunt_action_dict - { 
@@ -451,14 +458,15 @@ stunt_action_dict - {
 }
 ```
 ```{sidebar}
-In EvAdventure, we'll always set `stunt_type == defense_type` for simplicity. But you could also consider mixing things up so you could use DEX to confuse someone  and give them INT disadvantage, for example.
+在 EvAdventure 中，為了簡單起見，我們將始終設定 `stunt_type == defense_type`。但你也可以考慮將事情混合起來，這樣你就可以使用 DEX 來迷惑某人，並給他們帶來 INT 的劣勢，例如。
 ```
-This should result in an INT vs INT based check between the `Trickster` and the `Goblin` (maybe the trickster is trying to confuse the goblin with some clever word play). If the `Trickster` wins, the `Paladin` gains advantage against the Goblin on the `Paladin`'s next action . 
+這應該會導致 `Trickster` 和 `Goblin` 之間基於 INT 與 INT 的檢查（也許騙子試圖用一些巧妙的文字遊戲來迷惑妖精）。如果 `Trickster` 獲勝，則 `Paladin` 在 `Paladin` 的下一步行動中獲得對抗哥布林的優勢。
 
 
-## Action classes 
+(action-classes)=
+## 動作類
 
-Once our `action_dict` identifies the particular action we should use, we need something that reads those keys/values and actually _performs_ the action.
+一旦我們的 `action_dict` 確定了我們應該使用的特定操作，我們就需要一些東西來讀取這些鍵/值並實際_執行_該操作。
 
 
 ```python 
@@ -475,9 +483,9 @@ class CombatAction:
                 setattr(self, key, val)
 ```
 
-We will create a new instance of this class _every time an action is happening_. So we store some key things every action will need - we will need a reference to the common `combathandler` (which we will design in the next section), and to the `combatant` (the one performing this action). The `action_dict` is a dict matching the action we want to perform. 
+我們將在_每次發生操作時_建立該類別的新例項。因此，我們儲存每個操作都需要的一些關鍵內容 - 我們需要對常見的 `combathandler` （我們將在下一節中設計）和 `combatant` （執行此操作的那個）的引用。 `action_dict` 是一個與我們要執行的操作相符的字典。
 
-The `setattr` Python standard function assigns the keys/values of the `action_dict` to be properties "on" this action. This is very convenient to use in other methods. So for the `stunt`  action, other methods could just access `self.key`, `self.recipient`, `self.target` and so on directly. 
+`setattr` Python 標準函式將 `action_dict` 的鍵/值指派為「關於」此操作的屬性。這在其他方法中使用起來非常方便。因此，對於`stunt`操作，其他方法可以直接存取`self.key`、`self.recipient`、`self.target`等。
 
 ```python 
 # in evadventure/combat_base.py 
@@ -503,10 +511,10 @@ class CombatAction:
         pass 
 ```
 
-It's _very_ common to want to send messages to everyone in combat - you need to tell people they are getting attacked, if they get hurt and so on. So having a `msg` helper method on the action is convenient. We offload all the complexity to the combathandler.msg() method.
+想要向戰鬥中的每個人傳送訊息是很常見的——你需要告訴人們他們正在受到攻擊，他們是否受傷等等。因此，在操作上使用 `msg` 輔助方法很方便。我們將所有複雜性轉移到 combathandler.msg() 方法。
 
 
-The `can_use`, `execute` and `post_execute` should all be called in a chain and we should make sure the `combathandler` calls them like this: 
+`can_use`、`execute` 和 `post_execute` 都應該在鏈中呼叫，我們應該確保 `combathandler` 像這樣呼叫它們：
 
 ```python
 if action.can_use(): 
@@ -514,7 +522,8 @@ if action.can_use():
     action.post_execute()
 ```
 
-### Hold Action 
+(hold-action)=
+### 保持行動
 
 ```python
 # in evadventure/combat_base.py 
@@ -532,9 +541,10 @@ class CombatActionHold(CombatAction):
     """
 ```
 
-Holding does nothing but it's cleaner to nevertheless have a separate class for it. We use the docstring to specify how its action-dict should look.
+Holding 不執行任何操作，但為其提供一個單獨的類別會更乾淨。我們使用檔案字串來指定其操作字典的外觀。
 
-### Attack Action 
+(attack-action)=
+### 攻擊動作
 
 ```python
 # in evadventure/combat_base.py
@@ -564,9 +574,10 @@ class CombatActionAttack(CombatAction):
              weapon.at_post_use(attacker, target)
 ```
 
-Refer to how we [designed Evadventure weapons](./Beginner-Tutorial-Objects.md#weapons) to understand what happens here - most of the work is performed by the weapon class - we just plug in the relevant arguments.
+請參閱我們如何[設計Evadventure武器](./Beginner-Tutorial-Objects.md#weapons)來瞭解這裡發生的情況 - 大部分工作是由武器類執行的 - 我們只需插入相關引數即可。
 
-### Stunt Action
+(stunt-action)=
+### 特技動作
 
 ```python
 # in evadventure/combat_base.py 
@@ -645,13 +656,14 @@ class CombatActionStunt(CombatAction):
 
 ```
 
-The main action here is the call to the `rules.dice.opposed_saving_throw` to determine if the stunt succeeds. After that, most lines is about figuring out who should be given advantage/disadvantage and to communicate the result to the affected parties. 
+這裡的主要動作是呼叫`rules.dice.opposed_saving_throw`來決定特技是否成功。之後，大多數線路都是關於確定誰應該獲得優勢/劣勢，並將結果傳達給受影響的各方。
 
-Note that we make heavy use of the helper methods on the `combathandler` here, even those that are not yet implemented. As long as we pass the `action_dict` into the `combathandler`, the action doesn't actually care what happens next.
+請注意，我們在 `combathandler` 上大量使用了輔助方法，即使是尚未實現的方法。只要我們將 `action_dict` 傳遞到 `combathandler` 中，該操作實際上並不關心接下來會發生什麼。
 
-After we have performed a successful stunt, we queue the `combathandler.fallback_action_dict`. This is because stunts are meant to be one-off things are if we are repeating actions, it would not make sense to repeat the stunt over and over.
+在我們成功表演了特技之後，我們將 `combathandler.fallback_action_dict` 排隊。這是因為特技本來就是一次性的事情，如果我們重複動作，那麼一遍又一遍地重複特技就沒有意義。
 
-### Use Item Action 
+(use-item-action)=
+### 使用專案操作
 
 ```python
 # in evadventure/combat_base.py 
@@ -685,9 +697,10 @@ class CombatActionUseItem(CombatAction):
             item.at_post_use(user, target)
 ```
 
-See the [Consumable items in the Object lesson](./Beginner-Tutorial-Objects.md) to see how consumables work. Like with weapons, we offload all the logic to the item we use.
+請參閱[物件課程中的消耗品](./Beginner-Tutorial-Objects.md) 以瞭解消耗品的工作原理。就像武器一樣，我們將所有邏輯轉移到我們使用的物品上。
 
-### Wield Action 
+(wield-action)=
+### 揮舞動作
 
 ```python
 # in evadventure/combat_base.py 
@@ -711,19 +724,20 @@ class CombatActionWield(CombatAction):
 
 ```
 
-We rely on the [Equipment handler](./Beginner-Tutorial-Equipment.md) we created to handle the swapping of items for us. Since it doesn't make sense to keep swapping over and over, we queue the fallback action after this one.
+我們依靠我們建立的[裝置處理程式](./Beginner-Tutorial-Equipment.md)來為我們處理物品的交換。由於不斷地交換是沒有意義的，因此我們將後備操作排在這個操作之後。
 
-## Testing 
+(testing)=
+## 測試
 
-> Create a module `evadventure/tests/test_combat.py`.
+> 建立模組`evadventure/tests/test_combat.py`。
 
 ```{sidebar}
-Look under `evennia/contrib/tutorials/evadventure/`, in [tests/test_combat.py](evennia.contrib.tutorials.evadventure.tests.test_combat) for ready-made combat unit tests.
+檢視`evennia/contrib/tutorials/evadventure/`下的[tests/test_combat.py](evennia.contrib.tutorials.evadventure.tests.test_combat)中的現成戰鬥單元測試。
 ```
 
-Unit testing the combat base classes can seem impossible because we have not yet implemented most of it. We can however get very far by the use of [Mocks](https://docs.python.org/3/library/unittest.mock.html). The idea of a Mock is that you _replace_ a piece of code with a dummy object (a 'mock') that can be called to return some specific value. 
+對戰鬥基類進行單元測試似乎是不可能的，因為我們還沒有實現其中的大部分。然而，透過使用 [Mocks](https://docs.python.org/3/library/unittest.mock.html)，我們可以走得更遠。模擬的想法是用虛擬物件（“模擬”）_替換_一段程式碼，可以呼叫該虛擬物件來傳回某些特定值。
 
-For example, consider this following test of the `CombatHandler.get_combat_summary`. We can't just call this because it internally calls `.get_sides` which would raise a `NotImplementedError`. 
+例如，考慮以下 `CombatHandler.get_combat_summary` 的測試。我們不能直接呼叫它，因為它在內部呼叫 `.get_sides`，這會引發 `NotImplementedError`。
 
 ```{code-block} python 
 :linenos:
@@ -768,12 +782,13 @@ class TestEvAdventureCombatBaseHandler(EvenniaTestCase):
 		)
 ```
 
-The interesting places are where we apply the mocks: 
+有趣的地方是我們應用模擬的地方：
 
-- **Line 25** and **Line 32**: While `get_sides` is not implemented yet, we know what it is _supposed_ to return - a tuple of lists. So for the sake of the test, we _replace_ the `get_sides` method with a mock that when called will return something useful. 
+- **第 25 行**和 **第 32 行**：雖然 `get_sides` 尚未實現，但我們知道_應該_返回什麼 - 列表元組。因此，為了進行測試，我們將 `get_sides` 方法替換為模擬，該模擬在呼叫時會傳回有用的內容。
 
-With this kind of approach it's possible to fully test a system also when it's not 'complete' yet.
+透過這種方法，即使系統尚未“完成”，也可以對其進行全面測試。
 
-## Conclusions 
+(conclusions)=
+## 結論
 
-We have the core functionality we need for our combat system! In the following two lessons we will make use of these building blocks to create two styles of combat. 
+我們擁有戰鬥系統所需的核心功能！在接下來的兩節課中，我們將利用這些構建塊來建立兩種風格的戰鬥。

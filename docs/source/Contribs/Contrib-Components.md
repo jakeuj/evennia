@@ -1,38 +1,43 @@
-# Components
+(components)=
+# 成分
 
-Contrib by ChrisLR, 2021
+Contrib，ChrisLR，2021 年
 
-Expand typeclasses using a components/composition approach.
+使用元件/組合方法擴充套件typeclasses。
 
-## The Components Contrib
+(the-components-contrib)=
+## 組成部分Contrib
 
-This contrib introduces Components and Composition to Evennia.
-Each 'Component' class represents a feature that will be 'enabled' on a typeclass instance.
-You can register these components on an entire typeclass or a single object at runtime.
-It supports both persisted attributes and in-memory attributes by using Evennia's AttributeHandler.
+這contrib 向Evennia 介紹了元件和成分。
+每個「元件」類別代表將在 typeclass 例項上「啟用」的功能。
+您可以在執行時在整個 typeclass 或單一物件上註冊這些元件。
+它透過使用 Evennia 的 AttributeHandler 支援持久屬性和記憶體屬性。
 
-## Pros
-- You can reuse a feature across multiple typeclasses without inheritance
-- You can cleanly organize each feature into a self-contained class.
-- You can check if your object supports a feature without checking its instance.
+(pros)=
+## 優點
+- 您可以在多個 typeclasses 之間重複使用某個功能，而無需繼承
+- 您可以將每個功能清楚地組織到一個獨立的類別中。
+- 您可以檢查物件是否支援某個功能，而無需檢查其例項。
 
-## Cons
-- It introduces additional complexity.
-- A host typeclass instance is required.
+(cons)=
+## 缺點
+- 它引入了額外的複雜性。
+- 需要主機 typeclass 例項。
 
-## How to install
+(how-to-install)=
+## 如何安裝
 
-To enable component support for a typeclass,
-import and inherit the ComponentHolderMixin, similar to this
+要啟用對 typeclass 的元件支援，
+匯入並繼承ComponentHolderMixin，與此類似
 ```python
 from evennia.contrib.base_systems.components import ComponentHolderMixin
 class Character(ComponentHolderMixin, DefaultCharacter):
 # ...
 ```
 
-Components need to inherit the Component class and require a unique name.
-Components may inherit from other components but must specify another name.
-You can assign the same 'slot' to both components to have alternative implementations.
+元件需要繼承Component類，並且需要唯一的名稱。
+元件可以繼承自其他元件，但必須指定另一個名稱。
+您可以將相同的“槽”指派給兩個元件以獲得替代實作。
 ```python
 from evennia.contrib.base_systems.components import Component
 
@@ -46,13 +51,13 @@ class ItemHealth(Health):
     slot = "health"
 ```
 
-Components may define DBFields or NDBFields at the class level.
-DBField will store its values in the host's DB with a prefixed key.
-NDBField will store its values in the host's NDB and will not persist.
-The key used will be 'component_name::field_name'.
-They use AttributeProperty under the hood.
+元件可以在類別層級定義 DBFields 或 NDBFields。
+DBField 將使用字首鍵將其值儲存在主機的 DB 中。
+NDBField 會將其值儲存在主機的 NDB 中並且不會保留。
+使用的金鑰將為“component_name::field_name”。
+他們在幕後使用AttributeProperty。
 
-Example:
+例子：
 ```python
 from evennia.contrib.base_systems.components import Component, DBField
 
@@ -60,18 +65,18 @@ class Health(Component):
     health = DBField(default=1)
 ```
 
-Note that default is optional and will default to None.
+請注意，預設值是可選的，預設為“無”。
 
-Adding a component to a host will also a similarly named tag with 'components' as category.
-A Component named health will appear as key="health, category="components".
-This allows you to retrieve objects with specific components by searching with the tag.
+將元件新增至主機也會出現類似的名稱tag，其中「元件」作為類別。
+名為 health 的元件將顯示為 key="health,category="components"。
+這允許您透過使用 tag 搜尋來檢索具有特定元件的物件。
 
-It is also possible to add Component Tags the same way, using TagField.
-TagField accepts a default value and can be used to store a single or multiple tags.
-Default values are automatically added when the component is added.
-Component Tags are cleared from the host if the component is removed.
+也可以使用 TagField 以相同的方式新增元件 Tags。
+TagField 接受預設值，可用於儲存單一或多個tags。
+新增元件時會自動新增預設值。
+如果刪除元件，則元件 Tags 將從主機中清除。
 
-Example:
+例子：
 ```python
 from evennia.contrib.base_systems.components import Component, TagField
 
@@ -80,30 +85,30 @@ class Health(Component):
     vulnerability = TagField(default="fire", enforce_single=True)
 ```
 
-The 'resistances' field in this example can be set to multiple times and it will keep the added tags.
-The 'vulnerability' field in this example will override the previous tag with the new one.
+本例中的「resistances」欄位可以設定多次，並且它將保留新增的tags。
+本例中的「漏洞」欄位將用新欄位覆蓋先前的 tag。
 
 
 
-Each typeclass using the ComponentHolderMixin can declare its components
-in the class via the ComponentProperty.
-These are components that will always be present in a typeclass.
-You can also pass kwargs to override the default values
-Example
+每個typeclass使用ComponentHolderMixin可以宣告它的元件
+透過 ComponentProperty 在班級中。
+這些元件將始終出現在 typeclass 中。
+您也可以傳遞 kwargs 來覆寫預設值
+範例
 ```python
 from evennia.contrib.base_systems.components import ComponentHolderMixin
 class Character(ComponentHolderMixin, DefaultCharacter):
     health = ComponentProperty("health", hp=10, max_hp=50)
 ```
 
-You can then use character.components.health to access it.
-The shorter form character.cmp.health also exists.
-character.health would also be accessible but only for typeclasses that have
-this component defined on the class.
+然後您可以使用character.components.health 來訪問它。
+也存在縮寫形式 character.cmp.health。
+character.health 也可以訪問，但僅限於 typeclasses
+該元件定義在類別上。
 
-Alternatively you can add those components at runtime.
-You will have to access those via the component handler.
-Example
+或者，您可以在執行時新增這些元件。
+您必須透過元件處理程式存取它們。
+例子
 ```python
 character = self
 vampirism = components.Vampirism.create(character)
@@ -117,37 +122,39 @@ vampirism = character.components.get("vampirism")
 vampirism = character.cmp.vampirism
 ```
 
-Keep in mind that all components must be imported to be visible in the listing.
-As such, I recommend regrouping them in a package.
-You can then import all your components in that package's __init__
+請記住，必須匯入所有元件才能在清單中可見。
+因此，我建議將它們重新組合到一個包中。
+然後，您可以匯入該套件的 __init__ 中的所有元件
 
-Because of how Evennia import typeclasses and the behavior of python imports
-I recommend placing the components package inside the typeclass package.
-In other words, create a folder named components inside your typeclass folder.
-Then, inside the 'typeclasses/__init__.py' file add the import to the folder, like
+由於 Evennia import typeclasses 以及 python 匯入的行為
+我建議將元件包放在 typeclass 包內。
+換句話說，在 typeclass 資料夾中建立一個名為 Components 的資料夾。
+然後，在「typeclasses/__init__.py」檔案內將匯入新增至資料夾中，例如
 ```python
 from typeclasses import components
 ```
-This ensures that the components package will be imported when the typeclasses are imported.
-You will also need to import each components inside the package's own 'typeclasses/components/__init__.py' file.
-You only need to import each module/file from there but importing the right class is a good practice.
+這樣可以確保匯入typeclasses時元件包也會被匯入。
+您還需要匯入包自己的“typeclasses/components/__init__.py”檔案中的每個元件。
+您只需要從那裡匯入每個模組/檔案，但匯入正確的類別是一個很好的做法。
 ```python
 from typeclasses.components.health import Health
 ```
 ```python
 from typeclasses.components import health
 ```
-Both of the above examples will work.
+上面的兩個例子都可以工作。
 
-## Known Issues
+(known-issues)=
+## 已知問題
 
-Assigning mutable default values such as a list to a DBField will share it across instances.
-To avoid this, you must set autocreate=True on the field, like this.
+將可變預設值（例如列表）分配給 DBField 將在例項之間共用它。
+為了避免這種情況，您必須在欄位上設定 autocreate=True，如下所示。
 ```python
 health = DBField(default=[], autocreate=True)
 ```
 
-## Full Example
+(full-example)=
+## 完整範例
 ```python
 from evennia.contrib.base_systems import components
 
@@ -215,5 +222,5 @@ class Attack(Command):
 
 ----
 
-<small>This document page is generated from `evennia/contrib/base_systems/components/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\base_systems\components\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

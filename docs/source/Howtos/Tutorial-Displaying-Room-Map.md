@@ -1,9 +1,10 @@
-# Show a dynamic map of rooms
+(show-a-dynamic-map-of-rooms)=
+# 顯示房間的動態地圖
 
 ```{sidebar}
-See also the [Mapbuilder](../Contribs/Contrib-Mapbuilder.md) and [XYZGrid](../Contribs/Contrib-XYZGrid.md) contribs, which offer alternative ways of both creating and displaying room maps. The [Beginner Tutorial lesson implementing Evadventure rooms](https://www.evennia.com/docs/latest/Howtos/Beginner-Tutorial/Part3/Beginner-Tutorial-Rooms.html#adding-a-room-map) also explains how to add a (simpler) auto-map. 
+另請參閱 [Mapbuilder](../Contribs/Contrib-Mapbuilder.md) 和 [XYZGrid](../Contribs/Contrib-XYZGrid.md) contribs，它們提供了建立和顯示房間地圖的替代方法。 [實施 Evadventure 房間的初學者教學課程](https://www.evennia.com/docs/latest/Howtos/Beginner-Tutorial/Part3/Beginner-Tutorial-Rooms.html#adding-a-room-map) 也說明如何新增（更簡單的）自動地圖。
 ```
-An often desired feature in a MUD is to show an in-game map to help navigation.
+MUD 中經常需要的功能是顯示遊戲內地圖以幫助導航。
 
 ```
 Forest path
@@ -17,16 +18,18 @@ The trees are looming over the narrow forest path.
 Exits: East, West
 ```
 
-## The Grid of Rooms
+(the-grid-of-rooms)=
+## 房間網格
 
-There are at least two requirements needed for this tutorial to work.
+本教學的執行至少需要滿足兩個要求。
 
-1. The structure of your mud has to follow a logical layout. Evennia supports the layout of your world to be 'logically' impossible with rooms looping to themselves or exits leading to the other side of the map. Exits can also be named anything, from "jumping out the window" to "into the fifth dimension". This tutorial assumes you can only move in the cardinal directions (N, E, S and W).
-2. Rooms must be connected and linked together for the map to be generated correctly. Vanilla Evennia comes with a admin command [tunnel](evennia.commands.default.building.CmdTunnel) that allows a user to create rooms in the cardinal directions, but additional work is needed to assure that rooms are connected. For example, if you `tunnel east` and then immediately do `tunnel west` you'll find that you have created two completely stand-alone rooms. So care is needed if you want to create a "logical" layout. In this tutorial we assume you have such a grid of rooms that we can generate the map from.
+1. 泥漿的結構必須遵循邏輯佈局。 Evennia 支援你的世界的佈局在「邏輯上」是不可能的，房間迴圈到自己或出口通往地圖的另一邊。出口也可以被命名為任何名稱，從「跳出窗外」到「進入第五次元」。本教學假設您只能沿著基本方向（N、E、S 和 W）移動。
+2. 房間必須連線並連結在一起才能正確產生地圖。 Vanilla Evennia 附帶一個管理指令 [tunnel](evennia.commands.default.building.CmdTunnel)，允許使用者在基本方向上建立房間，但需要額外的工作來確保房間已連線。例如，如果您`tunnel east`，然後立即執行`tunnel west`，您會發現您已經建立了兩個完全獨立的房間。因此，如果您想建立“邏輯”佈局，則需要小心。在本教學中，我們假設您有這樣一個房間網格，我們可以從中產生地圖。
 
-## Concept
+(concept)=
+## 概念
 
-Before getting into the code, it is beneficial to understand and conceptualize how this is going to work. The idea is analogous to a worm that starts at your current position. It chooses a direction and 'walks' outward from it, mapping its route as it goes. Once it has traveled a pre-set distance it stops and starts over in another direction. An important note is that we want a system which is easily callable and not too complicated. Therefore we will wrap this entire code into a custom Python class (not a typeclass as this doesn't use any core objects from evennia itself).  We are going to create something that displays like this when you type 'look':
+在進入程式碼之前，理解和概念化它是如何運作的是有益的。這個想法類似於從您目前位置開始的蠕蟲。它選擇一個方向並從該方向向外“行走”，並在行走過程中繪製出其路線。一旦它行駛了預設的距離，它就會停下來並從另一個方向重新開始。需要注意的是，我們想要一個易於呼叫且不太複雜的系統。因此，我們將把整個程式碼包裝到一個自訂 Python 類別中（不是 typeclass，因為它不使用 evennia 本身的任何核心物件）。  我們將建立當您輸入“look”時顯示如下的內容：
 
 ```
 Hallway
@@ -41,12 +44,13 @@ wail throughout the empty halls.
 Exits: North, East, South
 ```
 
-Your current location is defined by `[@]` while the `[.]`s are other rooms that the "worm" has seen
-since departing from your location.
+您目前的位置由 `[@]` 定義，而 `[.]`s 是「蠕蟲」見過的其他房間
+自從離開您所在的位置後。
 
-## Setting up the Map Display
+(setting-up-the-map-display)=
+## 設定地圖顯示
 
-First we must define the components for displaying the map. For the "worm" to know what symbol to draw on the map we will have it check an Attribute on the room it visits called `sector_type`. For this tutorial we understand two symbols - a normal room and the room with us in it. We also define a fallback symbol for rooms without said Attribute - that way the map will still work even if we didn't prepare the room correctly. Assuming your game folder is named `mygame`, we create this code in `mygame/world/map.py.`
+首先我們必須定義用於顯示地圖的元件。為了讓「蠕蟲」知道在地圖上繪製什麼符號，我們將讓它檢查它訪問的名為 `sector_type` 的房間上的 Attribute。在本教學中，我們瞭解兩個符號 - 一個普通的房間和我們所在的房間。我們也為沒有說 Attribute 的房間定義了一個後備符號 - 這樣即使我們沒有正確準備房間，地圖仍然可以工作。假設您的遊戲資料夾名為`mygame`，我們在`mygame/world/map.py.`中建立此程式碼
 
 ```python
 # in mygame/world/map.py
@@ -58,9 +62,9 @@ SYMBOLS = { None : ' . ', # for rooms without sector_type Attribute
             'SECT_INSIDE': '[.]' }
 ```
 
-Since trying to access an unset Attribute returns `None`, this means rooms without the `sector_type`
-Atttribute will show as ` . `. Next we start building the custom class `Map`. It will hold all
-methods we need.
+由於嘗試造訪未設定的 Attribute 返回 `None`，這意味著沒有 `sector_type` 的房間
+屬性將顯示為`. `。接下來我們開始建立自訂類別`Map`。它將容納所有
+我們需要的方法。
 
 ```python
 # in mygame/world/map.py
@@ -76,12 +80,12 @@ class Map(object):
         self.curY = None
 ```
 
-- `self.caller` is normally your Character object, the one using the map.
-- `self.max_width/length` determine the max width and length of the map that will be generated. Note that it's important that these variables are set to *odd* numbers to make sure the display area has a center point.
-- ` self.worm_has_mapped` is building off the worm analogy above. This dictionary will store all rooms the "worm" has mapped as well as its relative position within the grid. This is the most important variable as it acts as a 'checker' and 'address book' that is able to tell us where the worm has been and what it has mapped so far.
-- `self.curX/Y` are coordinates representing the worm's current location on the grid.
+- `self.caller` 通常是您的角色物件，也就是使用地圖的角色物件。
+- `self.max_width/length` 確定將產生的地圖的最大寬度和長度。請注意，將這些變數設為“奇數”非常重要，以確保顯示區域具有中心點。
+- ` self.worm_has_mapped` 是基於上面的蠕蟲類比建構的。該字典將儲存「蠕蟲」對映的所有房間及其在網格內的相對位置。這是最重要的變數，因為它充當“檢查器”和“地址簿”，能夠告訴我們蠕蟲病毒去過哪裡以及到目前為止它所對映的內容。
+- `self.curX/Y` 是代表蠕蟲在網格上目前位置的座標。
 
- Before any sort of mapping can actually be done we need to create an empty display area and do some sanity checks on it by using the following methods.
+在實際完成任何型別的對應之前，我們需要建立一個空的顯示區域，並使用以下方法對其進行一些健全性檢查。
 
 ```python
 # in mygame/world/map.py
@@ -106,7 +110,7 @@ class Map(object):
             else False
 ```
 
-Before we can set our worm on its way, we need to know some of the computer science behind all this called 'Graph Traversing'. In Pseudo code what we are trying to accomplish is this:
+在我們讓蠕蟲病毒繼續傳播之前，我們需要了解這一切背後的一些電腦科學，即「圖遍歷」。在偽程式碼中，我們試圖完成的是：
 
 ```python
 # pseudo code
@@ -126,36 +130,37 @@ def draw_room_on_map(room, max_distance):
             self.draw_room_on_map(exit.destination, max_distance - 1)
 ```
 
-The beauty of Python is that our actual code of doing this doesn't differ much if at all from this
-Pseudo code example.
+Python 的美妙之處在於我們執行此操作的實際程式碼與此沒有太大區別
+偽程式碼範例。
 
-- `max_distance` is a variable indicating to our Worm how many rooms AWAY from your current location will it map. Obviously the larger the number the more time it will take if your current location has many many rooms around you.
+- `max_distance` 是一個變數，向我們的蠕蟲指示它將對映距離您當前位置有多少個房間 AWAY。顯然，如果您當前位置周圍有很多房間，則數字越大，所需的時間就越長。
 
-The first hurdle here is what value to use for 'max_distance'. There is no reason for the worm to travel further than what is actually displayed to you. For example, if your current location is placed in the center of a display area of size `max_length = max_width = 9`, then the worm need only
-go `4` spaces in either direction:
+這裡的第一個障礙是「max_distance」使用什麼值。蠕蟲沒有理由傳播得比實際顯示給您的距離更遠。例如，如果您的目前位置位於大小為`max_length = max_width = 9`的顯示區域的中心，那麼蠕蟲只需要
+向任一方向走 `4` 空格：
 
 ```
 [.][.][.][.][@][.][.][.][.]
  4  3  2  1  0  1  2  3  4
 ```
 
-The `max_distance` can be set dynamically based on the size of the display area. As your width/length changes it becomes a simple algebraic linear relationship which is simply `max_distance = (min(max_width, max_length) -1) / 2`.
+`max_distance`可以根據顯示區域的大小動態設定。當寬度/長度改變時，它會變成簡單的代數線性關係，即 `max_distance = (min(max_width, max_length) -1) / 2`。
 
-## Building the Mapper
+(building-the-mapper)=
+## 建構對映器
 
-Now we can start to fill our Map object with some methods. We are still missing a few methods that are very important:
+現在我們可以開始用一些方法填入我們的 Map 物件。我們還缺少一些非常重要的方法：
 
-* `self.draw(self, room)` - responsible for actually drawing room to grid.
-* `self.has_drawn(self, room)` - checks to see if the room has been mapped and worm has already been here.
-* `self.median(self, number)` - a simple utility method that finds the median (middle point) from `0, n`
-* `self.update_pos(self, room, exit_name)` - updates the worm's physical position by reassigning `self.curX/Y` accordingly.
-* `self.start_loc_on_grid(self)` - the very first initial draw on the grid representing your location in the middle of the grid.
-* `self.show_map` - after everything is done convert the map into a readable string
-* `self.draw_room_on_map(self, room, max_distance)` - the main method that ties it all together.
+* `self.draw(self, room)` - 負責實際繪製房間到網格。
+* `self.has_drawn(self, room)` - 檢查房間是否已被對映並且蠕蟲是否已經在這裡。
+* `self.median(self, number)` - 一種簡單的實用方法，可從 `0, n` 中找到中位數（中點）
+* `self.update_pos(self, room, exit_name)` - 透過相應地重新分配`self.curX/Y`來更新蠕蟲的物理位置。
+* `self.start_loc_on_grid(self)` - 網格上的第一個初始繪製代表您在網格中間的位置。
+* `self.show_map` - 一切完成後將地圖轉換為可讀字串
+* `self.draw_room_on_map(self, room, max_distance)` - 將它們聯絡在一起的主要方法。
 
 
-Now that we know which methods we need, let's refine our initial `__init__(self)` to pass some
-conditional statements and set it up to start building the display.
+現在我們知道我們需要哪些方法，讓我們改進最初的 `__init__(self)` 以傳遞一些
+條件語句並設定它以開始建立顯示。
 
 ```python
 #mygame/world/map.py
@@ -179,9 +184,9 @@ class Map(object):
 
 ```
 
-Here we check to see if the parameters for the grid are okay, then we create an empty canvas and map our initial location as the first room!
+在這裡，我們檢查網格引數是否正確，然後建立一個空畫布並將我們的初始位置對應為第一個房間！
 
-As mentioned above, the code for the `self.draw_room_on_map()` is not much different than the Pseudo code. The method is shown below:
+如上所述，`self.draw_room_on_map()` 的程式碼與偽程式碼沒有太大區別。方法如下圖所示：
 
 ```python
 # in mygame/world/map.py, in the Map class
@@ -205,7 +210,7 @@ def draw_room_on_map(self, room, max_distance):
         self.draw_room_on_map(exit.destination, max_distance - 1)
 ```
 
-The first thing the "worm" does is to draw your current location in `self.draw`. Lets define that...
+「蠕蟲」做的第一件事就是在`self.draw`中繪製你目前的位置。讓我們定義一下...
 
 ```python
 #in mygame/word/map.py, in the Map class
@@ -222,7 +227,7 @@ def draw(self, room):
         self.grid[self.curX][self.curY] = SYMBOLS[room.db.sector_type]
 ```
 
-In `self.start_loc_on_grid()`:
+在`self.start_loc_on_grid()`中：
 
 ```python
 def median(self, num):
@@ -241,10 +246,10 @@ def start_loc_on_grid(self):
     self.curX, self.curY = x, y # updating worms current location
 ```
 
-After the system has drawn the current map it checks to see if the `max_distance` is `0` (since this
-is the inital start phase it is not). Now we handle the iteration once we have each individual exit
-in the room. The first thing it does is check if the room the Worm is in has been mapped already..
-lets define that...
+系統繪製完目前地圖後，會檢查 `max_distance` 是否為 `0`（因為此
+是初始開始階段，但不是）。現在，一旦我們有每個單獨的出口，我們就處理迭代
+在房間裡。它做的第一件事是檢查蠕蟲所在的房間是否已經被對映。
+讓我們定義...
 
 
 ```python
@@ -252,9 +257,9 @@ def has_drawn(self, room):
     return True if room in self.worm_has_mapped.keys() else False
 ```
 
-If `has_drawn` returns `False` that means the worm has found a room that hasn't been mapped yet. It
-will then 'move' there. The self.curX/Y sort of lags behind, so we have to make sure to track the
-position of the worm; we do this in `self.update_pos()` below.
+如果`has_drawn`回傳`False`，這表示蠕蟲已經找到了一個尚未對映的房間。它
+然後會「移動」到那裡。 self.curX/Y 有點滯後，所以我們必須確保跟蹤
+蠕蟲的位置；我們在下面的 `self.update_pos()` 中執行此操作。
 
 ```python
 def update_pos(self, room, exit_name):
@@ -275,11 +280,11 @@ def update_pos(self, room, exit_name):
         self.curX += 1
 ```
 
-Once the system updates the position of the worm it feeds the new room back into the original
-`draw_room_on_map()` and starts the process all over again..
+一旦系統更新了蠕蟲的位置，它就會將新房間回饋給原來的房間
+`draw_room_on_map()` 並重新開始該過程..
 
-That is essentially the entire thing. The final method is to bring it all together and make a nice
-presentational string out of it using the `self.show_map()` method.
+這基本上就是整件事情了。最後的方法是將它們組合在一起並製作一個漂亮的
+使用 `self.show_map()` 方法從中提取表示性字串。
 
 ```python
 def show_map(self):
@@ -291,13 +296,14 @@ def show_map(self):
     return map_string
 ```
 
-## Using the Map
+(using-the-map)=
+## 使用地圖
 
-In order for the map to get triggered we store it on the Room typeclass. If we put it in
-`return_appearance` we will get the map back every time we look at the room.
+為了觸發地圖，我們將其儲存在房間 typeclass 上。如果我們把它放進去
+`return_appearance`我們每次看房間都會拿回地圖。
 
-> `return_appearance` is a default Evennia hook available on all objects; it is called e.g. by the
-`look` command to get the description of something (the room in this case).
+> `return_appearance` 是所有物件上可用的預設 Evennia 掛鉤；它被稱為e.g。由
+`look` 指令取得某事物的描述（本例中為房間）。
 
 ```python
 # in mygame/typeclasses/rooms.py
@@ -316,11 +322,11 @@ class Room(DefaultRoom):
         return string
 ```
 
-Obviously this method of generating maps doesn't take into account of any doors or exits that are hidden.. etc.. but hopefully it serves as a good base to start with. Like previously mentioned, it is very important to have a solid foundation on rooms before implementing this. You can try this on vanilla evennia by using @tunnel and essentially you can just create a long straight/edgy non- looping rooms that will show on your in-game map. 
+顯然，這種生成地圖的方法沒有考慮任何隱藏的門或出口…等等，但希望它可以作為一個良好的基礎。如前所述，在實施此操作之前，為房間打下堅實的基礎非常重要。您可以透過使用 @tunnel 在原版 evennia 上嘗試此操作，本質上您可以建立一個長直/前衛的非迴圈房間，該房間將顯示在您的遊戲地圖上。
 
-The above example will display the map above the room description. You could also use an [EvTable](github:evennia.utils.evtable) to place description and map next to each other. Some other things you can do is to have a [Command](../Components/Commands.md) that displays with a larger radius, maybe with a legend and other features.
+上面的範例將在房間描述上方顯示地圖。您也可以使用 [EvTable](github:evennia.utils.evtable) 將描述和地圖放在一起。您可以做的其他一些事情是讓 [Command](../Components/Commands.md) 以更大的半徑顯示，也許帶有圖例和其他功能。
 
-Below is the whole `map.py` for your reference. You need to update your `Room` typeclass (see above) to actually call it. Remember that to see different symbols for a location you also need to set the `sector_type` Attribute on the room to one of the keys in the `SYMBOLS` dictionary. So in this example, to make a room be mapped as `[.]` you would set the room's `sector_type` to `"SECT_INSIDE"`. Try it out with `@set here/sector_type = "SECT_INSIDE"`. If you wanted all new rooms to have a given sector symbol, you could change the default in the `SYMBOLS` dictionary below, or you could add the Attribute in the Room's `at_object_creation` method.
+以下是全部`map.py`供您參考。您需要更新您的`Room` typeclass（請參閱上文）才能實際呼叫它。請記住，要檢視某個位置的不同符號，您還需要將房間上的 `sector_type` Attribute 設定為 `SYMBOLS` 字典中的按鍵之一。因此，在此範例中，要使房間對應為 `[.]`，您需要將該房間的 `sector_type` 設為 `"SECT_INSIDE"`。用`@set here/sector_type = "SECT_INSIDE"`試試。如果您希望所有新房間都有給定的扇區符號，您可以更改下面 `SYMBOLS` 字典中的預設值，或者您可以在房間的 `at_object_creation` 方法中新增 Attribute。
 
 ```python
 # mygame/world/map.py
@@ -438,8 +444,9 @@ class Map(object):
         return map_string
 ```
 
-## Final Comments
+(final-comments)=
+## 最終意見
 
-The Dynamic map could be expanded with further capabilities. For example, it could mark exits or
-allow NE, SE etc directions as well. It could have colors for different terrain types. One could
-also look into up/down directions and figure out how to display that in a good way.
+動態地圖可以透過更多功能進行擴充。例如，它可以標記退出或
+也允許 NE、SE 等方向。它可以有適合不同地形型別的顏色。一個可以
+也要研究上/下方向並找出如何以良好的方式顯示它。

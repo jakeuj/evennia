@@ -1,91 +1,100 @@
-# Updating Evennia
+(updating-evennia)=
+# 正在更新Evennia
 
-When Evennia is updated to a new version you will usually see it announced in the [Discussion forum](github:discussions) and in the [dev blog](https://www.evennia.com/devblog/index.html). You can also see the changes on [github](github:) or through one of our other [linked pages](../Links.md).
+當Evennia更新到新版本時，您通常會在[討論論壇](github:discussions)和[開發部落格](https://www.evennia.com/devblog/index.html)中看到它的公告。您也可以在 [github](github:) 上或透過我們的其他[連結頁面](../Links.md) 之一檢視變更。
 
-## If you installed with `pip`
+(if-you-installed-with-pip)=
+## 如果您安裝了`pip`
 
-If you followed the [normal install instructions](./Installation.md), here's what you do to upgrade:
+如果您按照[正常安裝說明](./Installation.md) 進行操作，則升級步驟如下：
 
-1. Read the [changelog](../Coding/Changelog.md) to see what changed and if it means you need to make any changes to your game code.
-2. If you use a [virtualenv](#Installation-Git#virtualenv), make sure it's active. 
-3. `cd` to your game dir (e.g. `mygame`)
+1. 閱讀[變更日誌](../Coding/Changelog.md) 以瞭解發生了什麼變化以及這是否意味著您需要對遊戲程式碼進行任何更改。
+2. 如果您使用 [virtualenv](#Installation-Git#virtualenv)，請確保它處於活動狀態。
+3. `cd` 到您的遊戲目錄 (e.g。`mygame`)
 4. `evennia stop`
 5. `pip install --upgrade evennia`
-6. `cd` to your game dir 
-7. `evennia migrate` - this is safe to do, but can be skipped unless the release announcement/changelog specifically tells you to do so. _Ignore_ any warnings about running `makemigrations`, it should _not_ be done!
+6. `cd` 到你的遊戲目錄
+7. `evennia migrate` - 這樣做是安全的，但可以跳過，除非釋出公告/變更日誌明確告訴您這樣做。 _忽略_任何關於執行 `makemigrations` 的警告，它不應該_完成！
 8. `evennia start`
 
-##  If you installed with `git`
+(if-you-installed-with-git)=
+## 如果您安裝了`git`
 
-This applies if you followed the [git-install instructions](./Installation-Git.md). Before Evennia 1.0, this was the only way to install Evennia. 
+如果您遵循 [git-install 說明](./Installation-Git.md)，則適用。在 Evennia 1.0 之前，這是安裝 Evennia 的唯一方法。
 
-At any time, development is either happening in the `main` branch (latest stable) or `develop` (experimental). Which one is active and 'latest' at a given time depends - after a release,  `main` will see most updates, close to a new release, `develop` will usually be the fastest changing.
+在任何時候，開發要麼發生在 `main` 分支（最新穩定版）中，要麼發生在 `develop`（實驗版）中。哪一個在給定時間處於活動狀態且「最新」取決於 - 發布後，`main` 將看到最多更新，接近新版本時，`develop` 通常將是變化最快的。
 
-1. Read the [changelog](../Coding/Changelog.md) to see what changed and if it means you need to make any changes to your game code.
-2. If you use a [virtualenv](#Installation-Git#virtualenv), make sure it's active. 
-3. `cd` to your game dir  (e.g. `mygame`)
+1. 閱讀[變更日誌](../Coding/Changelog.md) 以瞭解發生了什麼變化以及這是否意味著您需要對遊戲程式碼進行任何更改。
+2. 如果您使用 [virtualenv](#Installation-Git#virtualenv)，請確保它處於活動狀態。
+3. `cd` 到您的遊戲目錄 (e.g。`mygame`)
 4. `evennia stop`
-5. `cd` to the `evennia` repo folder you cloned during the git installation process.
+5. `cd` 到您在 git 安裝過程中克隆的 `evennia` repo 資料夾。
 6. `git pull`
-7. `pip install --upgrade -e .`  (remember the `.` at the end!)
-9. `cd` back to your game dir
-10. `evennia migrate` - this is safe to do, but can be skipped unless the release announcement/changelog specifically tells you to do so. _Ignore_ any warnings about running `makemigrations`, it should _not_ be done!
+7. `pip install --upgrade -e.`（記得最後的`.`！）
+9. `cd`回到你的遊戲目錄
+10. `evennia migrate` - 這樣做是安全的，但可以跳過，除非釋出公告/變更日誌明確告訴您這樣做。 _忽略_任何關於執行 `makemigrations` 的警告，它不應該_完成！
 11. `evennia start`
 
-## If you installed with `docker`
+(if-you-installed-with-docker)=
+## 如果您安裝了`docker`
 
-If you followed the [docker installation instructions](./Installation-Docker.md), you need to pull the latest docker image for the branch you want: 
+如果您按照[docker安裝說明](./Installation-Docker.md)，您需要為您想要的分支拉取最新的docker映像：
 
-- `docker pull evennia/evennia`  (`main` branch)
-- `docker pull evennia/evennia:develop`  (experimental `develop` branch)
+- `docker pull evennia/evennia`（`main`分支）
+- `docker pull evennia/evennia:develop`（實驗`develop`分支）
 
-Then restart your containers.
+然後重新啟動容器。
 
-## Resetting your database
+(resetting-your-database)=
+## 重置您的資料庫
 
-Should you ever want to start over completely from scratch, there is no need to re-download Evennia. You just need to clear your database. 
+如果您想完全從頭開始，則無需重新下載Evennia。您只需要清除資料庫。
 
-First: 
+第一的：
 
-1.  `cd` to your game dir (e.g. `mygame`)
-2.  `evennia stop` 
+1.  `cd` 到您的遊戲目錄 (e.g。`mygame`)
+2.  `evennia stop`
 
-### SQLite3 (default)
+(sqlite3-default)=
+### SQLite3（預設）
 
-```{sidebar} Hint
-Make a copy of the `evennia.db3` file once you created your superuser. When you want to reset (and as long as you haven't had to run any new migrations), you can just stop evennia and copy that file back over `evennia.db3`. That way you don't have to run the same migrations and create the superuser every time! 
+```{sidebar} 暗示
+建立超級使用者後，請複製 `evennia.db3` 檔案。當您想要重設時（只要不必執行任何新的遷移），您只需停止 evennia 並將該檔案複製回 `evennia.db3` 即可。這樣您就不必每次都執行相同的遷移並建立超級使用者！
 ```
 
-3. delete the file `mygame/server/evennia.db3` 
+3. 刪除檔案`mygame/server/evennia.db3`
 4. `evennia migrate`
 5. `evennia start`
 
-### PostgreSQL 
+(postgresql)=
+### PostgreSQL
 
-3. `evennia dbshell`   (opens the psql client interface)
+3. `evennia dbshell`（開啟psql客戶端介面）
     ```
     psql> DROP DATABASE evennia;
     psql> exit
     ```
- 4. You should now follow the [PostgreSQL install instructions](./Choosing-a-Database.md#postgresql) to create a new evennia database.
+ 4. 現在您應該按照 [PostgreSQL 安裝說明](./Choosing-a-Database.md#postgresql) 建立新的 evennia 資料庫。
  5. `evennia migrate`
  6. `evennia start`
 
-### MySQL/MariaDB 
+(mysqlmariadb)=
+### MySQL/MariaDB
 
-3. `evennia dbshell` (opens the mysql client interface)
-   ```
-   mysql> DROP DATABASE evennia;
-   mysql> exit
-   ```
-4. You should now follow the [MySQL install instructions](./Choosing-a-Database.md#mysql-mariadb) to create a new evennia database.
+3. `evennia dbshell`（開啟mysql客戶端介面）
+````
+   mysql>DROP1evennia；
+   mysql> 退出
+   ````
+4. 現在您應該按照 [MySQL 安裝說明](./Choosing-a-Database.md#mysql-mariadb) 建立新的 evennia 資料庫。
 5. `evennia migrate`
 6. `evennia start`
 
-### What are database migrations?
+(what-are-database-migrations)=
+### 什麼是資料庫遷移？
 
-If and when an Evennia update modifies the database *schema* (that is, the under-the-hood details as to how data is stored in the database), you must update your existing database correspondingly to match the change. If you don't, the updated Evennia will complain that it cannot read the database properly. Whereas schema changes should become more and more rare as Evennia matures, it may still happen from time to time.
+如果Evennia更新修改了資料庫*架構*（即有關資料如何儲存在資料庫中的底層詳細資訊），您必須相應地更新現有資料庫以符合變更。如果不這樣做，更新後的 Evennia 將抱怨無法正確讀取資料庫。儘管隨著 Evennia 的成熟，模式變更應該變得越來越罕見，但它仍然可能不時發生。
 
-One way one could handle this is to apply the changes manually to your database using the database's command line. This often means adding/removing new tables or fields as well as possibly convert existing data to match what the new Evennia version expects. It should be quite obvious that this quickly becomes cumbersome and error-prone.  If your database doesn't contain anything critical yet it's probably easiest to simply reset it and start over rather than to bother converting. 
+處理此問題的一種方法是使用資料庫的指令列將變更手動套用到資料庫。這通常意味著新增/刪除新表或欄位，以及可能轉換現有資料以匹配新 Evennia 版本所期望的內容。很明顯，這很快就會變得麻煩且容易出錯。  如果您的資料庫不包含任何關鍵內容，那麼最簡單的方法可能是簡單地重置它並重新開始，而不是費心進行轉換。
 
-Enter *migrations*. Migrations keeps track of changes in the database schema and applies them automatically for you. Basically, whenever the schema changes we distribute small files called "migrations" with the source. Those tell the system exactly how to implement the change so you don't have to do so manually. When a migration has been added we will tell you so on Evennia's mailing lists and in commit messages - you then just run `evennia migrate` to be up-to-date again.
+輸入*遷移*。遷移會追蹤資料庫架構中的變更並自動為您套用它們。基本上，每當模式發生變化時，我們都會隨來源一起分發稱為「遷移」的小檔案。它們準確地告訴系統如何實施更改，因此您不必手動執行此操作。新增遷移後，我們會在 Evennia 的郵件清單和提交訊息中告訴您 - 然後您只需執行 `evennia migrate` 即可再次獲得最新狀態。

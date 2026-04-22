@@ -1,24 +1,26 @@
-# Parsing Command input
+(parsing-command-input)=
+# 解析指令輸入
 
-In this lesson we learn some basics about parsing the input of Commands. We will
-also learn how to add, modify and extend Evennia's default commands.
+在本課中，我們學習一些關於解析指令輸入的基礎知識。我們會
+也瞭解如何新增、修改和擴充套件 Evennia 的預設指令。
 
-## More advanced parsing
+(more-advanced-parsing)=
+## 更進階的解析
 
-In the [last lesson](./Beginner-Tutorial-Adding-Commands.md) we made a `hit` Command and struck a dragon with it. You should have the code from that still around.
+在[上一課](./Beginner-Tutorial-Adding-Commands.md)中，我們發出了`hit`指令並用它攻擊了一條龍。您應該還保留著該程式碼。
 
-Let's expand our simple `hit` command to accept a little more complex input:
+讓我們擴充套件簡單的 `hit` 指令來接受更複雜的輸入：
 
     hit <target> [[with] <weapon>]
 
-That is, we want to support all of these forms
+也就是說，我們要支援所有這些形式
 
     hit target
     hit target weapon
     hit target with weapon
 
-If you don't specify a weapon you'll use your fists. It's also nice to be able to skip "with" if
-you are in a hurry. Time to modify `mygame/commands/mycommands.py` again. Let us break out the parsing a little, in a new method `parse`:
+如果你沒有指定武器，你就會使用拳頭。能夠跳過“with”if也很好
+你很著急。是時候再修改`mygame/commands/mycommands.py`了。讓我們用一種新方法 `parse` 稍微分解解析一下：
 
 
 ```{code-block} python
@@ -69,18 +71,18 @@ class CmdHit(Command):
 # ...
 ```
 
-The `parse` method is a special one Evennia knows to call _before_ `func`. At this time it has access to all the same on-command variables as `func` does. Using `parse` not only makes things a little easier to read, it also means you can easily let other Commands _inherit_ your parsing - if you wanted some other Command to also understand input on the form `<arg> with <arg>` you'd inherit from this class and just implement the `func` needed for that command without implementing `parse` anew.
+`parse` 方法是一種特殊的方法，Evennia 知道在 _before_ `func` 之前呼叫。此時，它可以存取與 `func` 相同的所有指令變數。使用 `parse` 不僅使內容更容易閱讀，還意味著您可以輕鬆地讓其他指令_繼承_您的解析 - 如果您希望其他指令也理解 `<arg> with <arg>` 形式的輸入，您可以從此類繼承，並且只需實現該指令所需的 `func` 而無需重新實現 `parse`。
 
-```{sidebar} Tuples and Lists
+```{sidebar} 元組和列表
 
-- A `list` is written as `[a, b, c, d, ...]`. You can add and grow/shrink a list after it was first created.
-- A `tuple` is written as `(a, b, c, d, ...)`. A tuple cannot be modified once it is created.
+- `list` 寫為 `[a, b, c, d,...]`。您可以在首次建立清單後新增和擴大/縮小清單。
+- `tuple` 寫為 `(a, b, c, d,...)`。元組一旦建立就無法修改。
 
 ```
-- **Line 14** - We do the stripping of `self.args` once and for all here. We also store the stripped version back
-  into `self.args`, overwriting it. So there is no way to get back the non-stripped version from here on, which is fine
-  for this command.
-- **Line 15** - This makes use of the `.split` method of strings. `.split` will, well, split the string by some criterion.
+- **第 14 行** - 我們在這裡一勞永逸地剝離 `self.args`。我們還將剝離版本儲存回來
+到 `self.args` 中，覆蓋它。所以從現在開始就沒有辦法找回未剝離的版本，這很好
+  對於這個指令。
+- **第 15 行** - 這使用了字串的 `.split` 方法。 `.split` 將依照某種標準分割字串。
     `.split(" with ", 1)` means "split the string once, around the substring `" with "` if it exists". The result
     of this split is a _list_. Just how that list looks depends on the string we are trying to split:
     1. If we entered just `hit smaug`, we'd be splitting just `"smaug"` which would give the result `["smaug"]`.
@@ -92,7 +94,7 @@ The `parse` method is a special one Evennia knows to call _before_ `func`. At th
     2. `target` becomes `"smaug sword"` and `weapon` becomes `()`
     3. `target` becomes `"smaug"` and `weapon` becomes `("sword",)` (this is a tuple with one element, the comma [is required](https://docs.python.org/3/tutorial/datastructures.html?highlight=tuple#tuples-and-sequences) to indicate this).
 	
-- **Lines 16-17** - In this `if` condition we check if `weapon` is falsy (that is, the empty list). This can happen
+- **第 16-17 行** - 在這個 `if` 條件下，我們檢查 `weapon` 是否為假（即空清單）。這可能會發生
     under two conditions (from the example above):
     1. `target` is simply `smaug`
     2. `target` is `smaug sword`
@@ -100,78 +102,79 @@ The `parse` method is a special one Evennia knows to call _before_ `func`. At th
     To separate these cases we split `target` once again, this time by empty space `" "`. Again we store the result back with `target, *weapon =`. The result will be one of the following:
     1. `target` remains `"smaug"` and `weapon` remains `[]`
     2. `target` becomes `"smaug"` and `weapon` becomes `("sword",)`
-- **Lines 18-22** - We now store `target` and `weapon` into `self.target` and `self.weapon`. We must store on `self` in order for these local variables to become available in `func` later. Note that once we know that `weapon` exists, it must be a tuple (like `("sword",)`), so we use `weapon[0]` to get the first element of that tuple (tuples and lists in Python are indexed from 0). The instruction `weapon[0].strip()` can be read as "get the first string stored in the tuple `weapon` and remove all extra whitespace on it with `.strip()`". If we forgot the `[0]` here, we'd get an error since a tuple (unlike the string inside the tuple) does not have the `.strip()` method. 
+- **第 18-22 行** - 我們現在將 `target` 和 `weapon` 儲存到 `self.target` 和 `self.weapon` 中。我們必須儲存在 `self` 上，以便這些區域性變數稍後在 `func` 中可用。請注意，一旦我們知道 `weapon` 存在，它一定是一個元組（如 `("sword",)`），因此我們使用 `weapon[0]` 來獲取該元組的第一個元素（Python 中的元組和列表從 0 開始索引）。指令 `weapon[0].strip()` 可以理解為「取得儲存在元組 `weapon` 中的第一個字串，並使用 `.strip()` 刪除其上的所有多餘空格」。如果我們忘記了 `[0]` ，我們會得到一個錯誤，因為元組（與元組中的字串不同）沒有 `.strip()` 方法。
 
-Now onto the `func` method. The main difference is we now have `self.target` and `self.weapon` available for convenient use.
+現在進入 `func` 方法。主要差異是我們現在有 `self.target` 和 `self.weapon` 可供方便使用。
 ```{sidebar}
-Here we create the messages to send to each side of the fight explicitly. Later we'll find out how to use Evennia's [inline functions](../../../Components/FuncParser.md) to send a single string that looks different depending on who sees it.
+在這裡，我們建立要明確傳送給戰鬥各方的訊息。稍後我們將瞭解如何使用 Evennia 的[行內函數](../../../Components/FuncParser.md) 傳送看起來不同的字串，具體取決於誰看到它。
 ```
 
-- **Lines 29 and 35** - We make use of the previously parsed search terms for the target and weapon to find the
+- **第 29 行和第 35 行** - 我們利用先前解析的目標和武器搜尋字詞來找出
     respective resource.
-- **Lines 34-39** - Since the weapon is optional, we need to supply a default (use our fists!) if it's not set. We
+- **第 34-39 行** - 由於武器是可選的，因此如果未設定，我們需要提供預設值（使用我們的拳頭！）。我們
     use this to create a `weaponstr` that is different depending on if we have a weapon or not.
-- **Lines 41-42** - We merge the `weaponstr` with our attack texts and send it to attacker and target respectively.
+- **第 41-42 行** - 我們將 `weaponstr` 與我們的攻擊文字合併，並將其分別傳送給攻擊者和目標。
 
-Let's try it out!
+我們來嘗試一下吧！
 
     > reload
     > hit smaug with sword
     Could not find 'sword'.
     You hit smaug with bare fists!
 
-Oops, our `self.caller.search(self.weapon)` is telling us that it found no sword. This is reasonable (we don't have a sword). Since we are not `return`ing when failing to find a weapon in the way we do if we find no `target`,  we still continue fighting with our bare hands. 
+糟糕，`self.caller.search(self.weapon)` 告訴我們它沒有找到劍。這是合理的（我們沒有劍）。因為我們不會像找不到`target`時那樣`return`找不到武器，所以我們仍然繼續徒手戰鬥。
 
-This won't do. Let's make ourselves a sword:
+這不行。讓我們為自己打造一把劍：
 
     > create sword
 
-Since we didn't specify `/drop`, the sword will end up in our inventory and can seen with the `i` or `inventory` command. The `.search` helper will still find it there. There is no need to reload to see this change (no code changed, only stuff in the database).
+由於我們沒有指定 `/drop`，劍最終會出現在我們的庫存中，並且可以使用 `i` 或 `inventory` 指令看到。 `.search` 助手仍會在那裡找到它。無需重新載入即可看到此更改（未更改程式碼，僅更改資料庫中的內容）。
 
     > hit smaug with sword
     You hit smaug with sword!
 
-Poor Smaug.
+可憐的史矛革。
 
-## Adding a Command to an object
+(adding-a-command-to-an-object)=
+## 向物件新增指令
 
-```{sidebar} Command Sets on Characters 
-In case you wonder, the 'Character CmdSet' on `Characters` is configured to be available to _only_ that Character. If not, you'd get command multi-matches for things like `look` whenever you were in the same room with another character using the same command set. See [Command Sets](../../../Components/Command-Sets.md) docs for more info.
+```{sidebar} 角色指令集
+如果您想知道，`Characters` 上的「角色 CmdSet」被設定為_僅_該角色可用。如果沒有，每當您與使用相同指令集的另一個角色在同一個房間時，您都會獲得諸如 `look` 之類的指令多重匹配。有關詳細資訊，請參閱[指令集](../../../Components/Command-Sets.md) 檔案。
 ```
-As we learned in the lesson about [Adding commands](./Beginner-Tutorial-Adding-Commands.md), Commands are are grouped in Command Sets. Such Command Sets are attached to an object with `obj.cmdset.add()` and will then be available for that object to use. 
+正如我們在[新增指令](./Beginner-Tutorial-Adding-Commands.md) 課程中學到的，指令被分組在指令集中。此類指令集附加到具有 `obj.cmdset.add()` 的物件，然後可供該物件使用。
 
-What we didn't mention  before is that by default those commands are _also available to those in the same location as that object_. If you did the [Building quickstart lesson](./Beginner-Tutorial-Building-Quickstart.md) you've seen an example of this with the "Red Button" object. The [Tutorial world](./Beginner-Tutorial-Tutorial-World.md) also has many examples of objects with commands on them.
+我們之前沒有提到的是，預設情況下，這些指令_也可供與該物件位於相同位置的指令使用_。如果您上過[建立快速入門課程](./Beginner-Tutorial-Building-Quickstart.md)，您會看到帶有「紅色按鈕」物件的範例。 [教學世界](./Beginner-Tutorial-Tutorial-World.md) 還有許多帶有指令的物件範例。
 
-To show how this could work, let's put our 'hit' Command on our simple `sword` object from the previous section.
+為了展示這是如何運作的，讓我們將「hit」指令放在上一節中的簡單 `sword` 物件上。
 
     > py self.search("sword").cmdset.add("commands.mycommands.MyCmdSet", persistent=True)
 
-We find the sword (it's still in our inventory so `self.search` should be able to find it), then
-add `MyCmdSet` to it. This actually adds both `hit` and `echo` to the sword, which is fine.
+我們找到了劍（它仍在我們的庫存中，所以`self.search`應該能夠找到它），然後
+新增 `MyCmdSet` 到它。這實際上給劍增加了`hit`和`echo`，這很好。
 
-Let's try to swing it!
+讓我們試著搖擺它吧！
 
     > hit
     More than one match for 'hit' (please narrow target):
     hit-1 (sword #11)
     hit-2
 
-```{sidebar} Multi-matches
+```{sidebar} 多場比賽
 
-Some game engines will just pick the first hit when finding more than one. Evennia will always give you a choice. The reason for this is that Evennia cannot know if `hit` and `hit` are different or the same - maybe it behaves differently depending on the object it sits on? Besides, imagine if you had a red and a blue button both with the command `push` on it. Now you just write `push`. Wouldn't you prefer to be asked _which_ button you really wanted to push?
+有些遊戲引擎在找到多個時只會選擇第一個命中。 Evennia總是會給你一個選擇。原因是 Evennia 無法知道 `hit` 和 `hit` 是否不同或相同 - 也許它的行為不同取決於它所在的物件？此外，想像一下如果您有一個紅色和一個藍色按鈕，上面都帶有指令`push`。現在你只需寫`push`。難道您不想被問到您真正想按哪個按鈕嗎？
 ```
 
-Woah, that didn't go as planned. Evennia actually found _two_ `hit` commands and didn't know which one to use (_we_ know they are the same, but Evennia can't be sure of that). As we can see, `hit-1` is the one found on the sword. The other one is from adding `MyCmdSet` to ourself earlier. It's easy enough to tell Evennia which one you meant:
+哇哦，事情沒有照計劃進行。 Evennia 實際上找到_兩個_ `hit` 指令，但不知道該使用哪一個（_我們_知道它們是相同的，但 Evennia 無法確定）。正如我們所看到的，`hit-1`是在劍上發現的。另一種是之前給我們自己加上`MyCmdSet`。很容易告訴 Evennia 你指的是哪一個：
 
     > hit-1
     Who do you want to hit?
     > hit-2
     Who do you want to hit?
 
-In this case we don't need both command-sets, we should drop the version of `hit` sitting on our ourselves.
+在這種情況下，我們不需要這兩個指令集，我們應該放棄我們自己的 `hit` 版本。
 
-Go to `mygame/commands/default_cmdsets.py` and find the line where you added 
-`MyCmdSet` in the previous lesson. Delete or comment it out: 
+轉到`mygame/commands/default_cmdsets.py`並找到您新增的行
+`MyCmdSet` 在上一堂課中。刪除或註解掉：
 
 ```python
 # mygame/commands/default_cmdsets.py 
@@ -187,12 +190,12 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
 
 ```
 
-Next `reload` and you'll only have one `hit` command available:
+接下來`reload`，您將只有一個可用的`hit`指令：
 
     > hit
     Who do you want to hit?
 
-Now try making a new location and then drop the sword in it.
+現在嘗試建立一個新位置，然後將劍放入其中。
 
     > tunnel n = kitchen
     > n
@@ -204,31 +207,32 @@ Now try making a new location and then drop the sword in it.
     > hit
     Who do you want to hit?
 
-The `hit` command is only available if you hold _or_ are in the same room as the sword.
+只有當您持有或與劍位於同一房間時，`hit` 指令才可用。
 
-### You need to hold the sword!
+(you-need-to-hold-the-sword)=
+### 你需要握緊劍！
 
-```{sidebar} Locks
+```{sidebar} 鎖具
 
-Evennia Locks are defined as a mini-language defined in `lockstrings`. The lockstring is on a form `<situation>:<lockfuncs>`, where `situation` determines when this lock applies and the `lockfuncs` (there can be more than one) are run to determine if the lock-check passes or not depending on circumstance.
+Evennia 鎖定被定義為 `lockstrings` 中定義的迷你語言。鎖定字串採用 `<situation>:<lockfuncs>` 形式，其中 `situation` 確定何時應用此 lock，並根據情況執行 `lockfuncs`（可以有多個）來確定 lock 檢查是否透過。
 ```
 
-Let's get a little ahead of ourselves and make it so you have to _hold_ the sword for the `hit` command to be available. This involves a [Lock](../../../Components/Locks.md). We'll cover locks in more detail later, just know that they are useful for limiting the kind of things you can do with an object, including limiting just when you can call commands on it.
+讓我們稍微超前一點，讓你必須握住劍才能使用 `hit` 指令。這涉及到[Lock](../../../Components/Locks.md)。稍後我們將更詳細地介紹鎖，只需知道它們對於限制您可以對物件執行的操作型別非常有用，包括限制您何時可以對其呼叫指令。
 
     > py self.search("sword").locks.add("call:holds()")
 
-We added a new lock to the sword. The _lockstring_ `"call:holds()"` means that you can only _call_ commands on this object if you are _holding_ the object (that is, it's in your inventory).
+我們為劍增加了一個新的lock。 _lockstring_ `"call:holds()"` 表示如果您_持有_該物件（也就是說，它在您的庫存中），您只能_呼叫_該物件上的指令。
 
-For locks to work, you cannot be _superuser_, since the superuser passes all locks. You need to `quell` yourself first:
+要使鎖發揮作用，您不能成為_超級使用者_，因為超級使用者會傳遞所有鎖。你需要先`quell`自己：
 
-```{sidebar} quell/unquell
+```{sidebar} 平息/取消平息
 
-Quelling allows you as a developer to take on the role of players with less priveleges. This is useful for testing and debugging, in particular since a superuser has a little `too` much power sometimes. Use `unquell` to get back to your normal self.
+壓制讓您作為開發者可以扮演許可權較低的玩家角色。這對於測試和除錯很有用，特別是因為超級使用者有時有一點 `too` 的權力。使用`unquell`恢復正常。
 ```
 
     > quell
 	
-If the sword lies on the ground, try
+如果劍落在地上，請嘗試
 
     > hit
     Command 'hit' is not available. ..
@@ -236,21 +240,22 @@ If the sword lies on the ground, try
     > hit
     > Who do you want to hit?
 
-After we've waved the sword around (hit a dragon or two), we will get rid of ours sword so we have a clean slate with no more `hit` commands floating around. We can do that in two ways:
+在我們揮舞劍（擊中一兩條龍）後，我們將擺脫我們的劍，這樣我們就可以重新開始，不再有 `hit` 指令漂浮在周圍。我們可以透過兩種方式做到這一點：
 
     delete sword
 
-or
+或者
 
     py self.search("sword").delete()
 
 
-## Adding the Command to a default Cmdset
+(adding-the-command-to-a-default-cmdset)=
+## 將指令新增到預設Cmdset
 
 
-As we have seen we can use `obj.cmdset.add()` to add a new cmdset to objects, whether that object is ourself (`self`) or other objects like the `sword`. Doing this this way is a little cumbersome though. It would be better to add this to all characters. 
+正如我們所看到的，我們可以使用 `obj.cmdset.add()` 向物件新增新的 cmdset，無論該對像是我們自己 (`self`) 還是其他物件，例如 `sword`。雖然這樣做有點麻煩。最好將這個新增到所有字元中。
 
-The default cmdset are defined in `mygame/commands/default_cmdsets.py`. Open that file now:
+預設的 cmdset 在 `mygame/commands/default_cmdsets.py` 中定義。現在開啟該檔案：
 
 ```python
 """
@@ -304,22 +309,22 @@ class SessionCmdSet(default_cmds.SessionCmdSet):
         #
 ```
 
-```{sidebar} super()
+```{sidebar} 極好的（）
 
-The `super()` function refers to the parent of the current class and is commonly used to call same-named methods on the parent.
+`super()` 函式引用目前類別的父類，通常用於呼叫父類上的同名方法。
 ```
-`evennia.default_cmds` is a container that holds all of Evennia's default commands and cmdsets. In this module we can see that this was imported and then a new child class was made for each cmdset. Each class looks familiar (except the `key`, that's mainly used to easily identify the cmdset in listings). In each `at_cmdset_creation` all we do is call `super().at_cmdset_creation` which means that we call `at_cmdset_creation() on the _parent_ CmdSet.
+`evennia.default_cmds` 是一個容器，包含Evennia 的所有預設指令和cmdsets。在此模組中，我們可以看到它已匯入，然後為每個 cmdset 建立了一個新的子類別。每個類別看起來都很熟悉（`key` 除外，它主要用於輕鬆識別清單中的 cmdset）。在每個 `at_cmdset_creation` 中，我們所做的就是呼叫 `super().at_cmdset_creation`，這表示我們在 _parent_ CmdSet 上呼叫 `at_cmdset_creation()。
 
-This is what adds all the default commands to each CmdSet.
+這就是將所有預設指令新增到每個 CmdSet 的原因。
 
-When the `DefaultCharacter` (or a child of it) is created, you'll find that the equivalence of  `self.cmdset.add("default_cmdsets.CharacterCmdSet, persistent=True")` gets called. This means that all new Characters get this cmdset. After adding more commands to it, you just need to reload to have all characters see it. 
+當建立 `DefaultCharacter` （或其子層級）時，您會發現呼叫了 `self.cmdset.add("default_cmdsets.CharacterCmdSet, persistent=True")` 的等效項。這意味著所有新角色都會獲得此 cmdset。新增更多指令後，您只需重新載入即可讓所有角色看到它。
 
-- Characters (that is 'you' in the gameworld) has the `CharacterCmdSet`.
-- Accounts (the thing that represents your out-of-character existence on the server) has the `AccountCmdSet`
-- Sessions (representing one single client connection) has the `SessionCmdSet`
-- Before you log in (at the connection screen) your Session have access to the `UnloggedinCmdSet`.
+- 角色（即遊戲世界中的「你」）具有`CharacterCmdSet`。
+- 帳戶（代表您在伺服器上的異常存在的事物）具有 `AccountCmdSet`
+- Sessions（代表一個用戶端連線）具有`SessionCmdSet`
+- 在您登入之前（在連線畫面上），您的 Session 可以存取 `UnloggedinCmdSet`。
 
-For now, let's add our own `hit` and `echo` commands to the `CharacterCmdSet`:
+現在，讓我們將自己的 `hit` 和 `echo` 指令加入 `CharacterCmdSet` 中：
 
 
 ```python
@@ -346,7 +351,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
     > hit
     Who do you want to hit?
 
-Your new commands are now available for all player characters in the game. There is another way to add a bunch of commands at once, and that is to add your own _CmdSet_ to the other cmdset.
+您的新指令現在可用於遊戲中的所有玩家角色。還有另一種方法可以一次加一堆指令，那就是把你自己的_CmdSet_加到其他cmdset中。
 
 ```python
 from commands import mycommands
@@ -364,17 +369,18 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(mycommands.MyCmdSet)
 ```
 
-Which way you use depends on how much control you want, but if you already have a CmdSet,
-this is practical. A Command can be a part of any number of different CmdSets.
+你使用哪種方式取決於你想要多少控制權，但如果你已經有CmdSet，
+這是實用的。一個指令可以是任意數量的不同CmdSets的一部分。
 
-### Removing Commands
+(removing-commands)=
+### 刪除指令
 
-To remove your custom commands again, you of course just delete the change you did to
-`mygame/commands/default_cmdsets.py`. But what if you want to remove a default command?
+要再次刪除自訂指令，您當然只需刪除您所做的更改即可
+`mygame/commands/default_cmdsets.py`。但是如果您想刪除預設指令怎麼辦？
 
-We already know that we use `cmdset.remove()` to remove a cmdset. It turns out you can
-do the same in `at_cmdset_creation`. For example, let's remove the default `get` Command
-from Evennia. If you investigate the `default_cmds.CharacterCmdSet` parent, you'll find that its class is `default_cmds.CmdGet` (the 'real' location is `evennia.commands.default.general.CmdGet`). 
+我們已經知道我們使用 `cmdset.remove()` 來刪除 cmdset。事實證明你可以
+在 `at_cmdset_creation` 中執行相同操作。例如，讓我們刪除預設的 `get` 指令
+從Evennia開始。如果您調查 `default_cmds.CharacterCmdSet` 父級，您會發現它的類別是 `default_cmds.CmdGet`（「真實」位置是 `evennia.commands.default.general.CmdGet`）。
 
 
 ```python
@@ -400,12 +406,13 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
     > get
     Command 'get' is not available ...
 
-## Replace a default command
+(replace-a-default-command)=
+## 替換預設指令
 
-At this point you already have all the pieces for how to do this! We just need to add a new
-command with the same `key` in the `CharacterCmdSet` to replace the default one.
+此時，您已經掌握瞭如何執行此操作的所有內容！我們只需要增加一個新的
+指令中的`CharacterCmdSet`用相同的`key`來替換預設的。
 
-Let's combine this with what we know about classes and how to _override_ a parent class. Open `mygame/commands/mycommands.py` and make a new `get` command: 
+讓我們將其與我們對類別的瞭解以及如何_覆蓋_父類結合。開啟 `mygame/commands/mycommands.py` 並建立一個新的 `get` 指令：
 
 ```{code-block} python
 :linenos:
@@ -422,22 +429,22 @@ class MyCmdGet(default_cmds.CmdGet):
         self.caller.msg(str(self.caller.location.contents))
 ```
 
-- **Line 2**: We import `default_cmds` so we can get the parent class.
-We made a new class and we make it _inherit_ `default_cmds.CmdGet`. We don't
-need to set `.key` or `.parse`, that's already handled by the parent.
-In `func` we call `super().func()` to let the parent do its normal thing,
-- **Line 7**: By adding our own `func` we replace the one in the parent.
-- **Line 8**: For this simple change we still want the command to work the
-  same as before, so we use `super()` to call `func` on the parent.
-- **Line 9**: `.location` is the place an object is at. `.contents` contains, well, the
+- **第2行**：我們匯入`default_cmds`，這樣我們就可以獲得父類別。
+我們建立了一個新類，並使其_繼承_`default_cmds.CmdGet`。我們不
+需要設定 `.key` 或 `.parse`，這已由父級處理。
+在 `func` 中，我們呼叫 `super().func()` 讓父行程做正常的事情，
+- **第 7 行**：透過新增我們自己的`func`，我們取代了父級中的`func`。
+- **第 8 行**：對於這個簡單的更改，我們仍然希望該指令能夠正常工作
+和以前一樣，所以我們使用 `super()` 來呼叫父級上的 `func` 。
+- **第 9 行**：`.location` 是物件所在的位置。 `.contents` 包含，嗯，
     contents of an object. If you tried `py self.contents` you'd get a list that equals
     your inventory. For a room, the contents is everything in it.
     So `self.caller.location.contents` gets the contents of our current location. This is
     a _list_. In order send this to us with `.msg` we turn the list into a string. Python
     has a special function `str()` to do this.
 
-We now just have to add this so it replaces the default `get` command. Open
-`mygame/commands/default_cmdsets.py` again:
+我們現在只需新增此指令即可替換預設的 `get` 指令。開啟
+再次`mygame/commands/default_cmdsets.py`：
 
 ```python
 # ...
@@ -458,11 +465,11 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
 # ...
 ```
 
-We don't need to use `self.remove()` first; just adding a command with the same `key` (`get`) will replace the default `get` we had from before.
+我們不需要先使用`self.remove()`；只需新增具有相同`key` (`get`) 的指令將替換我們之前的預設`get`。
 
-```{sidebar} Another way
+```{sidebar} 另一種方式
 
-Instead of adding `MyCmdGet` explicitly in default_cmdset.py, you could also add it to `mycommands.MyCmdSet` and let it be added automatically here for you.
+您也可以將其新增到 `mycommands.MyCmdSet` 中，並讓它在此處自動新增，而不是在 default_cmdset.py 中明確新增 `MyCmdGet`。
 ```
 
     > reload
@@ -470,10 +477,11 @@ Instead of adding `MyCmdGet` explicitly in default_cmdset.py, you could also add
     Get What?
     [smaug, fluffy, YourName, ...]
 
-We just made a new `get`-command that tells us everything we could pick up (well, we can't pick up ourselves, so there's some room for improvement there ...).
+我們剛剛建立了一個新的 `get` 指令，它告訴我們可以拾取的所有內容（好吧，我們無法拾取自己，所以還有一些改進的空間...）。
 
-## Summary
+(summary)=
+## 概括
 
-In this lesson we got into some more advanced string formatting - many of those tricks will help you a lot in the future! We also made a functional sword. Finally we got into how to add to, extend and replace a default command on ourselves. Knowing to add commands is a big part of making a game! 
+在本課中，我們學習了一些更高階的字串格式 - 其中許多技巧將對您將來有很大幫助！我們還製作了一把實用的劍。最後我們討論瞭如何新增、擴充套件和替換我們自己的預設指令。知道新增指令是製作遊戲的重要組成部分！
 
-We have been beating on poor Smaug for too long. Next we'll create more things to play around with.
+我們已經打敗可憐的史矛革太久了。接下來我們將創造更多可以玩的東西。

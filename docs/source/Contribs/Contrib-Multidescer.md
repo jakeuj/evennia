@@ -1,29 +1,32 @@
-# Evennia Multidescer
+(evennia-multidescer)=
+# Evennia 多重解析器
 
-Contribution by Griatch 2016
+Gratch 2016 的貢獻
 
-A "multidescer" is a concept from the MUSH world. It allows for
-splitting your descriptions into arbitrary named 'sections' which you can
-then swap out at will. It is a way for quickly managing your look (such as when
-changing clothes) in more free-form roleplaying systems. This will also
-work well together with the `rpsystem` contrib.
+「multidescer」是來自 MUSH 世界的概念。它允許
+將您的描述分成任意命名的“部分”，您可以
+然後隨意交換。這是一種快速管理您的外觀的方法（例如當
+更自由的角色扮演系統中的換衣服）。這也將
+與 `rpsystem` contrib 配合良好。
 
-This multidescer will not require any changes to the Character class, rather it
-will use the `multidescs` Attribute (a list) and create it if it does not exist.
-It adds a new `+desc` command (where the + is optional in Evennia).
+這個 multidescer 不需要對 Character 類別進行任何更改，而是需要
+將使用 `multidescs` Attribute （清單），如果不存在則建立它。
+它新增了一個新的 `+desc` 指令（其中 + 在 Evennia 中是可選的）。
 
-## Installation
+(installation)=
+## 安裝
 
-Like for any custom command, you just add the new `+desc` command to a default
-cmdset: Import the `evennia.contrib.game_systems.multidescer.CmdMultiDesc` into
-`mygame/commands/default_cmdsets.py` and add it to the `CharacterCmdSet` class.
+與任何自訂指令一樣，您只需將新的 `+desc` 指令新增至預設指令
+cmdset：將`evennia.contrib.game_systems.multidescer.CmdMultiDesc`匯入
+`mygame/commands/default_cmdsets.py` 並將其新增到 `CharacterCmdSet` 類中。
 
-Reload the server and you should have the `+desc` command available (it
-will replace the default `desc` command).
+重新載入伺服器，您應該可以使用 `+desc` 指令（它
+將替換預設的 `desc` 指令）。
 
-## Usage
+(usage)=
+## 用法
 
-Use the `+desc` command in-game:
+在遊戲中使用`+desc`指令：
 
     +desc [key]                - show current desc desc with <key>
     +desc <key> = <text>       - add/replace desc with <key>
@@ -34,10 +37,10 @@ Use the `+desc` command in-game:
     +desc/swap <key1>-<key2>   - swap positions of <key1> and <key2> in list
     +desc/set <key> [+key+...] - set desc as default or combine multiple descs
 
-As an example, you can set one description for clothing, another for your boots,
-hairstyle or whatever you like. Use `|/` to add line breaks for multi-line descriptions and
-paragraphs, as well as `|_` to enforce indentations and whitespace (we don't
-include colors in the example since they don't show in this documentation).
+例如，您可以為衣服設定一個描述，為靴子設定另一個描述，
+髮型或任何你喜歡的東西。使用 `|/` 為多行描述新增換行符
+段落，以及 `|_` 來強制縮排和空格（我們不
+在範例中包含顏色，因為它們未在本文件中顯示）。
 
     +desc base = A handsome man.|_
     +desc mood = He is cheerful, like all is going his way.|/|/
@@ -47,7 +50,7 @@ include colors in the example since they don't show in this documentation).
     +desc boots = His boots are dusty from the road.
     +desc/set base + mood + head + shirt + pants + boots
 
-When looking at this character, you will now see (assuming auto-linebreaks)
+當檢視這個字元時，您現在將看到（假設自動換行）
 
     A hansome man. He is cheerful, like all is going his way.
 
@@ -55,12 +58,12 @@ When looking at this character, you will now see (assuming auto-linebreaks)
     white shirt. It has golden buttons. He wears blue pants with a dragon
     pattern on them. His boots are dusty from the road.
 
-If you now do
+如果你現在這樣做
 
     +desc mood = He looks sullen and forlorn.|/|/
     +desc shirt = His formerly white shirt is dirty and has a gash in it.|_
 
-Your description will now be
+您的描述現在將是
 
     A handsome man. He looks sullen and forlorn.
 
@@ -68,11 +71,11 @@ Your description will now be
     is dirty and has a gash in it. He wears blue pants with a pattern on them.
     His boots are dusty from the road.
 
-You can use any number of 'pieces' to build up your description, and can swap
-and replace them as you like and RP requires.
+您可以使用任意數量的“片段”來建立您的描述，並且可以交換
+並根據您的喜好和 RP 的要求替換它們。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/game_systems/multidescer/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\game_systems\multidescer\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

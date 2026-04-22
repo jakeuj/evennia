@@ -1,64 +1,69 @@
-# Wilderness system
+(wilderness-system)=
+# 荒野系統
 
-Contribution by titeuf87, 2017
+titeuf87 的貢獻，2017 年
 
-This contrib provides a wilderness map without actually creating a large number
-of rooms - as you move, you instead end up back in the same room but its description
-changes. This means you can make huge areas with little database use as
-long as the rooms are relatively similar (e.g. only the names/descs changing).
+這contrib提供了荒野地圖，而沒有實際建立大量
+房間數 - 當您移動時，您最終會回到同一個房間，但其描述
+變化。這意味著您可以使用很少的資料庫來建立巨大的區域，例如
+只要房間相對相似（e.g。僅名稱/描述發生變化）。
 
-## Installation
+(installation)=
+## 安裝
 
-This contrib does not provide any new commands. Instead the default `py` command
-is used to call functions/classes in this contrib directly.
+此contrib不提供任何新指令。而是預設的 `py` 指令
+用於直接呼叫這contrib中的函式/類別。
 
-## Usage
+(usage)=
+## 用法
 
-A wilderness map needs to created first. There can be different maps, all
-with their own name. If no name is provided, then a default one is used. Internally,
-the wilderness is stored as a Script with the name you specify. If you don't
-specify the name, a script named "default" will be created and used.
+首先需要建立荒野地圖。可以有不同的地圖，全部
+與他們自己的名字。如果未提供名稱，則使用預設名稱。在內部，
+荒野儲存為 Script 並具有您指定的名稱。如果你不這樣做
+指定名稱，將建立並使用名為“default”的script。
 
     py from evennia.contrib.grid import wilderness; wilderness.create_wilderness()
 
-Once created, it is possible to move into that wilderness map:
+建立後，就可以進入該荒野地圖：
 
     py from evennia.contrib.grid import wilderness; wilderness.enter_wilderness(me)
 
-All coordinates used by the wilderness map are in the format of `(x, y)`
-tuples. x goes from left to right and y goes from bottom to top. So `(0, 0)`
-is the bottom left corner of the map.
+荒野地圖所使用的所有座標均採用`(x, y)`格式
+元組。 x 從左到右，y 從下到上。所以`(0, 0)`
+是地圖的左下角。
 
-> You can also add a wilderness by defining a WildernessScript in your GLOBAL_SCRIPT
-> settings. If you do, make sure define the map provider.
+> 您也可以透過在 GLOBAL_SCRIPT 中定義 WildernessScript 來新增荒野
+> 設定.如果這樣做，請確保定義地圖提供者。
 
-## Customisation
+(customisation)=
+## 客製化
 
-The defaults, while useable, are meant to be customised. When creating a
-new wilderness map it is possible to give a "map provider": this is a
-python object that is smart enough to create the map.
+預設值雖然可用，但可以自訂。當建立一個
+新的荒野地圖可以提供“地圖提供者”：這是一個
+python 物件足夠聰明來建立地圖。
 
-The default provider, `WildernessMapProvider`, just creates a grid area that
-is unlimited in size.
+預設提供者 `WildernessMapProvider` 只是建立一個網格區域
+大小不受限制。
 
-`WildernessMapProvider` can be subclassed to create more interesting
-maps and also to customize the room/exit typeclass used.
+`WildernessMapProvider` 可以被子類化以建立更有趣的
+地圖，還可以自訂使用的房間/出口 typeclass。
 
-The `WildernessScript` also has an optional `preserve_items` property, which
-when set to `True` will not recycle rooms that contain any objects. By default,
-a wilderness room is recycled whenever there are no players left in it.
+`WildernessScript` 還有一個可選的 `preserve_items` 屬性，該屬性
+當設定為 `True` 時，將不會回收包含任何物件的房間。預設情況下，
+當荒野房間中沒有玩家時，就會被回收。
 
-There is also no command that allows players to enter the wilderness. This
-still needs to be added: it can be a command or an exit, depending on your
-needs.
+也沒有允許玩家進入荒野的指令。這個
+還需要補充：可以是指令，也可以是退出，取決於你的
+需要。
 
-## Example
+(example)=
+## 例子
 
-To give an example of how to customize, we will create a very simple (and
-small) wilderness map that is shaped like a pyramid. The map will be
-provided as a string: a "." symbol is a location we can walk on.
+為了給出一個如何自訂的例子，我們將建立一個非常簡單的（並且
+小）形狀像金字塔的荒野地圖。地圖將是
+以字串形式提供：「.」符號是我們可以行走的位置。
 
-Let's create a file `world/pyramid.py`:
+讓我們建立一個檔案`world/pyramid.py`：
 
 ```python
 # mygame/world/pyramid.py
@@ -105,34 +110,35 @@ class PyramidMapProvider(wilderness.WildernessMapProvider):
         room.ndb.active_desc = desc
 ```
 
-Note that the currently active description is stored as `.ndb.active_desc`. When
-looking at the room, this is what will be pulled and shown.
+請注意，目前活動描述儲存為 `.ndb.active_desc`。當
+看看房間，這就是將被拉出並顯示的內容。
 
-> Exits on a room are always present, but locks hide those not used for a
-> location. So make sure to `quell` if you are a superuser (since the superuser ignores
-> locks, those exits will otherwise not be hidden)
+> 房間的出口總是存在的，但鎖隱藏了那些不用於房間的出口。
+> 地點。因此，如果您是超級使用者，請確保`quell`（因為超級使用者忽略
+> 鎖，否則這些出口將不會被隱藏）
 
-Now we can use our new pyramid-shaped wilderness map. From inside Evennia we
-create a new wilderness (with the name "default") but using our new map provider:
+現在我們可以使用新的金字塔形荒野地圖了。從內部Evennia我們
+建立一個新的荒野（名稱為“default”），但使用我們的新地圖提供者：
 
     py from world import pyramid as p; p.wilderness.create_wilderness(mapprovider=p.PyramidMapProvider())
     py from evennia.contrib.grid import wilderness; wilderness.enter_wilderness(me, coordinates=(4, 1))
 
-## Implementation details
+(implementation-details)=
+## 實施細節
 
-When a character moves into the wilderness, they get their own room. If
-they move, instead of moving the character, the room changes to match the
-new coordinates.
+當角色進入荒野時，他們會得到自己的房間。如果
+他們移動，而不是移動角色，房間會改變以匹配
+新座標。
 
-If a character meets another character in the wilderness, then their room
-merges. When one of the character leaves again, they each get their own
-separate rooms.
+如果一個角色在荒野中遇到另一個角色，那麼他們的房間
+合併。當其中一個角色再次離開時，他們每個人都會得到自己的
+單獨的房間。
 
-Rooms are created as needed. Unneeded rooms are stored away to avoid the
-overhead cost of creating new rooms again in the future.
+房間是根據需要建立的。不需要的房間會被存放起來，以避免
+未來再次建立新房間的間接費用。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/grid/wilderness/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\grid\wilderness\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

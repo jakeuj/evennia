@@ -1,20 +1,22 @@
-# Building a chair you can sit on
+(building-a-chair-you-can-sit-on)=
+# 建造一張可以坐的椅子
 
-In this lesson we will make use of what we have learned to create a new game object: a chair you can sit on. 
+在本課中，我們將利用所學來創造一個新的遊戲物件：一張可以坐的椅子。
 
-Our goals are:
+我們的目標是：
 
-- We want a new 'sittable' object, a `Chair` in particular.
-- We want to be able to use a command to sit in the chair.
-- Once we are sitting in the chair it should affect us somehow. To demonstrate this store 
-the current chair in an attribute `is_sitting`. Other systems could check this to affect us in different ways.
-- A character should be able to stand up and move away from the chair.
-- When you sit down you should not be able to walk to another room without first standing up.
+- 我們想要一個新的「可坐」物件，特別是 `Chair`。
+- 我們希望能夠使用指令坐在椅子上。
+- 一旦我們坐在椅子上，它就會以某種方式影響我們。為了展示這家店
+當前主席在 attribute `is_sitting`。其他系統可以檢查這一點並以不同的方式影響我們。
+- 角色應該能夠站起來並離開椅子。
+- 當您坐下時，如果沒有先站起來，您不應該能夠走到另一個房間。
 
-## Make us not able to move while sitting
+(make-us-not-able-to-move-while-sitting)=
+## 讓我們坐著時無法動彈
 
-When you are sitting in a chair you can't just walk off without first standing up.
-This requires a change to our Character typeclass. Open `mygame/typeclasses/characters.py`:
+當你坐在椅子上時，你不能不先站起來就走開。
+這需要改變我們的角色typeclass。開啟`mygame/typeclasses/characters.py`：
 
 ```python
 # in mygame/typeclasses/characters.py
@@ -36,14 +38,15 @@ class Character(DefaultCharacter):
 
 ```
 
-When moving somewhere, [character.move_to](evennia.objects.objects.DefaultObject.move_to) is called. This in turn
-will call `character.at_pre_move`.  If this returns `False`, the move is aborted. 
+當移動到某個地方時，會呼叫[character.move_to](evennia.objects.objects.DefaultObject.move_to)。這反過來
+將呼叫`character.at_pre_move`。  如果返回 `False`，則移動將中止。
 
-Here we look for an Attribute `is_sitting` (which we will assign below) to determine if we are stuck on the chair or not.
+在這裡，我們尋找 Attribute `is_sitting`（我們將在下面分配）來確定我們是否被困在椅子上。
 
-## Making the Chair itself
+(making-the-chair-itself)=
+## 自己製作椅子
 
-Next we need the Chair itself, or rather a whole family of "things you can sit on" that we will call _sittables_. We can't just use a default Object since we want a sittable to contain some custom code. We need a new, custom Typeclass. Create a new module `mygame/typeclasses/sittables.py` with the following content:
+接下來我們需要椅子本身，或者更確切地說是一整套“你可以坐的東西”，我們稱之為_sittables_。我們不能只使用預設物件，因為我們想要一個可坐的東西包含一些自訂程式碼。我們需要一個新的自訂Typeclass。建立一個新模組 `mygame/typeclasses/sittables.py` 並包含以下內容：
 
 ```{code-block} python
 :linenos:
@@ -76,17 +79,17 @@ class Sittable(Object):
         sitter.msg(f"You sit on {self.key}")
 ```
 
-This handles the logic of someone sitting down on the chair.  
+這處理了某人坐在椅子上的邏輯。
 
-- **Line 3**: We inherit from the empty `Object` class in `mygame/typeclasses/objects.py`. This means we can theoretically modify that in the future and have those changes affect sittables too.
-- **Line 7**: The `do_sit` method expects to be called with the argument `sitter`, which is to be an `Object` (most likely a `Character`). This is the one wanting to sit down.
--  **Line 15**: Note that, if the [Attribute](../../../Components/Attributes.md) `sitter` is not defined on the chair (because this is the first time someone sits in it), this will simply return `None`, which is fine. 
-- **Lines 16-22** We check if someone is already sitting on the chair and returns appropriate error messages depending on if it's you or someone else. We use `return` to abort the sit-action.
-- **Line 23**: If we get to this point, `sitter` gets to, well, sit down. We store them in the `sitter` Attribute on the chair.
-- **Line 24**: `self.obj` is the chair this command is attachd to. We store that in the  `is_sitting` Attribute on the `sitter` itself.
-- **Line 25**: Finally we tell the sitter that they could sit down.
+- **第3行**：我們從`mygame/typeclasses/objects.py`中的空`Object`類別繼承。這意味著我們理論上可以在未來修改它，並使這些變化也影響到可坐的東西。
+- **第 7 行**：`do_sit` 方法期望使用引數 `sitter` 進行呼叫，該引數是 `Object`（最有可能是 `Character`）。這是那個想坐下來的人。
+-  **第 15 行**：請注意，如果椅子上未定義 [Attribute](../../../Components/Attributes.md) `sitter`（因為這是有人第一次坐在椅子上），則只會返回 `None`，這很好。
+- **第 16-22 行** 我們檢查是否有人已經坐在椅子上，並根據是您還是其他人返回相應的錯誤訊息。我們使用 `return` 來中止靜坐動作。
+- **第 23 行**：如果我們到達這一點，`sitter` 就可以坐下了。我們將它們存放在椅子上的`sitter` Attribute 中。
+- **第 24 行**：`self.obj` 是指令所附加的椅子。我們將其儲存在 `sitter` 本身的 `is_sitting` Attribute 中。
+- **第 25 行**：最後我們告訴保母他們可以坐下了。
 
-Let's continue: 
+我們繼續：
 
 ```{code-block} python 
 :linenos: 
@@ -111,20 +114,21 @@ Let's continue:
             stander.msg(f"You stand up from {self.key}.")
 ```
 
-This is the inverse of sitting down; we need to do some cleanup. 
+這是坐下的逆過程；我們需要做一些清理工作。
 
-- **Line 12**: If we are not sitting on the chair, it makes no sense to stand up from it.
-- **Line 15**: If we get here, we could stand up. We make sure to un-set the `sitter` Attribute so someone else could use the chair later. 
-- **Line 16**: The character is no longer sitting, so we delete their `is_sitting` Attribute. We could also have done `stander.db.is_sitting = None` here, but deleting the Attribute feels cleaner.
-- **Line 17**: Finally, we inform them that they stood up successfully.
+- **第12行**：如果我們沒有坐在椅子上，那麼從椅子上站起來就沒有意義。
+- **15號線**：如果我們到了這裡，我們就可以站起來了。我們確保取消設定 `sitter` Attribute，以便其他人稍後可以使用椅子。
+- **第16行**：角色不再坐著，所以我們刪除他們的`is_sitting` Attribute。我們也可以在這裡完成 `stander.db.is_sitting = None`，但刪除 Attribute 感覺更乾淨。
+- **第17行**：最後，我們通知他們站起來成功了。
 
-One could imagine that one could have the future `sit` command (which we haven't created yet) check if someone is already sitting in the chair instead. This would work too, but letting the `Sittable` class handle the logic around who can sit on it makes sense.
+人們可以想像，可以使用未來的 `sit` 指令（我們尚未建立）來檢查是否有人已經坐在椅子上。這也可以，但是讓 `Sittable` 類處理誰可以坐在上面的邏輯是有意義的。
 
-We let the typeclass handle the logic, and also let it do all the return messaging. This makes it easy to churn out a bunch of chairs for people to sit on. 
+我們讓 typeclass 處理邏輯，並讓它處理所有回傳訊息。這樣就可以很容易地製作出一堆椅子供人坐。
 
-### Sitting on or in? 
+(sitting-on-or-in)=
+### 坐在上面還是裡面？
 
-It's fine to sit 'on' a chair. But what if our Sittable is an armchair? 
+坐在椅子上很好。但如果我們的坐桌是一張扶手椅呢？
 
 ```
 > py evennia.create_object("typeclasses.sittables.Sittable", key="armchair", location=here)
@@ -132,9 +136,9 @@ It's fine to sit 'on' a chair. But what if our Sittable is an armchair?
 You sit on armchair.
 ```
 
-This is not grammatically correct, you actually sit "in" an armchair rather than "on" it. The type of chair matters (English is weird). We want to be able to control this.
+這在語法上是不正確的，你實際上是坐在扶手椅“裡面”，而不是“坐在”扶手椅上。椅子的型別很重要（英語很奇怪）。我們希望能夠控制這一點。
 
-We _could_ make a child class of `Sittable` named `SittableIn` that makes this change, but that feels excessive. Instead we will modify what we have: 
+我們_可以_建立一個名為 `SittableIn` 的 `Sittable` 子類別來進行此更改，但這感覺有點過分了。相反，我們將修改我們所擁有的：
 
 ```{code-block} python 
 :linenos:
@@ -185,29 +189,30 @@ class Sittable(Object):
             stander.msg(f"You stand up from {self.key}.")
 ```
 
-- **Line 15**: We grab the `preposition` Attribute. Using `self.db.preposition or "on"` here means that if the Attribute is not set (is `None`/falsy) the default "on" string will be assumed. This is because the `or` relation will return the first true condition. A more explicit way to write this would be to use a [ternary operator](https://www.dataquest.io/blog/python-ternary-operator/) `self.db.preposition if self.db.preposition else "on"`.
-- **Lines 19,22,27,39, and 43**: We use this preposition to modify the return text we see.  
+- **第 15 行**：我們抓取 `preposition` Attribute。此處使用 `self.db.preposition or "on"` 意味著如果未設定 Attribute（是 `None`/falsy），則將採用預設的「on」字串。這是因為 `or` 關係將傳回第一個 true 條件。更明確的編寫方法是使用 [三元運運算元](https://www.dataquest.io/blog/python-ternary-operator/) `self.db.preposition if self.db.preposition else "on"`。
+- **第 19、22、27、39 和 43 行**：我們使用此介詞來修改我們看到的回傳文字。
 
-`reload`  the server. An advantage of using Attributes like this is that they can be modified on the fly, in-game. Let's look at how a builder could use this with normal building commands (no need for `py`): 
+`reload` 伺服器。使用這樣的屬性的一個優點是它們可以在遊戲中動態修改。讓我們看看建構器如何將其與普通建置指令一起使用（不需要 `py`）：
 
 ```
 > set armchair/preposition = in 
 ```
 
-Since we haven't added the `sit` command yet, we must still use `py` to test: 
+由於我們還沒有新增`sit`指令，所以我們仍然必須使用`py`來測試：
 
 ```
 > py self.search("armchair").do_sit(me)
 You sit in armchair.
 ```
 
-### Extra credits 
+(extra-credits)=
+### 額外學分
 
-What if we want some more dramatic flair when you sit down in certain chairs? 
+當您坐在某些椅子上時，如果我們想要一些更戲劇性的天賦怎麼辦？
 
     You sit down and a whoopie cushion makes a loud fart noise!
 
-You can make this happen by tweaking your `Sittable` class having the return messages be replaceable by `Attributes` that you can set on the object you create. You want something like this: 
+您可以透過調整 `Sittable` 類別來實現這一點，使回傳訊息可由您在建立的物件上設定的 `Attributes` 取代。你想要這樣的東西：
 
 ```
 > py 
@@ -221,30 +226,32 @@ You stand up from pallet.
 You sit down and a whoopie cushion makes a loud fart noise!
 ```
 
-That is, if you are not setting the Attribute, you should get a default value. 
-We leave this implementation up to the reader.
+也就是說，如果您沒有設定Attribute，您應該獲得預設值。 
+我們將這個實作留給讀者。
 
-## Adding commands
+(adding-commands)=
+## 新增指令
 
-As we discussed in the [lesson about adding Commands](./Beginner-Tutorial-More-on-Commands.md), there are two main ways to design the commands for sitting and standing up:
-- You can store the commands on the chair so they are only available when a chair is in the room
-- You can store the commands on the Character so they are always available and you must always specify which chair to sit on.
+正如我們在[關於新增指令的課程](./Beginner-Tutorial-More-on-Commands.md)中討論的，設計坐下和站立指令的主要方法有兩種：
+- 您可以將指令存放在椅子上，這樣只有當房間裡有椅子時它們才可用
+- 您可以將指令儲存在角色上，以便它們始終可用，並且您必須始終指定坐在哪張椅子上。
 
-Both of these are very useful to know about, so in this lesson we'll try both.
+瞭解這兩者都非常有用，因此在本課中我們將嘗試兩者。
 
-### Command variant 1: Commands on the chair
+(command-variant-1-commands-on-the-chair)=
+### 指令變體 1：在椅子上發出指令
 
-This way to implement `sit` and `stand` puts new cmdsets on the Sittable itself.
-As we've learned before, commands on objects are made available to others in the room.
-This makes the command easy but instead adds some complexity in the management of the CmdSet.
+這種實現`sit`和`stand`的方法將新的cmdsets放在Sittable本身上。
+正如我們之前所瞭解的，房間中的其他人可以使用物件上的指令。
+這使得指令變得簡單，但反而增加了 CmdSet 管理的複雜度。
 
-This is how it could look if `armchair` is in the room (Extra credits: Change the sit message on the armchair to match this output instead of getting the default `You sit in armchair`!):
+如果 `armchair` 在房間裡，情況如下（附加積分：更改扶手椅上的坐訊息以匹配此輸出，而不是獲取預設的 `You sit in armchair`！）：
 
     > sit
     As you sit down in armchair, life feels easier.
 
-What happens if there are sittables `sofa` and `barstool` also in the room? Evennia will
-automatically handle this for us and allow us to specify which one we want:
+如果房間裡還有可坐的 `sofa` 和 `barstool` 會怎麼樣？ Evennia 將會
+自動為我們處理這個問題，並允許我們指定我們想要哪一個：
 
     > sit
     More than one match for 'sit' (please narrow target):
@@ -254,11 +261,11 @@ automatically handle this for us and allow us to specify which one we want:
     > sit-1
     As you sit down in armchair, life feels easier.
 
-To keep things separate we'll make a new module `mygame/commands/sittables.py`:
+為了保持分離，我們將建立一個新模組`mygame/commands/sittables.py`：
 
-```{sidebar} Separate Commands and Typeclasses?
+```{sidebar} 單獨的指令和Typeclasses？
 
-You can organize these things as you like. If you wanted you could put the sit-command + cmdset together with the `Sittable` typeclass in `mygame/typeclasses/sittables.py`. That has the advantage of keeping everything related to sitting in one place. But there is also some organizational merit to keeping all Commands in one place as we do here.
+您可以根據自己的喜好組織這些內容。如果您願意，可以將坐指令 + cmdset 與 `Sittable` typeclass 放在 `mygame/typeclasses/sittables.py` 中。這樣做的好處是可以將與坐相關的所有事情集中在一個地方。但是，像我們在這裡所做的那樣，將所有指令保留在一個地方也有一些組織上的優點。
 ```
 
 ```{code-block} python
@@ -294,12 +301,12 @@ class CmdSetSit(CmdSet):
 
 ```
 
-As seen, the commands are nearly trivial. 
+如所見，這些指令幾乎是微不足道的。
 
-- **Lines 11 and 19**: The `self.obj` is the object to which we added the cmdset with this Command (so the chair). We just call the `do_sit/stand` on that object and pass the `caller` (the person sitting down). The `Sittable` will do the rest.
-- **Line 23**: The   `priority = 1` on `CmdSetSit` means that same-named Commands from this cmdset merge with a bit higher priority than Commands from the on-Character-cmdset (which has `priority = 0`). This means that if you have a `sit` command on your Character and comes into a room with a chair, the `sit` command on the chair will take precedence. 
+- **第 11 行和第 19 行**：`self.obj` 是我們使用此指令新增 cmdset 的物件（因此是椅子）。我們只需呼叫該物件的 `do_sit/stand` 並傳遞 `caller`（坐下的人）。 `Sittable` 將完成剩下的工作。
+- **第 23 行**：`CmdSetSit` 上的 `priority = 1` 表示來自此 cmdset 的同名指令合併的優先順序比來自角色上的指令 -cmdset（具有 `priority = 0`）的優先順序稍高。這意味著，如果您的角色有 `sit` 指令並進入有椅子的房間，則椅子上的 `sit` 指令將優先。
 
-We also need to make a change to our `Sittable` typeclass. Open `mygame/typeclasses/sittables.py`:
+我們還需要對 `Sittable` typeclass 進行更改。開啟`mygame/typeclasses/sittables.py`：
 
 ```{code-block} python 
 :linenos: 
@@ -319,39 +326,39 @@ class Sittable(Object):
     # ... 
 ```
 
-- **Line 4**: We must install the `CmdSetSit` . 
-- **Line 10**: The `at_object_creation` method will only be called once, when the object is first created. 
-- **Line 11**: We add the command-set as a 'default' cmdset with `add_default`. This makes it persistent also protects it from being deleted should another cmdset be added. See [Command Sets](../../../Components/Command-Sets.md) for more info. 
+- **第 4 行**：我們必須安裝 `CmdSetSit` 。
+- **第 10 行**：`at_object_creation` 方法只會在第一次建立物件時呼叫一次。
+- **第 11 行**：我們將指令集新增為「預設」cmdset 和 `add_default`。這使其持久化，並防止在新增另一個 cmdset 時被刪除。有關詳細資訊，請參閱[指令集](../../../Components/Command-Sets.md)。
 
-Make sure to `reload` to make the code changes available.
+確保 `reload` 使程式碼變更可用。
 	
-All _new_ Sittables will now have your `sit` Command. Your existing `armchair` will not though. This is because  `at_object_creation` will not re-run for already existing objects. We can update it manually:
+所有_新_Sittables 現在都將擁有您的`sit` 指令。但你現有的 `armchair` 不會。這是因為 `at_object_creation` 不會針對已存在的物件重新執行。我們可以手動更新：
 
     > update armchair
 
-We could also update all existing sittables (all on one line):
+我們也可以更新所有現有的可坐桌（全部在一行上）：
 
-```{sidebar} List comprehensions 
-`[obj for obj in iterator]` is an example of a _list comprehension_. Think of it as an efficient way to construct a new list all in one line. You can read more about list comprehensions [here in the Python docs](https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions).
+```{sidebar} 列表推導式
+`[obj for obj in iterator]` 是_列表理解_的範例。將其視為在一行中建立新清單的有效方法。您可以[在 Python 檔案中](https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions) 閱讀更多關於清單推導式的資訊。
 ```
 
     > py from typeclasses.sittables import Sittable ;
            [sittable.at_object_creation() for sittable in Sittable.objects.all()]
 
-We should now be able to use `sit` while in the room with the armchair.
+我們現在應該能夠在有扶手椅的房間裡使用`sit`。
 
     > sit
     As you sit down in armchair, life feels easier.
     > stand
     You stand up from armchair.
 
-One issue with placing the `sit` (or `stand`) Command "on" the chair is that it will not be available when in a room without a Sittable object:
+將 `sit`（或 `stand`）指令放置在椅子「上」的一個問題是，當房間裡沒有可坐的物體時，該指令將不可用：
 
     > sit
     Command 'sit' is not available. ...
 
-This is practical but not so good-looking; it makes it harder for the user to know a `sit` action is at all possible. Here is a trick for fixing this. Let's add _another_ Command to the bottom
-of `mygame/commands/sittables.py`:
+這個很實用，但是不太好看；它使使用者更難知道 `sit` 操作是否可行。這是解決這個問題的技巧。讓我們在底部加上_another_指令
+`mygame/commands/sittables.py`：
 
 ```{code-block} python 
 :linenos: 
@@ -375,10 +382,10 @@ class CmdNoSitStand(Command):
 
 ```
 
-- **Line 9**: This command responds both to `sit` and `stand` because we added `stand` to its `aliases` list. Command aliases have the same 'weight' as the `key` of the  command, both equally identify the Command.
-- **Line 12**: The `.cmdname` of a `Command` holds the name actually used to call it. This will be one of `"sit"` or `"stand"`.  This leads to different return messages. 
+- **第 9 行**：此指令同時回應 `sit` 和 `stand`，因為我們將 `stand` 新增至其 `aliases` 清單中。指令別名與指令的 `key` 具有相同的“權重”，兩者同等地標識指令。
+- **第 12 行**：`Command` 的 `.cmdname` 儲存實際用來呼叫它的名稱。這將是 `"sit"` 或 `"stand"` 之一。  這會導致不同的返回訊息。
 
-We don't need a new CmdSet for this, instead we will add this to the default Character cmdset. Open `mygame/commands/default_cmdsets.py`:
+為此，我們不需要新的CmdSet，而是將其新增到預設字元cmdset。開啟`mygame/commands/default_cmdsets.py`：
 
 ```python
 # in mygame/commands/default_cmdsets.py
@@ -396,9 +403,9 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
 
 ```
 
-As usual, make sure to `reload` the server to have the new code recognized.
+與往常一樣，請確保`reload`伺服器能夠識別新程式碼。
 
-To test we'll build a new location without any comfy armchairs and go there:
+為了進行測試，我們將建立一個沒有任何舒適扶手椅的新位置，然後前往那裡：
 
     > tunnel n = kitchen
     north
@@ -408,11 +415,11 @@ To test we'll build a new location without any comfy armchairs and go there:
     sit
     As you sit down in armchair, life feels easier.
 
-We now have a fully functioning `sit` action that is contained with the chair itself. When no chair is around, a default error message is shown.
+現在我們有了一個功能齊全的 `sit` 動作，它包含在椅子本身中。當周圍沒有椅子時，會顯示預設錯誤訊息。
 
-How does this work? There are two cmdsets at play, both of which have a `sit/stand` Command - one on the `Sittable` (armchair) and the other on us (via the `CharacterCmdSet`). Since we set a `priority=1` on the chair's cmdset (and `CharacterCmdSet` has `priority=0`), there will be no command-collision: the chair's `sit` takes precedence over the `sit` defined on us ... until there is no chair around. 
+這是如何運作的？有兩個 cmdsets 在玩，兩個都有 `sit/stand` 指令 - 一個在 `Sittable`（扶手椅）上，另一個在我們身上（透過 `CharacterCmdSet`）。由於我們在椅子的cmdset上設定了`priority=1`（並且`CharacterCmdSet`有`priority=0`），因此不會有指令衝突：椅子的`sit`優先於我們定義的`sit`......直到周圍沒有椅子。
 
-So this handles `sit`. What about `stand`? That will work just fine:
+所以這處理`sit`。那`stand`呢？那會工作得很好：
 
     > stand
     You stand up from armchair.
@@ -420,7 +427,7 @@ So this handles `sit`. What about `stand`? That will work just fine:
     > stand
     You are not sitting down.
 
-We have one remaining problem with `stand` though - what happens when you are sitting down and try to `stand` in a room with more than one `Sittable`:
+不過，我們還有一個關於 `stand` 的問題 - 當你坐下來嘗試在一個有多個 `Sittable` 的房間裡進行 `stand` 時會發生什麼：
 
     > stand
     More than one match for 'stand' (please narrow target):
@@ -428,13 +435,13 @@ We have one remaining problem with `stand` though - what happens when you are si
      stand-2 (sofa)
      stand-3 (barstool)
 
-Since all the sittables have the `stand` Command on them, you'll get a multi-match error. This _works_  ... but you could pick _any_ of those sittables to "stand up from". That's really weird. 
+由於所有的可坐桌都有 `stand` 指令，因此您將收到多重匹配錯誤。這_有效_......但是你可以選擇_任何_這些坐墊來「站起來」。這真的很奇怪。
 
-With `sit` it was okay to get a choice - Evennia can't know which chair we intended to sit on. But once we sit we sure know from which chair we should stand up from! We must make sure that we only get the command from the chair we are actually sitting on.
+對於 `sit` 來說，有一個選擇是可以的 - Evennia 不知道我們打算坐在哪張椅子上。但一旦我們坐下來，我們就知道該從哪張椅子上站起來！我們必須確保我們只從我們實際坐的椅子上得到指令。
 
-We will fix this with a [Lock](../../../Components/Locks.md) and a custom `lock function`. We want a lock on the `stand` Command that only makes it available when the caller is actually sitting on the chair that particular `stand` command is attached to.
+我們將使用 [Lock](../../../Components/Locks.md) 和自訂 `lock function` 來修復此問題。我們希望 `stand` 指令上有 lock，僅當呼叫者實際坐在特定 `stand` 指令所連線的椅子上時才可用。
 
-First let's add the lock so we see what we want. Open `mygame/commands/sittables.py`:
+首先讓我們加入lock，這樣我們就可以看到我們想要的內容。開啟`mygame/commands/sittables.py`：
 
 ```{code-block} python 
 :linenos:
@@ -456,10 +463,10 @@ class CmdStand(Command):
 # ...
 ```
 
-- **Line 10**: This is the lock definition. It's on the form `condition:lockfunc`. The `cmd:` type lock is checked by Evennia when determining if a user has access to a Command at all. We want the lock-function to only return `True` if this command is on a chair which the caller is sitting on.
-  What will be checked is the `sitsonthis` _lock function_ which doesn't exist yet.
+- **第 10 行**：這是 lock 定義。其格式為 `condition:lockfunc`。在確定使用者是否有權存取指令時，Evennia 將檢查 `cmd:` 型別 lock。如果此指令位於呼叫者所坐的椅子上，我們希望 lock 函式只傳回 `True`。
+將檢查的是 `sitsonthis` _lock function_ 尚不存在。
 
-Open `mygame/server/conf/lockfuncs.py` to add it!
+開啟`mygame/server/conf/lockfuncs.py`新增！
 
 ```python
 # mygame/server/conf/lockfuncs.py
@@ -478,57 +485,58 @@ def sitsonthis(accessing_obj, accessed_obj, *args, **kwargs):
 # ...
 ```
 
-Evennia knows that _all_ functions in `mygame/server/conf/lockfuncs` should be possible to use in a lock definition. 
+Evennia 知道 `mygame/server/conf/lockfuncs` 中的 _all_ 函式應該可以在 lock 定義中使用。
 
-All lock functions must acccept the same arguments. The arguments are required and Evennia will pass all relevant objects as needed. 
+所有 lock 函式必須接受相同的引數。引數是必需的，Evennia 將根據需要傳遞所有相關物件。
 
 ```{sidebar} Lockfuncs
 
-Evennia provides a large number of default lockfuncs, such as checking permission-levels, if you are carrying or are inside the accessed object etc. There is no concept of 'sitting' in default Evennia however, so this we need to specify ourselves.
+Evennia提供了大量的預設lockfuncs，例如檢查許可權級別，是否攜帶或在存取物件內部等。但是預設Evennia中沒有「坐」的概念，所以這個需要我們自己指定。
 ```
 
-- `accessing_obj` is the one trying to access the lock. So us, in this case.
-- `accessed_obj` is the entity we are trying to gain a particular type of access to. Since we define the lock on the `CmdStand` class, this is _the command instance_. We are however not interested in that, but the object the command is assigned to (the chair). The object is available on the Command as `.obj`. So here, `accessed_obj.obj` is the chair. 
-- `args` is a tuple holding any arguments passed to the lockfunc. Since we use `sitsondthis()` this will be empty (and if we add anything, it will be ignored).
-- `kwargs` is a tuple of keyword arguments passed to the lockfuncs. This will be empty as well in our example.
+- `accessing_obj` 是嘗試訪問lock 的人。在這種情況下，我們也是如此。
+- `accessed_obj` 是我們試圖取得特定型別存取許可權的實體。由於我們在 `CmdStand` 類別上定義了 lock，因此這是_指令例項_。然而，我們對此不感興趣，而是指令分配給的物件（椅子）。該物件在指令上可用為 `.obj`。所以在這裡，`accessed_obj.obj` 是椅子。
+- `args` 是一個元組，儲存傳遞給 lockfunc 的任何引數。由於我們使用 `sitsondthis()` 這將是空的（如果我們新增任何內容，它將被忽略）。
+- `kwargs` 是傳遞給 lockfuncs 的關鍵字引數的元組。在我們的範例中，這也將是空的。
 
-Make sure you `reload`.
+確保你`reload`。
 
-If you are superuser, it's important that you `quell` yourself before trying this out. This is because the superuser bypasses all locks - it can never get locked out, but it means it will also not see the effects of a lock like this.
+如果您是超級使用者，那麼在嘗試此操作之前您自己 `quell` 很重要。這是因為超級使用者繞過所有鎖 - 它永遠不會被鎖定，但這意味著它也不會看到像這樣的 lock 的效果。
 
     > quell
     > stand
     You stand up from armchair
 
-None of the other sittables' `stand` commands passed the lock and only the one we are actually sitting on did! This is a fully functional chair now!
+其他 sattables 的 `stand` 指令都沒有透過 lock，只有我們實際坐的那個指令透過了！現在這是一張功能齊全的椅子！
 
-Adding a Command to the chair object like this is powerful and is a good technique to know. It does come with some caveats though, as we've seen.
+像這樣為椅子物件新增指令非常強大，也是一項值得了解的好技術。但正如我們所見，它確實有一些警告。
 
-We'll now try another way to add the `sit/stand` commands.
+我們現在將嘗試另一種方法來新增 `sit/stand` 指令。
 
-### Command variant 2: Command on Character
+(command-variant-2-command-on-character)=
+### 指令變體 2：對角色的指令
 
-Before we start with this, delete the chairs you've created: 
+在我們開始之前，請刪除您建立的椅子：
 
-	> del armchair 
-	> del sofa 
-	> (etc)
+	> 德爾扶手椅
+	> 德爾沙發
+	> （ETC）
 
-The make the following changes:
+進行以下更改：
 
-- In `mygame/typeclasses/sittables.py`, comment out the entire `at_object_creation` method.
-- In `mygame/commands/default_cmdsets.py`, comment out the line `self.add(sittables.CmdNoSitStand)`.
+- 在`mygame/typeclasses/sittables.py`中，註解掉整個`at_object_creation`方法。
+- 在`mygame/commands/default_cmdsets.py`中，註解掉`self.add(sittables.CmdNoSitStand)`行。
 
-This disables the on-object command solution so we can try an alternative. Make sure to `reload` so the changes are known to Evennia.
+這會禁用物件上指令解決方案，因此我們可以嘗試替代方案。確保 `reload` 以便 Evennia 知道更改。
 
-In this variation we will put the `sit` and `stand` commands on the `Character` instead of on the chair. This makes some things easier, but makes the Commands themselves more complex because they will not know which chair to sit on. We can't just do `sit` anymore. This is how it will work:
+在此變體中，我們將把 `sit` 和 `stand` 指令放在 `Character` 而不是椅子上。這使得一些事情變得更容易，但也使指令本身變得更加複雜，因為他們不知道該坐在哪張椅子上。我們不能再只做`sit`了。其工作原理如下：
 
     > sit <chair>
     You sit on chair.
     > stand
     You stand up from chair.
 
-Open `mygame/commands/sittables.py` again. We'll add a new sit-command. We name the class `CmdSit2` since we already have `CmdSit` from the previous example. We put everything at the end of the module to keep it separate.
+再次開啟`mygame/commands/sittables.py`。我們將新增一個新的坐指令。我們將類別命名為 `CmdSit2`，因為我們已經從上一個範例中獲得了 `CmdSit`。我們將所有內容放在模組的末尾以使其保持獨立。
 
 ```{code-block} python 
 :linenos:
@@ -575,17 +583,17 @@ class CmdSit2(Command):
 
 ```
 
-```{sidebar} Raising exceptions
+```{sidebar} 引發例外
 
-Raising an exception allows for immediately interrupting the current program flow. Python automatically raises error-exceptions when detecting problems with the code. It will be raised up through the sequence of called code (the 'stack') until it's either `caught` with a `try ... except` or reaches the outermost scope where it'll be logged or displayed. In this case Evennia knows to catch the `InterruptCommand` exception and stop the command execution early.
+引發異常可以立即中斷目前的程式流程。當偵測到程式碼問題時，Python 會自動引發錯誤異常。它將透過被呼叫程式碼的序列（「堆疊」）向上提升，直到它達到帶有 `try... except` 的 `caught` 或到達將記錄或顯示的最外層範圍。在這種情況下，Evennia 知道捕獲 `InterruptCommand` 異常並提前停止指令執行。
 ```
 
-- **Line 4**: We need the `InterruptCommand` to be able to abort command parsing early (see below).
-- **Line 27**: The `parse` method runs before the `func` method on a `Command`. If no argument is provided to the command, we want to fail early, already in `parse`, so `func` never fires. Just `return` is not enough to do that, we need to `raise InterruptCommand`. Evennia will see a raised `InterruptCommand` as a sign it should immediately abort the command execution.
-- **Line 32**: We use the parsed command arguments as the target-chair to search for. As discussed in the [search tutorial](./Beginner-Tutorial-Searching-Things.md), `self.caller.search()` will handle error messages itself. So if it returns `None`, we can just `return`. 
-- **Line 35-38**: The `try...except` block 'catches' and exception and handles it. In this case we try to run `do_sit` on the object. If the object we found is _not_ a `Sittable`, it will likely not have a `do_sit` method and an `AttributeError` will be raised. We should handle that case gracefully.
+- **第 4 行**：我們需要 `InterruptCommand` 才能提前中止指令解析（見下文）。
+- **第 27 行**：`parse` 方法在 `Command` 上的 `func` 方法之前執行。如果沒有向指令提供引數，我們希望儘早失敗，已經在 `parse` 中，因此 `func` 永遠不會觸發。僅 `return` 還不夠，我們需要 `raise InterruptCommand`。 Evennia 將看到一個凸起的 `InterruptCommand` 作為一個標誌，它應該立即中止指令執行。
+- **第 32 行**：我們使用解析後的指令引數作為要搜尋的目標主席。正如[搜尋教學](./Beginner-Tutorial-Searching-Things.md) 中所討論的，`self.caller.search()` 將自行處理錯誤訊息。因此，如果它返回`None`，我們就可以`return`。
+- **第 35-38 行**：`try...except` 區塊「捕獲」異常並處理它。在本例中，我們嘗試在物件上執行 `do_sit`。如果我們找到的物件不是 `Sittable`，它可能沒有 `do_sit` 方法，並且會引發 `AttributeError`。我們應該優雅地處理這個案子。
 
-Let's do the `stand` command while we are at it. Since the Command is external to the chair we need to figure out if we are sitting down or not. 
+讓我們執行 `stand` 指令。由於指令位於椅子外部，因此我們需要確定我們是否坐下。
 
 ```{code-block} python 
 :linenos:
@@ -614,11 +622,11 @@ class CmdStand2(Command):
 
 ```
 
-- **Line 17**: We didn't need the `is_sitting` Attribute for the first version of these Commands, but we do need it now. Since we have this, we don't need to search and know just which chair we sit on. If we don't have this Attribute set, we are not sitting anywhere. 
-- **Line 21**: We stand up using the sittable we found.
+- **第 17 行**：對於這些指令的第一個版本，我們不需要 `is_sitting` Attribute，但我們現在確實需要它。有了這個，我們就不需要搜尋並知道我們坐在哪張椅子上。如果我們沒有設定Attribute，我們就不會坐在任何地方。
+- **第 21 行**：我們使用找到的可坐桌站起來。
 
 
-All that is left now is to make `sit` and `stand` available to us. This type of Command should be available to us all the time so we can put it in the default Cmdset on the Character. Open `mygame/commands/default_cmdsets.py`.
+現在剩下的就是讓 `sit` 和 `stand` 可供我們使用。這種型別的指令應該始終可供我們使用，因此我們可以將其放在角色的預設 Cmdset 中。開啟`mygame/commands/default_cmdsets.py`。
 
 
 ```python
@@ -638,9 +646,9 @@ class CharacterCmdSet(CmdSet):
 
 ```
 
-Make sure to `reload`. 
+確保`reload`。
 
-Now let's try it out:
+現在我們來嘗試一下：
 
     > create/drop sofa : sittables.Sittable
     > sit sofa
@@ -651,16 +659,17 @@ Now let's try it out:
     > sit sofa 
     > You can't find 'sofa'.
 
-Storing commands on the Character centralizes them, but you must instead search or store any external objects you want that command to interact on.
+在角色上儲存指令可以集中它們，但您必須搜尋或儲存您希望該指令與之互動的任何外部物件。
 
-## Conclusions
+(conclusions)=
+## 結論
 
-In this lesson we built ourselves a chair and even a sofa! 
+在本課中，我們為自己製作了一張椅子，甚至一張沙發！
 
-- We modified our `Character` class to avoid moving when sitting down.
-- We made a new `Sittable` typeclass
-- We tried two ways to allow a user to interact with sittables using `sit` and `stand` commands.
+- 我們修改了 `Character` 類以避免坐下時移動。
+- 我們做了一個新的`Sittable` typeclass
+- 我們嘗試了兩種方法來允許使用者使用`sit`和`stand`指令與sittables互動。
 
-Eagle-eyed readers will notice that the `stand` command sitting "on" the chair (variant 1) would work just fine together with the `sit` command sitting "on" the Character (variant 2). There is nothing stopping you from mixing them, or even try a third solution that better fits what you have in mind.
+目光敏銳的讀者會注意到，坐在椅子「上」的 `stand` 指令（變體 1）可以與坐在角色「上」的 `sit` 指令（變體 2）一起工作。沒有什麼可以阻止您混合它們，甚至嘗試更適合您想法的第三種解決方案。
 
-This concludes the first part of the Beginner tutorial!
+初學者教學的第一部分到此結束！

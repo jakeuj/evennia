@@ -1,80 +1,89 @@
 
-# Evennia Server Lifecycle
+(evennia-server-lifecycle)=
+# Evennia 伺服器生命週期
 
-As part of your game design you may want to change how Evennia behaves when starting or stopping. A common use case would be to start up some piece of custom code you want to always have available once the server is up. 
+作為遊戲設計的一部分，您可能想要更改 Evennia 在啟動或停止時的行為。一個常見的用例是啟動一些您希望在伺服器啟動後始終可用的自訂程式碼。
 
-Evennia has three main life cycles, all of which you can add custom behavior for:
+Evennia 有三個主要生命週期，您可以為所有這些生命週期新增自訂行為：
 
-- **Database life cycle**: Evennia uses a database. This exists in parallel to the code changes you do. The database exists until you choose to reset or delete it. Doing so doesn't require re-downloading Evennia.
-- **Reboot life cycle**: From When Evennia starts to it being fully shut down, which means both Portal and Server are stopped. At the end of this cycle, all players are disconnected.
-- **Reload life cycle:** This is the main runtime, until a "reload" event. Reloads refreshes game code but do not kick any players.
+- **資料庫生命週期**：Evennia使用資料庫。這與您所做的程式碼變更同時存在。該資料庫一直存在，直到您選擇重置或刪除它為止。這樣做不需要重新下載Evennia。
+- **重啟生命週期**：從Evennia開始到完全關閉，這表示Portal和伺服器都停止了。在這個週期結束時，所有玩家都斷開連線。
+- **重新載入生命週期：** 這是主要執行時，直到發生「重新載入」事件。重新載入會重新整理遊戲程式碼，但不會踢任何玩家。
 
-## When Evennia starts for the first time
+(when-evennia-starts-for-the-first-time)=
+## 當Evennia第一次啟動時
 
-This is the beginning of the **Database life cycle**, just after the database is created and migrated for the first time (or after it was deleted and re-built). See [Choosing a Database](../Setup/Choosing-a-Database.md) for instructions on how to reset a database, should you want to re-run this sequence after the first time.
+這是**資料庫生命週期**的開始，就在資料庫第一次建立和遷移之後（或在資料庫被刪除和重建之後）。如果您想在第一次後重新執行此序列，請參閱[選擇資料庫](../Setup/Choosing-a-Database.md)，以瞭解有關如何重設資料庫的說明。
 
-Hooks called, in sequence: 
+鉤子按順序呼叫：
 
-1.  `evennia.server.initial_setup.handle_setup(last_step=None)`: Evennia's core initialization function. This is what creates the #1 Character (tied to the superuser account) and `Limbo` room. It calls the next hook below and also understands to restart at the last failed step if there was some issue. You should normally not override this function unless you _really_ know what you are doing. To override, change `settings.INITIAL_SETUP_MODULE` to your own module with a `handle_setup` function in it.
-2. `mygame/server/conf/at_initial_setup.py` contains a single function, `at_initial_setup()`, which will be called without arguments. It's called last in the setup sequence by the above function. Use this to add your own custom behavior or to tweak the initialization. If you for example wanted to change the auto-generated Limbo room, you should do it from here. If you want to change where this function is found, you can do so by changing `settings.AT_INITIAL_SETUP_HOOK_MODULE`. 
+1.  `evennia.server.initial_setup.handle_setup(last_step=None)`：Evennia的核心初始化函式。這就是為什麼建立 #1 角色（與超級使用者帳戶繫結）和 `Limbo` 房間的原因。它會呼叫下面的下一個掛鉤，如果出現問題，也會在最後一個失敗的步驟處重新啟動。通常你不應該重寫這個函式，除非你_真的_知道你在做什麼。要覆蓋，請將 `settings.INITIAL_SETUP_MODULE` 更改為您自己的模組，其中包含 `handle_setup` 函式。
+2. `mygame/server/conf/at_initial_setup.py` 包含一個函式 `at_initial_setup()`，將在不帶引數的情況下呼叫函式。它是由上述函式在設定序列中最後呼叫的。使用它來新增您自己的自訂行為或調整初始化。例如，如果您想要變更自動產生的 Limbo 房間，您應該從這裡進行。如果您想更改此函式的位置，可以透過更改 `settings.AT_INITIAL_SETUP_HOOK_MODULE` 來實現。
 
-## When Evennia starts and shutdowns 
+(when-evennia-starts-and-shutdowns)=
+## 當 Evennia 啟動和關閉時
 
-This is part of the **Reboot life cycle**. Evennia consists of two main processes, the [Portal and the Server](../Components/Portal-And-Server.md). On a reboot or shutdown, both Portal and Server shuts down, which means all players are disconnected. 
+這是**重新啟動生命週期**的一部分。 Evennia 由兩個主要程式組成，[Portal 和伺服器](../Components/Portal-And-Server.md)。重新啟動或關閉時，Portal 和伺服器都會關閉，這意味著所有玩家都將斷開連線。
 
-Each process call a series of hooks located in `mygame/server/conf/at_server_startstop.py`. You can customize the module used with `settings.AT_SERVER_STARTSTOP_MODULE` - this can even be a list of modules, if so, the appropriately-named functions will be called from each module, in sequence. 
+每個程式呼叫位於`mygame/server/conf/at_server_startstop.py`的一系列鉤子。您可以自訂與 `settings.AT_SERVER_STARTSTOP_MODULE` 一起使用的模組 - 這甚至可以是模組列表，如果是這樣，將從每個模組中按順序呼叫適當命名的函式。
 
-All hooks are called without arguments. 
+所有鉤子的呼叫都不帶引數。
 
-> The use of the term 'server' in the hook-names indicate the whole of Evennia, not just the `Server` component.
+> 在鉤子名稱中使用術語「伺服器」表示整個 Evennia，而不僅僅是 `Server` 元件。
 
-### Server cold start 
+(server-cold-start)=
+### 伺服器冷啟動
 
-Starting the server from zero, after a full stop. This is done with `evennia start` from the terminal.
+完全停止後從零啟動伺服器。這是透過終端的 `evennia start` 完成的。
 
-1. `at_server_init()` - Always called first in the startup sequence.
-2. `at_server_cold_start()` - Only called on cold starts.
-3. `at_server_start()` - Always called last in the startup sequece. 
+1. `at_server_init()` - 始終在啟動順序中先呼叫。
+2. `at_server_cold_start()` - 僅在冷啟動時呼叫。
+3. `at_server_start()` - 始終在啟動序列中最後呼叫。
 
-### Server cold shutdown
+(server-cold-shutdown)=
+### 伺服器冷關機
 
-Shutting everything down. Done with `shutdown` in-game or `evennia stop` from the terminal.
+關閉一切。在遊戲中使用 `shutdown` 或從終端使用 `evennia stop` 完成。
 
-1. `at_server_cold_stop()` - Only called on cold stops.
-2. `at_server_stop()` - Always called last in the stopping sequence.
+1. `at_server_cold_stop()` - 僅在冷站時呼叫。
+2. `at_server_stop()` - 始終在停止序列中最後呼叫。
 
-### Server reboots 
+(server-reboots)=
+### 伺服器重新啟動
 
-This is done with `evennia reboot` and effectively constitutes an automatic cold shutdown followed by a cold start controlled from the `evennia` launcher. There are no special `reboot` hooks for this, instead it looks like you'd expect:
+這是透過 `evennia reboot` 完成的，並有效地構成自動冷關閉，然後由 `evennia` 啟動器控製冷啟動。沒有特殊的 `reboot` 鉤子，相反，它看起來像您所期望的：
 
 1. `at_server_cold_stop()`
-2. `at_server_stop()`  (after this, both `Server` + `Portal` have both shut down)
-3. `at_server_init()`  (like a cold start)
+2. `at_server_stop()`（此後，`Server` + `Portal` 均已關閉）
+3. `at_server_init()`（如冷啟動）
 4. `at_server_cold_start()`
 5. `at_server_start()`
 
-## When Evennia reloads and resets
+(when-evennia-reloads-and-resets)=
+## 當Evennia重新載入並重置時
 
-This is the **Reload life cycle**. As mentioned above, Evennia consists of two components, the [Portal and Server](../Components/Portal-And-Server.md). During a reload, only the `Server` component is shut down and restarted. Since the Portal stays up, players are not disconnected.
+這就是**重新載入生命週期**。如上所述，Evennia 由兩個元件組成，[Portal 和伺服器](../Components/Portal-And-Server.md)。重新載入期間，僅 `Server` 元件關閉並重新啟動。由於 Portal 保持開啟狀態，因此玩家不會斷開連線。
 
-All hooks are called without arguments. 
+所有鉤子的呼叫都不帶引數。
 
-### Server reload
+(server-reload)=
+### 伺服器重新載入
 
-Reloads are initiated with the `reload` command in-game, or with `evennia reload` from the terminal.
+重新載入是透過遊戲中的 `reload` 指令啟動的，或者透過終端使用 `evennia reload` 啟動的。
 
-1. `at_server_reload_stop()` - Only called on reload stops.
-2. `at_server_stop` - Always called last in the stopping sequence.
-3. `at_server_init()` - Always called first in startup sequence.
-4. `at_server_reload_start()` - Only called on a reload (re)start.
-5. `at_server_start()` - Always called last in the startup sequence. 
+1. `at_server_reload_stop()` - 僅在重新載入停止時呼叫。
+2. `at_server_stop` - 始終在停止序列中最後呼叫。
+3. `at_server_init()` - 始終在啟動順序中先呼叫。
+4. `at_server_reload_start()` - 僅在重新載入（重新）啟動時呼叫。
+5. `at_server_start()` - 始終在啟動序列中最後呼叫。
 
-### Server reset
+(server-reset)=
+### 伺服器重置
 
-A 'reset' is a hybrid reload state, where the reload is treated as a cold shutdown only for the sake of running hooks (players are not disconnected). It's run with `reset` in-game or with `evennia reset` from the terminal. 
+「重置」是一種混合重新載入狀態，其中重新載入被視為冷關閉，只是為了執行掛鉤（玩家不會斷開連線）。它在遊戲中使用 `reset` 執行，或從終端使用 `evennia reset` 執行。
 
 1. `at_server_cold_stop()`
-2. `at_server_stop()`  (after this, only `Server` has shut down)
-3. `at_server_init()`  (`Server` coming back up)
+2. `at_server_stop()`（此後，只有`Server`關閉）
+3. `at_server_init()`（`Server` 即將恢復）
 4. `at_server_cold_start()`
 5. `at_server_start()`

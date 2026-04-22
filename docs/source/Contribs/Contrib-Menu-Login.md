@@ -1,28 +1,31 @@
-# Menu-based login system
+(menu-based-login-system)=
+# 基於選單的登入系統
 
-Contribution by Vincent-lg 2016. Reworked for modern EvMenu by Griatch, 2019.
+Vincent-lg 2016 年貢獻。 Griatch 2019 年重新設計現代 EvMenu。
 
-This changes the Evennia login to ask for the account name and password as a series
-of questions instead of requiring you to enter both at once. It uses Evennia's 
-menu system `EvMenu` under the hood.
+這將Evennia登入更改為要求輸入帳戶名稱和密碼作為一系列
+問題，而不是要求您同時輸入兩個問題。它使用Evennia的
+選單系統 `EvMenu` 在引擎蓋下。
 
-## Installation
+(installation)=
+## 安裝
 
-To install, add this to `mygame/server/conf/settings.py`:
+要安裝，請將其新增到 `mygame/server/conf/settings.py`：
 
     CMDSET_UNLOGGEDIN = "evennia.contrib.base_systems.menu_login.UnloggedinCmdSet"
     CONNECTION_SCREEN_MODULE = "evennia.contrib.base_systems.menu_login.connection_screens"
 
-Reload the server and reconnect to see the changes.
+重新載入伺服器並重新連線以檢視變更。
 
-## Notes
+(notes)=
+## 筆記
 
-If you want to modify the way the connection screen looks, point
-`CONNECTION_SCREEN_MODULE` to your own module. Use the default as a
-guide (see also Evennia docs).
+如果您想要修改連線螢幕的外觀，請指向
+`CONNECTION_SCREEN_MODULE` 到您自己的模組。使用預設值作為
+指南（另請參閱 Evennia 檔案）。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/base_systems/menu_login/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\base_systems\menu_login\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

@@ -1,23 +1,25 @@
+(tutorialmirror)=
 # TutorialMirror
 
-Contribution by Griatch, 2017
+Griatch 的貢獻，2017 年
 
-A simple mirror object to experiment with. It will respond to being looked at.
+一個簡單的鏡子物件進行實驗。它會對被注視做出反應。
 
-- echoes back the description of the object looking at it
-- echoes back whatever is being sent to its .msg - to the
-  sender, if given, otherwise to the location of the mirror.
+- 回顯所看到的物體的描述
+- 回顯傳送到其.msg 的任何內容 - 到
+傳送者，如果給出的話，否則到映象的位置。
 
-## Installation
+(installation)=
+## 安裝
 
-Create the mirror with
+建立映象
 
     create/drop mirror:contrib.tutorials.mirror.TutorialMirror
 
-Then look at it.
+然後看看它。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/tutorials/mirror/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\tutorials\mirror\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

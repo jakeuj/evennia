@@ -1,52 +1,54 @@
-# Building a giant mech 
+(building-a-giant-mech)=
+# 建造巨型機甲
 
-Let us create a functioning giant mech in Evennia. Everyone likes a giant mech, right? Start in-game as a character with build privileges (or the superuser). 
+讓我們在Evennia中創造一個運作良好的巨型機甲。每個人都喜歡巨型機甲，對吧？以具有建置許可權的角色（或超級使用者）開始遊戲。
 
     create/drop Giant Mech ; mech
 
-Boom. We created a Giant Mech Object and dropped it in the room. We also gave it an alias *mech*.
-Let’s describe it.
+繁榮。我們建立了一個巨型機甲物體並將其扔到房間裡。我們也給它取了一個別名*mech*。
+我們來描述一下。
 
     desc mech = This is a huge mech. It has missiles and stuff.
 
-Next we define who can “puppet” the mech object.
+接下來我們定義誰可以「操縱」機甲物件。
 
     lock mech = puppet:all()
 
-This makes it so that everyone can control the mech. More mechs to the people! (Note that whereas Evennia’s default commands may look vaguely MUX-like, you can change the syntax to look like whatever interface style you prefer.)
+這使得每個人都可以控制機甲。為人民提供更多機甲！ （請注意，雖然 Evennia 的預設指令可能看起來有點像 MUX-，但您可以更改語法以使其看起來像您喜歡的任何介面風格。）
 
-Before we continue, let’s make a brief detour. Evennia is very flexible about its objects and even more flexible about using and adding commands to those objects. Here are some ground rules well worth remembering for the remainder of this article: 
+在繼續之前，讓我們先繞一下。 Evennia 對於它的物件非常靈活，對於使用和向這些物件新增指令甚至更加靈活。對於本文的其餘部分，以下是一些值得記住的基本規則：
 
-- The [Account](../Components/Accounts.md) represents the real person logging in and has no game-world existence.
-- Any [Object](../Components/Objects.md) can be puppeted by an Account (with proper permissions).
-- [Characters](../Components/Objects.md#characters), [Rooms](../Components/Objects.md#rooms), and [Exits](../Components/Objects.md#exits) are just children of normal Objects.
-- Any Object can be inside another (except if it creates a loop).
-- Any Object can store custom sets of commands on it. Those commands can:
-    - be made available to the puppeteer (Account),
-    - be made available to anyone in the same location as the Object, and
-    - be made available to anyone “inside” the Object
-    - Also Accounts can store commands on themselves. Account commands are always available unless commands on a puppeted Object explicitly override them.
+- [帳號](../Components/Accounts.md)代表真人登入，不存在遊戲世界。
+- 任何[物件](../Components/Objects.md) 都可以被帳號操縱（具有適當的許可權）。
+- [字元](../Components/Objects.md#characters)、[房間](../Components/Objects.md#rooms) 和[出口](../Components/Objects.md#exits) 只是普通物件的子物件。
+- 任何物件都可以位於另一個物件內部（除非它建立了迴圈）。
+- 任何物件都可以在其上儲存自訂指令集。這些指令可以：
+    - 可供木偶操縱者（帳號）使用，
+    - 可供與物件位於同一位置的任何人使用，且
+    - 可供物件「內部」的任何人使用
+    - 帳戶還可以儲存自己的指令。帳戶指令始終可用，除非傀儡物件上的指令明確覆蓋它們。
 
-In Evennia, using the `ic` command will allow you to puppet a given Object (assuming you have puppet-access to do so). As mentioned above, the bog-standard Character class is in fact like any Object: it is auto-puppeted when logging in and just has a command set on it containing the normal in-game commands, like look, inventory, get and so on. 
+在 Evennia 中，使用 `ic` 指令將允許您操縱給定的物件（假設您具有操縱許可權來執行此操作）。如上所述，沼澤標準的角色類別實際上就像任何物件一樣：它在登入時會自動傀儡，並且只有一個指令集，其中包含正常的遊戲內指令，例如檢視、庫存、獲取等。
 
     ic mech
 
-You just jumped out of your Character and *are* now the mech! If people look at you in-game, they
-will look at a mech. The problem at this point is that the mech Object has no commands of its own.
-The usual things like look, inventory and get sat on the Character object, remember? So at the
-moment the mech is not quite as cool as it could be.
+你剛剛跳出了你的角色，現在*是*機甲了！如果人們在遊戲中看著你，他們
+會看機甲。此時的問題是機械物件沒有自己的指令。
+常見的事情，例如檢視、庫存和坐在角色物件上，還記得嗎？所以在
+此刻，機甲並沒有想像中那麼酷。
 
     ic <Your old Character>
 
-You just jumped back to puppeting your normal, mundane Character again. All is well.
+你剛剛又跳回傀儡你正常的、平凡的角色。一切都很好。
 
-> Where did that `ic` command come from, if the mech had no commands on it? The
-answer is that it came from the `Account`'s command set. This is important. Without the Account being the one with the `ic` command, we would not have been able to get back out of our mech again.
+> 如果機甲上沒有指令，那麼 `ic` 指令從何而來？這
+答案是它來自`Account`的指令集。這很重要。如果該帳戶不是使用 `ic` 指令的帳戶，我們將無法再次登出我們的機甲。
 
-## Make a Mech that can shoot
+(make-a-mech-that-can-shoot)=
+## 製作一個可以射擊的機甲
 
-Let us make the mech a little more interesting. In our favorite text editor, we will create some new
-mech-suitable commands. In Evennia, commands are defined as Python classes.
+讓我們讓機甲變得更有趣一點。在我們最喜歡的文字編輯器中，我們將建立一些新的
+適合機甲的指令。在Evennia中，指令被定義為Python類別。
 
 ```python
 # in a new file mygame/commands/mechcommands.py
@@ -91,12 +93,12 @@ class CmdLaunch(Command):
 
 ```
 
-This is saved as a normal Python module (let’s call it `mechcommands.py`), in a place Evennia looks for such modules (`mygame/commands/`). This command will trigger when the player gives the command “shoot”, “fire,” or even “fire!” with an exclamation mark. The mech can shoot in the air or at a target if you give one. In a real game the gun would probably be given a chance to hit and give
-damage to the target, but this is enough for now.
+這被儲存為普通的 Python 模組（我們稱之為 `mechcommands.py`），在 Evennia 的地方查詢此類模組（`mygame/commands/`）。當玩家發出「射擊」、「開火」甚至「開火！」指令時，該指令就會觸發。帶有感嘆號。如果你有的話，機甲可以在空中或目標上射擊。在真實的遊戲中，槍可能有機會擊中並給予
+對目標造成傷害，但這已經足夠了。
 
-We also make a second command for launching missiles (`CmdLaunch`). To save space we won’t describe it here; it looks the same except it returns a text about the missiles being fired and has different `key` and `aliases`. We leave that up to you to create as an exercise. You could have it print `"WOOSH! The mech launches missiles against <target>!`, for example.
+我們也發出了第二個發射飛彈的指令（`CmdLaunch`）。為了節省篇幅，這裡不再描述；它看起來相同，只是它返回有關正在發射的導彈的文字並且具有不同的 `key` 和 `aliases`。我們將其留給您來建立作為練習。例如，您可以讓它列印`"WOOSH! The mech launches missiles against <target>!`。
 
-Now we shove our commands into a command set. A [Command Set](../Components/Command-Sets.md) (CmdSet) is a container holding any number of commands. The command set is what we will store on the mech.
+現在我們將指令放入指令集中。 [指令集](../Components/Command-Sets.md) (CmdSet) 是容納任意數量指令的容器。指令集是我們將儲存在機械上的內容。
 
 ```python
 # in the same file mygame/commands/mechcommands.py
@@ -116,32 +118,33 @@ class MechCmdSet(CmdSet):
         self.add(CmdLaunch())
 ```
 
-This simply groups all the commands we want. We add our new shoot/launch commands. Let’s head back into the game. For testing we will manually attach our new CmdSet to the mech.
+這只是將我們想要的所有指令分組。我們新增了新的射擊/發射指令。讓我們回到遊戲中。為了進行測試，我們將手動將新的CmdSet附加到機械上。
 
     py self.search("mech").cmdset.add("commands.mechcommands.MechCmdSet")
 
-This is a little Python snippet that searches for the mech in our current location and attaches our new MechCmdSet to it. What we add is actually the Python path to our cmdset class. Evennia will import and initialize it behind the scenes.
+這是一個小的 Python 片段，用於搜尋目前位置的機甲並將新的 MechCmdSet 附加到它。我們新增的實際上是 cmdset 類別的 Python 路徑。 Evennia 將在幕後匯入並初始化它。
 
     ic mech
 
-We are back as the mech! Let’s do some shooting!
+我們作為機甲回來了！讓我們進行一些拍攝吧！
 
     fire!
     BOOM! The mech fires its gun in the air!
 
-There we go, one functioning mech. Try your own `launch` command and see that it works too. We can not only walk around as the mech — since the CharacterCmdSet is included in our MechCmdSet, the mech can also do everything a Character could do, like look around, pick up stuff, and have an inventory. We could now shoot the gun at a target or try the missile launch command. Once you have your own mech, what else do you need?
+就這樣，一臺正常運轉的機甲。嘗試您自己的 `launch` 指令，看看它是否也有效。我們不僅可以作為機甲四處走動——因為CharacterCmdSet包含在我們的MechCmdSet中，所以機甲還可以做角色可以做的所有事情，比如環顧四周，撿起東西，並擁有庫存。我們現在可以用槍射擊目標或嘗試導彈發射指令。一旦你擁有了自己的機甲，你還需要什麼？
 
-> You'll find that the mech's commands are available to you by just standing in the same
-location (not just by puppeting it). We'll solve this with a *lock* in the next section.
+> 你會發現，只要站在同一個地方，就可以使用機甲的指令
+位置（不僅僅是透過操縱它）。我們將在下一節中使用 *lock* 來解決這個問題。
 
-## Making an army of Mechs
+(making-an-army-of-mechs)=
+## 組一支機甲軍隊
 
-What we’ve done so far is just to make a normal Object, describe it and put some commands on it.
-This is great for testing. The way we added it, the MechCmdSet will even go away if we reload the
-server. Now we want to make the mech an actual object “type” so we can create mechs without those extra steps. For this we need to create a new Typeclass.
+到目前為止我們所做的只是建立一個普通的物件，描述它並在它上面放置一些指令。
+這對於測試來說非常有用。按照我們新增的方式，如果我們重新載入，MechCmdSet 甚至會消失
+伺服器。現在我們想讓機甲成為一個實際的物件“型別”，這樣我們就可以建立機甲而無需這些額外的步驟。為此，我們需要建立一個新的Typeclass。
 
-A [Typeclass](../Components/Typeclasses.md) is a near-normal Python class that stores its existence to the database
-behind the scenes. A Typeclass is created in a normal Python source file:
+[Typeclass](../Components/Typeclasses.md) 是一個接近普通的 Python 類，它將其存在儲存到資料庫中
+在幕後。在普通的 Python 原始檔中建立 Typeclass：
 
 ```python
 # in the new file mygame/typeclasses/mech.py
@@ -162,31 +165,32 @@ class Mech(Object):
         self.db.desc = "This is a huge mech. It has missiles and stuff."
 ```
 
-For convenience we include the full contents of the default `CharacterCmdSet` in there. This will make a Character’s normal commands available to the mech. We also add the mech-commands from before, making sure they are stored persistently in the database. The locks specify that anyone can puppet the meck and no-one can "call" the mech's Commands from 'outside' it - you have to puppet it to be able to shoot.
+為了方便起見，我們在其中包含預設 `CharacterCmdSet` 的完整內容。這將使角色的正常指令可供機甲使用。我們還新增了先前的機械指令，確保它們持久地儲存在資料庫中。這些鎖規定任何人都可以操縱機甲，並且沒有人可以從機甲的“外部”“呼叫”機甲的指令 - 你必須操縱它才能射擊。
 
-That’s it. When Objects of this type are created, they will always start out with the mech’s command set and the correct lock. We set a default description, but you would probably change this with `desc` to individualize your mechs as you build them.
+就是這樣。當建立這種型別的物件時，它們總是以機甲的指令集和正確的lock開始。我們設定了預設描述，但您可能會使用 `desc` 更改此描述，以便在建立機甲時個性化您的機甲。
 
-Back in the game, just exit the old mech (`@ic` back to your old character) then do
+回到遊戲，只需退出舊機甲（`@ic`回到你的舊角色）然後執行
 
     create/drop The Bigger Mech ; bigmech : mech.Mech
 
-We create a new, bigger mech with an alias bigmech. Note how we give the python-path to our
-Typeclass at the end — this tells Evennia to create the new object based on that class (we don't
-have to give the full path in our game dir `typeclasses.mech.Mech` because Evennia knows to look in the `typeclasses` folder already). A shining new mech will appear in the room! Just use
+我們建立了一個新的、更大的機甲，別名為 bigmech。注意我們如何將 python-path 提供給我們的
+Typeclass 最後 - 這告訴 Evennia 基於該類別建立新物件（我們不
+必須提供我們遊戲目錄 `typeclasses.mech.Mech` 中的完整路徑，因為 Evennia 已經知道要查詢 `typeclasses` 資料夾）。一個閃亮的新機甲將出現在房間裡！只需使用
 
     ic bigmech
 
-to take it on a test drive.
+試駕一下。
 
-### Future Mechs
+(future-mechs)=
+### 未來機甲
 
-Having you puppet the mech-object directly is just one way to implement a giant mech in Evennia.
+直接操縱機甲物件只是在 Evennia 中實現巨型機甲的一種方法。
 
-For example, you could instead picture a mech as a “vehicle” that you “enter” as your normal
-Character (since any Object can move inside another). In that case the “insides” of the mech Object could be the “cockpit”. The cockpit would have the `MechCommandSet` stored on itself and all the shooting goodness would be made available to you only when you enter it.
+例如，您可以將機甲想像成您正常“進入”的“車輛”
+角色（因為任何物件都可以在另一個物件內部移動）。在這種情況下，機甲物體的「內部」可能是「駕駛艙」。駕駛艙本身會存放`MechCommandSet`，只有當你進入駕駛艙時，所有的射擊技巧才會提供給你。
 
-To expand on this you could add more commands to the mech and remove others. Maybe the mech shouldn’t work just like a Character after all. 
+要對此進行擴充套件，您可以向機甲新增更多指令並刪除其他指令。也許機甲畢竟不該像角色一樣運作。
 
-Maybe it makes loud noises every time it passes from room to room. Maybe it cannot pick up things without crushing them. Maybe it needs fuel, ammo and repairs. Maybe you’ll lock it down so it can only be puppeted by emo teenagers.
+也許它每次從一個房間經過另一個房間時都會發出很大的噪音。也許它無法在不壓碎東西的情況下撿起它們。也許它需要燃料、彈藥和修理。也許你會lock把它放下，這樣它就只能被情緒化的青少年操縱。
 
-And of course you could put more guns on it. And make it fly.
+當然，你可以在上面放更多的槍。並讓它飛起來。

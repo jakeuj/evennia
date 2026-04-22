@@ -1,18 +1,20 @@
-# Continuous Integration (CI)
+(continuous-integration-ci)=
+# 持續整合（CI）
 
-[Continuous Integration (CI)](https://en.wikipedia.org/wiki/Continuous_integration) is a development practice that requires developers to integrate code into a shared repository. Each check-in is then verified by an automated build, allowing teams to detect problems early. This  can be set up to safely deploy data to a production server only after tests have passed, for example. 
+[持續整合(CI)](https://en.wikipedia.org/wiki/Continuous_integration)是一種開發實踐，要求開發人員將程式碼整合到共享儲存庫中。然後，每次簽入都會透過自動建置進行驗證，使團隊能夠及早發現問題。例如，可以將其設定為僅在測試透過後才將資料安全地部署到生產伺服器。
 
-For Evennia, continuous integration allows an automated build process to:
+對於Evennia，持續整合允許自動化建置流程：
 
-* Pull down a latest build from Source Control.
-* Run migrations on the backing SQL database.
-* Automate additional unique tasks for that project.
-* Run unit tests.
-* Publish those files to the server directory
-* Reload the game.
+* 從原始碼管理下載最新版本。
+* 在支援 SQL 資料庫上執行遷移。
+* 自動化該專案的其他獨特任務。
+* 執行單元測試。
+* 將這些檔案釋出到伺服器目錄
+* 重新載入遊戲。
 
-## Continuous-Integration guides
+(continuous-integration-guides)=
+## 持續整合指南
 
-Evennia itself is making heavy use of [github actions](https://github.com/features/actions). This is integrated with Github and is probably the one to go for most people, especially if your code is on Github already. You can see and analyze how Evennia's actions are running [here](https://github.com/evennia/evennia/actions).
+Evennia 本身大量使用了 [github actions](https://github.com/features/actions)。它與 Github 整合，可能是大多數人的首選，尤其是如果您的程式碼已經在 Github 上的話。您可以在[此處](https://github.com/evennia/evennia/actions)檢視並分析Evennia的操作如何運作。
 
-There are however a lot of tools and services providing CI functionality.   [Here is a blog overview](https://www.atlassian.com/continuous-delivery/continuous-integration/tools)  (external link).
+然而，有許多工具和服務提供CI 功能。   [這裡是部落格概述](https://www.atlassian.com/continuous-delivery/continuous-integration/tools)（外部連結）。

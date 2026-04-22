@@ -1,8 +1,11 @@
-# Server Setup and Life
+(server-setup-and-life)=
+# 伺服器設定與生命週期
 
-This sums up all steps of maintaining your Evennia game from first installation to production release.
+這裡整理了 Evennia 遊戲從第一次安裝到正式上線的整體維運流程。
 
-## Installation and running 
+(installation-and-running)=
+<a id="installation-and-running"></a>
+## 安裝與執行
 
 ```{toctree}
 :maxdepth: 1
@@ -18,7 +21,9 @@ Running-Evennia
 Updating-Evennia
 ```
 
-## Configuration
+(configuration)=
+<a id="configuration"></a>
+## 設定
 
 ```{toctree}
 :maxdepth: 2
@@ -33,7 +38,9 @@ Channels-to-RSS
 Channels-to-Twitter
 ```
 
-## Going Online
+(going-online)=
+<a id="going-online"></a>
+## 上線
 
 ```{toctree} 
 :maxdepth: 2

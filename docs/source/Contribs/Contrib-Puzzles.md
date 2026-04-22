@@ -1,31 +1,34 @@
-# Puzzles System
+(puzzles-system)=
+# 謎題系統
 
-Contribution by Henddher 2018
+Henddher 2018 年的貢獻
 
-Intended for adventure-game style combination puzzles, such as combining fruits
-and a blender to create a smoothie. Provides a typeclass and commands for objects 
-that can be combined (i.e. used together). Unlike the `crafting` contrib, each 
-puzzle is built from unique objects rather than using tags and a builder can create 
-the puzzle entirely from in-game.
+適用於冒險遊戲風格的組合謎題，例如組合水果
+和攪拌機來製作冰沙。為物件提供typeclass和指令
+可以組合（i.e。一起使用）。與 `crafting` contrib 不同，每個
+拼圖是由獨特的物件建構的，而不是使用 tags 並且建構者可以建立
+謎題完全來自遊戲內。
 
-A `Puzzle` is a recipe of what objects (aka parts) must be combined by a player so
-a new set of objects (aka results) are automatically created.
+`Puzzle` 是玩家必須組合哪些物件（也稱為零件）的配方，以便
+自動建立一組新的物件（也稱為結果）。
 
-## Installation
+(installation)=
+## 安裝
 
-Add the `PuzzleSystemCmdSet` to all players (e.g. in their Character typeclass).
+將`PuzzleSystemCmdSet`新增到所有玩家（e.g。在他們​​的角色typeclass中）。
 
-Alternatively (for quick testing):
+或（用於快速測試）：
 
     py self.cmdset.add('evennia.contrib.game_systems.puzzles.PuzzleSystemCmdSet')
 
-## Usage
+(usage)=
+## 用法
 
-Consider this simple Puzzle:
+考慮這個簡單的難題：
 
     orange, mango, yogurt, blender = fruit smoothie
 
-As a Builder:
+作為建造者：
 
     create/drop orange
     create/drop mango
@@ -45,33 +48,34 @@ As a Builder:
     ....
     Puzzle smoothie(#1234) has been armed successfully
 
-As Player:
+作為玩家：
 
     use orange, mango, yogurt, blender
     ...
     Genius, you blended all fruits to create a fruit smoothie!
 
-## Details
+(details)=
+## 細節
 
-Puzzles are created from existing objects. The given
-objects are introspected to create prototypes for the
-puzzle parts and results. These prototypes become the
-puzzle recipe. (See PuzzleRecipe and `puzzle`
-command). Once the recipe is created, all parts and result
-can be disposed (i.e. destroyed).
+謎題是根據現有物體建立的。給定的
+物件被內省以建立原型
+拼圖部分和結果。這些原型成為
+拼圖食譜。 （參見PuzzleRecipe和`puzzle`
+指令）。建立配方後，所有部分和結果
+可以處置（i.e。銷毀）。
 
-At a later time, a Builder or a Script can arm the puzzle
-and spawn all puzzle parts in their respective
-locations (See armpuzzle).
+稍後，建造者或 Script 可以裝備拼圖
+並在各自的位置產生所有拼圖部分
+位置（參見臂謎）。
 
-A regular player can collect the puzzle parts and combine
-them (See use command). If player has specified
-all pieces, the puzzle is considered solved and all
-its puzzle parts are destroyed while the puzzle results
-are spawened on their corresponding location.
+普通玩家可以收集拼圖部件並組合
+他們（請參閱使用指令）。如果玩家已指定
+所有碎片，拼圖被視為已解決並且所有
+當謎題結果時，它的謎題部分被破壞
+產卵在其對應的位置。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/game_systems/puzzles/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\game_systems\puzzles\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

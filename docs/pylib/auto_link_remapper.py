@@ -132,7 +132,7 @@ def auto_link_remapper(no_autodoc=False):
 
             targetname = targetpath.name.rsplit(".", 1)[0]
             targetpath = targetpath.as_posix()
-            url = relpath(targetpath, dirname(sourcepath))
+            url = relpath(targetpath, dirname(sourcepath)).replace("\\", "/")
             if not "/" in url:
                 # need to be explicit or there will be link ref collisions between
                 # e.g. TickerHandler page and TickerHandle api node
@@ -263,7 +263,7 @@ def auto_link_remapper(no_autodoc=False):
     if count > 0:
         print(f"  -- Auto-corrected links in {count} documents.")
 
-    for (fname, src_url) in sorted(toc_map.items(), key=lambda tup: tup[0]):
+    for fname, src_url in sorted(toc_map.items(), key=lambda tup: tup[0]):
         if fname not in _USED_REFS and not src_url.startswith("api/"):
             print(f"  ORPHANED DOC: no refs found to {src_url}.md")
 

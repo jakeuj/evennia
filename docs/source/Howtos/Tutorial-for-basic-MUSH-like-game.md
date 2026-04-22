@@ -1,50 +1,53 @@
-# Tutorial for basic MUSH like game
+(tutorial-for-basic-mush-like-game)=
+# 基本MUSH類遊戲教學
 
 
-This tutorial lets you code a small but complete and functioning MUSH-like game in Evennia. A
-[MUSH](https://en.wikipedia.org/wiki/MUSH) is, for our purposes, a class of roleplay-centric games
-focused on free form storytelling. Even if you are not interested in MUSH:es, this is still a good
-first game-type to try since it's not so code heavy. You will be able to use the same principles for
-building other types of games.
+本教學讓您可以在 Evennia 中編寫一個小型但完整且功能性類似於 MUSH 的遊戲。一個
+[MUSH](https://en.wikipedia.org/wiki/MUSH) 就我們的目的而言，是一類以角色扮演為中心的遊戲
+專注於自由形式的故事敘述。即使你對 MUSH:es 不感興趣，這仍然是一個很好的選擇
+第一個嘗試的遊戲型別，因為它的程式碼量不是很大。您將能夠使用相同的原則
+建構其他型別的遊戲。
 
-The tutorial starts from scratch. If you did the [First Steps Coding](Beginner-Tutorial/Part1/Beginner-Tutorial-Part1-Overview.md) tutorial
-already you should have some ideas about how to do some of the steps already.
+本教學從頭開始。如果您完成了[第一步編碼](Beginner-Tutorial/Part1/Beginner-Tutorial-Part1-Overview.md)教學
+您應該已經對如何執行某些步驟有了一些想法。
 
-The following are the (very simplistic and cut-down) features we will implement (this was taken from
-a feature request from a MUSH user new to Evennia). A Character in this system should:
+以下是我們將實現的（非常簡單和精簡的）功能（摘自
+來自新加入 Evennia 的 MUSH 使用者的功能請求）。該系統中的角色應該：
 
-- Have a “Power” score from 1 to 10 that measures how strong they are (stand-in for the stat
-system).
-- Have a command (e.g. `+setpower 4`) that sets their power (stand-in for character generation
-code).
-- Have a command (e.g. `+attack`) that lets them roll their power and produce a "Combat Score"
-between `1` and `10*Power`, displaying the result and editing their object to record this number
-(stand-in for `+actions` in the command code).
-- Have a command that displays everyone in the room and what their most recent "Combat Score" roll
-was (stand-in for the combat code).
-- Have a command (e.g. `+createNPC Jenkins`) that creates an NPC with full abilities.
-- Have a command to control NPCs, such as `+npc/cmd (name)=(command)` (stand-in for the NPC
-controlling code).
+- 有一個從 1 到 10 的「力量」分數，衡量他們的實力（代表統計資料）
+系統）。
+- 有一個指令（e.g。`+setpower 4`）來設定他們的力量（替代角色生成
+程式碼）。
+- 有一個指令（e.g。`+attack`）讓他們滾動他們的力量並產生“戰鬥分數”
+`1` 和 `10*Power` 之間，顯示結果並編輯其物件以記錄此數字
+（代表指令程式碼中的`+actions`）。
+- 有一個指令可以顯示房間中的每個人以及他們最近的“戰鬥分數”卷
+是（戰鬥程式碼的替代）。
+- 有一個指令（e.g。`+createNPC Jenkins`）建立一個具有全部能力的NPC。
+- 有一個指令來控制NPCs，例如`+npc/cmd (name)=(command)`（取代NPC
+控制程式碼）。
 
-In this tutorial we will assume you are starting from an empty database without any previous
-modifications.
+在本教學中，我們假設您從空資料庫開始，之前沒有任何資料庫
+修改。
 
-## Server Settings
+(server-settings)=
+## 伺服器設定
 
-To emulate a MUSH, the default `MULTISESSION_MODE=0` is enough (one unique session per
-account/character). This is the default so you don't need to change anything. You will still be able
-to puppet/unpuppet objects you have permission to, but there is no character selection out of the
-box in this mode.
+要模擬 MUSH，預設的 `MULTISESSION_MODE=0` 就足夠了（每個 session 一個唯一的 session）
+帳戶/角色）。這是預設設定，因此您無需更改任何內容。你仍然可以
+操縱/取消操縱您有權操縱的物件，但沒有從中選擇角色
+在此模式下的框框。
 
-We will assume our game folder is called `mygame` henceforth.  You should be fine with the default
-SQLite3 database.
+我們假設我們的遊戲資料夾從此被稱為`mygame`。  你應該可以使用預設值
+SQLite3 資料庫。
 
-## Creating the Character
+(creating-the-character)=
+## 建立角色
 
-First thing is to choose how our Character class works. We don't need to define a special NPC object
--- an NPC is after all just a Character without an Account currently controlling them.
+首先是選擇我們的角色類別的工作方式。我們不需要定義特殊的NPC物件
+-- NPC 畢竟只是一個角色，目前沒有帳戶控制它們。
 
-Make your changes in the `mygame/typeclasses/characters.py` file:
+在 `mygame/typeclasses/characters.py` 檔案中進行更改：
 
 ```python
 # mygame/typeclasses/characters.py
@@ -61,60 +64,62 @@ class Character(DefaultCharacter):
         self.db.combat_score = 1
 ```
 
-We defined two new [Attributes](../Components/Attributes.md) `power` and `combat_score` and set them to default
-values. Make sure to `@reload` the server if you had it already running (you need to reload every
-time you update your python code, don't worry, no accounts will be disconnected by the reload).
+我們定義了兩個新的[屬性](../Components/Attributes.md)`power`和`combat_score`並將它們設為預設值
+價值觀。如果伺服器已經在執行，請確保 `@reload` 伺服器（您需要重新載入每個
+當你更新你的Python程式碼時，不用擔心，重新載入不會斷開任何帳戶的連線）。
 
-Note that only *new* characters will see your new Attributes (since the `at_object_creation` hook is
-called when the object is first created, existing Characters won't have it).  To update yourself,
-run
+請注意，只有*新*字元才會看到您的新屬性（因為 `at_object_creation` 鉤子是
+首次建立物件時呼叫，現有角色不會擁有它）。  為了更新自己，
+跑
 
      @typeclass/force self
 
-This resets your own typeclass (the `/force` switch is a safety measure to not do this
-accidentally), this means that `at_object_creation` is re-run.
+這會重置您自己的typeclass（`/force`開關是一種安全措施，不這樣做
+意外），這意味著 `at_object_creation` 重新執行。
 
      examine self
 
-Under the "Persistent attributes" heading you should now find the new Attributes `power` and `score`
-set on yourself by `at_object_creation`. If you don't, first make sure you `@reload`ed into the new
-code, next look at your server log (in the terminal/console) to see if there were any syntax errors
-in your code that may have stopped your new code from loading correctly.
+在「永續性屬性」標題下，您現在應該找到新屬性 `power` 和 `score`
+`at_object_creation` 為你自己設定。如果不這樣做，請先確保您 `@reload`ed 進入新的
+程式碼，接下來檢視您的伺服器日誌（在終端機/控制檯中）以檢視是否存在任何語法錯誤
+在您的程式碼中，這可能會阻止您的新程式碼正確載入。
 
-## Character Generation
+(character-generation)=
+## 角色生成
 
-We assume in this example that Accounts first connect into a "character generation area". Evennia
-also supports full OOC menu-driven character generation, but for this example, a simple start room
-is enough. When in this room (or rooms) we allow character generation commands. In fact, character
-generation commands will *only* be available in such rooms.
+在此範例中，我們假設帳戶首先連線到「字元產生區域」。 Evennia
+也支援完整的OOC選單驅動的角色生成，但對於這個例子，一個簡單的開始房間
+就足夠了。當在這個房間（或多個房間）中時，我們允許角色產生指令。其實性格
+產生指令*僅*在此類房間中可用。
 
-Note that this again is made so as to be easy to expand to a full-fledged game. With our simple
-example, we could simply set an `is_in_chargen` flag on the account and have the `+setpower` command
-check it. Using this method however will make it easy to add more functionality later.
+請注意，這樣做是為了易於擴充套件為成熟的遊戲。用我們簡單的
+例如，我們可以簡單地在帳戶上設定 `is_in_chargen` 標誌並使用 `+setpower` 指令
+檢查一下。然而，使用此方法將使以後新增更多功能變得容易。
 
-What we need are the following:
+我們需要的是以下內容：
 
-- One character generation [Command](../Components/Commands.md) to set the "Power" on the `Character`.
-- A chargen [CmdSet](../Components/Command-Sets.md) to hold this command. Lets call it `ChargenCmdset`.
-- A custom `ChargenRoom` type that makes this set of commands available to players in such rooms.
-- One such room to test things in.
+- 產生一個字元[指令](../Components/Commands.md)來設定`Character`上的「力量」。
+- 一個 Chargen [CmdSet](../Components/Command-Sets.md) 來儲存此指令。我們稱之為`ChargenCmdset`。
+- 自訂 `ChargenRoom` 型別，使此類房間中的玩家可以使用這組指令。
+- 一間這樣的房間來測試東西。
 
-### The +setpower command
+(the-setpower-command)=
+### +setpower 指令
 
-For this tutorial we will add all our new commands to `mygame/commands/command.py` but you could
-split your commands into multiple module if you prefered.
+在本教學中，我們將所有新指令新增至`mygame/commands/command.py`，但您可以
+如果您願意，可以將指令拆分為多個模組。
 
-For this tutorial character generation will only consist of one [Command](../Components/Commands.md) to set the
-Character s "power" stat. It will be called on the following MUSH-like form:
+對於本教學，角色生成僅包含一個 [指令](../Components/Commands.md) 來設定
+角色的「力量」統計。它將以以下類似 MUSH 的形式呼叫：
 
      +setpower 4
 
-Open `command.py` file. It contains documented empty templates for the base command and the
-"MuxCommand" type used by default in Evennia. We will use the plain `Command` type here, the
-`MuxCommand` class offers some extra features like stripping whitespace that may be useful - if so,
-just import from that instead.
+開啟 `command.py` 檔案。它包含基本指令和
+Evennia 中預設使用「MuxCommand」型別。我們將在這裡使用簡單的 `Command` 型別，
+`MuxCommand` 類提供了一些額外的功能，例如可能有用的剝離空格 - 如果是這樣，
+只需從中匯入即可。
 
-Add the following to the end of the `command.py` file:
+將以下內容新增至 `command.py` 檔案的末尾：
 
 ```python
 # end of command.py
@@ -152,23 +157,23 @@ class CmdSetPower(Command):
         self.caller.db.power = power
         self.caller.msg(f"Your Power was set to {power}.")
 ```
-This is a pretty straightforward command. We do some error checking, then set the power on ourself.
-We use a `help_category` of "mush" for all our commands, just so they are easy to find and separate
-in the help list.
+這是一個非常簡單的指令。我們進行一些錯誤檢查，然後自行啟動。
+我們對所有指令使用 `help_category` 的“mush”，這樣它們就很容易找到和分離
+在幫助清單中。
 
-Save the file. We will now add it to a new [CmdSet](../Components/Command-Sets.md) so it can be accessed (in a full
-chargen system you would of course have more than one command here).
+儲存檔案。我們現在將其新增到新的 [CmdSet](../Components/Command-Sets.md) 中，以便可以存取它（以完整的方式）
+chargen 系統你當然會在這裡有多個指令）。
 
-Open `mygame/commands/default_cmdsets.py` and import your `command.py` module at the top. We also
-import the default `CmdSet` class for the next step:
+開啟 `mygame/commands/default_cmdsets.py` 並在頂部匯入您的 `command.py` 模組。我們也
+匯入預設的 `CmdSet` 類別以進行下一步：
 
 ```python
 from evennia import CmdSet
 from commands import command
 ```
 
-Next scroll down and define a new command set (based on the base `CmdSet` class we just imported at
-the end of this file, to hold only our chargen-specific command(s):
+接下來向下捲動並定義一個新的指令集（基於我們剛剛匯入的基本 `CmdSet` 類別）
+該檔案的末尾，僅儲存我們特定於 chargen 的指令：
 
 ```python
 # end of default_cmdsets.py
@@ -183,15 +188,16 @@ class ChargenCmdset(CmdSet):
         self.add(command.CmdSetPower())
 ```
 
-In the future you can add any number of commands to this cmdset, to expand your character generation
-system as you desire. Now we need to actually put that cmdset on something so it's made available to
-users.  We could put it directly on the Character, but that would make it available all the time.
-It's cleaner to put it on a room, so it's only available when players are in that room.
+將來你可以為這個cmdset新增任意數量的指令，以擴充套件你的角色生成
+系統如你所願。現在我們需要實際將 cmdset 放在某個東西上，以便它可供使用
+使用者。  我們可以將其直接放在角色上，但這將使其始終可用。
+把它放在房間裡會更乾淨，所以只有當玩家在那個房間時它才可用。
 
-### Chargen areas
+(chargen-areas)=
+### 電荷區
 
-We will create a simple Room typeclass to act as a template for all our Chargen areas. Edit
-`mygame/typeclasses/rooms.py` next:
+我們將建立一個簡單的 Room typeclass 作為我們所有 Chargen 區域的模板。編輯
+`mygame/typeclasses/rooms.py` 接下來：
 
 ```python
 from commands.default_cmdsets import ChargenCmdset
@@ -208,62 +214,65 @@ class ChargenRoom(Room):
         "this is called only at first creation"
         self.cmdset.add(ChargenCmdset, persistent=True)
 ```
-Note how new rooms created with this typeclass will always start with `ChargenCmdset` on themselves.
-Don't forget the `persistent=True` keyword or you will lose the cmdset after a server reload. For
-more information about [Command Sets](../Components/Command-Sets.md) and [Commands](../Components/Commands.md), see the respective
-links.
+請注意，使用 typeclass 建立的新房間將始終以 `ChargenCmdset` 開頭。
+不要忘記 `persistent=True` 關鍵字，否則伺服器重新載入後您將丟失 cmdset。對於
+有關[指令集](../Components/Command-Sets.md) 和[指令](../Components/Commands.md) 的更多資訊，請參閱相應的
+連結。
 
-### Testing chargen
+(testing-chargen)=
+### 測試電荷
 
-First, make sure you have `@reload`ed the server (or use `evennia reload` from the terminal) to have
-your new python code added to the game. Check your terminal and fix any errors you see - the error
-traceback lists exactly where the error is found - look line numbers in files you have changed.
+首先，請確保您已`@reload`ed伺服器（或從終端使用`evennia reload`）
+您的新 Python 程式碼已新增至遊戲中。檢查您的終端並修復您看到的任何錯誤 - 錯誤
+回溯準確地列出了發現錯誤的位置 - 檢視已更改的檔案中的行號。
 
-We can't test things unless we have some chargen areas to test. Log into the game (you should at
-this point be using the new, custom Character class). Let's dig a chargen area to test.
+除非我們有一些帶電區域要測試，否則我們無法測試事物。登入遊戲（您應該在
+此時將使用新的自訂字元類別）。我們挖一個帶電區域來測試一下。
 
      @dig chargen:rooms.ChargenRoom = chargen,finish
 
-If you read the help for `@dig` you will find that this will create a new room named `chargen`. The
-part after the `:` is the python-path to the Typeclass you want to use. Since Evennia will
-automatically try the `typeclasses` folder of our game directory, we just specify
-`rooms.ChargenRoom`, meaning it will look inside the module `rooms.py` for a class named
-`ChargenRoom` (which is what we created above). The names given after `=` are the names of exits to
-and from the room from your current location. You could also append aliases to each one name, such
-as `chargen;character generation`.
+如果您閱讀`@dig`的幫助，您會發現這將建立一個名為`chargen`的新房間。的
+`:` 之後的部分是您要使用的 Typeclass 的 python 路徑。由於 Evennia 將
+自動嘗試我們遊戲目錄的`typeclasses`資料夾，我們只需指定
+`rooms.ChargenRoom`，這意味著它將在模組 `rooms.py` 中尋找名為的類
+`ChargenRoom`（這是我們上面建立的）。 `=` 之後給出的名稱是出口的名稱
+以及從您目前位置的房間。您也可以為每個名稱附加別名，例如
+為`chargen;character generation`。
 
-So in summary, this will create a new room of type ChargenRoom and open an exit `chargen` to it and
-an exit back here named `finish`. If you see errors at this stage, you must fix them in your code.
+總而言之，這將建立一個型別為 ChargenRoom 的新房間，並為其開啟一個出口 `chargen`，
+一個名為 `finish` 的出口。如果您在此階段看到錯誤，則必須在程式碼中修復它們。
 `@reload`
-between fixes. Don't continue until the creation seems to have worked okay.
+修復之間。在建立看起來工作正常之前不要繼續。
 
      chargen
 
-This should bring you to the chargen room. Being in there you should now have the `+setpower`
-command available, so test it out. When you leave (via the `finish` exit), the command will go away
-and trying `+setpower` should now give you a command-not-found error. Use `ex me` (as a privileged
-user) to check so the `Power` [Attribute](../Components/Attributes.md) has been set correctly.
+這應該會帶你到充電室。在那裡你現在應該有`+setpower`
+指令可用，所以測試一下。當您離開時（透過 `finish` 出口），該指令將消失
+嘗試 `+setpower` 現在應該會給你一個指令找不到的錯誤。使用`ex me`（作為特權
+使用者）檢查 `Power` [Attribute](../Components/Attributes.md) 是否設定正確。
 
-If things are not working, make sure your typeclasses and commands are free of bugs and that you
-have entered the paths to the various command sets and commands correctly. Check the logs or command
-line for tracebacks and errors.
+如果出現問題，請確保您的 typeclasses 和指令沒有錯誤，並且您
+已正確輸入各種指令集和指令的路徑。檢查日誌或指令
+用於回溯和錯誤的行。
 
-## Combat System
+(combat-system)=
+## 戰鬥系統
 
-We will add our combat command to the default command set, meaning it will be available to everyone
-at all times. The combat system consists of a `+attack` command to get how successful our attack is.
-We also change the default `look` command to display the current combat score.
+我們將把戰鬥指令新增到預設指令集中，這意味著每個人都可以使用它
+任何時候。戰鬥系統由 `+attack` 指令組成，用於獲取我們的攻擊有多成功。
+我們還更改了預設的 `look` 指令來顯示當前的戰鬥分數。
 
 
-### Attacking with the +attack command
+(attacking-with-the-attack-command)=
+### 使用+attack指令進行攻擊
 
-Attacking in this simple system means rolling a random "combat score" influenced by the `power` stat
-set during Character generation:
+在這個簡單的系統中攻擊意味著滾動一個受 `power` 統計影響的隨機“戰鬥分數”
+在角色生成期間設定：
 
     > +attack
     You +attack with a combat score of 12!
 
-Go back to `mygame/commands/command.py` and add the command to the end like this:
+返回 `mygame/commands/command.py` 並將指令新增到末尾，如下所示：
 
 ```python
 import random
@@ -308,44 +317,45 @@ class CmdAttack(Command):
         ), exclude=caller)
 ```
 
-What we do here is simply to generate a "combat score" using Python's inbuilt `random.randint()`
-function. We then store that and echo the result to everyone involved.
+我們在這裡所做的只是使用Python內建的`random.randint()`來產生“戰鬥分數”
+功能。然後我們儲存該結果並將結果回顯給所有相關人員。
 
-To make the `+attack` command available to you in game, go back to
-`mygame/commands/default_cmdsets.py` and scroll down to the `CharacterCmdSet` class. At the correct
-place add this line:
+要使 `+attack` 指令在遊戲中可用，請返回
+`mygame/commands/default_cmdsets.py` 並向下捲動至 `CharacterCmdSet` 類。在正確的
+地方加入這一行：
 
 ```python
 self.add(command.CmdAttack())
 ```
 
-`@reload` Evennia and the `+attack` command should be available to you. Run it and use e.g. `@ex` to
-make sure the `combat_score` attribute is saved correctly.
+`@reload` Evennia 和 `+attack` 指令應該可供您使用。執行它並使用e.g。 `@ex` 至
+確保 `combat_score` attribute 已正確儲存。
 
-### Have "look" show combat scores
+(have-look-show-combat-scores)=
+### 「看」顯示戰鬥分數
 
-Players should be able to view all current combat scores in the room.  We could do this by simply
-adding a second command named something like `+combatscores`, but we will instead let the default
-`look` command do the heavy lifting for us and display our scores as part of its normal output, like
-this:
+玩家應該能夠檢視房間中所有當前的戰鬥分數。  我們可以透過簡單地做到這一點
+新增第二個名為 `+combatscores` 的指令，但我們將使用預設值
+`look` 指令為我們完成繁重的工作並將我們的分數顯示為正常輸出的一部分，例如
+這個：
 
     >  look Tom
     Tom (combat score: 3)
     This is a great warrior.
 
-We don't actually have to modify the `look` command itself however. To understand why, take a look
-at how the default `look` is actually defined. It sits in [evennia/commands/default/general.py](evennia.commands.default.general).
+然而，我們實際上不必修改 `look` 指令本身。要了解原因，請看一下
+預設 `look` 是如何實際定義的。它位於 [evennia/commands/default/general.py](evennia.commands.default.general)。
 
-You will find that the actual return text is done by the `look` command calling a *hook method*
-named `return_appearance` on the object looked at. All the `look` does is to echo whatever this hook
-returns.  So what we need to do is to edit our custom Character typeclass and overload its
-`return_appearance` to return what we want (this is where the advantage of having a custom typeclass
-comes into play for real).
+你會發現實際的回傳文字是透過`look`指令呼叫*hook方法*完成的
+在所檢視的物件上命名為 `return_appearance`。 `look` 所做的只是回顯該鉤子的任何內容
+返回。  所以我們需要做的是編輯我們的自訂角色typeclass並過載它
+`return_appearance` 回傳我們想要的內容（這就是自訂 typeclass 的優勢所在
+真正發揮作用）。
 
-Go back to your custom Character typeclass in `mygame/typeclasses/characters.py`. The default
-implementation of `return appearance` is found in  [evennia.DefaultCharacter](evennia.objects.objects.DefaultCharacter).
+傳回 `mygame/typeclasses/characters.py` 中的自訂角色 typeclass。預設
+`return appearance` 的實現位於 [evennia.DefaultCharacter](evennia.objects.objects.DefaultCharacter) 中。
 
-If you  want to make bigger changes you could copy & paste the whole default thing into our overloading method. In our case the change is small though:
+如果您想進行更大的更改，您可以將整個預設內容複製並貼上到我們的過載方法中。在我們的例子中，變化很小：
 
 ```python
 class Character(DefaultCharacter):
@@ -374,37 +384,39 @@ class Character(DefaultCharacter):
         return text
 ```
 
-What we do is to simply let the default `return_appearance` do its thing (`super` will call the
-parent's version of the same method). We then split out the first line of this text, append our
-`combat_score` and put it back together again.
+我們所做的就是簡單地讓預設的 `return_appearance` 做它的事情（`super` 將呼叫
+相同方法的父母版本）。然後我們分割出該文字的第一行，並附加我們的
+`combat_score` 並再次將其放回原處。
 
-`@reload` the server and you should be able to look at other Characters and see their current combat
-scores.
+`@reload` 伺服器，你應該能夠檢視其他角色並瞭解他們當前的戰鬥
+分數。
 
-> Note: A potentially more useful way to do this would be to overload the entire `return_appearance`
-of the `Room`s of your mush and change how they list their contents; in that way one could see all
-combat scores of all present Characters at the same time as looking at the room. We leave this as an
-exercise.
+> 注意：一個可能更有用的方法是過載整個 `return_appearance`
+`Room`s 的糊狀內容並更改它們列出內容的方式；這樣人們就可以看到所有
+檢視房間的同時顯示所有在場角色的戰鬥分數。我們將其保留為
+鍛煉。
 
-## NPC system
+(npc-system)=
+## NPC系統
 
-Here we will re-use the Character class by introducing a command that can create NPC objects. We
-should also be able to set its Power and order it around.
+這裡我們將透過引入一個可以建立NPC物件的指令來重複使用Character類別。我們
+還應該能夠設定其功率並對其進行排序。
 
-There are a few ways to define the NPC class. We could in theory create a custom typeclass for it
-and put a custom NPC-specific cmdset on all NPCs. This cmdset could hold all manipulation commands.
-Since we expect NPC manipulation to be a common occurrence among the user base however, we will
-instead put all relevant NPC commands in the default command set and limit eventual access with
-[Permissions and Locks](../Components/Permissions.md).
+有幾種方法可以定義 NPC 類別。理論上我們可以為它建立一個自訂的 typeclass
+並將自訂NPC-特定cmdset放在所有NPCs上。這個cmdset可以容納所有的操作指令。
+然而，由於我們預期 NPC 操縱在使用者群中很常見，因此我們將
+相反，將所有相關的 NPC 指令放入預設指令集中，並限制最終訪問
+[許可權和鎖定](../Components/Permissions.md)。
 
-### Creating an NPC with +createNPC
+(creating-an-npc-with-createnpc)=
+### 使用 +createNPC 建立 NPC
 
-We need a command for creating the NPC, this is a very straightforward command:
+我們需要一個指令來建立NPC，這是一個非常簡單的指令：
 
     > +createnpc Anna
     You created the NPC 'Anna'.
 
-At the end of `command.py`, create our new command:
+在`command.py`末尾，建立我們的新指令：
 
 ```python
 from evennia import create_object
@@ -451,42 +463,43 @@ class CmdCreateNPC(Command):
             npc=name,
         ), exclude=caller)
 ```
-Here we define a `+createnpc` (`+createNPC` works too) that is callable by everyone *not* having the
-`nonpcs` "[permission](../Components/Permissions.md)" (in Evennia, a "permission" can just as well be used to
-block access, it depends on the lock we define). We create the NPC object in the caller's current
-location, using our custom `Character` typeclass to do so.
+這裡我們定義了一個 `+createnpc` （`+createNPC` 也可以），每個*不*擁有
+`nonpcs`「[許可權](../Components/Permissions.md)」（在Evennia中，「許可權」也可以用於
+阻止訪問，這取決於我們定義的lock）。我們在呼叫者的目前物件中建立 NPC 物件
+位置，使用我們自訂的 `Character` typeclass 來執行此操作。
 
-We set an extra lock condition on the NPC, which we will use to check who may edit the NPC later --
-we allow the creator to do so, and anyone with the Builders permission (or higher). See
-[Locks](../Components/Locks.md) for more information about the lock system.
+我們在 NPC 上設定了一個額外的 lock 條件，我們將用它來檢查誰可以稍後編輯 NPC --
+我們允許建立者以及任何擁有建構者許可權（或更高許可權）的人這樣做。參見
+[鎖定](../Components/Locks.md) 以瞭解更多有關 lock 系統的資訊。
 
-Note that we just give the object default permissions (by not specifying the `permissions` keyword
-to the `create_object()` call).  In some games one might want to give the NPC the same permissions
-as the Character creating them, this might be a security risk though.
+請注意，我們只是授予物件預設許可權（透過不指定 `permissions` 關鍵字
+到 `create_object()` 呼叫）。  在某些遊戲中，人們可能會想給予 NPC 相同的許可權
+作為建立它們的角色，這可能會帶來安全風險。
 
-Add this command to your default cmdset the same way you did the `+attack` command earlier.
-`@reload` and it will be available to test.
+將此指令新增至預設的 cmdset 中，就像之前執行 `+attack` 指令一樣。
+`@reload` 並且可以進行測試。
 
-### Editing the NPC with +editNPC
+(editing-the-npc-with-editnpc)=
+### 使用 +editNPC 編輯 NPC
 
-Since we re-used our custom character typeclass, our new NPC already has a *Power* value - it
-defaults to 1. How do we change this?
+由於我們重新使用了自定義角色 typeclass，因此我們的新 NPC 已經具有 *Power* 值 - 它
+預設為 1。我們如何更改它？
 
-There are a few ways we can do this. The easiest is to remember that the `power` attribute is just a
-simple [Attribute](../Components/Attributes.md) stored on the NPC object. So as a Builder or Admin we could set this
-right away with the default `@set` command:
+我們可以透過幾種方法來做到這一點。最簡單的是記住 `power` attribute 只是一個
+簡單 [Attribute](../Components/Attributes.md) 儲存在 NPC 物件上。所以身為建構者或管理員我們可以設定這個
+立即使用預設的 `@set` 指令：
 
      @set mynpc/power = 6
 
-The `@set` command is too generally powerful though, and thus only available to staff. We will add a
-custom command that only changes the things we want players to be allowed to change. We could in
-principle re-work our old `+setpower` command, but let's try something more useful. Let's make a
-`+editNPC` command.
+但 `@set` 指令過於強大，因此僅對工作人員可用。我們將新增一個
+自訂指令僅更改我們希望允許玩家更改的內容。我們可以在
+原則上重新工作我們舊的 `+setpower` 指令，但讓我們嘗試一些更有用的東西。讓我們做一個
+`+editNPC` 指令。
 
     > +editNPC Anna/power = 10
     Set Anna's property 'power' to 10.
 
-This is a slightly more complex command. It goes at the end of your `command.py` file as before.
+這是一個稍微複雜的指令。它像以前一樣位於 `command.py` 檔案的末尾。
 
 ```python
 class CmdEditNPC(Command):
@@ -563,33 +576,34 @@ class CmdEditNPC(Command):
                           npc.attributes.get(self.propname, default="N/A")))
 ```
 
-This command example shows off the use of more advanced parsing but otherwise it's mostly error
-checking. It searches for the given npc in the same room, and checks so the caller actually has
-permission to "edit" it before continuing. An account without the proper permission won't even be
-able to view the properties on the given NPC. It's up to each game if this is the way it should be.
+此指令範例展示了更高階解析的使用，但否則主要是錯誤
+檢查。它會在同一個房間中搜尋給定的 npc，並檢查呼叫者是否確實擁有
+在繼續之前「編輯」它的許可權。未經適當許可的帳戶甚至不會
+能夠檢視給定 NPC 上的屬性。這取決於每場比賽是否應該如此。
 
-Add this to the default command set like before and you should be able to try it out.
+像以前一樣將其新增到預設指令集中，您應該可以嘗試一下。
 
-_Note: If you wanted a player to use this command to change an on-object property like the NPC's
-name (the `key` property), you'd need to modify the command since "key" is not an Attribute (it is
-not retrievable via `npc.attributes.get` but directly via `npc.key`). We leave this as an optional
+_注意：如果您希望玩家使用此指令來更改物件屬性，例如 NPC
+name（`key` 屬性），您需要修改指令，因為「key」不是 Attribute（它是
+無法透過 `npc.attributes.get` 檢索，但可以直接透過 `npc.key` 檢索）。我們將其保留為可選
 exercise._
 
-### Making the NPC do stuff - the +npc command
+(making-the-npc-do-stuff-the-npc-command)=
+### 讓 NPC 做事 - +npc 指令
 
-Finally, we will make a command to order our NPC around. For now, we will limit this command to only
-be usable by those having the "edit" permission on the NPC. This can be changed if it's possible for
-anyone to use the NPC.
+最後，我們將發出一個指令來對 NPC 進行排序。目前，我們將限制此指令僅
+可供對 NPC 具有「編輯」許可權的人員使用。如果可能的話，可以更改此設定
+任何人都可以使用NPC。
 
-The NPC, since it inherited our Character typeclass has access to most commands a player does. What
-it doesn't have access to are Session and Player-based cmdsets (which means, among other things that
-they cannot chat on channels, but they could do that if you just added those commands). This makes
-the `+npc` command simple:
+NPC，因為它繼承了我們的角色typeclass，因此可以存取玩家執行的大多數指令。什麼
+它無權訪問Session 和基於玩家的cmdsets（這意味著，除其他外，
+他們無法在頻道上聊天，但如果您剛剛新增這些指令，他們就可以這樣做）。這使得
+`+npc` 指令很簡單：
 
     +npc Anna = say Hello!
     Anna says, 'Hello!'
 
-Again, add to the end of your `command.py` module:
+再次，新增到 `command.py` 模組的末尾：
 
 ```python
 class CmdNPC(Command):
@@ -631,33 +645,34 @@ class CmdNPC(Command):
         caller.msg(f"You told {npc.key} to do '{self.cmdname}'.")
 ```
 
-Note that if you give an erroneous command, you will not see any error message, since that error
-will be returned to the npc object, not to you. If you want players to see this, you can give the
-caller's session ID to the `execute_cmd` call, like this:
+請注意，如果您發出錯誤的指令，您將不會看到任何錯誤訊息，因為該錯誤
+將會回傳給npc物件，而不是你。如果你想讓玩家看到這個，你可以給
+呼叫者的 session ID 到 `execute_cmd` 呼叫，如下所示：
 
 ```python
 npc.execute_cmd(self.cmdname, sessid=self.caller.sessid)
 ```
 
-Another thing to remember is however that this is a very simplistic way to control NPCs. Evennia
-supports full puppeting very easily. An Account (assuming the "puppet" permission was set correctly)
-could simply do `@ic mynpc` and be able to play the game "as" that NPC. This is in fact just what
-happens when an Account takes control of their normal Character as well.
+然而，要記住的另一件事是，這是控制 NPCs 的非常簡單的方法。 Evennia
+非常輕鬆地支援完整的木偶操作。一個帳戶（假設“puppet”許可權設定正確）
+可以簡單地執行`@ic mynpc`並能夠「像」NPC那樣玩遊戲。這實際上就是這樣
+當帳戶也控制其正常角色時就會發生。
 
-## Concluding remarks
+(concluding-remarks)=
+## 結束語
 
-This ends the tutorial. It looks like a lot of text but the amount of code you have to write is
-actually relatively short. At this point you should have a basic skeleton of a game and a feel for
-what is involved in coding your game.
+教學到此結束。看起來文字很多，但你需要寫的程式碼量是
+其實比較短。至此，您應該已經瞭解了遊戲的基本框架並感受到了
+遊戲編碼涉及哪些內容。
 
-From here on you could build a few more ChargenRooms and link that to a bigger grid. The `+setpower`
-command can either be built upon or accompanied by many more to get a more elaborate character
-generation.
+從這裡開始，您可以再建立一些 ChargenRooms 並將其連結到更大的網格。 `+setpower`
+指令可以建立在更多指令之上或伴隨更多指令來獲得更複雜的角色
+一代。
 
-The simple "Power" game mechanic should be easily expandable to something more full-fledged and
-useful, same is true for the combat score principle. The `+attack` could be made to target a
-specific player (or npc) and automatically compare their relevant attributes to determine a result.
+簡單的「力量」遊戲機制應該很容易擴充套件到更成熟和更成熟的東西。
+有用，戰鬥得分原理也是如此。 `+attack` 可以針對
+特定玩家（或NPC）並自動比較其相關屬性以確定結果。
 
-To continue from here, you can take a look at the [Tutorial World](Beginner-Tutorial/Part1/Beginner-Tutorial-Tutorial-World.md). For
-more specific ideas, see the [other tutorials and hints](./Howtos-Overview.md) as well
-as the [Evennia Component overview](../Components/Components-Overview.md).
+要從這裡繼續，您可以檢視[教學世界](Beginner-Tutorial/Part1/Beginner-Tutorial-Tutorial-World.md)。對於
+更具體的想法，請參閱[其他教學和提示](./Howtos-Overview.md)
+如[Evennia元件概述](../Components/Components-Overview.md)。

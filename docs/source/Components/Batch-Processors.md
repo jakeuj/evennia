@@ -1,4 +1,5 @@
-# Batch Processors
+(batch-processors)=
+# 批次處理機
 
 ```{toctree}
 :maxdepth: 2
@@ -7,41 +8,42 @@ Batch-Command-Processor.md
 Batch-Code-Processor.md
 ```
 
-Building a game world is a lot of work, especially when starting out. Rooms should be created, descriptions have to be written, objects must be detailed and placed in their proper places. In many
-traditional MUD setups you had to do all this online, line by line, over a telnet session.
+建立遊戲世界需要大量工作，尤其是剛開始。應該建立房間，必須編寫描述，必須詳細說明物件並將其放置在適當的位置。在許多
+傳統的 MUD 設定您必須透過 telnet session 線上上逐行完成所有這些操作。
 
-Evennia already moves away from much of this by shifting the main coding work to external Python modules. But also building would be helped if one could do some or all of it externally. Enter Evennia's *batch processors* (there are two of them). The processors allows you, as a game admin, to build your game completely offline in normal text files (*batch files*) that the processors understands. Then, when you are ready, you use the processors to read it all into Evennia (and into the database) in one go.
+Evennia 已經透過將主要編碼工作轉移到外部 Python 模組來擺脫大部分這種情況。但如果可以在外部完成部分或全部工作，那麼建設也會有所幫助。輸入Evennia的*批處理器*（有兩個）。作為遊戲管理員，處理器允許您在處理器可以理解的普通文字檔案（*批次檔*）中完全離線建立遊戲。然後，當您準備好時，您可以使用處理器將其全部讀入 Evennia（並讀入資料庫）。
 
-You can of course still build completely online should you want to - this is certainly the easiest way to go when learning and for small build projects. But for major building work, the advantages of using the batch-processors are many:
-- It's hard to compete with the comfort of a modern desktop text editor; Compared to a traditional MUD line input, you can get much better overview and many more features. Also, accidentally pressing Return won't immediately commit things to the database.
-- You might run external spell checkers on your batch files. In the case of one of the batch- processors (the one that deals with Python code), you could also run external debuggers and code analyzers on your file to catch problems before feeding it to Evennia.
-- The batch files (as long as you keep them) are records of your work. They make a natural starting point for quickly re-building your world should you ever decide to start over.
-- If you are an Evennia developer, using a batch file is a fast way to setup a test-game after having reset the database.
-- The batch files might come in useful should you ever decide to distribute all or part of your world to others.
+當然，如果您願意，您仍然可以完全線上構建 - 這無疑是學習和小型構建專案時最簡單的方法。但對於主要的建築工作，使用批次程式的優點有很多：
+- 它很難與現代桌面文字編輯器的舒適度競爭；與傳統的 MUD 行輸入相比，您可以獲得更好的概覽和更多功能。此外，意外按下 Return 鍵不會立即將內容提交至資料庫。
+- 您可以對批次檔執行外部拼字檢查器。對於批次處理器之一（處理 Python 程式碼的處理器），您也可以在檔案上執行外部偵錯器和程式碼分析器以捕獲問題，然後再提供給 Evennia。
+- 批次檔（只要您保留它們）是您的工作記錄。如果您決定重新開始，它們是快速重建您的世界的自然起點。
+- 如果您是 Evennia 開發人員，則使用批次檔是重置資料庫後設定測試遊戲的快速方法。
+- 如果您決定將您的世界的全部或部分分發給其他人，則批次檔案可能會很有用。
 
-There are two batch processors, the Batch-*command* processor and the Batch-*code* processor. The
-first one is the simpler of the two. It doesn't require any programming knowledge - you basically
-just list in-game commands in a text file. The code-processor on the other hand is much more
-powerful but also more complex - it lets you use Evennia's API to code your world in full-fledged
-Python code.
+有兩個批處理器，Batch-*command* 處理器和 Batch-*code* 處理器。的
+第一個是兩者中較簡單的一個。它不需要任何程式設計知識 - 基本上你
+只需在文字檔案中列出遊戲內指令即可。另一方面，程式碼處理器的作用要大得多
+功能強大但也更複雜 - 它允許您使用 Evennia 的 API 來完整地編寫您的世界
+Python 程式碼。
 
 
-## A note on File Encodings
+(a-note-on-file-encodings)=
+## 關於檔案編碼的註釋
 
-As mentioned, both the processors take text files as input and then proceed to process them. As long as you stick to the standard [ASCII](https://en.wikipedia.org/wiki/Ascii) character set (which means the normal English characters, basically) you should not have to worry much about this section. 
+如前所述，兩個處理器都將文字檔案作為輸入，然後繼續處理它們。只要您堅持標準的 [ASCII](https://en.wikipedia.org/wiki/Ascii) 字元集（基本上意味著正常的英文字元），您就不必太擔心此部分。
 
-Many languages however use characters outside the simple `ASCII` table. Common examples are various apostrophes and umlauts but also completely different symbols like those of the greek or cyrillic alphabets.
+然而，許多語言使用簡單 `ASCII` 表之外的字元。常見的例子是各種撇號和變音符號，但也有完全不同的符號，例如希臘或西里爾字母的符號。
 
-First, we should make it clear that Evennia itself handles international characters just fine. It (and Django) uses [unicode](https://en.wikipedia.org/wiki/Unicode) strings internally.
+首先，我們應該明確 Evennia 本身可以很好地處理國際字元。它（和 Django）在內部使用 [unicode](https://en.wikipedia.org/wiki/Unicode) 字串。
 
-The problem is that when reading a text file like the batchfile, we need to know how to decode the byte-data stored therein to universal unicode. That means we need an *encoding* (a mapping) for how the file stores its data. There are many, many byte-encodings used around the world, with opaque names such as `Latin-1`, `ISO-8859-3` or `ARMSCII-8` to pick just a few examples. Problem is that it's practially impossible to determine which encoding was used to save a file just by looking at it (it's just a bunch of bytes!). You have to *know*.
+問題是，當讀取像批次檔這樣的文字檔案時，我們需要知道如何將其中儲存的位元組資料解碼為通用unicode。這意味著我們需要一個*編碼*（對映）來確定檔案如何儲存其資料。世界各地使用的位元組編碼有很多很多，它們的名稱不透明，例如 `Latin-1`、`ISO-8859-3` 或 `ARMSCII-8`，僅舉幾個例子。問題是，實際上不可能僅透過檢視檔案來確定使用哪種編碼來儲存檔案（它只是一堆位元組！）。你必須*知道*。
 
-With this little introduction it should be clear that Evennia can't guess but has to *assume* an encoding when trying to load a batchfile. The text editor and Evennia must speak the same "language" so to speak. Evennia will by default first try the international `UTF-8` encoding, but you can have Evennia try any sequence of different encodings by customizing the `ENCODINGS` list in your settings file. Evennia will use the first encoding in the list that do not raise any errors. Only if none work will the server give up and return an error message.
+透過這個小介紹，應該清楚 Evennia 無法猜測，但在嘗試載入批次檔時必須「假設」編碼。可以說，文字編輯器和 Evennia 必須使用相同的「語言」。預設情況下，Evennia 將首先嘗試國際 `UTF-8` 編碼，但您可以透過自訂設定檔中的 `ENCODINGS` 列表，讓 Evennia 嘗試不同編碼的任何序列。 Evennia 將使用清單中不會引發任何錯誤的第一個編碼。只有當沒有任何工作時，伺服器才會放棄並傳回錯誤訊息。
 
-You can often change the text editor encoding (this depends on your editor though), otherwise you need to add the editor's encoding to Evennia's `ENCODINGS` list. If you are unsure, write a test file with lots of non-ASCII letters in the editor of your choice, then import to make sure it works as it should.
+您經常可以變更文字編輯器編碼（但這取決於您的編輯器），否則您需要將編輯器的編碼新增至 Evennia 的 `ENCODINGS` 清單中。如果您不確定，請在您選擇的編輯器中編寫一個包含大量非 ASCII 字母的測試檔案，然後匯入以確保其正常運作。
 
-More help with encodings can be found in the entry [Text Encodings](../Concepts/Text-Encodings.md) and also in the Wikipedia article [here](https://en.wikipedia.org/wiki/Text_encodings).
+有關編碼的更多幫助可以在條目 [文字編碼](../Concepts/Text-Encodings.md) 以及維基百科文章[此處](https://en.wikipedia.org/wiki/Text_encodings) 中找到。
 
-**A footnote for the batch-code processor**: Just because *Evennia* can parse your file and your
-fancy special characters, doesn't mean that *Python* allows their use. Python syntax only allows international characters inside *strings*. In all other source code only `ASCII` set characters are
-allowed.
+**批次程式碼處理器的腳註**：僅僅因為 *Evennia* 可以解析您的檔案和您的檔案
+花哨的特殊字元，並不意味著 *Python* 允許使用它們。 Python 語法只允許在 *string* 中使用國際字元。在所有其他原始程式碼中，僅 `ASCII` 設定字元
+允許。

@@ -1,26 +1,29 @@
-# Changing game calendar and time speed
+(changing-game-calendar-and-time-speed)=
+# 更改比賽日曆和時間速度
 
 
-A lot of games use a separate time system we refer to as *game time*. This runs in parallel to what we usually think of as *real time*.  The game time might run at a different speed, use different
-names for its time units or might even use a completely custom calendar. You don't need to rely on a game time system at all. But if you do, Evennia offers basic tools to handle these various situations. This tutorial will walk you through these features.
+許多遊戲使用單獨的時間系統，我們稱之為「遊戲時間」。這與我們通常認為的“實時”並行執行。  遊戲時間可能會以不同的速度執行，使用不同的
+其時間單位的名稱，甚至可能使用完全自訂的日曆。您根本不需要依賴遊戲時間系統。但如果您這樣做，Evennia 提供了處理這些不同情況的基本工具。本教學將引導您瞭解這些功能。
 
-## A game time with a standard calendar
+(a-game-time-with-a-standard-calendar)=
+## 標準日曆的比賽時間
 
-Many games let their in-game time run faster or slower than real time, but still use our normal
-real-world calendar. This is common both for games set in present day as well as for games in
-historical or futuristic settings. Using a standard calendar has some advantages:
+許多遊戲讓他們的遊戲時間比即時執行得更快或更慢，但仍然使用我們的正常時間
+現實世界的日曆。這對於以當今為背景的遊戲以及過去的遊戲來說都很常見。
+歷史或未來的背景。使用標準日曆有一些優點：
 
-- Handling repetitive actions is much easier, since converting from the real time experience to the
-in-game perceived one is easy.
-- The intricacies of the real world calendar, with leap years and months of different length etc are
-automatically handled by the system.
+- 處理重複操作要容易得多，因為從即時體驗轉換為即時體驗
+遊戲中的感知很容易。
+- 現實世界日曆的複雜性，包括閏年和不同長度的月份等
+由系統自動處理。
 
-Evennia's game time features assume a standard calendar (see the relevant section below for a custom calendar).
+Evennia 的遊戲時間功能採用標準日曆（有關自訂日曆，請參閱下面的相關部分）。
 
-### Setting up game time for a standard calendar
+(setting-up-game-time-for-a-standard-calendar)=
+### 為標準日曆設定比賽時間
 
-All is done through the settings.  Here are the settings you should use if you want a game time with
-a standard calendar:
+一切都是透過設定完成的。  如果您想玩遊戲，請使用以下設定
+標準日曆：
 
 ```python
 # in a file settings.py in mygame/server/conf
@@ -35,12 +38,12 @@ TIME_FACTOR = 2.0
 TIME_GAME_EPOCH = None
 ```
 
-By default, the game time runs twice as fast as the real time.  You can set the time factor to be 1 (the game time would run exactly at the same speed than the real time) or lower (the game time will be slower than the real time).  Most games choose to have the game time spinning faster (you will find some games that have a time factor of 60, meaning the game time runs sixty times as fast as the real time, a minute in real time would be an hour in game time). 
+預設情況下，遊戲時間執行速度是即時時間的兩倍。  您可以將時間係數設為 1（遊戲時間將以與即時完全相同的速度執行）或更低（遊戲時間將比即時慢）。  大多數遊戲選擇讓遊戲時間旋轉得更快（你會發現一些遊戲的時間係數為 60，這意味著遊戲時間比即時時間快 60 倍，即時時間一分鐘將是遊戲時間一小時）。
 
-The epoch is a slightly more complex setting.  It should contain a number of seconds that would
-indicate the time your game started.  As indicated, an epoch of 0 would mean January 1st, 1970.  If
-you want to set your time in the future, you just need to find the starting point in seconds.  There
-are several ways to do this in Python, this method will show you how to do it in local time:
+時代是一個稍微複雜的設定。  它應該包含一些秒數
+指示您的遊戲開始的時間。  如前所述，紀元 0 表示 1970 年 1 月 1 日。如果
+你想設定未來的時間，你只需要在幾秒鐘內找到起點。  那裡
+在 Python 中有多種方法可以實現此目的，此方法將向您展示如何在本機時間執行此操作：
 
 ```python
 # We're looking for the number of seconds representing
@@ -51,15 +54,15 @@ start = datetime(2020, 1, 1)
 time.mktime(start.timetuple())
 ```
 
-This should return a huge number - the number of seconds since Jan 1 1970. Copy that directly into your settings (editing `server/conf/settings.py`):
+這應該會返回一個巨大的數字 - 自 1970 年 1 月 1 日以來的秒數。將其直接複製到您的設定中（編輯 `server/conf/settings.py`）：
 
 ```python
 # in a file settings.py in mygame/server/conf
 TIME_GAME_EPOCH = 1577865600
 ```
 
-Reload the game with `@reload`, and then use the `@time` command.  You should see something like
-this:
+使用`@reload`重新載入遊戲，然後使用`@time`指令。  你應該會看到類似的東西
+這個：
 
 ```
 +----------------------------+-------------------------------------+
@@ -78,23 +81,24 @@ this:
 +----------------------------+-------------------------------------+
 ```
 
-The line that is most relevant here is the game time epoch.  You see it shown at 2020-01-01.  From
-this point forward, the game time keeps increasing.  If you keep typing `@time`, you'll see the game
-time updated correctly... and going (by default) twice as fast as the real time.
+這裡最相關的行是遊戲時間紀元。  您會看到它顯示於 2020-01-01。  來自
+至此，比賽時間不斷增加。  如果你繼續輸入`@time`，你會看到遊戲
+時間更新正確......並且（預設）速度是即時的兩倍。
 
-### Time-related events
+(time-related-events)=
+### 與時間相關的事件
 
-The `gametime` utility also has a way to schedule game-related events, taking into account your game time, and assuming a standard calendar (see below for the same feature with a custom calendar).  For instance, it can be used to have a specific message every (in-game) day at 6:00 AM showing how the sun rises.
+`gametime` 實用程式還有一種方法來安排與遊戲相關的事件，考慮到您的遊戲時間，並假設標準日曆（請參閱下面的自訂日曆的相同功能）。  例如，它可用於在每天（遊戲內）的 6:00 AM 傳送特定訊息，顯示太陽如何升起。
 
-The function `schedule()` should be used here.  It will create a [script](../Components/Scripts.md) with some additional features to make sure the script is always executed when the game time matches the given parameters.
+這裡應該使用函式`schedule()`。  它將建立一個具有一些附加功能的 [script](../Components/Scripts.md)，以確保當遊戲時間與給定引數匹配時始終執行 script。
 
-The `schedule` function takes the following arguments:
+`schedule` 函式採用下列引數：
 
-- The *callback*, a function to be called when time is up.
-- The keyword `repeat` (`False` by default) to indicate whether this function should be called repeatedly.
-- Additional keyword arguments `sec`, `min`, `hour`, `day`, `month` and `year` to describe the time to schedule.  If the parameter isn't given, it assumes the current time value of this specific unit.
+- *回撥*，時間到時呼叫的函式。
+- 關鍵字`repeat`（預設為`False`）指示是否應重複呼叫此函式。
+- 其他關鍵字引數 `sec`、`min`、`hour`、`day`、`month` 和 `year` 用於描述計畫時間。  如果未給予該引數，則假定該特定單位的目前時間值。
 
-Here is a short example for making the sun rise every day:
+這是讓太陽每天升起的一個簡短範例：
 
 ```python
 # in a file ingame_time.py in mygame/world/
@@ -114,40 +118,42 @@ def start_sunrise_event():
     script.key = "at sunrise"
 ```
 
-If you want to test this function, you can easily do something like:
+如果你想測試這個功能，你可以輕鬆地執行以下操作：
 
 ```
 @py from world import ingame_time; ingame_time.start_sunrise_event()
 ```
 
-The script will be created silently. The `at_sunrise` function will now be called every in-game day
-at 6 AM. You can use the `@scripts` command to see it. You could stop it using `@scripts/stop`. If
-we hadn't set `repeat` the sun would only have risen once and then never again.
+script 將被靜默建立。 `at_sunrise` 函式現在將在遊戲中的每個日呼叫
+6AM。可以使用`@scripts`指令來檢視。您可以使用 `@scripts/stop` 來停止它。如果
+我們沒有設定`repeat`，太陽只會升起一次，然後就不會再升起。
 
-We used the `@py` command here: nothing prevents you from adding the system into your game code. Remember to be careful not to add each event at startup, however, otherwise there will be a lot of overlapping events scheduled when the sun rises.
+我們在這裡使用了 `@py` 指令：沒有什麼可以阻止您將系統新增到遊戲程式碼中。但請記住，不要在啟動時新增每個事件，否則在太陽升起時會安排許多重疊的事件。
 
-The `schedule` function when using `repeat` set to `True` works with the higher, non-specified unit.
-In our example, we have specified hour, minute and second.  The higher unit we haven't specified is
-day: `schedule` assumes we mean "run the callback every day at the specified time".  Therefore, you
-can have an event that runs every hour at HH:30, or every month on the 3rd day.
+當使用設定為 `True` 的 `repeat` 時，`schedule` 函式適用於較高的、未指定的單位。
+在我們的範例中，我們指定了小時、分鐘和秒。  我們沒有指定的較高單位是
+day: `schedule` 假設我們的意思是「每天在指定時間執行回呼」。  因此，你
+可以有一個每小時 HH:30 執行的事件，或每月第 3 天執行的事件。
 
-> A word of caution for repeated scripts on a monthly or yearly basis: due to the variations in the
-real-life calendar you need to be careful when scheduling events for the end of the month or year.
-For example, if you set a script to run every month on the 31st it will run in January but find no
-such day in February, April etc. Similarly, leap years may change the number of days in the year.
+> 請注意每月或每年重複 scripts：由於
+現實生活中的日曆在安排月末或年末的活動時需要小心。
+例如，如果您將 script 設定為每月 31 號執行，它將在一月執行，但找不到
+二月、四月等的這一天。同樣，閏年可能會改變一年中的天數。
 
-### A game time with a custom calendar
+(a-game-time-with-a-custom-calendar)=
+### 帶有自訂日曆的遊戲時間
 
-Using a custom calendar to handle game time is sometimes needed if you want to place your game in a fictional universe.  For instance you may want to create the Shire calendar which Tolkien described having 12 months, each which 30 days. That would give only 360 days per year (presumably hobbits weren't really fond of the hassle of following the astronomical calendar).  Another example would be creating a planet in a different solar system with, say, days 29 hours long and months of only 18 days.
+如果您想將遊戲置於虛構的宇宙中，有時需要使用自訂日曆來處理遊戲時間。  例如，您可能想要建立託爾金所描述的夏爾曆，有 12 個月，每個月 30 天。這樣一來，一年只有 360 天（大概哈比人並不真正喜歡遵循天文日曆的麻煩）。  另一個例子是在不同的太陽系中創造一顆行星，例如，白天長 29 小時，月份只有 18 天。
 
-Evennia handles custom calendars through an optional *contrib* module, called `custom_gametime`.
-Contrary to the normal `gametime` module described above it is not active by default.
+Evennia 透過選購的 *contrib* 模組（稱為 `custom_gametime`）處理自訂日曆。
+與上述正常的 `gametime` 模組相反，它預設不處於活動狀態。
 
-### Setting up the custom calendar
+(setting-up-the-custom-calendar)=
+### 設定自訂日曆
 
-In our first example of the Shire calendar, used by hobbits in books by Tolkien, we don't really need the notion of weeks... but we need the notion of months having 30 days, not 28.
+在託爾金書中哈比人使用的夏爾日曆的第一個例子中，我們實際上並不需要周的概念……但我們需要有 30 天而不是 28 天的月份的概念。
 
-The custom calendar is defined by adding the `TIME_UNITS` setting to your settings file. It's a dictionary containing as keys the name of the units, and as value the number of seconds (the smallest unit for us) in this unit. Its keys must be picked among the following: "sec", "min", "hour", "day", "week", "month" and "year" but you don't have to include them all.  Here is the configuration for the Shire calendar:
+自訂日曆是透過將 `TIME_UNITS` 設定新增至您的設定檔來定義的。它是一個字典，其中包含單位名稱作為鍵，以及該單位中的秒數（我們的最小單位）作為值。它的鍵必須從以下選項中選擇：“秒”、“分鐘”、“小時”、“日”、“週”、“月”和“年”，但不必全部包含。  以下是 Shire 日曆的設定：
 
 ```python
 # in a file settings.py in mygame/server/conf
@@ -159,11 +165,11 @@ TIME_UNITS = {"sec": 1,
               "year": 60 * 60 * 24 * 30 * 12 }
 ```
 
-We give each unit we want as keys.  Values represent the number of seconds in that unit.  Hour is set to 60 * 60 (that is, 3600 seconds per hour).  Notice that we don't specify the week unit in this configuration:  instead, we skip from days to months directly.
+我們將我們想要的每個單位作為金鑰。  值表示該單位的秒數。  小時設定為60 * 60（即每小時3600秒）。  請注意，我們在此設定中沒有指定週單位：相反，我們直接從天跳到月。
 
-In order for this setting to work properly, remember all units have to be multiples of the previous units.  If you create "day", it needs to be multiple of hours, for instance.
+為了使此設定正常工作，請記住所有單位都必須是先前單位的倍數。  例如，如果您建立“日”，則它需要是多個小時。
 
-So for our example, our settings may look like this:
+因此，對於我們的範例，我們的設定可能如下所示：
 
 ```python
 # in a file settings.py in mygame/server/conf
@@ -184,19 +190,20 @@ TIME_UNITS = {
 }
 ```
 
-Notice we have set a time epoch of 0.  Using a custom calendar, we will come up with a nice display of time on our own. In our case the game time starts at year 0, month 1, day 1, and at midnight. 
+請注意，我們已將時間紀元設定為 0。使用自訂日曆，我們將自己設計出漂亮的時間顯示。在我們的例子中，遊戲時間從第 0 年、第 1 月、第 1 天和午夜開始。
 
-> Year, hour, minute and sec starts from 0, month, week and day starts from 1, this makes them
-> behave consistently with the standard time.
+> 年、時、分、秒從0開始，月、週、日從1開始，這使得它們
+> 行為與標準時間一致。
 
-Note that while we use "month", "week" etc in the settings, your game may not use those terms in- game, instead referring to them as "cycles", "moons", "sand falls" etc. This is just a matter of you
-displaying them differently. See next section.
+請注意，雖然我們在設定中使用「月」、「週」等，但您的遊戲可能不會在遊戲中使用這些術語，而是將它們稱為「週期」、「月亮」、「沙落」等。這只是您的問題
+以不同的方式顯示它們。請參閱下一節。
 
-#### A command to display the current game time
+(a-command-to-display-the-current-game-time)=
+#### 顯示當前遊戲時間的指令
 
-As pointed out earlier, the `@time` command is meant to be used with a standard calendar, not a custom one.  We can easily create a new command though.  We'll call it `time`, as is often the case
-on other MU*.  Here's an example of how we could write it (for the example, you can create a file
-`gametime.py` in your `commands` directory and paste this code in it):
+如前所述，`@time` 指令旨在與標準日曆一起使用，而不是與自訂日曆一起使用。  不過我們可以輕鬆建立一個新指令。  我們稱之為`time`，就像通常的情況一樣
+其他MU*。  這是我們如何編寫它的範例（例如，您可以建立一個檔案
+`gametime.py` 在您的 `commands` 目錄中並將此程式碼貼到其中）：
 
 ```python
 # in a file mygame/commands/gametime.py
@@ -227,7 +234,7 @@ class CmdTime(Command):
         self.msg(time_string)
 ```
 
-Don't forget to add it in your CharacterCmdSet to see this command:
+不要忘記將其新增到您的 CharacterCmdSet 中以檢視此指令：
 
 ```python
 # in mygame/commands/default_cmdset.py
@@ -253,14 +260,15 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(CmdTime())   # <- Add
 ```
 
-Reload your game with the `@reload` command.  You should now see the `time` command.  If you enter it, you might see something like:
+使用 `@reload` 指令重新載入遊戲。  您現在應該看到 `time` 指令。  如果您輸入它，您可能會看到類似以下內容：
 
     We are in year 0, day 0, month 0.
     It's 00:52:17.
 
-You could display it a bit more prettily with names for months and perhaps even days, if you want.
-And if "months" are called "moons" in your game, this is where you'd add that.
+如果您願意，您可以更漂亮地顯示幾個月甚至幾天的名稱。
+如果“月份”在您的遊戲中被稱為“月亮”，那麼您就需要在此處新增它。
 
-## Time-related events in custom gametime
+(time-related-events-in-custom-gametime)=
+## 自訂遊戲時間中與時間相關的事件
 
-The `custom_gametime` module also has a way to schedule game-related events, taking into account your game time (and your custom calendar).  It can be used to have a specific message every day at 6:00 AM, to show the sun rises, for instance. The `custom_gametime.schedule` function works in the same way as described for the default one above.
+`custom_gametime` 模組還可以考慮您的遊戲時間（以及您的自訂日曆）來安排與遊戲相關的事件。  它可用於每天 6:00 AM 傳送特定訊息，例如顯示太陽升起。 `custom_gametime.schedule` 函式的工作方式與上述預設函式的工作方式相同。

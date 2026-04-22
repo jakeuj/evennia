@@ -1,112 +1,118 @@
-# Evennia for MUSH Users
+(evennia-for-mush-users)=
+# Evennia 為 MUSH 使用者
 
-*This page is adopted from an article originally posted for the MUSH community [here on
+*此頁面改編自最初為 MUSH 社群發布的文章 [此處
 musoapbox.net](https://musoapbox.net/topic/1150/evennia-for-mushers).*
 
-[MUSH](https://en.wikipedia.org/wiki/MUSH)es are text multiplayer games traditionally used for
-heavily roleplay-focused game styles. They are often (but not always) utilizing game masters and
-human oversight over code automation. MUSHes are traditionally built on the TinyMUSH-family of game
-servers, like PennMUSH, TinyMUSH, TinyMUX and RhostMUSH. Also their siblings
-[MUCK](https://en.wikipedia.org/wiki/TinyMUCK) and [MOO](https://en.wikipedia.org/wiki/MOO) are
-often mentioned together with MUSH since they all inherit from the same
-[TinyMUD](https://en.wikipedia.org/wiki/MUD_trees#TinyMUD_family_tree) base. A major feature is the
-ability to modify and program the game world from inside the game by using a custom scripting
-language. We will refer to this online scripting as *softcode* here.
+[MUSH](https://en.wikipedia.org/wiki/MUSH)es 是傳統上用於
+高度重視角色扮演的遊戲風格。他們經常（但並非總是）利用遊戲大師和
+人類對程式碼自動化的監督。 MUSHes 傳統上是基於 TinyMUSH 系列遊戲構建的
+伺服器，例如 PennMUSH、TinyMUSH、TinyMUX 和 RhostMUSH。還有他們的兄弟姊妹
+[MUCK](https://en.wikipedia.org/wiki/TinyMUCK) 和 [MOO](https://en.wikipedia.org/wiki/MOO) 是
+經常與 MUSH 一起提及，因為它們都繼承自同一個
+[TinyMUD](https://en.wikipedia.org/wiki/MUD_trees#TinyMUD_family_tree) 基礎。一個主要特點是
+能夠使用自訂指令碼從遊戲內部修改和程式設計遊戲世界
+語言。我們在此將此線上指令碼稱為「軟程式碼」。
 
-Evennia works quite differently from a MUSH both in its overall design and under the hood. The same
-things are achievable, just in a different way. Here are some fundamental differences to keep in
-mind if you are coming from the MUSH world.
+Evennia 的工作方式與 MUSH 的整體設計和底層都有很大不同。一樣的
+事情是可以實現的，只是方式不同而已。以下是一些需要保留的基本差異
+如果你來自 MUSH 世界，請介意。
 
-## Developers vs Players
+(developers-vs-players)=
+## 開發者 vs 玩家
 
-In MUSH, users tend to code and expand all aspects of the game from inside it using softcode. A MUSH
-can thus be said to be managed solely by *Players* with different levels of access. Evennia on the
-other hand, differentiates between the role of the *Player* and the *Developer*.
+在MUSH中，使用者傾向於使用軟程式碼從遊戲內部編碼和擴充套件遊戲的各個方面。 MUSH
+因此可以說是由具有不同存取等級的「玩家」單獨管理。 Evennia 上
+另一方面，區分*玩家*和*開發者*的角色。
 
-- An Evennia *Developer* works in Python from *outside* the game, in what MUSH would consider
-“hardcode”. Developers implement larger-scale code changes and can fundamentally change how the game
-works. They then load their changes into the running Evennia server. Such changes will usually not
-drop any connected players.
-- An Evennia *Player* operates from *inside* the game. Some staff-level players are likely to double
-as developers. Depending on access level, players can modify and expand the game's world by digging
-new rooms, creating new objects, alias commands, customize their experience and so on. Trusted staff
-may get access to Python via the `@py` command, but this would be a security risk for normal Players
-to use. So the *Player* usually operates by making use of the tools prepared for them by the
-*Developer* - tools that can be as rigid or flexible as the developer desires.
+- Evennia *開發人員*在遊戲*外部*使用 Python 工作，MUSH 會考慮什麼
+「硬編碼」。開發人員實施更大規模的程式碼更改，可以從根本上改變遊戲的方式
+作品。然後他們將更改載入到正在執行的 Evennia 伺服器中。這種變化通常不會
+刪除所有已連線的玩家。
+- Evennia *玩家*在遊戲*內部*操作。一些職員級別的球員可能會加倍
+作為開發商。根據訪問級別，玩家可以透過挖掘來修改和擴充套件遊戲世界
+新房間、建立新物件、別名指令、客製化體驗等等。值得信賴的員工
+可以透過`@py`指令存取Python，但這對普通玩家來說是一個安全風險
+使用。所以*玩家*通常會利用玩家為他們準備的工具來操作。
+*開發人員* - 工具可以根據開發人員的需求而嚴格或靈活。
 
-## Collaborating on a game - Python vs Softcode
+(collaborating-on-a-game-python-vs-softcode)=
+## 協作開發遊戲 - Python 與 Softcode
 
-For a *Player*, collaborating on a game need not be too different between MUSH and Evennia. The
-building and description of the game world can still happen mostly in-game using build commands,
-using text tags and [inline functions](../Components/FuncParser.md) to prettify and customize the
-experience. Evennia offers external ways to build a world but those are optional. There is also
-nothing *in principle* stopping a Developer from offering a softcode-like language to Players if
-that is deemed necessary.
+對於*玩家*來說，MUSH 和 Evennia 之間的遊戲協作不需要有太大差異。的
+遊戲世界的建構和描述仍然可以在遊戲中使用建置指令進行，
+使用文字tags和[行內函數](../Components/FuncParser.md)來美化和定製
+經驗。 Evennia 提供了建構世界的外部方法，但這些都是可選的。還有
+*原則上*沒有什麼可以阻止開發者向玩家提供類似軟程式碼的語言，如果
+這被認為是必要的。
 
-For *Developers* of the game, the difference is larger: Code is mainly written outside the game in
-Python modules rather than in-game on the command line. Python is a very popular and well-supported
-language with tons of documentation and help to be found. The Python standard library is also a
-great help for not having to reinvent the wheel. But that said, while Python is considered one of
-the easier languages to learn and use it is undoubtedly very different from MUSH softcode.
+對於遊戲的*開發者*來說，差異更大：程式碼主要是在遊戲之外編寫的
+Python 模組而不是遊戲中的指令列。 Python 是一種非常流行且得到良好支援的
+具有大量檔案和幫助的語言。 Python 標準函式庫也是一個
+對於不必重新發明輪子有很大幫助。但話雖如此，雖然 Python 被認為是
+更容易學習和使用的語言無疑與MUSH軟程式碼有很大不同。
 
-While softcode allows collaboration in-game, Evennia's external coding instead opens up the
-possibility for collaboration using professional version control tools and bug tracking using
-websites like github (or bitbucket for a free private repo). Source code can be written in proper
-text editors and IDEs with refactoring, syntax highlighting and all other conveniences. In short,
-collaborative development of an Evennia game is done in the same way most professional collaborative
-development is done in the world, meaning all the best tools can be used.
+雖然軟程式碼允許在遊戲中進行協作，但 Evennia 的外部編碼反而開啟了
+使用專業版本控制工具進行協作和使用錯誤追蹤的可能性
+諸如 github 之類的網站（或用於免費私人儲存庫的 bitbucket）。原始碼可以用適當的方式編寫
+文字編輯器和 IDEs 具有重構、語法突出顯示和所有其他便利功能。簡而言之，
+Evennia遊戲的協作開發與最專業的協作方式相同
+開發是在世界範圍內完成的，這意味著可以使用所有最好的工具。
 
-## `@parent` vs `@typeclass` and `@spawn`
+(parent-vs-typeclass-and-spawn)=
+## `@parent` 與 `@typeclass` 及 `@spawn`
 
-Inheritance works differently in Python than in softcode. Evennia has no concept of a "master
-object" that other objects inherit from. There is in fact no reason at all to introduce "virtual
-objects" in the game world - code and data are kept separate from one another.
+繼承在 Python 中的工作方式與在軟程式碼中的工作方式不同。 Evennia沒有「主人」的概念
+其他物件繼承自的物件」。事實上根本沒有理由引入“虛擬”
+遊戲世界中的「物件」——程式碼和資料彼此分開。
 
-In Python (which is an [object oriented](https://en.wikipedia.org/wiki/Object-oriented_programming)
-language) one instead creates *classes* - these are like blueprints from which you spawn any number
-of *object instances*. Evennia also adds the extra feature that every instance is persistent in the
-database (this means no SQL is ever needed). To take one example, a unique  character in Evennia is
-an instances of the class `Character`.
+在Python中（這是一個[物件導向](https://en.wikipedia.org/wiki/Object-oriented_programming)
+語言）而是建立*類別* - 這些就像您可以從中生成任何數字的藍圖
+*物件例項*。 Evennia 還增加了額外的功能，即每個例項都持久存在於
+資料庫（這意味著不需要 SQL）。舉個例子，Evennia 中的唯一字元是
+類別 `Character` 的例項。
 
-One parallel to MUSH's `@parent` command may be Evennia's `@typeclass` command, which changes which
-class an already existing object is an instance of. This way you can literally turn a `Character`
-into a `Flowerpot` on the spot.
+與 MUSH 的 `@parent` 指令並行的一個指令可能是 Evennia 的 `@typeclass` 指令，它改變了
+類別是一個已經存在的物件的例項。這樣你就可以真正轉動`Character`
+當場變成`Flowerpot`。
 
-if you are new to object oriented design it's important to note that all object instances of a class
-does *not* have to be identical. If they did, all Characters would be named the same. Evennia allows
-to customize individual objects in many different ways. One way is through *Attributes*, which are
-database-bound properties that can be linked to any object. For example, you could have an `Orc`
-class that defines all the stuff an Orc should be able to do (probably in turn inheriting from some
-`Monster` class shared by all monsters). Setting different Attributes on different instances
-(different strength, equipment, looks etc) would make each Orc unique despite all sharing the same
-class.
+如果您是物件導向設計的新手，請務必注意類別的所有物件例項
+*不一定*必須相同。如果他們這樣做，所有角色都會被命名為相同。 Evennia 允許
+以多種不同的方式自訂單一物件。一種方法是透過*屬性*，它們是
+可以連結到任何物件的資料庫繫結屬性。例如，您可以有 `Orc`
+定義獸人應該能夠做的所有事情的類別（可能依次繼承自某些
+`Monster` 所有怪物共享的等級）。在不同的例項上設定不同的屬性
+（不同的力量、裝備、外表等）將使每個獸人獨一無二，儘管他們共享相同的東西
+類。
 
- The `@spawn` command allows one to conveniently choose between different "sets" of Attributes to
-put on each new Orc (like the "warrior" set or "shaman" set) . Such sets can even inherit one
-another which is again somewhat remniscent at least of the *effect* of  `@parent` and the object-
-based inheritance of MUSH.
+`@spawn` 指令允許人們方便地在不同的屬性「集」之間進行選擇
+穿上每個新的獸人（如“戰士”套裝或“薩滿”套裝）。這樣的集合甚至可以繼承一個
+另一個至少又讓人想起`@parent`的*效果*和物件-
+基於MUSH的繼承。
 
-There are other differences for sure, but that should give some feel for things. Enough with the
-theory. Let's get down to more practical  matters next. To install, see the 
-[Getting Started instructions](../Setup/Installation.md).
+當然還有其他差異，但這應該能給人一些感覺。夠了
+理論。接下來讓我們開始討論更實際的問題。若要安裝，請參閱
+[入門說明](../Setup/Installation.md)。
 
-## A first step making things more familiar
+(a-first-step-making-things-more-familiar)=
+## 讓事情變得更熟悉的第一步
 
-We will here give two examples of customizing Evennia to be more familiar to a MUSH *Player*.
+我們將在這裡給出兩個自訂 Evennia 的範例，以便 MUSH *玩家* 更加熟悉。
 
-### Activating a multi-descer
+(activating-a-multi-descer)=
+### 啟動多重解析器
 
-By default Evennia’s `desc` command updates your description and that’s it. There is a more feature-
-rich optional “multi-descer” in `evennia/contrib/multidesc.py` though. This alternative allows for
-managing and combining a multitude of keyed descriptions.
+預設情況下，Evennia 的 `desc` 指令會更新您的描述，僅此而已。還有一個特點——
+不過`evennia/contrib/multidesc.py`中有豐富的可選「multi-descer」。這種替代方案允許
+管理和組合大量的鍵控描述。
 
-To activate the multi-descer, `cd` to your game folder and into the `commands` sub-folder. There
-you’ll find the file `default_cmdsets.py`. In Python lingo all `*.py` files are called *modules*.
-Open the module in a text editor. We won’t go into Evennia in-game *Commands* and *Command sets*
-further here, but suffice to say Evennia allows you to change which commands (or versions of
-commands) are available to the player from moment to moment depending on circumstance.
+要啟動多重解析器，`cd` 到您的遊戲資料夾並進入 `commands` 子資料夾。那裡
+你會找到檔案`default_cmdsets.py`。在 Python 術語中，所有 `*.py` 檔案都稱為*模組*。
+在文字編輯器中開啟該模組。我們不會討論遊戲中的Evennia*指令*和*指令集*
+這裡進一步，但足以說明 Evennia 允許您更改哪些指令（或
+指令）根據情況隨時可供玩家使用。
 
-Add two new lines to the module as seen below:
+在模組中新增兩行新行，如下所示：
 
 ```python
 # the file mygame/commands/default_cmdsets.py
@@ -134,21 +140,21 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
 # [...]
 ```
 
-Note that Python cares about indentation, so make sure to indent with the same number of spaces as
-shown above!
+請注意，Python 關心縮排，因此請確保縮排的空格數與
+如上圖所示！
 
-So what happens above? We [import the
-module](https://www.linuxtopia.org/online_books/programming_books/python_programming/python_ch28s03.html)
-`evennia/contrib/multidescer.py` at the top. Once imported we can access stuff inside that module
-using full stop (`.`). The multidescer is defined as a class `CmdMultiDesc` (we could find this out
-by opening said module in a text editor). At the bottom we create a new instance of this class and
-add it to the `CharacterCmdSet` class. For the sake of this tutorial we only need to know that
-`CharacterCmdSet` contains all commands that should be be available to the `Character` by default.
+那麼上面會發生什麼事呢？我們[匯入
+模組](https://www.linuxtopia.org/online_books/programming_books/python_programming/python_ch28s03.html)
+`evennia/contrib/multidescer.py` 在頂部。匯入後我們就可以存取該模組內的內容
+使用句號（`.`）。 multidescer 被定義為類別 `CmdMultiDesc` （我們可以發現
+透過在文字編輯器中開啟所述模組）。在底部我們建立這個類別的一個新例項並
+將其新增到 `CharacterCmdSet` 類別中。為了本教學的目的，我們只需要知道
+`CharacterCmdSet` 包含預設情況下 `Character` 可用的所有指令。
 
-This whole thing will be triggered when the command set is first created, which happens on server
-start. So we need to reload Evennia with `@reload` - no one will be disconnected by doing this. If
-all went well you should now be able to use `desc` (or `+desc`) and find that you have more
-possibilities:
+當指令集首次建立時，整個事情將被觸發，這發生在伺服器上
+開始。因此我們需要用 `@reload` 重新載入 Evennia - 這樣做不會導致任何人斷開連線。如果
+一切順利，您現在應該能夠使用`desc`（或`+desc`）並發現您有更多
+可能性：
 
 ```text
 > help +desc                  # get help on the command
@@ -159,63 +165,65 @@ possibilities:
 A big guy. His eyes are blue.
 ```
 
-If there are errors,  a *traceback* will show in the server log - several lines of text showing
-where the error occurred. Find where the error is by locating the line number related to the
-`default_cmdsets.py` file (it's the only one you've changed so far). Most likely you mis-spelled
-something or missed the indentation. Fix it and either `@reload` again or run `evennia start` as
-needed.
+如果發生錯誤，伺服器日誌中將顯示 *traceback* - 多行文字顯示
+發生錯誤的地方。透過尋找與該錯誤相關的行號來尋找錯誤所在
+`default_cmdsets.py` 檔案（這是迄今為止您唯一更改過的檔案）。很有可能是你拼字錯誤
+某些東西或錯過了縮排。修復它並再次 `@reload` 或執行 `evennia start` 作為
+需要。
 
-### Customizing the multidescer syntax 
+(customizing-the-multidescer-syntax)=
+### 自訂 multidescer 語法
 
-As seen above the multidescer uses syntax like this  (where `|/` are Evennia's tags for line breaks)
+如上所示，multidescer 使用這樣的語法（其中 `|/` 是 Evennia 的 tags 用於換行）
 :
 
 ```text
 > +desc/set basic + |/|/ + cape + footwear + |/|/ + attitude 
 ``` 
 
-This use of `+ ` was prescribed by the *Developer* that coded this `+desc` command. What if the
-*Player* doesn’t like this syntax though? Do players need to pester the dev to change it? Not
-necessarily. While Evennia does not allow the player to build their own multi-descer on the command
-line, it does allow for *re-mapping* the command syntax to one they prefer. This is done using the
-`nick` command.
+`+ ` 的使用是由編寫此 `+desc` 指令的*開發人員*規定的。如果
+*玩家*不喜歡這種文法嗎？玩家需要糾纏開發者來修改嗎？不
+必然。而Evennia則不允許玩家在指令上建立自己的多重解析器
+行，它確實允許將指令語法“重新對映”為他們喜歡的語法。這是使用以下方法完成的
+`nick` 指令。
 
-Here’s a nick that changes how to input the command above: 
+這是一個改變上面指令輸入方式的暱稱：
 
 ```text
 > nick setdesc $1 $2 $3 $4 = +desc/set $1 + |/|/ + $2 + $3 + |/|/ + $4
 ```
 
-The string on the left will be matched against your input and if matching, it will be replaced with
-the string on the right. The `$`-type tags will store space-separated arguments and put them into
-the replacement. The nick allows [shell-like wildcards](http://www.linfo.org/wildcard.html), so you
-can use `*`, `?`, `[...]`, `[!...]` etc to match parts of the input.
+左側的字串將與您的輸入進行匹配，如果匹配，它將被替換為
+右邊的字串。 `$`-type tags 將儲存空格分隔的引數並將它們放入
+替代品。暱稱允許[shell-like萬用字元](http://www.linfo.org/wildcard.html)，所以你
+可以使用 `*`、`?`、`[...]`、`[!...]` 等來配對部分輸入。
 
-The same description as before can now be set as 
+現在可以將與以前相同的描述設定為
 
 ```text
 > setdesc basic cape footwear attitude 
 ```
 
-With the `nick` functionality players can mitigate a lot of syntax dislikes even without the
-developer changing the underlying Python code.
+透過 `nick` 功能，即使沒有
+開發人員更改底層 Python 程式碼。
 
-## Next steps
+(next-steps)=
+## 後續步驟
 
-If you are a *Developer* and are interested in making a more MUSH-like Evennia game, a good start is
-to look into the Evennia [Tutorial for a first MUSH-like game](./Tutorial-for-basic-MUSH-like-game.md).
-That steps through building a simple little game from scratch and helps to acquaint you with the
-various corners of Evennia. There is also the [Tutorial for running roleplaying sessions](Evennia-
-for-roleplaying-sessions) that can be of interest.
+如果您是*開發人員*並且有興趣製作更像 MUSH 的 Evennia 遊戲，那麼一個好的開始是
+檢視Evennia [第一個類似MUSH 的遊戲的教學](./Tutorial-for-basic-MUSH-like-game.md)。
+這將逐步從頭開始建立一個簡單的小遊戲，並幫助您熟悉
+Evennia的各個角落。還有[執行角色扮演sessions教學](Evennia-
+for-roleplaying-sessions)你可能會感興趣。
 
-An important aspect of making things more familiar for *Players* is adding new and tweaking existing
-commands. How this is done is covered by the [Tutorial on adding new commands](Adding-Command-
-Tutorial). You may also find it useful to shop through the `evennia/contrib/` folder. The 
-[Tutorial world](Beginner-Tutorial/Part1/Beginner-Tutorial-Tutorial-World.md) is a small single-player quest you can try (it’s not very MUSH-
-like but it does show many Evennia concepts in action). Beyond that there are [many more tutorials](./Howtos-Overview.md) 
-to try out. If you feel you want a more visual overview you can also look at
-[Evennia in pictures](https://evennia.blogspot.se/2016/05/evennia-in-pictures.html).
+讓*玩家*更加熟悉的一個重要方面是新增新內容並調整現有內容
+指令。 [新增指令教學](Adding-Command-
+Tutorial) 介紹如何完成此操作。您可能還會發現透過 `evennia/contrib/` 資料夾進行購物很有用。的
+[教學世界](Beginner-Tutorial/Part1/Beginner-Tutorial-Tutorial-World.md)是一個你可以嘗試的小型單人任務（不是很MUSH-
+喜歡，但它確實顯示了許多 Evennia 概念的實際應用）。除此之外還有[更多教學](./Howtos-Overview.md)
+嘗試一下。如果您覺得想要更直觀的概述，您也可以檢視
+[圖片中Evennia](https://evennia.blogspot.se/2016/05/evennia-in-pictures.html)。
 
-… And of course, if you need further help you can always drop into the [Evennia
-chatroom](https://webchat.freenode.net/?channels=evennia&uio=MT1mYWxzZSY5PXRydWUmMTE9MTk1JjEyPXRydWUbb)
-or post a question in our [forum/mailing list](https://groups.google.com/forum/#%21forum/evennia)!
+…當然，如果您需要進一步的幫助，您可以隨時進入 [Evennia
+聊天室](https://webchat.freenode.net/?channels=evennia&uio=MT1mYWxzZSY5PXRydWUmMTE9MTk1JjEyPXRydWUbb)
+或在我們的[論壇/郵件列表](https://groups.google.com/forum/#%21forum/evennia) 中發布問題！

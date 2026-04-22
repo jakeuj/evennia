@@ -1,19 +1,20 @@
-# Input/Output Auditing
+(inputoutput-auditing)=
+# 輸入/輸出審核
 
-Contribution by Johnny, 2017
+Johnny 的貢獻，2017 年
 
-Utility that taps and intercepts all data sent to/from clients and the
-server and passes it to a callback of your choosing. This is intended for 
-quality assurance, post-incident investigations and debugging.
+實用程式可以竊聽並攔截傳送到/從用戶端傳送的所有資料以及
+伺服器並將其傳遞給您選擇的回撥。這是為了
+品質保證、事故後調查和除錯。
 
-Note that this should be used with care since it can obviously be abused. All 
-data is recorded in cleartext. Please be ethical, and if you are unwilling to 
-properly deal with the implications of recording user passwords or private 
-communications, please do not enable this module.
+請注意，應謹慎使用，因為它顯然可能被濫用。全部
+資料以明文形式記錄。請保持道德，如果您不願意
+妥善處理記錄使用者密碼或隱私的影響
+通訊時，請不要啟用該模組。
 
-Some checks have been implemented to protect the privacy of users.
+已經實施了一些檢查來保護使用者的隱私。
 
-Files included in this module:
+此模組包含的檔案：
 
     outputs.py - Example callback methods. This module ships with examples of
             callbacks that send data as JSON to a file in your game/server/logs
@@ -27,15 +28,16 @@ Files included in this module:
 	        arguments are having their PII scrubbed.
 
 
-## Installation/Configuration:
+(installationconfiguration)=
+## 安裝/設定：
 
-Deployment is completed by configuring a few settings in server.conf. This line
-is required:
+透過設定server.conf中的一些設定即可完成部署。這條線
+需要：
 
     SERVER_SESSION_CLASS = 'evennia.contrib.utils.auditing.server.AuditedServerSession'
 
-This tells Evennia to use this ServerSession instead of its own. Below are the
-other possible options along with the default value that will be used if unset.
+這告訴 Evennia 使用這個 ServerSession 而不是它自己的。以下是
+其他可能的選項以及未設定時將使用的預設值。
 
     # Where to send logs? Define the path to a module containing your callback
     # function. It should take a single dict argument as input
@@ -73,5 +75,5 @@ other possible options along with the default value that will be used if unset.
 
 ----
 
-<small>This document page is generated from `evennia/contrib/utils/auditing/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\utils\auditing\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

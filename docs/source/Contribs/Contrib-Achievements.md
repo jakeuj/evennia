@@ -1,14 +1,16 @@
-# Achievements
+(achievements)=
+# 成就
 
-A simple, but reasonably comprehensive, system for tracking achievements. Achievements are defined using ordinary Python dicts, reminiscent of the core prototypes system, and while it's expected you'll use it only on Characters or Accounts, they can be tracked for any typeclassed object.
+一個簡單但相當全面的成就追蹤系統。成就是使用普通的 Python 字典定義的，讓人想起核心原型系統，雖然預計您只會在角色或帳戶上使用它，但可以追蹤任何型別分類的物件。
 
-The contrib provides several functions for tracking and accessing achievements, as well as a basic in-game command for viewing achievement status.
+contrib 提供了多種用於追蹤和存取成就的功能，以及用於檢視成就狀態的基本遊戲內指令。
 
-## Installation
+(installation)=
+## 安裝
 
-This contrib requires creation one or more module files containing your achievement data, which you then add to your settings file to make them available.
+此 contrib 需要建立一個或多個包含成就資料的模組檔案，然後將其新增至設定檔以使其可用。
 
-> See the section below on "Creating Achievements" for what to put in this module.
+> 請參閱下面有關「建立成就」的部分，以瞭解此模組中的內容。
 
 ```python
 # in server/conf/settings.py
@@ -16,7 +18,7 @@ This contrib requires creation one or more module files containing your achievem
 ACHIEVEMENT_CONTRIB_MODULES = ["world.achievements"]
 ```
 
-To allow players to check their achievements, you'll also want to add the `achievements` command to your default Character and/or Account command sets.
+為了允許玩家檢查他們的成就，您還需要將 `achievements` 指令新增至預設的角色和/或帳戶指令集中。
 
 ```python
 # in commands/default_cmdsets.py
@@ -31,9 +33,9 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(CmdAchieve)
 ```
 
-**Optional** - The achievements contrib stores individual progress data on the `achievements` attribute by default, visible via `obj.db.achievements`. You can change this by assigning an attribute (key, category) tuple to the setting `ACHIEVEMENT_CONTRIB_ATTRIBUTE`
+**可選** - 成就 contrib 預設將個人進度資料儲存在 `achievements` attribute 上，可透過 `obj.db.achievements` 檢視。您可以透過將 attribute（鍵，類別）元組指派給設定 `ACHIEVEMENT_CONTRIB_ATTRIBUTE` 來變更此設定
 
-Example:
+例子：
 ```py
 # in settings.py
 
@@ -41,33 +43,37 @@ ACHIEVEMENT_CONTRIB_ATTRIBUTE = ("progress_data", "achievements")
 ```
 
 
-## Creating achievements
+(creating-achievements)=
+## 創造業績
 
-An achievement is represented by a simple python dictionary defined at the module level in your achievements module(s).
+成就由在成就模組中的模組層級定義的簡單 Python 字典表示。
 
-Each achievement requires certain specific keys to be defined to work properly, along with several optional keys that you can use to override defaults.
+每個成就都需要定義某些特定的鍵才能正常運作，以及幾個可用於覆蓋預設值的可選鍵。
 
-> Note: Any additional keys not described here are included in the achievement data when you access those acheivements through the contrib, so you can easily add your own extended features.
+> 注意：當您透過contrib存取這些成就時，此處未描述的任何其他鍵都包含在成就資料中，因此您可以輕鬆新增自己的擴充功能。
 
-#### Required keys
+(required-keys)=
+#### 所需按鍵
 
-- **name** (str): The searchable name for the achievement. Doesn't need to be unique.
-- **category** (str): The category, or general type, of condition which can progress this achievement. Usually this will be a player action or result. e.g. you would use a category of "defeat" on an achievement for killing 10 rats.
-- **tracking** (str or list): The specific subset of condition which can progress this achievement. e.g. you would use a tracking value of "rat" on an achievement for killing 10 rats. An achievement can also track multiple things, for example killing 10 rats or snakes. For that situation, assign a list of all the values to check against, e.g. `["rat", "snake"]`
+- **名稱** (str)：成就的可搜尋名稱。不需要是唯一的。
+- **category** (str)：可以推進該成就的條件類別或一般型別。通常這將是玩家的動作或結果。 e.g。您可以對殺死 10 隻老鼠的成就使用「失敗」類別。
+- **追蹤**（字串或清單）：可以推進此成就的特定條件子集。 e.g。您可以在殺死 10 隻老鼠的成就上使用「老鼠」的追蹤值。一項成就還可以追蹤多個事物，例如殺死 10 隻老鼠或蛇。對於這種情況，指定要檢查的所有值的列表，e.g。 `["rat", "snake"]`
 
-#### Optional keys
+(optional-keys)=
+#### 可選按鍵
 
-- **key** (str): *Default value if unset: the variable name.* The unique, case-insensitive key identifying this achievement.
-> Note: If any achievements have the same unique key, only *one* will be loaded. It is case-insensitive, but punctuation is respected - "ten_rats", "Ten_Rats" and "TEN_RATS" will conflict, but "ten_rats" and "ten rats" will not.
-- **desc** (str): A longer description of the achievement. Common uses for this would be flavor text or hints on how to complete it.
-- **count** (int): *Default value if unset: 1* The number of tallies this achievement's requirements need to build up in order to complete the achievement. e.g. killing 10 rats would have a `"count"` value of `10`. For achievements using the "separate" tracking type, *each* item being tracked must tally up to this number to be completed.
-- **tracking_type** (str): *Default value if unset: `"sum"`* There are two valid tracking types: "sum" (which is the default) and "separate". `"sum"` will increment a single counter every time any of the tracked items match. `"separate"` will have a counter for each individual item in the tracked items. ("See the Example Achievements" section for a demonstration of the difference.)
-- **prereqs** (str or list): The *keys* of any achievements which must be completed before this achievement can start tracking progress.
+- **key** (str)：*如果未設定，則預設值：變數名稱。 * 標識此成就的唯一、不區分大小寫的鍵。
+> 注意：如果任何成就具有相同的唯一鍵，則只會載入*一個*。它不區分大小寫，但尊重標點符號 - “ten_rats”、“Ten_Rats”和“TEN_RATS”會衝突，但“ten_rats”和“十隻老鼠”不會衝突。
+- **desc** (str)：成就較長的描述。其常見用途是說明文字或如何完成它的提示。
+- **count** (int)：*如果未設定，則預設值：1* 為了完成該成就，該成就的要求需要建立的計數數量。 e.g。殺死 10 隻老鼠的 `"count"` 值為 `10`。對於使用「單獨」追蹤型別的成就，正在追蹤的*每個*專案必須達到此數字才能完成。
+- **tracking_type** (str)：*如果未設定則預設值：`"sum"`* 有兩種有效的追蹤型別：「sum」（預設值）和「separate」。每次任何追蹤專案匹配時，`"sum"` 都會增加一個計數器。 `"separate"` 將為追蹤專案中的每個單獨專案提供一個計數器。 （「請參閱範例成就」部分以示範差異。）
+- **先決條件**（字串或清單）：任何成就的“關鍵”，必須先完成該成就才能開始追蹤進度。
 
 
-### Example achievements
+(example-achievements)=
+### 成就範例
 
-A simple achievement which you can get just for logging in the first time. This achievement has no prerequisites and it only needs to be fulfilled once to complete.
+第一次登入即可獲得的簡單成就。該成就沒有任何先決條件，只需要完成一次即可完成。
 ```python
 # This achievement has the unique key of "first_login_achieve"
 FIRST_LOGIN_ACHIEVE = {
@@ -78,7 +84,7 @@ FIRST_LOGIN_ACHIEVE = {
 }
 ```
 
-An achievement for killing a total of 10 rats, and another for killing 10 *dire* rats which requires the "kill 10 rats" achievement to be completed first. The dire rats achievement won't begin tracking *any* progress until the first achievement is completed.
+一個成就是總共殺死 10 隻老鼠，另一個是殺死 10 隻「可怕」老鼠，這需要先完成「殺死 10 隻老鼠」成就。在第一個成就完成之前，可怕的老鼠成就不會開始追蹤*任何*進度。
 ```python
 # This achievement has the unique key of "ten_rats" instead of "achieve_ten_rats"
 ACHIEVE_TEN_RATS = {
@@ -100,7 +106,7 @@ ACHIEVE_DIRE_RATS = {
 }
 ```
 
-An achievement for buying a total of 5 of apples, oranges, *or* pears. The "sum" tracking types means that all items are tallied together - so it can be completed by buying 5 apples, or 5 pears, or 3 apples, 1 orange and 1 pear, or any other combination of those three fruits that totals to 5.
+總共購買 5 個蘋果、橘子、*或*梨的成就。 「總和」追蹤型別意味著所有物品都統計在一起 - 因此可以透過購買 5 個蘋果、5 個梨、3 個蘋果、1 個柳橙和 1 個梨，或這三種水果的任何其他組合（總計為 5）來完成。
 
 ```python
 FRUIT_FAN_ACHIEVEMENT = {
@@ -112,7 +118,7 @@ FRUIT_FAN_ACHIEVEMENT = {
 }
 ```
 
-An achievement for buying 5 *each* of apples, oranges, and pears. The "separate" tracking type means that each of the tracked items is tallied independently of the other items - so you will need 5 apples, 5 oranges, and 5 pears.
+購買 5 個蘋果、柳橙和梨*各*即可獲得成就。 「單獨」追蹤型別意味著每個追蹤的專案都獨立於其他專案進行計數 - 因此您將需要 5 個蘋果、5 個橙子和 5 個梨子。
 ```python
 FRUIT_BASKET_ACHIEVEMENT = {
     "name": "Fruit Basket",
@@ -125,19 +131,22 @@ FRUIT_BASKET_ACHIEVEMENT = {
 ```
 
 
-## Usage
+(usage)=
+## 用法
 
-The two main things you'll need to do in order to use the achievements contrib in your game are **tracking achievements** and **getting achievement information**. The first is done with the function `track_achievements`; the second can be done with `search_achievement` or `get_achievement`.
+為了在遊戲中使用成就contrib，您需要做的兩件主要事情是**追蹤成就**和**獲取成就資訊**。第一個是用函式 `track_achievements` 完成的；第二個可以用 `search_achievement` 或 `get_achievement` 完成。
 
-### Tracking achievements
+(tracking-achievements)=
+### 追蹤成就
 
+(track_achievements)=
 #### `track_achievements`
 
-In any actions or functions in your game's mechanics which you might want to track in an achievement, add a call to `track_achievements` to update that player's achievement progress.
+在您可能想要在成就中追蹤的遊戲機制中的任何操作或功能中，新增對 `track_achievements` 的呼叫以更新該玩家的成就進度。
 
-Using the "kill 10 rats" example achievement from earlier, you might have some code that triggers when a character is defeated: for the sake of example, we'll pretend we have an `at_defeated` method on the base Object class that gets called when the Object is defeated.
+使用先前的「殺死 10 隻老鼠」範例成就，您可能有一些在角色被擊敗時觸發的程式碼：為了舉例，我們假設我們在基本 Object 類別上有一個 `at_defeated` 方法，當物件被擊敗時會呼叫該方法。
 
-Adding achievement tracking to it could then look something like this:
+新增成就追蹤可能看起來像這樣：
 
 ```python
 # in typeclasses/objects.py
@@ -156,9 +165,9 @@ class Object(ObjectParent, DefaultObject):
         track_achievements(victor, category="defeated", tracking=mob_type, count=1)
 ```
 
-If a player defeats something tagged `rat` with a tag category of `mob_type`, it'd now count towards the rat-killing achievement.
+如果玩家擊敗了標記為 `rat` 且 tag 類別為 `mob_type` 的東西，它現在將計入滅鼠成就。
 
-You can also have the tracking information hard-coded into your game, for special or unique situations. The achievement described earlier, `FIRST_LOGIN_ACHIEVE`, for example, would be tracked like this:
+您還可以將追蹤資訊硬編碼到您的遊戲中，以應對特殊或獨特的情況。例如，前面描述的成就 `FIRST_LOGIN_ACHIEVE` 將按如下方式追蹤：
 
 ```py
 # in typeclasses/accounts.py
@@ -173,19 +182,22 @@ class Account(DefaultAccount):
         track_achievements(self, category="login", tracking="first")
 ```
 
-The `track_achievements` function does also return a value: an iterable of keys for any achievements which were newly completed by that update. You can ignore this value, or you can use it to e.g. send a message to the player with their latest achievements.
+`track_achievements` 函式也傳回一個值：該更新新完成的任何成就的可迭代鍵。您可以忽略該值，也可以將其用於e.g。向玩家傳送最新成就的訊息。
 
-### Getting achievements
+(getting-achievements)=
+### 取得成就
 
-The main method for getting a specific achievement's information is `get_achievement`, which takes an already-known achievement key and returns the data for that one achievement.
+取得特定成就資訊的主要方法是`get_achievement`，它採用已知的成就金鑰並傳回該成就的資料。
 
-For handling more variable and player-friendly input, however, there is also `search_achievement`, which does partial matching on not just the keys, but also the display names and descriptions for the achievements.
+然而，為了處理更多變數和玩家友好的輸入，還有`search_achievement`，它不僅對按鍵進行部分匹配，還對成就的顯示名稱和描述進行部分匹配。
 
+(get_achievement)=
 #### `get_achievement`
 
-A utility function for retrieving a specific achievement's data from the achievement's unique key. It cannot be used for searching, but if you already have an achievement's key - for example, from the results of `track_achievements` - you can retrieve its data this way.
+用於從成就的唯一鍵檢索特定成就的資料的實用函式。它不能用於搜尋，但如果您已經擁有成就的金鑰 - 例如，從 `track_achievements` 的結果中 - 您可以透過這種方式檢索其資料。
 
-#### Example:
+(example)=
+#### 例子：
 
 ```py
 from evennia.contrib.game_systems.achievements import get_achievement
@@ -198,15 +210,17 @@ def toast(achiever, completed_list):
         achiever.msg(f"|wAchievement Get!|n {iter_to_str(name for name in names if name)}"))
 ```
 
+(search_achievement)=
 #### `search_achievement`
 
-A utility function for searching achievements by name or description. It handles partial matching and returns a dictionary of matching achievements. The provided `achievement` command for in-game uses this function to find matching achievements from user inputs.
+用於按名稱或描述搜尋成就的實用功能。它處理部分匹配並返回匹配成就的字典。遊戲中提供的 `achievement` 指令使用此函式從使用者輸入中尋找匹配的成就。
 
-#### Example:
+(example-1)=
+#### 例子：
 
-The first example does a search for "fruit", which returns the fruit medley achievement as it contains "fruit" in the key and name.
+第一個範例搜尋“fruit”，它會傳回水果混合成就，因為它的鍵和名稱中包含“fruit”。
 
-The second example searches for "usual", which returns the ten rats achievement due to its display name.
+第二個範例搜尋“usual”，它會根據其顯示名稱傳回十隻老鼠的成就。
 
 ```py
 >>> from evennia.contrib.game_systems.achievements import search_achievement
@@ -216,13 +230,15 @@ The second example searches for "usual", which returns the ten rats achievement 
 {'ten_rats': {'key': 'ten_rats', 'name': 'The Usual', 'desc': 'Why do all these inns have rat problems?', 'category': 'defeat', 'tracking': 'rat', 'count': 10}}
 ```
 
-### The `achievements` command
+(the-achievements-command)=
+### `achievements`指令
 
-The contrib's provided command, `CmdAchieve`, aims to be usable as-is, with multiple switches to filter achievements by various progress statuses and the ability to search by achievement names.
+contrib 提供的指令 `CmdAchieve` 旨在按原樣使用，具有多個開關以按各種進度狀態過濾成就以及按成就名稱搜尋的能力。
 
-To make it easier to customize for your own game (e.g. displaying some of that extra achievement data you might have added), the format and style code is split out from the command logic into the `format_achievement` method and the `template` attribute, both on `CmdAchieve`
+為了更輕鬆地針對您自己的遊戲進行自訂（e.g。顯示您可能新增的一些額外成就資料），格式和樣式程式碼從指令邏輯中拆分為 `format_achievement` 方法和 `template` attribute，兩者都在 `CmdAchieve` 上
 
-#### Example output
+(example-output)=
+#### 輸出範例
 
 ```
 > achievements
@@ -247,5 +263,5 @@ There are no matching achievements.
 
 ----
 
-<small>This document page is generated from `evennia/contrib/game_systems/achievements/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\game_systems\achievements\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

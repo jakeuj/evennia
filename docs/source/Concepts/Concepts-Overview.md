@@ -1,8 +1,11 @@
-# Core Concepts 
+(core-concepts)=
+# 核心概念
 
-This documentation cover more over-arching concepts of Evennia, often involving many [Core Components](../Components/Components-Overview.md) acting together.
+本文件涵蓋了 Evennia 的更多總體概念，通常涉及許多共同作用的[核心元件](../Components/Components-Overview.md)。
 
-## General concepts
+(general-concepts)=
+<a id="general-concepts"></a>
+## 一般概念
 
 ```{toctree}
 :maxdepth: 2
@@ -12,7 +15,9 @@ OOB.md
 Async-Process.md
 ```
 
-## Text processing
+(text-processing)=
+<a id="text-processing"></a>
+## 文字處理
 ```{toctree}
 :maxdepth: 2
 
@@ -22,7 +27,9 @@ Internationalization.md
 Text-Encodings.md
 ```
 
-## Access 
+(access)=
+<a id="access"></a>
+## 存取控制
 
 ```{toctree}
 :maxdepth: 2
@@ -32,7 +39,9 @@ Guests.md
 Banning.md
 ```
 
-## Extending the Server 
+(extending-the-server)=
+<a id="extending-the-server"></a>
+## 擴充伺服器
 
 ```{toctree}
 :maxdepth: 2

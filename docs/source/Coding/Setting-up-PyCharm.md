@@ -1,125 +1,133 @@
-# Setting up PyCharm with Evennia
+(setting-up-pycharm-with-evennia)=
+# 使用 Evennia 設定 PyCharm
 
-[PyCharm](https://www.jetbrains.com/pycharm/) is a Python developer's IDE from Jetbrains available for Windows, Mac and Linux. 
-It is a commercial product but offer free trials, a scaled-down community edition and also generous licenses for OSS projects like Evennia.
+[PyCharm](https://www.jetbrains.com/pycharm/) 是來自 Jetbrains 的 Python 開發人員的 IDE，可用於 Windows、Mac 和 Linux。 
+它是一個商業產品，但提供免費試用、縮小版社群版本以及針對 OSS 專案（例如 Evennia）的慷慨授權。
 
-First, download and install the IDE edition of your choosing.
-The community edition should have everything you need, 
-but the professional edition has integrated support for Django which can help.
+首先，下載並安裝您選擇的IDE版本。
+社群版應該有你需要的一切，
+但專業版整合了對 Django 的支援，這可以提供幫助。
 
-## From an existing project
+(from-an-existing-project)=
+## 來自現有專案
 
-Use this if you want to use PyCharm with an already existing Evennia game.
-First, ensure you have completed the steps outlined [here](https://www.evennia.com/docs/latest/Setup/Installation.html#requirements).
-Especially the virtualenv part, this will make setting the IDE up much easier.
+如果您想將 PyCharm 與現有的 Evennia 遊戲一起使用，請使用此選項。
+首先，請確保您已完成[此處]所列的步驟(https://www.evennia.com/docs/latest/Setup/Installation.html#requirements)。
+特別是 virtualenv 部分，這將使設定 IDE 變得更加容易。
 
-1. Open Pycharm and click on the open button, open your root folder corresponding to `mygame/`.
-2. Click on File -> Settings -> Project -> Python Interpreter -> Add Interpreter -> Add Local Interpreter
-![Example](https://imgur.com/QRo8O1C.png)
-3. Click on VirtualEnv -> Existing Interpreter -> Select your existing virtualenv folder, 
-   should be `evenv` if you followed the default installation.
+1. 開啟Pycharm，點選開啟按鈕，開啟`mygame/`對應的根資料夾。
+2. 點選檔案 -> 設定 -> 專案 -> Python 直譯器 -> 新增直譯器 -> 新增本機直譯器
+![例](https://imgur.com/QRo8O1C.png)
+3. 點選 VirtualEnv -> 現有解譯器 -> 選擇現有的 virtualenv 資料夾，
+如果您遵循預設安裝，則應為 `evenv`。
 
-![Example](https://imgur.com/XDmgjTw.png)
+![例](https://imgur.com/XDmgjTw.png)
 
-## From a new project
+(from-a-new-project)=
+## 來自一個新專案
 
-Use this if you are starting from scratch or want to make a new Evennia game.
-1. Click on the new project button.
-2. Select the location for your project.
-You should create two new folders, one for the root of your project and one
-for the evennia game directly. It should look like `/location/projectfolder/gamefolder`
-3. Select the `Custom environment` interpreter type, using `Generate New` of type `Virtual env` using a
-compatible base python version as recommended in https://www.evennia.com/docs/latest/Setup/Installation.html#requirements
-Then choose a folder for your virtual environment as a sub folder of your project folder.
+如果您從頭開始或想要製作新的 Evennia 遊戲，請使用此選項。
+1. 點選新專案按鈕。
+2. 選擇您的專案的位置。
+您應該建立兩個新資料夾，一個用於專案的根目錄，另一個用於
+直接進行evennia遊戲。它應該看起來像`/location/projectfolder/gamefolder`
+3. 選擇 `Custom environment` 解譯器型別，使用 `Generate New` 型別 `Virtual env` 使用
+https://www.evennia.com/docs/latest/Setup/Installation.html#requirements 中推薦的相容基本 python 版本
+然後為您的虛擬環境選擇一個資料夾作為專案資料夾的子資料夾。
 
-![Example new project configuration](https://imgur.com/R5Yr9I4.png)
+![新專案設定範例](https://imgur.com/R5Yr9I4.png)
 
-Click on the create button and it will take you inside your new project with a bare bones virtual environment.
-To install Evennia, you can then either clone evennia in your project folder or install it via pip.
-The simplest way is to use pip.
+點選“建立”按鈕，它將帶您進入具有基本虛擬環境的新專案。
+要安裝 Evennia，您可以在專案資料夾中克隆 evennia 或透過 pip 安裝它。
+最簡單的方法是使用 pip。
 
-Click on the `terminal` button
+點選`terminal`按鈕
 
-![Terminal Button](https://i.imgur.com/fDr4nhv.png)
+![終端按鈕](https://i.imgur.com/fDr4nhv.png)
 
-1. Type in `pip install evennia`
-2. Close the IDE and navigate to the project folder
-3. Rename the game folder to a temporary name and create a new empty folder with the previous name
-4. Open your OS terminal, navigate to your project folder and activate your virtualenv.
-On linux, `source .evenv/bin/activate`
-On windows, `evenv\Scripts\activate`
-5. Type in `evennia --init mygame`
-6. Move the files from your temporary folder, which should contain the `.idea/` folder into
-the folder you have created at step 3 and delete the now empty temporary folder.
-7. In the terminal, Move into the folder and type in `evennia migrate`
-8. Start evennia to ensure that it works with `evennia start` and stop it with `evennia stop`
+1. 輸入`pip install evennia`
+2. 關閉 IDE 並導航至專案資料夾
+3. 將遊戲資料夾重新命名為臨時名稱，並使用先前的名稱建立新的空白資料夾
+4. 開啟 OS 終端，導航至專案資料夾並啟動 virtualenv。
+在 Linux 上，`source.evenv/bin/activate`
+在 Windows 上，`evenv\Scripts\activate`
+5. 輸入`evennia --init mygame`
+6. 將檔案從臨時資料夾（應包含 `.idea/` 資料夾）移至
+您在步驟 3 中建立的資料夾並刪除現在為空的臨時資料夾。
+7. 在終端機中，移至資料夾並輸入 `evennia migrate`
+8. 啟動evennia以確保它與`evennia start`一起工作並與`evennia stop`停止它
 
-At this point, you can reopen your IDE and it should be functional.
-[Look here for additional information](https://www.evennia.com/docs/latest/Setup/Installation.html)
-
-
-## Debug Evennia from inside PyCharm
-
-### Attaching to the process
-1. Launch Evennia in the pycharm terminal
-2. Attempt to start it twice, this will give you the process ID of the server
-3. In the PyCharm menu, select `Run > Attach to Process...`
-4. From the list, pick the corresponding process id, it should be the `twistd` process with the `server.py` parameter (Example: `twistd.exe --nodaemon --logfile=\<mygame\>\server\logs\server.log --python=\<evennia repo\>\evennia\server\server.py`)
-
-You can attach to the `portal` process as well, if you want to debug the Evennia launcher
-or runner for some reason (or just learn how they work!), see Run Configuration below.
-
-> NOTE: Whenever you reload Evennia, the old Server process will die and a new one start. So when you restart you have to detach from the old and then reattach to the new process that was created.
+此時，您可以重新開啟 IDE，它應該可以正常運作。
+[檢視此處以瞭解更多資訊](https://www.evennia.com/docs/latest/Setup/Installation.html)
 
 
-### Run Evennia with a Run/Debug Configuration
+(debug-evennia-from-inside-pycharm)=
+## 從 PyCharm 內部除錯 Evennia
 
-This configuration allows you to launch Evennia from inside PyCharm. 
-Besides convenience, it also allows suspending and debugging the evennia_launcher or evennia_runner
-at points earlier than you could by running them externally and attaching.
-In fact by the time the server and/or portal are running the launcher will have exited already.
+(attaching-to-the-process)=
+### 附加到程式
+1. 在pycharm終端中啟動Evennia
+2. 嘗試啟動它兩次，這將為您提供伺服器的程式 ID
+3. 在PyCharm選單中，選擇`Run > Attach to Process...`
+4. 從清單中選擇相應的程式ID，它應該是帶有`server.py`引數的`twistd`程式（例如：`twistd.exe --nodaemon --logfile=\<mygame\>\server\logs\server.log --python=\<evennia repo\>\evennia\server\server.py`）
 
-#### On Windows
-1. Go to `Run > Edit Configutations...`
-2. Click the plus-symbol to add a new configuration and choose Python
-3. Add the script: `\<yourprojectfolder>\.evenv\Scripts\evennia_launcher.py` (substitute your virtualenv if it's not named `evenv`)
-4. Set script parameters to: `start -l` (-l enables console logging)
-5. Ensure the chosen interpreter is your virtualenv
-6. Set Working directory to your `mygame` folder (not your project folder nor evennia)
-7. You can refer to the PyCharm documentation for general info, but you'll want to set at least a config name (like "MyMUD start" or similar).
+如果您想偵錯 Evennia 啟動器，您也可以附加到 `portal` 程式
+或出於某種原因執行（或只是瞭解它們如何工作！），請參閱下面的執行設定。
 
-A dropdown box holding your new configurations should appear next to your PyCharm run button. 
-Select it start and press the debug icon to begin debugging.
+> NOTE：每當您重新載入Evennia時，舊的伺服器程式就會終止，並啟動一個新的程式。因此，當您重新啟動時，您必須與舊程式分離，然後重新附加到已建立的新程式。
 
-#### On Linux
-1. Go to `Run > Edit Configutations...`
-2. Click the plus-symbol to add a new configuration and choose Python
-3. Add the script: `/<yourprojectfolder>/.evenv/bin/twistd` (substitute your virtualenv if it's not named `evenv`)
-4. Set script parameters to: `--python=/<yourprojectfolder>/.evenv/lib/python3.11/site-packages/evennia/server/server.py --logger=evennia.utils.logger.GetServerLogObserver --pidfile=/<yourprojectfolder>/<yourgamefolder>/server/server.pid --nodaemon`
-5. Add an environment variable `DJANGO_SETTINGS_MODULE=server.conf.settings`
-6. Ensure the chosen interpreter is your virtualenv
-7. Set Working directory to your game folder (not your project folder nor evennia)
-8. You can refer to the PyCharm documentation for general info, but you'll want to set at least a config name (like "MyMUD Server" or similar).
 
-A dropdown box holding your new configurations should appear next to your PyCharm run button. 
-Select it start and press the debug icon to begin debugging.
-Note that this only starts the server process, you can either start the portal manually or set up
-the configuration for the portal. The steps are very similar to the ones above.
+(run-evennia-with-a-rundebug-configuration)=
+### 使用執行/除錯設定執行 Evennia
 
-1. Go to `Run > Edit Configutations...`
-2. Click the plus-symbol to add a new configuration and choose Python
-3. Add the script: `/<yourprojectfolder>/.evenv/bin/twistd` (substitute your virtualenv if it's not named `evenv`)
-4. Set script parameters to: `--python=/<yourprojectfolder>/.evenv/lib/python3.11/site-packages/evennia/server/portal/portal.py --logger=evennia.utils.logger.GetServerLogObserver --pidfile=/<yourprojectfolder>/<yourgamefolder>/server/portal.pid --nodaemon`
-5. Add an environment variable `DJANGO_SETTINGS_MODULE=server.conf.settings`
-6. Ensure the chosen interpreter is your virtualenv
-7. Set Working directory to your game folder (not your project folder nor evennia)
-8. You can refer to the PyCharm documentation for general info, but you'll want to set at least a config name (like "MyMUD Portal" or similar).
+此設定可讓您從 PyCharm 內部啟動 Evennia。 
+除了方便之外，它還允許暫停和除錯evennia_launcher或evennia_runner
+比您在外部執行它們並附加的時間更早。
+事實上，當伺服器和/或 portal 執行時，啟動器已經退出。
 
-You should now be able to start both modes and get full debugging.
-If you want to go one step further, you can add another config to automatically start both.
+(on-windows)=
+#### 在 Windows 上
+1. 前往`Run > Edit Configutations...`
+2. 點選加號新增設定並選擇 Python
+3. 新增script：`\<yourprojectfolder>\.evenv\Scripts\evennia_launcher.py`（如果未命名為`evenv`，請替換您的virtualenv）
+4. 將 script 引數設定為：`start -l`（-l 啟用控制檯日誌記錄）
+5. 確保所選的直譯器是您的 virtualenv
+6. 將工作目錄設定為您的 `mygame` 資料夾（不是您的專案資料夾，也不是 evennia）
+7. 您可以參閱 PyCharm 檔案以獲取一般資訊，但您至少需要設定一個設定名稱（例如“MyMUD start”或類似名稱）。
 
-1. Go to `Run > Edit Configutations...`
-2. Click the plus-symbol to add a new configuration and choose Compound
-3. Add your two previous configurations, name it appropriately and press Ok.
+儲存新設定的下拉框應該會出現在 PyCharm 執行按鈕旁邊。 
+選擇它啟動並按除錯圖示開始除錯。
 
-You can now start your game with one click with full debugging active.
+(on-linux)=
+#### 在 Linux 上
+1. 前往`Run > Edit Configutations...`
+2. 點選加號新增設定並選擇 Python
+3. 新增script：`/<yourprojectfolder>/.evenv/bin/twistd`（如果未命名為`evenv`，請替換您的virtualenv）
+4. 將 script 引數設定為：`--python=/<yourprojectfolder>/.evenv/lib/python3.11/site-packages/evennia/server/server.py --logger=evennia.utils.logger.GetServerLogObserver --pidfile=/<yourprojectfolder>/<yourgamefolder>/server/server.pid --nodaemon`
+5. 新增環境變數`DJANGO_SETTINGS_MODULE=server.conf.settings`
+6. 確保所選的直譯器是您的 virtualenv
+7. 將工作目錄設定為您的遊戲資料夾（不是您的專案資料夾，也不是evennia）
+8. 您可以參閱 PyCharm 檔案以獲取一般資訊，但您至少需要設定一個設定名稱（例如“MyMUD Server”或類似名稱）。
+
+儲存新設定的下拉框應該會出現在 PyCharm 執行按鈕旁邊。 
+選擇它啟動並按除錯圖示開始除錯。
+請注意，這只會啟動伺服器程式，您可以手動啟動 portal 或設定
+portal 的設定。步驟與上面的非常相似。
+
+1. 前往`Run > Edit Configutations...`
+2. 點選加號新增設定並選擇 Python
+3. 新增script：`/<yourprojectfolder>/.evenv/bin/twistd`（如果未命名為`evenv`，請替換您的virtualenv）
+4. 將 script 引數設定為：`--python=/<yourprojectfolder>/.evenv/lib/python3.11/site-packages/evennia/server/portal/portal.py --logger=evennia.utils.logger.GetServerLogObserver --pidfile=/<yourprojectfolder>/<yourgamefolder>/server/portal.pid --nodaemon`
+5. 新增環境變數`DJANGO_SETTINGS_MODULE=server.conf.settings`
+6. 確保所選的直譯器是您的 virtualenv
+7. 將工作目錄設定為您的遊戲資料夾（不是您的專案資料夾，也不是evennia）
+8. 您可以參閱 PyCharm 檔案以瞭解一般資訊，但您至少需要設定一個設定名稱（例如“MyMUD Portal”或類似名稱）。
+
+現在您應該能夠啟動這兩種模式並進行完整的除錯。
+如果您想更進一步，可以新增另一個設定來自動啟動兩者。
+
+1. 前往`Run > Edit Configutations...`
+2. 點選加號新增設定並選擇複合
+3. 新增先前的兩個設定，適當命名並按“確定”。
+
+現在您可以一鍵啟動遊戲並啟用完整除錯。

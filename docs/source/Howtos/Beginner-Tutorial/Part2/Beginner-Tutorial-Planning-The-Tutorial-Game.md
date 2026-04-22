@@ -1,461 +1,502 @@
-# Planning our tutorial game
+(planning-our-tutorial-game)=
+# 規劃我們的教學遊戲
 
-Using the general plan from last lesson we'll now establish what kind of game we want to create for this tutorial.  We'll call it ... _EvAdventure_.
-Remembering that we need to keep the scope down, let's establish some parameters.
+使用上一課的總體計劃，我們現在將確定要為本教學建立哪種型別的遊戲。  我們稱之為…_EvAdventure_。
+請記住，我們需要縮小範圍，讓我們建立一些引數。
 
-- We want EvAdventure be a small game we can play ourselves for fun, but which could in principle be expanded  to something more later.
-- We want to have a clear game-loop, with clear goals.
-- Let's go with a fantasy theme, it's well understood.
-- We will use a small, existing tabletop RPG rule set ([Knave](https://www.drivethrurpg.com/product/250888/Knave), more info later)
-- We want to be able to create and customize a character of our own.
-- While not roleplay-focused, it should still be possible to socialize and to collaborate.
-- We don't want to have to rely on a Game master to resolve things, but will rely on code for skill resolution and combat.
-- We want monsters to fight and NPCs we can talk to. So some sort of AI.
-- We want some sort of quest system and merchants to buy stuff from.
+- 我們希望 EvAdventure 是一個我們可以自己玩的小遊戲，但原則上可以在以後擴充套件到更多東西。
+- 我們希望有一個清晰的遊戲迴圈，有明確的目標。
+- 讓我們以奇幻為主題，這很好理解。
+- 我們將使用一個小型的現有桌面 RPG 規則集（[Knave](https://www.drivethrurpg.com/product/250888/Knave)，稍後會提供更多資訊）
+- 我們希望能夠建立和自訂我們自己的角色。
+- 雖然不是以角色扮演為重點，但仍應該可以進行社交和協作。
+- 我們不想依賴遊戲大師來解決問題，而是依賴程式碼來解決技能和戰鬥。
+- 我們希望怪物能夠戰鬥並且NPCs我們可以與之交談。所以某種AI。
+- 我們想要某種任務系統和商人來購買東西。
 
 
-## Game concept 
+(game-concept)=
+## 遊戲理念
 
-With these points in mind, here's a quick blurb for our game:
+考慮到這些要點，以下是我們遊戲的快速簡介：
 
-_Recently, the nearby village discovered that the old abandoned well contained a dark secret. The bottom of the well led to a previously undiscovered dungeon of ever shifting passages. No one knew why it was there or what its purpose was, but local rumors abound. The first adventurer that went down didn't come back. The second ... brought back a handful of glittering riches._
+近日，附近的村莊發現，廢棄的老井裡藏著一個不為人知的秘密。井底通往一個以前未被發現的地牢，裡面的通道不斷改變。沒有人知道它為什麼在那裡或它的目的是什麼，但當地的謠言比比皆是。第一個倒下的冒險者再也沒有回來。第二個…帶回了一把閃閃發光的riches._
 
-_Now the rush is on - there's a dungeon to explore and coin to earn. Knaves, cutthroats, adventurers and maybe even a hero or two are coming from all over the realm to challenge whatever lurks at the bottom of that well._
+_現在熱潮已經開始－有一個地牢可供探索，還有金幣可供賺取。惡棍、殺手、冒險家，甚至可能還有一兩個英雄從世界各地趕來挑戰潛伏在well._底部的一切
 
-_Local merchants and opportunists have seen a chance for profit. A camp of tents has sprung up around the old well, providing food and drink, equipment, entertainment and rumors for a price. It's a festival to enjoy before paying the entrance fee for dropping down the well to find your fate among the shadows below ..._
+_當地商人和機會主義者看到了獲利的機會。古井周圍出現了一個帳篷營地，有償提供食物和飲料、裝置、娛樂和謠言。在支付入場費之前，這是一個可以享受的節日，可以跳下井，在下面的陰影中找到你的命運......_
 
-Our game will consist of two main game modes - above ground and below. The player starts above ground and is expected to do 'expeditions' into the dark. The design goal is for them to be forced back up again when their health, equipment and luck is about to run out.
-- Above, in the "dungeon festival", the player can restock and heal up, buy things and do a small set of quests. It's the only place where the characters can sleep and fully heal. They also need to spend coin here to gain XP and levels. This is a place for players to socialize and RP. There is no combat above ground except for an optional spot for non-lethal PvP. 
-- Below is the mysterious dungeon. This is a procedurally generated set of rooms. Players can collaborate if they go down the well together, they will not be able to run into each other otherwise (so this works as an instance). Each room generally presents some challenge (normally a battle). Pushing deeper is more dangerous but can grant greater rewards. While the rooms could in theory go on forever, there should be a boss encounter once a player reaches deep enough.
+我們的遊戲將包含兩種主要遊戲模式 - 地上和地下。玩家從地面開始，預計將在黑暗中進行「探險」。設計目標是當他們的生命值、裝備和運氣即將耗盡時，他們被迫再次回來。
+- 上面，在「地下城節日」中，玩家可以補貨、治療、購買東西以及做一小部分任務。這是角色可以睡覺並完全治癒的唯一地方。他們還需要在這裡花費硬幣來獲得XP和等級。這是玩家社交和RP的地方。除了非致命 PvP 的可選地點外，地面上沒有戰鬥。
+- 下面就是神秘的地牢。這是一組按程式產生的房間。玩家如果一起下井就可以合作，否則他們將無法碰到對方（所以這是一個例項）。每個房間通常都會帶來一些挑戰（通常是一場戰鬥）。越深入越危險，但可以帶來更大的回報。雖然理論上這些房間可以永遠持續下去，但一旦玩家到達足夠深的地方，就應該會遇到老闆。
 
-Here's an overview of the topside camp for inspiration (quickly thrown together in the free version of [Inkarnate](https://inkarnate.com/)). We'll explore how to break this up into "rooms" (locations) when we get to creating the game world later.
+以下是頂部靈感營地的概述（在 [Inkarnate](https://inkarnate.com/) 的免費版本中快速匯總）。當我們稍後建立遊戲世界時，我們將探討如何將其分解為「房間」（位置）。
 
-![Last Step Camp](../../../_static/images/starting_tutorial/Dungeon_Merchant_Camp.jpg)
+![最後一步營地](../../../_static/images/starting_tutorial/Dungeon_Merchant_Camp.jpg)
 
-For the rest of this lesson we'll answer and reason around the specific questions posed in the previous [Game Planning](./Beginner-Tutorial-Game-Planning.md) lesson.
+在本課的其餘部分中，我們將圍繞上一課[遊戲規劃](./Beginner-Tutorial-Game-Planning.md) 中提出的具體問題進行回答和推理。
 
-## Administration
+(administration)=
+## 行政
 
-### Should your game rules be enforced by coded systems by human game masters?
+(should-your-game-rules-be-enforced-by-coded-systems-by-human-game-masters)=
+### 你的遊戲規則應該由人類遊戲大師的編碼系統來執行嗎？
 
-Generally, the more work you expect human staffers/GMs to do, the less your code needs to work. To support GMs you'd need to design commands to support GM-specific actions and the type of game-mastering you want them to do. You may need to expand communication channels so you can easily talk to groups people in private and split off gaming groups from each other. RPG rules could be as simple
-as the GM sitting with the rule books and using a dice-roller for visibility.
+一般來說，您期望員工/總經理做的工作越多，您的程式碼需要工作的次數就越少。為了支援 GM，您需要設計指令來支援 GM- 特定操作以及您希望他們執行的遊戲控制型別。您可能需要擴充套件溝通管道，以便您可以輕鬆地與群組成員進行私下交談，並將遊戲群組彼此分開。 RPG規則可以如此簡單
+就像 GM 坐在規則書上並使用擲骰子來提高可見度。
 
-GM:ing is work-intensive however, and even the most skilled and enthusiastic GM can't be awake all hours of the day to serve an international player base. The computer never needs sleep, so having the ability for players to "self-serve" their RP itch when no GMs are around is a good idea even for the most GM-heavy games.
+GM：然而，工作量很大，即使是最熟練和最熱情的GM也無法整天都醒著為國際玩家群服務。電腦永遠不需要睡眠，因此即使對於最重的 GM- 遊戲來說，在沒有 GM 的情況下讓玩家能夠「自助」他們的 RP 癢也是一個好主意。
 
-On the other side of the spectrum are games with no GMs at all; all gameplay are driven either by the computer or by the interactions between players. Such games still need an active staff, but nowhere as much active involvement. Allowing for solo-play with the computer also allows players to have fun when the number of active
-players is low.
+另一方面是根本沒有 GM 的遊戲；所有遊戲玩法要麼由電腦驅動，要麼由玩家之間的互動驅動。這類遊戲仍然需要積極的工作人員，但沒有那麼多的積極參與。允許與電腦進行單人遊戲也可以讓玩家在活躍人數較多時獲得樂趣
+玩家水平低。
 
-**EvAdventure Answer:**
+**EvAdventure 答案：**
 
-We want EvAdventure to work entirely without depending on human GMs. That said, there'd be nothing stopping a GM from stepping in and run an adventure for some players should they want to.
+我們希望 EvAdventure 完全不依賴人類 GM 來運作。也就是說，如果某些玩家願意的話，沒有什麼可以阻止 GM 介入並為他們進行冒險。
 
-### What is the staff hierarchy in your game? Is vanilla Evennia roles enough or do you need something else?
+(what-is-the-staff-hierarchy-in-your-game-is-vanilla-evennia-roles-enough-or-do-you-need-something-else)=
+### 你的遊戲中的人員等級是怎樣的？普通的 Evennia 角色就夠了還是你還需要別的東西？
 
-The default hierarchy is
+預設層次結構是
 
-- `Player`  - regular players
-- `Player Helper`  - can create/edit help entries
-- `Builder` - can use build commands
-- `Admin` - can kick and ban accounts
-- `Developer` - full access, usually also trusted with server access
+- `Player` - 普通玩家
+- `Player Helper` - 可以建立/編輯幫助條目
+- `Builder` - 可以使用建置指令
+- `Admin` - 可以踢出並禁止帳戶
+- `Developer` - 完全訪問，通常也受伺服器訪問信任
 
-There is also the _superuser_, the "owner" of the game you create when you first set up your database. This user goes outside the regular hierarchy and while powerful it's not so suitable for testing since it bypasses all [locks](../../../Components/Locks.md) (using `quell` or a separate `Developer`-level account is recommended).
+還有_超級使用者_，您在首次設定資料庫時建立的遊戲的「所有者」。該使用者超出了常規層次結構，雖然功能強大，但不太適合測試，因為它繞過所有[鎖](../../../Components/Locks.md)（建議使用`quell`或單獨的`Developer`級別帳戶）。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-We are okay with keeping the default permission structure for our game.
+我們可以保留遊戲的預設許可權結構。
 
-### Should players be able to post out-of-characters on channels and via other means like bulletin-boards?
+(should-players-be-able-to-post-out-of-characters-on-channels-and-via-other-means-like-bulletin-boards)=
+### 玩家是否應該能夠在頻道上或透過公告板等其他方式發布不符合角色的內容？
 
-Evennia's _Channels_ are by default only available between _Accounts_. That is, for players to communicate with each
-other. By default, the `public` channel is created for general discourse.
-Channels are logged to a file and when you are coming back to the game you can view the history of a channel in case you missed something.
+預設情況下，Evennia 的 _Channels_ 僅在 _Accounts_ 之間可用。也就是說，玩家之間可以互相交流
+其他。預設情況下，`public` 頻道是為一般討論建立的。
+頻道會記錄到檔案中，當您返回遊戲時，您可以檢視頻道的歷史記錄，以防您錯過了某些內容。
 
     > public Hello world!
     [Public] MyName: Hello world!
 
-But Channels can also be set up to work between Characters instead of Accounts. This would mean the channels would have an in-game meaning:
+但通道也可以設定為在角色而不是帳戶之間工作。這意味著頻道將具有遊戲內的含義：
 
-- Members of a guild could be linked telepathically.
-- Survivors of the apocalypse can communicate over walkie-talkies.
-- Radio stations you can tune into or have to discover.
+- 公會的成員可以透過心靈感應聯絡起來。
+- 天啟的倖存者可以透過對講機進行溝通。
+- 您可以收聽或必須發現的廣播電臺。
 
-_Bulletin boards_ are a sort of in-game forum where posts are made publicly or privately. Contrary to a channel, the messages are usually stored and are grouped into topics with replies. Evennia has no default bulletin-board system.
+_公告板_是一種遊戲內論壇，可以公開或私下釋出貼文。與通道相反，訊息通常會儲存並分組到帶有回應的主題中。 Evennia沒有預設的公告板系統。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-In EvAdventure we will just use the default inter-account channels. We will also not be implementing any bulletin boards; instead the merchant NPCs will act as quest givers.
+在EvAdventure中，我們將只使用預設的帳戶間通道。我們也不會實施任何公告板；相反，商人NPCs將充當任務提供者。
 
-## Building
+(building)=
+## 大樓
 
-### How will the world be built?
+(how-will-the-world-be-built)=
+### 世界將如何建構？
 
-There are two main ways to handle this:
-- Traditionally, from in-game with build-commands:  This means builders creating content in their game   client. This has the advantage of not requiring Python skills nor server access. This can often be a quite  intuitive way to build since you are sort-of walking around in your creation as you build it. However, the  developer (you) must make sure to provide build-commands that are flexible enough for builders to be able to  create the content you want for your game.
-- Externally (by batchcmds): Evennia's `batchcmd` takes a text file with Evennia Commands and executes them   in sequence. This allows the build process to be repeated and applied quickly to a new database during development.
-  It also allows builders to use proper text-editing tools rather than writing things line-by-line in their clients. The drawback is that for their changes to go live they either need server access or they need to send their batchcode to the game administrator so they can apply the changes. Or use version control.
-- Externally (with batchcode or custom code): This is the "professional game development" approach. This gives the   builders maximum power by creating the content in Python using Evennia primitives. The `batchcode` processor
-  allows Evennia to apply and re-apply build-scripts that are raw Python modules. Again, this would require the   builder to have server access or to use version control to share their work with the rest of the development team.
+有兩種主要方法可以處理這個問題：
+- 傳統上，從遊戲中使用建立指令：這意味著建構者在其遊戲使用者端中建立內容。這樣做的優點是不需要 Python 技能或伺服器存取許可權。這通常是一種非常直觀的構建方式，因為當你建造它時，你可以在你的創作中四處走動。但是，開發人員（您）必須確保提供足夠靈活的建置指令，以便建構者能夠建立您想要的遊戲內容。
+- 外部（透過batchcmds）：Evennia的`batchcmd`採用帶有Evennia指令的文字檔案並按順序執行它們。這允許在開發過程中重複建置過程並快速應用於新資料庫。
+它還允許建構者使用適當的文字編輯工具，而不是在用戶端中逐行編寫內容。缺點是，為了使更改生效，他們要麼需要伺服器存取許可權，要麼需要將批次程式碼傳送給遊戲管理員，以便他們可以應用更改。或使用版本控制。
+- 外部（使用批次程式碼或自訂程式碼）：這是“專業遊戲開發”方法。透過使用 Evennia 原語在 Python 中建立內容，這為建構者提供了最大的能力。 `batchcode`處理器
+允許 Evennia 應用和重新應用作為原始 Python 模組的 build-scripts。同樣，這將要求建構者俱有伺服器存取許可權或使用版本控制與開發團隊的其他成員共享他們的工作。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-For EvAdventure, we will build the above-ground part of the game world using batch-scripts. The world below-ground we will build procedurally, using raw code.
+對於EvAdventure，我們將使用batch-scripts來建立遊戲世界的地上部分。我們將使用原始程式碼按程式建構地下世界。
 
-### Can only privileged Builders create things or should regular players also have limited build-capability?
+(can-only-privileged-builders-create-things-or-should-regular-players-also-have-limited-build-capability)=
+### 只有特權建造者才能創造東西，還是普通玩家也應該擁有有限的建造能力？
 
-In some game styles, players have the ability to create objects and even script them. While giving regular users the ability to create objects with in-built commands is easy and safe, actual code-creation (aka _softcode_ ) is not something Evennia supports natively. 
+在某些遊戲風格中，玩家有能力創造物體，甚至script它們。雖然為普通使用者提供使用內建指令建立物件的能力既簡單又安全，但實際的程式碼建立（又稱 _softcode_）並不是 Evennia 本身支援的。
 
-Regular, untrusted users should never be allowed to execute raw Python
-code (such as what you can do with the `py` command). You can
-[read more about Evennia's stance on softcode here](../../../Coding/Soft-Code.md). If you want users to do limited scripting, it's suggested that this is accomplished by adding more powerful build-commands for them to use.
+絕不應該允許常規的、不受信任的使用者執行原始 Python
+程式碼（例如您可以使用 `py` 指令執行的操作）。你可以
+[在此詳細瞭解 Evennia 對軟程式碼的立場](../../../Coding/Soft-Code.md)。如果您希望使用者執行有限的指令碼編寫，建議透過新增更強大的建置指令供他們使用來完成。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-For our tutorial-game, we will only allow privileged builders and admins to modify the world. 
+對於我們的教學遊戲，我們只允許特權建構者和管理員修改世界。
 
-## Systems
+(systems)=
+## 系統
 
-### Do you base your game off an existing RPG system or make up your own?
+(do-you-base-your-game-off-an-existing-rpg-system-or-make-up-your-own)=
+### 您的遊戲是基於現有的 RPG 系統還是自己建造？
 
-There is a plethora of options out there, and what you choose depends on the game you want. It can be tempting to grab a short free-form ruleset, but remember that the computer does not have any intuitiion or common sense to interpret the rules like a human GM could. Conversely, if you pick a very 'crunchy' game system, with detailed simulation of the real world, remember that you'll need to actually _code_ all those exceptions and tables yourself. 
+有很多選擇，您的選擇取決於您想要的遊戲。取得簡短的自由格式規則集可能很誘人，但請記住，電腦沒有任何直覺或常識來像人類 GM 那樣解釋規則。相反，如果您選擇一個非常“脆弱”的遊戲系統，並且對現實世界進行詳細模擬，請記住您需要自己實際_編碼_所有這些異常和表格。
 
-For speediest development, what you want is a game with a _consolidated_ resolution mechanic - one you can code once and then use in a lot of situations. But you still want enough rules to help telling the computer how various situations should be resolved (combat is the most common system that needs such structure). 
+為了實現最快的開發速度，您想要的是一款具有_綜合_解析度機制的遊戲 - 您可以編寫一次程式碼，然後在許多情況下使用。但你仍然需要足夠的規則來幫助告訴電腦應該如何解決各種情況（戰鬥是需要這種結構的最常見的系統）。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-For this tutorial, we will make use of [Knave](https://www.drivethrurpg.com/product/250888/Knave), a very light [OSR](https://en.wikipedia.org/wiki/Old_School_Renaissance) ruleset by Ben Milton. It's only a few pages long but highly compatible with old-school D&D games. It's consolidates all rules around a few opposed d20 rolls and includes clear rules for combat, inventory, equipment and so on. Since _Knave_ is a tabletop RPG, we will have to do some minor changes here and there to fit it to the computer medium.
+在本教學中，我們將使用 [Knave](https://www.drivethrurpg.com/product/250888/Knave)，這是 Ben Milton 的一個非常輕量級的 [OSR](https://en.wikipedia.org/wiki/Old_School_Renaissance) 規則集。它只有幾頁長，但與老式 D&D 遊戲高度相容。它整合了圍繞一些對立 d20 骰子的所有規則，並包括有關戰鬥、庫存、裝備等的明確規則。由於 _Knave_ 是一個桌面 RPG，我們必須在這裡或那裡做一些小的改變以適應電腦媒體。
 
-_Knave_ is available under a Creative Commons Attributions 4.0 License, meaning it can be used for derivative work (even commercially). The above link allows you to purchase the PDF and supporting the author. Alternatively you can find unofficial fan releases of the rules [on this page](https://dungeonsandpossums.com/2020/04/some-great-knave-rpg-resources/). 
+_Knave_ 可根據 Creative Commons Attributions 4.0 授權使用，這意味著它可以用於衍生作品（甚至是商業用途）。上面的連結允許您購買PDF並支援作者。或者，您可以[在此頁面](https://dungeonsandpossums.com/2020/04/some-great-knave-rpg-resources/)找到非官方的粉絲發布的規則。
 
 
-### What are the game mechanics? How do you decide if an action succeeds or fails?
+(what-are-the-game-mechanics-how-do-you-decide-if-an-action-succeeds-or-fails)=
+### 遊戲機制是什麼？您如何決定某項操作是成功還是失敗？
 
-This follows from the RPG system decided upon in the previous question.
+這是從上一個問題中決定的 RPG 系統得出的結論。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-_Knave_ gives every character a set of six traditional stats: Strength, Intelligence, Dexterity, Constitution, Intelligence, Wisdom and Charisma. Each has a value from +1 to +10. To find its "Defense" value, you add 10. 
+_Knave_ 為每個角色提供了一組六種傳統統計資料：力量、智力、敏捷、體質、智力、智慧和魅力。每個值的範圍是 +1 到 +10。若要找到其“防禦”值，請新增 10。
 
     You have Strength +1. Your Strength-Defense is 10 + 1 = 11
 
-To make a check, say an arm-wrestling challenge you roll a twenty-sided die (d20) and add your stat. You have to roll higher than the opponents defense for that stat.
+要進行檢查，假設有一個扳手腕挑戰，您需要擲出一個二十面骰子 (d20) 並新增您的統計資料。你必須擲出比對手防守更高的數值才能獲得該資料。
 
     I have Strength +1, my opponent has a Strength of +2. To beat them in arm wrestling I must roll d20 + 1 and hope to get higher than 12, which is their Strength defense (10 + 2). 
 
-If you attack someone you do the same, except you roll against their `Armor` defense. If you rolled higher, you roll for how much damage you do (depends on your weapon).
-You can have _advantage_ or _disadvantage_ on a roll. This means rolling 2d20 and picking highest or lowest value. 
+如果你攻擊某人，你也會做同樣的事情，只不過你會對抗他們的 `Armor` 防禦。如果你擲得更高，你會擲出造成的傷害（取決於你的武器）。
+您可以同時擁有_優勢_或_劣勢_。這意味著滾動 2d20 並選擇最高或最低值。
 
-In Knave, combat is turn-based. In our implementation we'll also play turn-based, but we'll resolve everything _simultaneously_. This changes _Knave_'s feel quite a bit, but is a case where the computer can do things not practical to do when playing around a table.
+在《Knave》中，戰鬥是回合製的。在我們的實作中，我們也將玩回合製遊戲，但我們將_同時_解決所有問題。這極大地改變了 _Knave_ 的感覺，但在這種情況下，計算機可以做一些在桌子上玩時不切實際的事情。
 
-There are also a few tables we'll need to implement. For example, if you lose all health, there's a one-in-six chance you'll die outright. We'll keep this perma-death aspect, but make it very easy to start a new character and jump back in.
+我們還需要實作一些表。例如，如果您失去所有生命值，則有六分之一的機會您會直接死亡。我們將保留這個永久死亡的方面，但讓開始一個新角色並跳回來變得非常容易。
 
-> In this tutorial we will not add opportunities to make use of all of the character stats, making some, like strength, intelligence and dexterity more useful than others. In a full game, one would want to expand so a user can utilize all of their character's strengths.
+> 在本教學中，我們不會新增利用所有角色統計資料的機會，從而使某些屬性（如力量、智力和敏捷性）比其他屬性更有用。在一款完整的遊戲中，人們會希望進行擴充套件，以便使用者可以利用其角色的所有優勢。
 
-### Does the flow of time matter in your game - does night and day change? What about seasons?
+(does-the-flow-of-time-matter-in-your-game-does-night-and-day-change-what-about-seasons)=
+### 時間的流動在你的遊戲中重要嗎──白天和黑夜會改變嗎？季節又如何呢？
 
-Most commonly, game-time runs faster than real-world time. There are
-a few advantages with this:
+最常見的是，遊戲時間比現實世界時間跑得快。有
+這樣做的一些優點：
 
-- Unlike in a single-player game, you can't fast-forward time in a multiplayer game if you are waiting for something, like NPC shops opening. 
-- Healing and other things that we know takes time will go faster while still being reasonably 'realistic'.
+- 與單人遊戲不同，如果您在等待某些事情（例如 NPC 商店開業），則無法在多人遊戲中快轉時間。
+- 治療和其他我們知道需要時間的事情會進展得更快，同時仍然相當「現實」。
 
-The main drawback is for games with slower roleplay pace. While you are having a thoughtful roleplaying scene over dinner, the game world reports that two days have passed. Having a slower game time than real-time is a less common, but possible solution for such games.
+主要缺點是角色扮演節奏較慢的遊戲。當您在晚餐時進行深思熟慮的角色扮演場景時，遊戲世界報告說兩天已經過去了。對於此類遊戲來說，遊戲時間比即時時間慢是一種不太常見但可能的解決方案。
 
-It is however _not_ recommended to let game-time exactly equal the speed of real time. The reason for this is that people will join your game from all around the world, and they will often only be able to play at particular times of their day. With a game-time drifting relative real-time, everyone will eventually be able to experience both day and night in the game.
+然而，不建議讓遊戲時間完全等於即時速度。原因是人們會從世界各地加入您的遊戲，並且他們通常只能在一天中的特定時間玩遊戲。隨著遊戲時間的漂移相對即時，每個人最終都能夠在遊戲中體驗白天和黑夜。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-The passage of time will have no impact on our particular game example, so we'll go with Evennia's default, which is that the game-time runs two times faster than real time.
+時間的流逝不會對我們的特定遊戲範例產生影響，因此我們將採用 Evennia 的預設值，即遊戲時間的執行速度比實際時間快兩倍。
 
-### Do you want changing, global weather or should weather just be set manually in roleplay?
+(do-you-want-changing-global-weather-or-should-weather-just-be-set-manually-in-roleplay)=
+### 您想要改變全球天氣還是應該在角色扮演中手動設定天氣？
 
-A weather system is a good example of a game-global system that affects a subset of game entities (outdoor rooms). 
+天氣系統是影響遊戲實體子集（室外房間）的遊戲全域系統的一個很好的例子。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-We'll not change the weather, but will add some random messages to echo through
-the game world at random intervals just to show the principle.
+我們不會改變天氣，但會加入一些隨機訊息來回顯
+隨機間隔的遊戲世界只是為了展示原則。
 
-### Do you want a coded world-economy or just a simple barter system? Or no formal economy at all?
-This is a big question and depends on how deep and interconnected the virtual transactions are that are happening in the game. Shop prices could rice and drop due to supply and demand, supply chains could involve crafting and production. One also could consider adding money sinks and manipulate the in-game market to combat inflation. 
+(do-you-want-a-coded-world-economy-or-just-a-simple-barter-system-or-no-formal-economy-at-all)=
+### 您想要一個編碼的世界經濟還是隻是一個簡單的以物易物系統？還是根本沒有正規經濟？
+這是一個大問題，取決於遊戲中發生的虛擬交易的深度和相互關聯程度。由於供需關係，商店價格可能會因供應和需求而下降，供應鏈可能涉及手工和生產。人們還可以考慮增加資金池並操縱遊戲內市場以對抗通貨膨脹。
 
-The [Barter](../../../Contribs/Contrib-Barter.md) contrib provides a full interface for trading with another player in a safe way.
+[以物易物](../../../Contribs/Contrib-Barter.md) contrib 提供了一個完整的介面，可以安全地與其他玩家進行交易。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-We will not deal with any of this complexity. We will allow for players to buy from npc sellers and players will be able to trade using the normal `give` command.
+我們不會處理任何這種複雜性。我們將允許玩家從 npc 賣家處購買，並且玩家將能夠使用正常的 `give` 指令進行交易。
 
-### Do you have concepts like reputation and influence?
+(do-you-have-concepts-like-reputation-and-influence)=
+### 你有聲譽、影響力這樣的概念嗎？
 
-These are useful things for a more social-interaction heavy game. 
+這些對於社互動動性較強的遊戲來說是有用的。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-We will not include them for this tutorial. Adding the Barter contrib is simple though. 
+我們不會將它們包含在本教學中。不過新增易貨 contrib 很簡單。
 
-### Will your characters be known by their name or only by their physical appearance?
+(will-your-characters-be-known-by-their-name-or-only-by-their-physical-appearance)=
+### 你的角色會透過他們的名字還是僅僅透過他們的外表而被認識？
 
-This is a common thing in RP-heavy games. Others will only see you as "The tall woman" until you introduce yourself and they 'recognize' you with a name. Linked to this is the concept of more complex emoting and posing.
+這在RP-重度遊戲中很常見。在您自我介紹並且他們透過名字“認出”您之前，其他人只會將您視為“高個子女人”。與此相關的是更複雜的情緒和姿勢的概念。
 
-Implementing such a system is not trivial, but the [RPsystem](../../../Contribs/Contrib-RPSystem.md) Evennia contrib offers a ready system with everything needed for free emoting, recognizing people by their appearance and more.
+實現這樣一個系統並不簡單，但是 [RPsystem](../../../Contribs/Contrib-RPSystem.md) Evennia contrib 提供了一個現成的系統，其中包含自由表情、透過外表識別人們等所需的一切。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-We will not use any special RP systems for this tutorial. Adding the RPSystem contrib is a good extra expansion though!
+在本教學中，我們不會使用任何特殊的 RP 系統。不過，增加 RPSystem contrib 是一個很好的額外擴充！
 
-## Rooms
+(rooms)=
+## 客房
 
-### Is a simple room description enough or should the description be able to change?
+(is-a-simple-room-description-enough-or-should-the-description-be-able-to-change)=
+### 簡單的房間描述就足夠了還是描述可以更改？
 
-Changing room descriptions for day and night, winder and summer is actually quite easy to do, but looks very impressive. We happen to know there is also a contrib that helps with this, so we'll show how to include that.
+改變白天和夜晚、冬天和夏天的房間描述實際上很容易做到，但看起來非常令人印象深刻。我們碰巧知道還有一個 contrib 可以幫助解決這個問題，所以我們將展示如何包含它。
 
-There is an [Extended Room](../../../Contribs/Contrib-Extended-Room.md) contrib that adds a Room type that is aware of the time-of-day as well as seasonal variations. 
+有一個[擴充套件房間](../../../Contribs/Contrib-Extended-Room.md) contrib 增加了一種能夠識別一天中的時間以及季節變化的房間型別。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-We will stick to a normal room in this tutorial and let the world be in a perpetual daylight. Making Rooms into ExtendedRooms is not hard though. 
+在本教學中，我們將堅持使用普通房間，讓世界永遠處於陽光下。不過，要將房間變成 ExtendedRooms 並不難。
 
-### Should the room have different statuses?
+(should-the-room-have-different-statuses)=
+### 房間應該有不同的狀態嗎？
 
-One could picture weather making outdoor rooms wet, cold or burnt. In rain, bow strings could get wet and fireballs fizz out. In a hot room, characters could require drinking more water, or even take damage if not finding shelter.
+人們可以想像室外房間潮濕、寒冷或被燒毀的天氣。在雨中，弓弦可能會被弄濕，火球會發出嘶嘶聲。在炎熱的房間裡，角色可能需要喝更多的水，如果找不到庇護所，甚至會受到傷害。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-For the above-ground we need to be able to disable combat all rooms except for the PvP location. We also need to consider how to auto-generate the rooms under ground. So we probably will need some statuses to control that. 
+對於地面，我們需要能夠停用除 PvP 位置之外的所有房間的戰鬥。我們還需要考慮如何自動生成地下房間。所以我們可能需要一些狀態來控制它。
 
-Since each room under ground should present some sort of challenge, we may need a few different room types different from the above-ground Rooms.
+由於地下的每個房間都會帶來某種挑戰，因此我們可能需要一些與地上房間不同的不同房間型別。
 
-### Can objects be hidden in the room? Can a person hide in the room?
+(can-objects-be-hidden-in-the-room-can-a-person-hide-in-the-room)=
+### 房間裡可以藏東西嗎？一個人可以躲在房間裡嗎？
 
-This ties into if you have hide/stealth mechanics. Maybe you could evesdrop or attack out of hiding. 
+這與你是否有隱藏/隱形機制有關。也許你可以偷聽或偷偷攻擊。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-We will not model hiding and stealth. This will be a game of honorable face-to-face conflict.
+我們不會模擬隱藏和秘密行動。這將是一場光榮的面對面衝突的遊戲。
 
-## Objects
+(objects)=
+## 物件
 
-### How numerous are your objects? Do you want large loot-lists or are objects just role playing props?
+(how-numerous-are-your-objects-do-you-want-large-loot-lists-or-are-objects-just-role-playing-props)=
+### 你的對像有多少？您想要大量的戰利品清單還是隻是角色扮演道具？
 
-This also depends on the type of game. In a pure freeform RPG, most objects may be 'imaginary' and just appearing in fiction. If the game is more coded, you want objects with properties that the computer can measure, track and calculate. In many roleplaying-heavy games, you find a mixture of the two, with players imagining items for roleplaying scenes, but only using 'real' objects to resolve conflicts. 
+這也取決於遊戲的型別。在純粹的自由形式RPG中，大多數物件可能是「想像的」並且只出現在小說中。如果遊戲的編碼較多，您需要具有電腦可以測量、追蹤和計算的屬性的物件。在許多角色扮演遊戲中，您會發現兩者的混合體，玩家為角色扮演場景想像物品，但僅使用「真實」物體來解決衝突。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-We will want objects with properties, like weapons and potions and such. Monsters should drop loot even though our list of objects will not be huge in this example game.
+我們需要具有屬性的物體，例如武器和藥劑等。即使在這個範例遊戲中我們的物件清單不會很大，怪物也應該掉落戰利品。
 
-### Is each coin a separate object or do you just store a bank account value?
+(is-each-coin-a-separate-object-or-do-you-just-store-a-bank-account-value)=
+### 每個硬幣是單獨的物件還是隻儲存銀行帳戶價值？
 
-The advantage of having multiple items is that it can be more immersive. The drawback is that it's also very fiddly to deal with individual coins, especially if you have to deal with different currencies.
+擁有多個專案的好處是可以更加身臨其境。缺點是處理單一硬幣也非常繁瑣，特別是當您必須處理不同的貨幣時。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-_Knave_ uses the "copper" as the base coin and so will we. Knave considers the weight of coin and one inventory "slot" can hold 100 coins. So we'll implement a "coin item" to represent many coins.
+_Knave_ 使用「銅」作為基礎貨幣，我們也是如此。 Knave 考慮了硬幣的重量，一個庫存「槽」可以容納 100 個硬幣。因此，我們將實現一個「硬幣項」來代表許多硬幣。
 
-### Do multiple similar objects form stack and how are those stacks handled in that case?
+(do-multiple-similar-objects-form-stack-and-how-are-those-stacks-handled-in-that-case)=
+### 多個相似的物件是否形成堆疊？在這種情況下如何處理這些堆疊？
 
-If you drop two identical apples on the ground, Evennia will default to show this in the room as "two apples", but this is just a visual effect - there are still two apple-objects in the room. One could picture instead merging the two into a single object "X nr of apples" when you drop the apples. 
+如果您將兩個相同的蘋果扔到地上，Evennia 將預設在房間中將其顯示為“兩個蘋果”，但這只是視覺效果 - 房間中仍然有兩個蘋果物件。人們可以想像，當你放下蘋果時，將兩者合併成一個物件「X nr of apples」。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-We will keep Evennia's default.
+我們將保留Evennia的預設值。
 
-### Does an object have weight or volume (so you cannot carry an infinite amount of them)?
+(does-an-object-have-weight-or-volume-so-you-cannot-carry-an-infinite-amount-of-them)=
+### 物體有重量或體積嗎（所以你不能攜帶無限數量的物體）？
 
-Limiting carrying weight is one way to stop players from hoarding. It also makes it more important for players to pick only the equipment they need. Carrying limits can easily come across as annoying to players though, so one needs to be careful with it.
+限制攜帶重量是阻止玩家囤積物品的一種方法。這也使得玩家只選擇他們所需要的裝備變得更加重要。不過，攜帶限制很容易讓玩家感到厭煩，因此需要小心對待。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-_Knave_ limits your inventory to `Constitution + 10` "slots", where most items take up one slot and some large things, like armor, uses two. Small items (like rings) can fit 2-10 per slot and you can fit 100 coins in a slot.  This is an important game mechanic to limit players from hoarding. Especially since you need coin to level up.
+_Knave_ 將你的庫存限制為`Constitution + 10`“槽位”，其中大多數物品佔用一個槽位，而一些大型物品（例如盔甲）則使用兩個槽位。每個插槽可容納 2-10 個小物品（如戒指），一個插槽可容納 100 個硬幣。  這是限制玩家囤積的重要遊戲機制。特別是因為你需要硬幣來升級。
 
-### Can objects be broken? Can they be repaired?
+(can-objects-be-broken-can-they-be-repaired)=
+### 物體可以被破壞嗎？它們可以修復嗎？
 
-Item breakage is very useful for a game economy; breaking weapons adds tactical considerations (if it's not too common, then it becomes annoying) and repairing things gives work for crafting players.
+物品破損對於遊戲經濟非常有用；破壞武器會增加戰術考慮（如果不太常見，那就會變得煩人），而修理東西則為製作玩家提供了工作。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-In _Knave_, items will break if you make a critical failure on using them (rolls a native 1 on d20). This means they lose a level of `quality` and once at 0, it's unusable. We will not allow players to repair, but we could allow merchants to repair items for a fee.
+在 _Knave_ 中，如果你在使用物品時發生嚴重故障（在 d20 上投出原生 1），物品將會損壞。這意味著它們會失去 `quality` 的等級，一旦達到 0，就無法使用。我們不會允許玩家修理，但我們可以允許商家付費修理物品。
 
-### Can you fight with a chair or a flower or must you use a special 'weapon' kind of thing?
+(can-you-fight-with-a-chair-or-a-flower-or-must-you-use-a-special-weapon-kind-of-thing)=
+### 你可以用椅子或花打架，還是必須使用特殊的「武器」之類的東西？
 
-Traditionally, only 'weapons' could be used to fight with. In the past this was a useful
-simplification, but with Python classes and inheritance, it's not actually more work to just let all items in game work as a weapon in a pinch.
+傳統上，只有「武器」才能用來戰鬥。過去這是一個有用的
+簡化，但有了 Python 類別和繼承，讓遊戲中的所有物品在緊要關頭充當武器實際上並不需要更多工作。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
- Since _Knave_ deals with weapon lists and positions where items can be wielded, we will have a separate "Weapon" class for everything you can use for fighting. So, you won't be able to fight with a chair (unless we make it a weapon-inherited chair).
+由於 _Knave_ 處理武器清單和可以使用物品的位置，因此我們將為您可以用於戰鬥的所有物品提供一個單獨的「武器」類別。所以，你將無法用椅子戰鬥（除非我們把它做成一把武器繼承的椅子）。
 
-### Will characters be able to craft new objects?
+(will-characters-be-able-to-craft-new-objects)=
+### 角色能夠製作新物品嗎？
 
-Crafting is a common feature in multiplayer games. In code it usually means using a skill-check to combine base ingredients from a fixed recipe in order to create a new item. The classic example is to combine _leather straps_, a _hilt_, a _pommel_ and a _blade_ to make a new _sword_.
+製作是多人遊戲中常見的功能。在程式碼中，這通常意味著使用技能檢定來組合固定配方中的基本成分，以建立新專案。經典的例子是將_皮革帶_、_刀柄_、_鞍頭_和_刀片_組合起來製作一把新的_劍_。
 
-A full-fledged crafting system could require multiple levels of crafting, including having to mine for ore or cut down trees for wood.
+一個成熟的製作系統可能需要多個級別的製作，包括必須開採礦石或砍伐樹木以獲取木材。
 
-Evennia's [Crafting](../../../Contribs/Contrib-Crafting.md) contrib adds a full crafting system to any game. It's based on [Tags](../../../Components/Tags.md), meaning that pretty much any object can be made usable for crafting, even used in an unexpected way. 
+Evennia 的[製作](../../../Contribs/Contrib-Crafting.md) contrib 為任何遊戲新增完整的製作系統。它基於 [Tags](../../../Components/Tags.md)，這意味著幾乎任何物件都可以用於製作，甚至可以以意想不到的方式使用。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-In our case we will not add any crafting in order to limit the scope of our game. Maybe NPCs will be able to repair items - for a cost?
+在我們的例子中，我們不會新增任何製作來限制我們的遊戲範圍。也許NPCs能夠修理物品－需要付費嗎？
 
-### Should mobs/NPCs have some sort of AI?
+(should-mobsnpcs-have-some-sort-of-ai)=
+### mobs/NPCs 應該有某種 AI 嗎？
 
-As a rule, you should not hope to fool anyone into thinking your AI is actually intelligent. The best you will be able to do is to give interesting results and unless you have a side-gig as an AI researcher, users will likely not notice any practical difference between a simple state-machine and you spending a lot of time learning
-how to train a neural net.
+一般來說，你不應該希望欺騙任何人，讓他們認為你的 AI 實際上是聰明的。你能做的最好的事情就是給出有趣的結果，除非你有一個 AI 研究人員的副業，否則使用者可能不會注意到簡單的狀態機和你花費大量時間學習之間的任何實際差異
+如何訓練神經網路。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-For this tutorial, we will show how to add a simple state-machine AI for monsters. NPCs will only be shop-keepers and quest-gives so they won't need any real AI to speak of.
+在本教學中，我們將展示如何為怪物新增一個簡單的狀態機 AI。 NPCs只會是店主和任務給予者，所以他們不需要任何真正的AI來說話。
 
-### Are NPCs and mobs different entities? How do they differ?
+(are-npcs-and-mobs-different-entities-how-do-they-differ)=
+### NPCs 和生物是不同的實體嗎？它們有何不同？
 
-"Mobs" or "mobiles" are things that move around. This is traditionally monsters you can fight with, but could also be city guards or the baker going to chat with the neighbor. Back in the day, they were often fundamentally different. These days it's often easier to just make NPCs and mobs essentially the same thing.
+「生物」或「移動物」是移動的東西。這通常是你可以與之戰鬥的怪物，但也可能是城市守衛或與鄰居聊天的麵包師。在過去，它們往往有著根本的差異。如今，讓 NPCs 和小怪本質上是一樣的東西通常會更容易。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-In EvAdventure, Monsters and NPCs do very different things, so they will be different classes, sharing some code where possible.
+在EvAdventure中，怪物和NPCs做非常不同的事情，所以它們將是不同的類，在可能的情況下共享一些程式碼。
 
-### _Should there be NPCs giving quests? If so, how do you track Quest status?
+(_should-there-be-npcs-giving-quests-if-so-how-do-you-track-quest-status)=
+### _應該有NPCs給予任務嗎？如果是這樣，您如何追蹤任務狀態？
 
-Quests are a staple of many classic RPGs. 
+任務是許多經典RPGs的主要內容。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-We will design a simple quest system with some simple conditions for success, like carrying the right item or items back to the quest giver.
+我們將設計一個簡單的任務系統，其中包含一些簡單的成功條件，例如將正確的物品帶回給任務提供者。
 
-## Characters
+(characters)=
+## 人物
 
-### Can players have more than one Character active at a time or are they allowed to multi-play?
+(can-players-have-more-than-one-character-active-at-a-time-or-are-they-allowed-to-multi-play)=
+### 玩家是否可以同時擁有多個活躍角色，或者是否允許他們進行多人遊戲？
 
-Since Evennia differentiates between `Sessions` (the client-connection to the game), `Accounts` and `Character`s, it natively supports multi-play. This is controlled by the `MULTISESSION_MODE` setting, which has a value from `0` (default) to `3`.
+由於 Evennia 區分 `Sessions`（遊戲的用戶端連線）、`Accounts` 和 `Character`s，因此它本身支援多人遊戲。這是由 `MULTISESSION_MODE` 設定控制的，該設定的值從 `0`（預設）到 `3`。
 
-- `0`- One Character per Account and one Session per Account. This means that if you login to the same
-  account from another client you'll be disconnected from the first. When creating a new account, a Character
-  will be auto-created with the same name as your Account. This is default mode and mimics legacy code bases
-  which had no separation between Account and Character.
-- `1` - One Character per Account, multiple Sessions per Account. So you can connect simultaneously from
-  multiple clients and see the same output in all of them.
-- `2` - Multiple Characters per Account, one Session per Character. This will not auto-create a same-named
-  Character for you, instead you get to create/choose between a number of Characters up to a max limit given by
-  the `MAX_NR_CHARACTERS` setting (default 1). You can play them all simultaneously if you have multiple clients
-  open, but only one client per Character.
-- `3` - Multiple Characters per Account, Multiple Sessions per Character. This is like mode 2, except players
-  can control each Character from multiple clients, seeing the same output from each Character.
+- `0`- 每個帳戶一個角色，每個帳戶一個 Session。這意味著如果您登入相同的
+如果您使用其他客戶的帳戶，您將與第一個客戶斷開連線。建立新帳戶時，角色
+  將使用與您的帳戶相同的名稱自動建立。這是預設模式並模仿遺留程式碼庫
+  帳戶和角色之間沒有分離。
+- `1` - 每個帳戶一個字元，每個帳戶多個 Sessions。這樣您就可以同時連線
+多個用戶端並在所有用戶端中看到相同的輸出。
+- `2` - 每個帳戶多個字元，每個字元一個 Session。這不會自動建立同名的
+為您提供角色，相反，您可以建立/選擇多個角色，最多可達以下給出的最大限制
+  `MAX_NR_CHARACTERS` 設定（預設 1）。如果您有多個用戶端，您可以同時玩所有遊戲
+  開放，但每個角色只能有一個用戶端。
+- `3` - 每個帳戶多個字元，每個字元多個 Sessions。這就像模式 2，除了玩家
+可以從多個用戶端控制每個角色，並看到每個角色的相同輸出。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-Due to the nature of _Knave_, characters are squishy and probably short-lived. So it makes little sense to keep a stable of them. We'll use use mode 0 or 1. 
+由於_Knave_的性質，角色是軟弱的並且可能是短暫的。因此保持它們的穩定沒有什麼意義。我們將使用使用模式 0 或 1。
 
-### How does the character-generation work?
+(how-does-the-character-generation-work)=
+### 角色生成是如何運作的？
 
-There are a few common ways to do character generation:
+有幾種常見的角色生成方法：
 
-- Rooms. This is the traditional way. Each room's description tells you what command to use to modify   your character. When you are done you move to the next room. Only use this if you have another reason for   using a room, like having a training dummy to test skills on, for example.
-- A Menu. The Evennia _EvMenu_ system allows you to code very flexible in-game menus without needing to walk   between rooms. You can both have a step-by-step menu (a 'wizard') or allow the user to jump between the
-  steps as they please. This tends to be a lot easier for newcomers to understand since it doesn't require
-  using custom commands they will likely never use again after this.
-- Questions. A fun way to build a character is to answer a series of questions. This is usually implemented  with a sequential menu.
+- 房間。這是傳統的方式。每個房間的描述都會告訴您使用什麼指令來修改您的角色。完成後，您將前往下一個房間。只有當您有其他使用房間的原因時才使用此功能，例如使用訓練假人來測試技能。
+- 選單。 Evennia _EvMenu_ 系統可讓您編寫非常靈活的遊戲內選單，而無需在房間之間行走。您既可以有一個逐步選單（“嚮導”），也可以允許使用者在
+隨心所欲地採取步驟。對於新手來說，這往往更容易理解，因為它不需要
+  使用自訂指令之後他們可能再也不會使用。
+- 問題。塑造角色的一個有趣方法是回答一系列問題。這通常透過順序選單來實現。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
- Knave randomizes almost aspects of the Character generation. We'll use a menu to let the player add their name and sex as well as do the minor re-assignment of stats allowed by the rules.
+無賴隨機化了角色生成的幾乎各個面向。我們將使用一個選單讓玩家新增他們的姓名和性別，並對規則允許的統計資料進行細微的重新分配。
 
-### How do you implement different "classes" or "races"?
+(how-do-you-implement-different-classes-or-races)=
+### 如何實現不同的「階級」或「種族」？
 
-The way classes and races work in most RPGs is that they act as static 'templates' that inform which bonuses and special abilities you have. Much of this only comes into play during character generation or when leveling up. 
+在大多數RPGs中，類別和種族的工作方式是它們充當靜態“模板”，告知您擁有哪些獎金和特殊能力。其中大部分僅在角色生成或升級時發揮作用。
 
-Often all we need to store on the Character is _which_ class and _which_ race they have; the actual logic can sit in Python code and just be looked up when we need it.
+通常我們需要在角色上儲存的只是他們擁有的類別和種族；實際的邏輯可以放在 Python 程式碼中，只需在需要時找到即可。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-There are no races and no classes in _Knave_. Every character is a human.
+_Knave_ 中沒有種族，也沒有職業。每個角色都是人。
 
-### If a Character can hide in a room, what skill will decide if they are detected?
+(if-a-character-can-hide-in-a-room-what-skill-will-decide-if-they-are-detected)=
+### 如果角色可以隱藏在房間裡，那麼什麼技能將決定他們是否被發現？
 
-Hiding means a few things.
-- The Character should not appear in the room's description / character list
-- Others hould not be able to interact with a hidden character. It'd be weird if you could do `attack <name>`
-  or `look <name>` if the named character is in hiding.
-- There must be a way for the person to come out of hiding, and probably for others to search or accidentally
-  find the person (probably based on skill checks).
-- The room will also need to be involved, maybe with some modifier as to how easy it is to hide in the room.
+隱藏意味著一些事情。
+- 該角色不應出現在房間的描述/角色清單中
+- 其他人應該無法與隱藏角色互動。如果你能做到`attack <name>`那就奇怪了
+如果指定的角色處於隱藏狀態，則為 `look <name>`。
+- 一定有辦法讓這個人從躲藏處出來，並且很可能讓其他人搜查或意外
+找到這個人（可能基於技能檢定）。
+- 房間也需要參與進來，也許需要一些修改來隱藏在房間裡有多容易。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-We will not be including a hide-mechanic in EvAdventure. 
+我們不會在 EvAdventure 中包含隱藏機制。
 
-### What does the skill tree look like? Can a Character gain experience to improve? By killing enemies? Solving quests? By roleplaying?
+(what-does-the-skill-tree-look-like-can-a-character-gain-experience-to-improve-by-killing-enemies-solving-quests-by-roleplaying)=
+### 技能樹是什麼樣的？角色可以獲得經驗來提升嗎？透過殺死敵人？解決任務？透過角色扮演？
 
-Gaining experience points (XP) and improving one's character is a staple of roleplaying games. There are many
-ways to implement this:
-- Gaining XP from kills is very common; it's easy to let a monster be 'worth' a certain number of XP and it's easy to tell when you should gain it.
-- Gaining XP from quests is the same - each quest is 'worth' XP and you get them when completing the test.
-- Gaining XP from roleplay is harder to define. Different games have tried a lot of different ways to do this:
-  - XP from being online - just being online gains you XP. This inflates player numbers but many players may
+獲得經驗值（XP）和提升角色是角色扮演遊戲的主要內容。有很多
+實作方法：
+- 從擊殺中獲得 XP 是很常見的；讓怪物「值得」一定數量的XP是很容易的，並且很容易判斷何時應該獲得它。
+- 從任務中獲得 XP 是相同的 - 每個任務都「值得」XP，你在完成測試時會得到它們。
+- 從角色扮演中獲得 XP 更難定義。不同的遊戲嘗試了很多不同的方法來做到這一點：
+  - XP 來自線上 - 僅線上即可讓您獲得 XP。這會增加玩家數量，但許多玩家可能會
      just be lurking and not be actually playing the game at any given time.
-  - XP from roleplaying scenes - you gain XP according to some algorithm analyzing your emotes for 'quality',
+  - XP 來自角色扮演場景 - 根據某種演演算法分析你的表情“品質”，你獲得 XP，
     how often you post, how long your emotes are etc.
-  - XP from actions - you gain XP when doing things, anything. Maybe your XP is even specific to each action, so
+  - XP 來自行動 - 當你做事、做任何事情時，你會獲得 XP。也許你的 XP 甚至特定於每個操作，所以
     you gain XP only for running when you run, XP for your axe skill when you fight with an axe etc.
-  - XP from fails - you only gain XP when failing rolls.
-  - XP from other players - other players can award you XP for good RP.
+  - XP 失敗 - 失敗擲骰時你只能得到 XP。
+  - 來自其他玩家的 XP - 其他玩家可以獎勵您 XP 的好RP。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
- We will use an alternative rule in _Knave_, where Characters gain XP by spending coins they carry back from their adventures. The above-ground merchants will allow you to spend your coins and exchange them for XP 1:1. Each level costs 1000 coins. Every level you have `1d8  * new level` (minimum what you had before + 1) HP, and can raise 3 different ability scores by 1 (max +10). There are no skills in _Knave_, but the principle of increasing them would be the same.
+我們將在_Knave_中使用替代規則，其中角色透過花費他們從冒險中帶回的硬幣來獲得XP。地面商人將允許您花費您的硬幣並以1:1的比例兌換XP。每個等級花費 1000 個金幣。每升一級，你擁有`1d8  * new level`（你之前擁有的最少+1）HP，並且可以將3個不同的能力分數提高1（最多+10）。 _Knave_中沒有技能，但增加技能的原理是一樣的。
 
-### May player-characters attack each other (PvP)?
+(may-player-characters-attack-each-other-pvp)=
+### 玩家角色可以互相攻擊（PvP）嗎？
 
-Deciding this affects the style of your entire game. PvP makes for exciting gameplay but it opens a whole new can of worms when it comes to "fairness". Players will usually accept dying to an overpowered NPC dragon. They will not be as accepting if they perceive another player as being overpowered. PvP means that you
-have to be very careful to balance the game - all characters does not have to be exactly equal but they should all be viable to play a fun game with. 
+決定這一點會影響整個遊戲的風格。 PvP 帶來了令人興奮的遊戲玩法，但在「公平」方面卻帶來了全新的麻煩。玩家通常會接受死於被壓倒的NPC龍的情況。如果他們認為其他玩家被壓倒了，他們就不會那麼接受。 PvP 意味著你
+必須非常小心地平衡遊戲 - 所有角色不必完全相同，但他們都應該能夠玩有趣的遊戲。
 
-PvP does not only mean combat though. Players can compete in all sorts of ways, including gaining influence in a political game or gaining market share when selling their crafted merchandise.
+PvP 不僅僅意味著戰鬥。玩家可以透過各種方式進行競爭，包括在政治遊戲中獲得影響力，或在銷售自己製作的商品時獲得市場份額。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
- We will allow PvP only in one place - a special Dueling location where players can play-fight each other for training and prestige, but not actually get killed. Otherwise no PvP will be allowed. Note that without a full Barter system in place (just regular `give`, it makes it theoretically easier for players to scam one another.
+我們只允許在一個地方進行 PvP - 一個特殊的決鬥地點，玩家可以在其中互相戰鬥以獲取訓練和聲望，但實際上不會被殺死。否則將不允許進行 PvP。請注意，如果沒有完整的以物易物系統（只是常規的`give`），從理論上講，它會讓玩家更容易互相欺騙。
 
-### What are the penalties of defeat? Permanent death? Quick respawn? Time in prison?
+(what-are-the-penalties-of-defeat-permanent-death-quick-respawn-time-in-prison)=
+### 失敗的懲罰是什麼？永久死亡？快速重生？入獄時間？
 
-This is another big decision that strongly affects the mood and style of your game.
+這是另一個重大決定，會強烈影響遊戲的情緒和風格。
 
-Perma-death means that once your character dies, it's gone and you have to make a new one.
+永久死亡意味著一旦你的角色死亡，它就消失了，你必須創造一個新的。
 
-- It allows for true heroism. If you genuinely risk losing your character of two years to fight the dragon,
-  your triumph is an actual feat.
-- It limits the old-timer dominance problem. If long-time players dies occationally, it will open things
-  up for newcomers.
-- It lowers inflation, since the hoarded resources of a dead character can be removed.
-- It gives capital punishment genuine discouraging power.
-- It's realistic.
+- 它允許真正的英雄主義。如果你真的冒著失去兩年人格的風險來與龍戰鬥，
+你的勝利是一個真正的壯舉。
+- 它限制了舊時代的統治問題。如果長期玩家偶爾死亡，就會開啟局面
+適合新人。
+- 它降低了通貨膨脹，因為死亡角色的囤積資源可以被移除。
+- 它賦予死刑真正的威懾力。
+- 這是現實的。
 
-Perma-death comes with some severe disadvantages however.
+然而，永久死亡也有一些嚴重的缺點。
 
-- Many players say they like the _idea_ of permadeath except when it could happen to them.
-- Some players refuse to take any risks if death is permanent.
-- It may make players even more reluctant to play conflict-driving 'bad guys'.
-- Balancing PvP becomes very hard. Fairness and avoiding exploits becomes critical when the outcome
-is permanent.
+- 許多玩家表示他們喜歡永久死亡的想法，除非這種情況可能發生在他們身上。
+- 如果死亡是永久性的，有些玩家拒絕承擔任何風險。
+- 這可能會讓玩家更不願意扮演引發衝突的「壞人」。
+- 平衡 PvP 變得非常困難。當結果出現時，公平和避免被利用就變得至關重要
+是永久的。
 
-For these reasons, it's very common to do hybrid systems. Some tried variations:
+由於這些原因，混合系統很常見。一些嘗試過的變體：
 
-- NPCs cannot kill you, only other players can.
-- Death is permanent, but it's difficult to actually die - you are much more likely to end up being severely hurt/incapacitated.
-- You can pre-pay 'insurance' to magically/technologically avoid actually dying. Only if don't have insurance will
-  you die permanently.
-- Death just means harsh penalties, not actual death.
-- When you die you can fight your way back to life from some sort of afterlife.
-- You'll only die permanently if you as a player explicitly allows it.
+- NPCs無法殺死你，只有其他玩家可以。
+- 死亡是永久性的，但真正死亡是很困難的——你更有可能最終受到嚴重傷害/喪失能力。
+- 您可以預先支付“保險”，以神奇/技術方式避免實際死亡。只有沒有保險才會
+你將永遠死去。
+- 死亡只是意味著嚴厲的懲罰，而不是真正的死亡。
+- 當你死後，你可以透過某種來世努力復活。
+- 只有當你作為玩家明確允許時，你才會永久死亡。
 
-**EvAdventure Answer**
+**EvAdventure回答**
 
-In _Knave_, when you hit 0 HP, you roll on a death table, with a 1/8 chance of immediate death (otherwise you lose
-points in a random stat). We will offer an "Insurance" that allows you to resurrect if you carry enough coin on you when
-you die. If not, you are perma-dead and have to create a new character (which is easy and quick since it's mostly
-randomized).
+在_Knave_中，當你擊中 0 HP 時，你會在死亡桌上滾動，有 1/8 的機會立即死亡（否則你會輸
+隨機統計中的點）。我們將為您提供“保險”，如果您身上攜帶足夠的硬幣，您就可以復活
+你死了。如果沒有，你就永遠死了，必須建立一個新角色（這很簡單快捷，因為它主要是
+隨機）。
 
-## Conclusions
+(conclusions)=
+## 結論
 
-Going through the questions has helped us get a little bit more of a feel for the game we want to do. There are many, many other things we could ask ourselves, but if we can cover these points we will be a good way towards a complete,
-playable game!
+透過這些問題，我們對我們想要做的遊戲有了更多的感覺。我們也可以問自己很多很多其他的事情，但如果我們能夠涵蓋這些要點，我們將成為實現完整的、
+可玩的遊戲！
 
-In the last of these planning lessons we'll sketch out how these ideas will map to Evennia.
+在最後的規劃課程中，我們將概述這些想法如何對應到 Evennia。

@@ -1,10 +1,11 @@
+(typeclasses)=
 # Typeclasses
 
-*Typeclasses* form the core of Evennia's data storage. It allows Evennia to represent any number of different game entities as Python classes, without having to modify the database schema for every new type.
+*Typeclasses*構成Evennia資料儲存的核心。它允許 Evennia 將任意數量的不同遊戲實體表示為 Python 類，而無需為每個新型別修改資料庫架構。
 
-In Evennia the most important game entities, [Accounts](./Accounts.md), [Objects](./Objects.md), [Scripts](./Scripts.md) and [Channels](./Channels.md) are all Python classes inheriting, at varying distance, from `evennia.typeclasses.models.TypedObject`.  In the documentation we refer to these objects as being "typeclassed" or even "being a typeclass".
+在Evennia中，最重要的遊戲實體，[帳戶](./Accounts.md)、[物件](./Objects.md)、[Scripts](./Scripts.md)和[頻道](./Channels.md)都是從`evennia.typeclasses.models.TypedObject`以不同距離繼承的Python類別。  在檔案中，我們將這些物件稱為「型別分類」甚至「typeclass」。
 
-This is how the inheritance looks for the typeclasses in Evennia:
+這是繼承在 Evennia 中找出 typeclasses 的方式：
 
 ```
                                   ┌───────────┐
@@ -34,21 +35,22 @@ This is how the inheritance looks for the typeclasses in Evennia:
                                                          └────┘
 ```
 
-- **Level 1** above is the "database model" level. This describes the database tables and fields (this is technically a [Django model](https://docs.djangoproject.com/en/4.1/topics/db/models/)).
-- **Level 2** is where we find Evennia's default implementations of the various game entities, on top of the database. These classes define all the hook methods that Evennia calls in various situations. `DefaultObject` is a little special since it's the parent for `DefaultCharacter`, `DefaultRoom` and `DefaultExit`. They are all grouped under level 2 because they all represents defaults to build from.
-- **Level 3**, finally, holds empty template classes created in your game directory. This is the level you are meant to modify and tweak as you please, overloading the defaults as befits your game. The templates inherit directly from their defaults, so `Object` inherits from `DefaultObject` and `Room` inherits from `DefaultRoom`.
+- 上面的**等級 1** 是「資料庫模型」等級。這描述了資料庫表和欄位（從技術上講，這是一個 [Django 模型](https://docs.djangoproject.com/en/4.1/topics/db/models/)）。
+- **等級 2** 是我們在資料庫頂部找到 Evennia 各種遊戲實體的預設實現的地方。這些類別定義了Evennia在各種情況下呼叫的所有鉤子方法。 `DefaultObject` 有點特殊，因為它是 `DefaultCharacter`、`DefaultRoom` 和 `DefaultExit` 的父級。它們都被分組在等級 2 下，因為它們都代表建置的預設值。
+- 最後，**第 3 級**包含在遊戲目錄中建立的空白模板類別。這是您應該根據需要修改和調整的級別，過載預設值以適合您的遊戲。模板直接從其預設值繼承，因此 `Object` 從 `DefaultObject` 繼承，`Room` 從 `DefaultRoom` 繼承。
 
-> This diagram doesn't include the `ObjectParent` mixin for `Object`, `Character`, `Room` and `Exit`. This establishes a common parent for those classes, for shared properties. See [Objects](./Objects.md) for more details.
+> 此圖不包括 `Object`、`Character`、`Room` 和 `Exit` 的 `ObjectParent` mixin。這為這些類建立了一個共同的父類，用於共享屬性。有關詳細資訊，請參閱[物件](./Objects.md)。
 
-The `typeclass/list` command will provide a list of all typeclasses known to Evennia. This can be useful for getting a feel for what is available. Note however that if you add a new module with a class in it but do not import that module from anywhere, the `typeclass/list` will not find it. To make it known to Evennia you must import that module from somewhere.
+`typeclass/list` 指令將提供Evennia 已知的所有typeclasses 的清單。這對於瞭解可用的內容很有用。但請注意，如果您新增一個包含類別的新模組，但不從任何地方匯入該模組，則 `typeclass/list` 將找不到它。為了讓 Evennia 知道它，您必須從某個地方匯入該模組。
 
 
-## Difference between typeclasses and classes
+(difference-between-typeclasses-and-classes)=
+## typeclasses 和類別之間的差異
 
-All Evennia classes inheriting from class in the table above share one important feature and two important limitations. This is why we don't simply call them "classes" but "typeclasses".
+從上表中的類別繼承的所有 Evennia 類別都有一個重要的特性和兩個重要的限制。這就是為什麼我們不簡單地稱它們為「類」而是「typeclasses」。
 
- 1. A typeclass can save itself to the database. This means that some properties (actually not that many) on the class actually represents database fields and can only hold very specific data types.
- 1. Due to its connection to the database, the typeclass' name must be *unique* across the _entire_ server namespace. That is, there must never be two same-named classes defined anywhere. So the below code would give an error (since `DefaultObject` is now globally found both in this module and in the default library):
+ 1. typeclass 可以將自身儲存到資料庫中。這意味著類別上的某些屬性（實際上不是很多）實際上代表資料庫欄位，並且只能儲存非常特定的資料型別。
+ 1. 由於它與資料庫的連線，typeclass' 名稱在整個伺服器名稱空間中必須是*唯一的*。也就是說，任何地方都不能定義兩個同名的類別。因此，下面的程式碼會給出錯誤（因為 `DefaultObject` 現在在此模組和預設庫中全域找到）：
 
     ```python
     from evennia import DefaultObject as BaseObject
@@ -56,7 +58,7 @@ All Evennia classes inheriting from class in the table above share one important
          pass
     ```
 
- 1. A typeclass' `__init__` method should normally not be overloaded. This has mostly to do with the fact that the `__init__` method is not called in a predictable way. Instead Evennia suggest you use the `at_*_creation` hooks (like `at_object_creation` for Objects) for setting things the very first time the typeclass is saved to the database or the `at_init` hook which is called every time the object is cached to memory. If you know what you are doing and want to use `__init__`, it *must* both accept arbitrary keyword arguments and use `super` to call its parent: 
+ 1. typeclass' `__init__` 方法通常不應過載。這主要與 `__init__` 方法沒有以可預測的方式呼叫有關。相反，Evennia 建議您使用 `at_*_creation` 掛鉤（如物件的 `at_object_creation`）在第一次將 typeclass 儲存到資料庫時進行設定，或每次將物件快取到記憶體時呼叫 `at_init` 掛鉤。如果您知道自己在做什麼並且想要使用 `__init__`，它*必須*既接受任意關鍵字引數並使用 `super` 呼叫其父級：
  
     ```python
     def __init__(self, **kwargs):
@@ -65,13 +67,15 @@ All Evennia classes inheriting from class in the table above share one important
         # my content
     ```
 
-Apart from this, a typeclass works like any normal Python class and you can treat it as such.
+除此之外，typeclass 的工作方式與任何普通的 Python 類別一樣，您可以這樣對待它。
 
-## Working with typeclasses
+(working-with-typeclasses)=
+## 與 typeclasses 一起工作
 
-### Creating a new typeclass
+(creating-a-new-typeclass)=
+### 創造一個新的typeclass
 
- It's easy to work with Typeclasses. Either you use an existing typeclass or you  create a new Python class inheriting from an existing typeclass. Here is an example of creating a new type of Object:
+使用 Typeclasses 很容易工作。您可以使用現有的typeclass，也可以建立一個繼承現有typeclass 的新Python 類別。這是建立新型別物件的範例：
  
 ```python
     from evennia import DefaultObject
@@ -83,8 +87,8 @@ Apart from this, a typeclass works like any normal Python class and you can trea
 
 ```
 
-You can now create a new `Furniture` object in two ways.  First (and usually not the most
-convenient) way is to create an instance of the class and then save it manually to the database:
+現在您可以透過兩種方式建立新的 `Furniture` 物件。  首先（通常不是最
+方便）的方法是建立該類別的例項，然後手動將其儲存到資料庫中：
 
 ```python
 chair = Furniture(db_key="Chair")
@@ -92,9 +96,9 @@ chair.save()
 
 ```
 
-To use this you must give the database field names as keywords to the call. Which are available depends on the entity you are creating, but all start with `db_*` in Evennia. This is a method you may be familiar with if you know Django from before.
+要使用此功能，您必須將資料庫欄位名稱作為呼叫的關鍵字。哪些可用取決於您要建立的實體，但全部以 Evennia 中的 `db_*` 開頭。如果您以前瞭解過 Django，那麼您可能會熟悉這種方法。
 
-It is recommended that you instead use the `create_*` functions to create typeclassed entities:
+建議您改用 `create_*` 函式來建立型別分類實體：
 
 
 ```python
@@ -105,9 +109,9 @@ chair = create_object(Furniture, key="Chair")
 chair = create_object("furniture.Furniture", key="Chair")
 ```
 
-The `create_object` (`create_account`, `create_script` etc) takes the typeclass as its first argument; this can both be the actual class or the python path to the typeclass as found under your game directory. So if your `Furniture` typeclass sits in `mygame/typeclasses/furniture.py`, you could point to it as `typeclasses.furniture.Furniture`. Since Evennia will itself look in `mygame/typeclasses`, you can shorten this even further to just `furniture.Furniture`. The create-functions take a lot of extra keywords allowing you to set things like [Attributes](./Attributes.md) and [Tags](./Tags.md) all in one go. These keywords don't use the `db_*` prefix. This will also automatically save the new instance to the database, so you don't need to call `save()` explicitly.
+`create_object`（`create_account`、`create_script` 等）將 typeclass 作為其第一個引數；這可以是實際的類，也可以是在遊戲目錄下找到的 typeclass 的 python 路徑。因此，如果您的 `Furniture` typeclass 位於 `mygame/typeclasses/furniture.py`，您可以將其指向 `typeclasses.furniture.Furniture`。由於 Evennia 本身會出現在 `mygame/typeclasses` 中，因此您可以進一步縮短為 `furniture.Furniture`。建立函式需要很多額外的關鍵字，允許您一次設定 [屬性](./Attributes.md) 和 [Tags](./Tags.md) 等內容。這些關鍵字不使用 `db_*` 字首。這也會自動將新執行個體儲存到資料庫，因此您不需要明確呼叫 `save()`。
 
-An example of a database field is `db_key`. This stores the "name" of the entity you are modifying and can thus only hold a string. This is one way of making sure to update the `db_key`:
+資料庫欄位的範例是 `db_key`。它儲存您正在修改的實體的“名稱”，因此只能儲存一個字串。這是確保更新 `db_key` 的一種方法：
 
 ```python
 chair.db_key = "Table"
@@ -117,7 +121,7 @@ print(chair.db_key)
 <<< Table
 ```
 
-That is, we change the chair object to have the `db_key` "Table", then save this to the database. However, you almost never do things this way; Evennia defines property wrappers for all the database fields. These are named the same as the field, but without the `db_` part:
+也就是說，我們將椅子物件更改為具有`db_key`“桌子”，然後將其儲存到資料庫中。然而，你幾乎從來不會這樣做； Evennia 定義所有資料庫欄位的屬性包裝器。它們的命名與欄位相同，但沒有 `db_` 部分：
 
 ```python
 chair.key = "Table"
@@ -127,49 +131,51 @@ print(chair.key)
 
 ```
 
-The `key` wrapper is not only shorter to write, it will make sure to save the field for you, and does so more efficiently by levering sql update mechanics under the hood. So whereas it is good to be aware that the field is named `db_key` you should use `key` as much as you can.
+`key` 包裝器不僅編寫起來更短，它還可以確保為您儲存該欄位，並且透過在後臺利用 sql 更新機制來更有效地完成此操作。因此，雖然最好知道該欄位名為 `db_key`，但您應該盡可能多地使用 `key`。
 
-Each typeclass entity has some unique fields relevant to that type.  But all also share the
-following fields (the wrapper name without `db_` is given):
+每個 typeclass 實體都有一些與該型別相關的唯一欄位。  但所有人也共享
+以下欄位（給出不含 `db_` 的包裝器名稱）：
 
- - `key` (str): The main identifier for the entity, like "Rose", "myscript" or "Paul". `name` is an alias.
- - `date_created` (datetime): Time stamp when this object was created.
- - `typeclass_path` (str): A python path pointing to the location of this (type)class
+ - `key` (str)：實體的主要識別符號，例如「Rose」、「myscript」或「Paul」。 `name` 是別名。
+ - `date_created` (datetime)：建立此物件時的時間戳記。
+ - `typeclass_path` (str)：指向該（型別）類別位置的Python路徑
 
-There is one special field that doesn't use the `db_` prefix (it's defined by Django):
+有一個特殊欄位不使用 `db_` 字首（它是由 Django 定義的）：
 
- - `id` (int): the database id (database ref) of the object. This is an ever-increasing, unique integer. It can also be accessed as `dbid` (database ID) or `pk` (primary key). The `dbref` property returns the string form "#id".
+ - `id` (int): 物件的資料庫 ID (database ref)。這是一個不斷增加的唯一整數。它也可以作為`dbid`（資料庫ID）或`pk`（主鍵）進行存取。 `dbref` 屬性傳回字串形式「#id」。
 
-The typeclassed entity has several common handlers:
+型別分類實體有幾個常見的處理程式：
 
- - `tags` - the [TagHandler](./Tags.md) that handles tagging. Use `tags.add()` , `tags.get()` etc.
- - `locks` - the [LockHandler](./Locks.md) that manages access restrictions. Use `locks.add()`, `locks.get()` etc.
- - `attributes` - the [AttributeHandler](./Attributes.md) that manages Attributes on the object. Use `attributes.add()`
-etc.
- - `db` (DataBase) - a shortcut property to the AttributeHandler; allowing `obj.db.attrname = value`
- - `nattributes` - the [Non-persistent AttributeHandler](./Attributes.md) for attributes not saved in the
-database.
- - `ndb` (NotDataBase) - a shortcut property to the Non-peristent AttributeHandler. Allows `obj.ndb.attrname = value`
+ - `tags` - 處理標記的 [TagHandler](./Tags.md)。使用 `tags.add()` 、 `tags.get()` 等。
+ - `locks` - 管理存取限制的 [LockHandler](./Locks.md)。使用`locks.add()`、`locks.get()`等。
+ - `attributes` - 管理物件屬性的 [AttributeHandler](./Attributes.md)。使用`attributes.add()`
+ETC。
+ - `db` (DataBase) - AttributeHandler 的捷徑屬性；允許`obj.db.attrname = value`
+ - `nattributes` - 未儲存在屬性中的 [非持久 AttributeHandler](./Attributes.md)
+資料庫.
+ - `ndb` (NotDataBase) - 非持久 AttributeHandler 的捷徑屬性。允許`obj.ndb.attrname = value`
 
 
-Each of the typeclassed entities then extend this list with their own properties. Go to the respective pages for [Objects](./Objects.md), [Scripts](./Scripts.md), [Accounts](./Accounts.md) and [Channels](./Channels.md) for more info. It's also recommended that you explore the available entities using [Evennia's flat API](../Evennia-API.md) to explore which properties and methods they have available.
+然後，每個型別分類的實體都會用自己的屬性擴充套件此列表。請前往[物件](./Objects.md)、[Scripts](./Scripts.md)、[帳號](./Accounts.md) 和[頻道](./Channels.md) 的對應頁面瞭解更多資訊。也建議您使用 [Evennia 的平面 API](../Evennia-API.md) 來探索可用實體，以探索它們具有哪些可用屬性和方法。
 
-### Overloading hooks
+(overloading-hooks)=
+### 超載吊鉤
 
-The way to customize typeclasses is usually to overload *hook methods* on them. Hooks are methods that Evennia call in various situations. An example is the `at_object_creation` hook on `Objects`, which is only called once, the very first time this object is saved to the database.  Other examples are the `at_login` hook of Accounts and the `at_repeat` hook of Scripts.
+自訂 typeclasses 的方法通常是在它們上過載 *hook 方法*。鉤子是Evennia在各種情況下呼叫的方法。一個範例是 `Objects` 上的 `at_object_creation` 掛鉤，僅在第一次將此物件儲存到資料庫時呼叫一次。  其他範例包括 Accounts 的 `at_login` 掛鉤和 Scripts 的 `at_repeat` 掛鉤。
 
-### Querying for typeclasses
+(querying-for-typeclasses)=
+### 查詢 typeclasses
 
-Most of the time you search for objects in the database by using convenience methods like the `caller.search()` of [Commands](./Commands.md) or the search functions like `evennia.search_objects`.
+大多數時候，您可以使用 [指令](./Commands.md) 的 `caller.search()` 等便捷方法或 `evennia.search_objects` 等搜尋功能來搜尋資料庫中的物件。
 
-You can however also query for them directly using [Django's query language](https://docs.djangoproject.com/en/4.1/topics/db/queries/). This makes use of a _database manager_ that sits on all typeclasses, named `objects`. This manager holds methods that allow database searches against that particular type of object (this is the way Django normally works too). When using Django queries, you need to use the full field names (like `db_key`) to search:
+不過，您也可以直接使用[Django 的查詢語言](https://docs.djangoproject.com/en/4.1/topics/db/queries/) 來查詢它們。這利用了位於所有 typeclasses 上的_資料庫管理器_，名為 `objects`。此管理器擁有允許針對特定型別的物件進行資料庫搜尋的方法（這也是 Django 通常的工作方式）。使用 Django 查詢時，需要使用完整的欄位名稱（如 `db_key`）進行搜尋：
 
 ```python
 matches = Furniture.objects.get(db_key="Chair")
 
 ```
 
-It is important that this will *only* find objects inheriting directly from `Furniture` in your database. If there was a subclass of `Furniture` named `Sitables` you would not find any chairs derived from `Sitables` with this query (this is not a Django feature but special to Evennia). To find objects from subclasses Evennia instead makes the `get_family` and `filter_family` query methods available:
+重要的是，這將「僅」查詢直接從資料庫中的 `Furniture` 繼承的物件。如果 `Furniture` 有一個名為 `Sitables` 的子類，則使用此查詢將找不到任何從 `Sitables` 派生的椅子（這不是 Django 功能，而是 Evennia 所特有的）。若要從子類別 Evennia 尋找物件，請使用 `get_family` 和 `filter_family` 查詢方法：
 
 ```python
 # search for all furnitures and subclasses of furnitures
@@ -178,18 +184,19 @@ matches = Furniture.objects.filter_family(db_key__startswith="Chair")
 
 ```
 
-To make sure to search, say, all `Scripts` *regardless* of typeclass, you need to query from the database model itself. So for Objects, this would be `ObjectDB` in the diagram above. Here's an example for Scripts:
+為了確保搜尋，例如，所有 `Scripts` *不管* typeclass，您需要從資料庫模型本身進行查詢。因此對於物件來說，這將是上圖中的`ObjectDB`。以下是 Scripts 的範例：
 
 ```python
 from evennia import ScriptDB
 matches = ScriptDB.objects.filter(db_key__contains="Combat")
 ```
 
-When querying from the database model parent you don't need to use `filter_family` or `get_family` - you will always query all children on the database model.
+從資料庫模型父級查詢時，不需要使用 `filter_family` 或 `get_family` - 您將始終查詢資料庫模型上的所有子級。
 
-### Updating existing typeclass instances
+(updating-existing-typeclass-instances)=
+### 正在更新現有 typeclass 例項
 
-If you already have created instances of Typeclasses, you can modify the *Python code* at any time - due to how Python inheritance works your changes will automatically be applied to all children once you have reloaded the server. However, database-saved data, like `db_*` fields, [Attributes](./Attributes.md), [Tags](./Tags.md) etc, are not themselves embedded into the class and will *not* be updated automatically. This you need to manage yourself, by searching for all relevant objects and updating or adding the data:
+如果您已經建立了 Typeclasses 的例項，則可以隨時修改 *Python 程式碼* - 由於 Python 繼承的工作原理，一旦您重新載入伺服器，您的變更將自動套用至所有子層級。然而，資料庫儲存的資料，如 `db_*` 欄位、[屬性](./Attributes.md)、[Tags](./Tags.md) 等，本身並未嵌入到類別中，且不會自動更新。您需要透過搜尋所有相關物件並更新或新增資料來自行管理：
 
 ```python
 # add a worth Attribute to all existing Furniture
@@ -198,7 +205,7 @@ for obj in Furniture.objects.all():
     obj.db.worth = 100
 ```
 
-A common use case is putting all Attributes in the `at_*_creation` hook of the entity, such as `at_object_creation` for `Objects`. This is called every time an object is created - and only then. This is usually what you want but it does mean already existing objects won't get updated if you change the contents of `at_object_creation` later. You can fix this in a similar way as above (manually setting each Attribute) or with something like this:
+一個常見的用例是將所有屬性放入實體的 `at_*_creation` 掛鉤中，例如 `at_object_creation` 對應 `Objects`。每次建立物件時都會呼叫此方法 - 並且只有在那時。這通常是您想要的，但它確實意味著如果您稍後更改 `at_object_creation` 的內容，則現有物件將不會更新。您可以透過與上面類似的方式修復此問題（手動設定每個 Attribute）或使用類似以下內容：
 
 ```python
 # Re-run at_object_creation only on those objects not having the new Attribute
@@ -207,58 +214,62 @@ for obj in Furniture.objects.all():
         obj.at_object_creation()
 ```
 
-The above examples can be run in the command prompt created by `evennia shell`. You could also run it all in-game using `@py`. That however requires you to put the code (including imports) as one single line using `;` and [list comprehensions](http://www.secnetix.de/olli/Python/list_comprehensions.hawk), like this (ignore the line break, that's only for readability in the wiki):
+上面的範例可以在`evennia shell`建立的指令提示字元下執行。您還可以使用 `@py` 在遊戲中執行它。然而，這需要您使用 `;` 和 [列表推導式](http://www.secnetix.de/olli/Python/list_comprehensions.hawk) 將程式碼（包括匯入）作為一行，如下所示（忽略換行符，這只是為了 wiki 中的可讀性）：
 
 ```
 py from typeclasses.furniture import Furniture;
 [obj.at_object_creation() for obj in Furniture.objects.all() if not obj.db.worth]
 ```
 
-It is recommended that you plan your game properly before starting to build, to avoid having to retroactively update objects more than necessary.
+建議您在開始建造之前正確規劃遊戲，以避免不必要地追溯更新物件。
 
-### Swap typeclass
+(swap-typeclass)=
+### 交換typeclass
 
-If you want to swap an already existing typeclass, there are two ways to do so: From in-game and via code. From inside the game you can use the default `@typeclass` command:
+如果您想交換已經存在的 typeclass，有兩種方法可以實現：從遊戲內和透過程式碼。在遊戲內部，您可以使用預設的 `@typeclass` 指令：
 
 ```
 typeclass objname = path.to.new.typeclass
 ```
 
-There are two important switches to this command:
-- `/reset` - This will purge all existing Attributes on the object and re-run the creation hook (like `at_object_creation` for Objects). This assures you get an object which is purely of this new class.
-- `/force` - This is required if you are changing the class to be *the same* class the object already has - it's a safety check to avoid user errors. This is usually used together with `/reset` to re-run the creation hook on an existing class.
+此指令有兩個重要的開關：
+- `/reset` - 這將清除物件上的所有現有屬性並重新執行建立掛鉤（如物件的 `at_object_creation`）。這可以確保您獲得純粹屬於這個新類別的物件。
+- `/force` - 如果您要將類別變更為物件已有的「相同」類，則這是必需的 - 這是避免使用者錯誤的安全檢查。這通常與 `/reset` 一起使用以在現有類別上重新執行建立掛鉤。
 
-In code you instead use the `swap_typeclass` method which you can find on all typeclassed entities:
+在程式碼中，您可以使用 `swap_typeclass` 方法，您可以在所有型別分類的實體上找到該方法：
 
 ```python
 obj_to_change.swap_typeclass(new_typeclass_path, clean_attributes=False,
                    run_start_hooks="all", no_default=True, clean_cmdsets=False)
 ```
 
-The arguments to this method are described [in the API docs here](github:evennia.typeclasses.models#typedobjectswap_typeclass).
+此方法的引數在[此處的 API 檔案中](github:evennia.typeclasses.models#typedobjectswap_typeclass) 中進行了描述。
 
 
-## How typeclasses actually work
+(how-typeclasses-actually-work)=
+## typeclasses 實際工作原理
 
-*This is considered an advanced section.*
+*這被認為是高階部分。 *
 
-Technically, typeclasses are [Django proxy models](https://docs.djangoproject.com/en/4.1/topics/db/models/#proxy-models).  The only database models that are "real" in the typeclass system (that is, are represented by actual tables in the database) are `AccountDB`, `ObjectDB`, `ScriptDB` and `ChannelDB` (there are also [Attributes](./Attributes.md) and [Tags](./Tags.md) but they are not typeclasses themselves). All the subclasses of them are "proxies", extending them with Python code without actually modifying the database layout.
+從技術上講，typeclasses 是 [Django 代理模型](https://docs.djangoproject.com/en/4.1/topics/db/models/#proxy-models)。  typeclass 系統中唯一「真實」的資料庫模型（即由資料庫中的實際表表示）是 `AccountDB`、`ObjectDB`、`ScriptDB` 和 `ChannelDB`（還有 [屬性](./Attributes.md) 和 [Tags](./Tags.md)，但它們本身不是 typeclasses）。它們的所有子類別都是“代理”，用 Python 程式碼擴充套件它們，而無需實際修改資料庫佈局。
 
-Evennia modifies Django's proxy model in various ways to allow them to work without any boiler plate (for example you don't need to set the Django "proxy" property in the model `Meta` subclass, Evennia handles this for you using metaclasses). Evennia also makes sure you can query subclasses as well as patches Django to allow multiple inheritance from the same base class.
+Evennia 以各種方式修改 Django 的代理模型，以允許它們在沒有任何樣板的情況下工作（例如，您不需要在模型 `Meta` 子類中設定 Django「代理」屬性，Evennia 使用元類為您處理此問題）。 Evennia 還確保您可以查詢子類別以及修補 Django 以允許從同一基底類別進行多重繼承。
 
-### Caveats
+(caveats)=
+### 注意事項
 
-Evennia uses the *idmapper* to cache its typeclasses (Django proxy models) in memory. The idmapper allows things like on-object handlers and properties to be stored on typeclass instances and to not get lost as long as the server is running (they will only be cleared on a Server reload). Django does not work like this by default; by default every time you search for an object in the database you'll get a *different* instance of that object back and anything you stored on it that was not in the database would be lost. The bottom line is that Evennia's Typeclass instances subsist in memory a lot longer than vanilla Django model instances do. 
+Evennia 使用 *idmapper* 將其 typeclasses （Django 代理模型）快取在記憶體中。 idmapper 允許將物件處理程式和屬性等內容儲存在 typeclass 例項上，只要伺服器正在執行，就不會遺失（它們只會在伺服器重新載入時清除）。 Django 預設不是這樣運作的；預設情況下，每次在資料庫中搜尋物件時，您都會得到該物件的「不同」例項，並且儲存在該物件上的任何不在資料庫中的內容都會遺失。最重要的是，Evennia 的 Typeclass 例項在記憶體中的存在時間比普通 Django 模型例項長很多。
 
-There is one caveat to consider with this, and that relates to [making your own models](New-
-Models): Foreign relationships to typeclasses are cached by Django and that means that if you were to change an object in a foreign relationship via some other means than via that relationship, the object seeing the relationship may not reliably update but will still see its old cached version. Due to typeclasses staying so long in memory, stale caches of such relationships could be more visible than common in Django. See the [closed issue #1098 and its comments](https://github.com/evennia/evennia/issues/1098) for examples and solutions.
+對此需要考慮一個警告，這與[製作自己的模型](New-
+Models)有關：與typeclasses的外部關係由Django快取，這意味著如果您要透過該關係以外的其他方式更改外部關係中的物件，看到該關係的物件可能無法可靠地更新，但仍會看到其舊的快取版本。由於 typeclasses 在記憶體中保留了很長時間，此類關係的過時快取可能比 Django 中常見的快取更明顯。請參閱[已關閉的問題 #1098 及其評論](https://github.com/evennia/evennia/issues/1098) 以取得範例和解決方案。
 
-## Will I run out of dbrefs? 
+(will-i-run-out-of-dbrefs)=
+## 我會用完 dbrefs 嗎？
 
-Evennia does not re-use its `#dbrefs`. This means new objects get an ever-increasing `#dbref`, even if you delete older objects. There are technical and safety reasons for this. But you may wonder if this means you have to worry about a big game 'running out' of dbref integers eventually.
+Evennia 不會重複使用其 `#dbrefs`。這表示即使您刪除舊物件，新對像也會持續增加 `#dbref`。這有技術和安全方面的原因。但您可能想知道這是否意味著您必須擔心大型遊戲最終會「耗盡」 dbref 整數。
 
-The answer is simply **no**. 
+答案很簡單：**不**。
 
-For example, the max dbref value for the default sqlite3 database is `2**64`. If you *created 10 000 new objects every second of every minute of every day of the year it would take about **60 million years** for you to run out of dbref numbers*. That's a database of 140 TeraBytes, just to store the dbrefs, no other data. 
+例如，預設 sqlite3 資料庫的最大 dbref 值為 `2**64`。如果您*一年中的每一天、每一分鐘、每一秒都建立 10 000 個新物件，那麼您將需要大約 **6000 萬年**才能用完 dbref 數字*。這是一個 140TeraBytes 的資料庫，僅用於儲存 dbrefs，沒有其他資料。
 
-If you are still using Evennia at that point and have this concern, get back to us and we can discuss adding dbref reuse then.
+如果此時您仍在使用 Evennia 並有此擔憂，請回覆我們，我們可以討論新增 dbref 重複使用。

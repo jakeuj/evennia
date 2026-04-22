@@ -1,11 +1,12 @@
-# Handling Equipment 
+(handling-equipment)=
+# 搬運裝置
 
-In _Knave_, you have a certain number of inventory "slots". The amount of slots is given by `CON + 10`.  All items (except coins) have a `size`, indicating how many slots it uses. You can't carry more items  than you have slot-space for. Also items wielded or worn count towards the slots. 
+在_Knave_中，你有一定數量的庫存「插槽」。槽位的數量由`CON + 10`給出。  所有物品（除了金幣）都有一個`size`，表示它使用了多少個插槽。你攜帶的物品不能超過你的插槽空間。揮舞或磨損的物品也計入插槽。
 
-We still need to track what the character is using however: What weapon they have readied affects the damage they can do. The shield, helmet and armor they use affects their defense. 
+然而，我們仍然需要追蹤角色正在使用什麼：他們準備的武器會影響他們可以造成的傷害。他們使用的盾牌、頭盔和盔甲會影響他們的防禦力。
 
-We have already set up the possible 'wear/wield locations' when we defined our Objects
-[in the previous lesson](./Beginner-Tutorial-Objects.md). This is what we have in `enums.py`:
+當我們定義物件時，我們已經設定了可能的“佩戴/揮舞位置”
+[在上一課中](./Beginner-Tutorial-Objects.md)。這就是 `enums.py` 中的內容：
 
 ```python 
 # mygame/evadventure/enums.py
@@ -22,21 +23,22 @@ class WieldLocation(Enum):
     HEAD = "head"  # helmets
 ```
 
-Basically, all the weapon/armor locations are exclusive - you can only have one item in each (or none).  The BACKPACK is special - it contains any number of items (up to the maximum slot usage).
+基本上，所有武器/盔甲位置都是專有的 - 每個位置只能擁有一件物品（或沒有）。  BACKPACK 很特殊 - 它包含任意數量的專案（最多可達最大插槽使用量）。
 
-## EquipmentHandler that saves
+(equipmenthandler-that-saves)=
+## EquipmentHandler 儲存
 
-> Create a new module `mygame/evadventure/equipment.py`.
+> 建立一個新模組`mygame/evadventure/equipment.py`。
 
 ```{sidebar}
-If you want to understand more about behind how Evennia uses handlers, there is a 
-[dedicated tutorial](../../Tutorial-Persistent-Handler.md) talking about the principle.
+如果你想了解更多關於 Evennia 如何使用處理程式的資訊，有一個
+【專用教學】(../../Tutorial-Persistent-Handler.md)講原理。
 ```
-In default Evennia, everything you pick up will end up "inside" your character object (that is, have you as its `.location`). This is called your _inventory_ and has no limit. We will keep 'moving items into us' when we pick them up, but we will add more functionality using an _Equipment handler_.
+在預設的Evennia中，你拾取的所有東西最終都會出現在你的角色物件的「內部」（也就是說，你是它的`.location`）。這稱為您的_庫存_並且沒有限制。當我們拾取物品時，我們將繼續“將物品移入我們體內”，但我們將使用_裝置處理程式_新增更多功能。
 
-A handler is (for our purposes) an object that sits "on" another entity, containing functionality for doing one specific thing (managing equipment, in our case).
+處理程式（就我們的目的而言）是一個位於另一個實體「之上」的物件，包含執行一項特定操作的功能（在我們的例子中是管理裝置）。
 
-This is the start of our handler: 
+這是我們的處理程式的開始：
 
 ```python 
 # in mygame/evadventure/equipment.py 
@@ -71,8 +73,8 @@ class EquipmentHandler:
         self.obj.attributes.add(self.save_attribute, self.slots, category="inventory") 
 ```
 
-This is a compact and functional little handler. Before analyzing how it works, this is how 
-we will add it to the Character: 
+這是一款緊湊且實用的小型處理程式。在分析它是如何工作之前，這是這樣的
+我們將其新增到角色中：
 
 ```python
 # mygame/evadventure/characters.py
@@ -93,47 +95,48 @@ class EvAdventureCharacter(LivingMixin, DefaultCharacter):
         return EquipmentHandler(self)
 ```
 
-After reloading the server, the equipment-handler will now be accessible on character-instances as
+重新載入伺服器後，現在可以在角色例項上存取裝置處理程式，如下所示
 
     character.equipment
 
-The `@lazy_property` works such that it will not load the handler until someone actually tries to  fetch it with `character.equipment`. When that  happens, we start up the handler and feed it `self` (the `Character` instance itself). This is what  enters `__init__` as `.obj` in the `EquipmentHandler` code above.
+`@lazy_property` 的工作方式是，在有人實際嘗試使用 `character.equipment` 取得該處理程式之前，它不會載入該處理程式。當這種情況發生時，我們啟動處理程式並為其提供 `self`（`Character` 例項本身）。這就是上面 `EquipmentHandler` 程式碼中將 `__init__` 輸入為 `.obj` 的內容。
 
-So we now have a handler on the character, and the handler has a back-reference to the character it sits on. 
+現在我們在角色上有了一個處理程式，並且該處理程式具有對其所在角色的反向引用。
 
-Since the handler itself is just a regular Python object, we need to use the `Character` to store
-our data - our _Knave_ "slots". We must save them to the database, because we want the server to remember them even after reloading.
+由於處理程式本身只是一個常規的 Python 物件，因此我們需要使用 `Character` 來儲存
+我們的資料 - 我們的_Knave_「老虎機」。我們必須將它們儲存到資料庫中，因為我們希望伺服器即使在重新載入後也能記住它們。
 
-Using `self.obj.attributes.add()` and `.get()` we save the data to the Character in a specially named [Attribute](../../../Components/Attributes.md). Since we use a `category`, we are unlikely to collide with 
-other Attributes.
+使用`self.obj.attributes.add()`和`.get()`，我們將資料儲存到角色中一個專門命名的[Attribute](../../../Components/Attributes.md)中。由於我們使用`category`，所以我們不太可能與
+其他屬性。
 
-Our storage structure is a `dict` with keys after our available `WieldLocation` enums. Each can only have one item except `WieldLocation.BACKPACK`, which is a list.
+我們的儲存結構是 `dict`，其鍵位於可用的 `WieldLocation` 列舉之後。每個只能有一項，除了 `WieldLocation.BACKPACK` 之外，它是一個清單。
 
-## Connecting the EquipmentHandler
+(connecting-the-equipmenthandler)=
+## 連線EquipmentHandler
 
-Whenever an object leaves from one location to the next, Evennia will call a set of _hooks_ (methods) on the  object that moves, on the source-location and on its destination. This is the same for all moving things - whether it's a character moving between rooms or an item being dropping from your hand to the ground. 
+每當一個物件從一個位置離開到下一個位置時，Evennia 將在移動的物件、來源位置及其目的地上呼叫一組 _hooks_（方法）。這對於所有移動的物體都是一樣的 - 無論是在房間之間移動的角色還是從你手中掉落到地上的物品。
 
-We need to tie our new `EquipmentHandler` into this system. By reading the doc page on [Objects](../../../Components/Objects.md), or looking at the [DefaultObject.move_to](evennia.objects.objects.DefaultObject.move_to) docstring, we'll find out what hooks Evennia will call. Here `self` is the object being moved from `source_location` to `destination`: 
+我們需要將新的 `EquipmentHandler` 繫結到這個系統。透過閱讀 [Objects](../../../Components/Objects.md) 上的檔案頁面，或檢視 [DefaultObject.move_to](evennia.objects.objects.DefaultObject.move_to) 檔案字串，我們將找出 Evennia 將呼叫什麼鉤子。這裡 `self` 是從 `source_location` 移動到 `destination` 的物件：
 
 
-1. `self.at_pre_move(destination)` (abort if return False)
-2. `source_location.at_pre_object_leave(self, destination)` (abort if return False)
-3. `destination.at_pre_object_receive(self, source_location)` (abort if return False)
+1. `self.at_pre_move(destination)`（如果返回False則中止）
+2. `source_location.at_pre_object_leave(self, destination)`（如果返回False則中止）
+3. `destination.at_pre_object_receive(self, source_location)`（如果返回False則中止）
 4. `source_location.at_object_leave(self, destination)`
 5. `self.announce_move_from(destination)`
-6. (move happens here)
+6. （移動發生在這裡）
 7. `self.announce_move_to(source_location)`
 8. `destination.at_object_receive(self, source_location)`
 9. `self.at_post_move(source_location)`
 
-All of these hooks can be overridden to customize movement behavior. In this case we are interested in controlling how items 'enter' and 'leave' our character - being 'inside' the character is the same as them 'carrying' it. We have three good hook-candidates to use for this. 
+所有這些鉤子都可以被覆蓋以定製移動行為。在這種情況下，我們感興趣的是控制專案如何「進入」和「離開」我們的角色 - 在角色「內部」與它們「攜帶」角色相同。我們有三個很好的鉤子候選者可以用於此目的。
 
-- `.at_pre_object_receive` - used to check if you can actually pick something up, or if your equipment-store is full.
-- `.at_object_receive` - used to add the item to the equipmenthandler
-- `.at_object_leave` - used to remove the item from the equipmenthandler
+- `.at_pre_object_receive` - 用於檢查你是否真的可以拾取東西，或者你的裝備商店是否已滿。
+- `.at_object_receive` - 用於將專案新增至裝置處理程式中
+- `.at_object_leave` - 用於從裝置處理程式中刪除該專案
 
-You could also picture using `.at_pre_object_leave` to restrict dropping (cursed?) items, but 
-we will skip that for this tutorial.
+你也可以想像使用 `.at_pre_object_leave` 來限制掉落（被詛咒的？）物品，但是
+在本教學中我們將跳過它。
 
 ```python 
 # mygame/evadventure/character.py 
@@ -166,15 +169,17 @@ class EvAdventureCharacter(LivingMixin, DefaultCharacter):
         self.equipment.remove(moved_object)
 ```
 
-Above we have assumed the `EquipmentHandler` (`.equipment`) has methods `.validate_slot_usage`,  `.add` and `.remove`. But we haven't actually added them yet - we just put some reasonable names! Before we can use this, we need to go actually adding those methods. 
+上面我們假設 `EquipmentHandler` (`.equipment`) 有方法 `.validate_slot_usage`、`.add` 和 `.remove`。但我們實際上還沒有新增它們 - 我們只是新增了一些合理的名稱！在使用它之前，我們需要實際新增這些方法。
 
-When you do things like `create/drop monster:NPC`, the npc will briefly be in your inventory before being dropped on the ground. Since an NPC is not a valid thing to equip, the EquipmentHandler will complain with an `EquipmentError` (we define this see below). So we need to 
+當你執行`create/drop monster:NPC`之類的操作時，NPC 會短暫出現在你的庫存中，然後被扔到地上。由於 NPC 不是有效的裝備，EquipmentHandler 會抱怨 `EquipmentError`（我們對此的定義見下文）。所以我們需要
 
-## Expanding the Equipmenthandler
+(expanding-the-equipmenthandler)=
+## 擴充裝置處理程式
 
+(validate_slot_usage)=
 ## `.validate_slot_usage`
 
-Let's start with implementing the first method we came up with above, `validate_slot_usage`:
+讓我們從實現上面提出的第一個方法開始，`validate_slot_usage`：
 ```python 
 # mygame/evadventure/equipment.py 
 
@@ -223,47 +228,49 @@ class EquipmentHandler:
 ```
 
 ```{sidebar}
-The `@property` decorator turns a method into a property so you don't need to 'call' it. 
-That is, you can access `.max_slots` instead of `.max_slots()`. In this case, it's just a 
-little less to type.
+`@property` 裝飾器將方法轉換為屬性，因此您不需要「呼叫」它。 
+也就是說，您可以訪問 `.max_slots` 而不是 `.max_slots()`。在這種情況下，它只是一個
+打字少一點。
 ```
-We add two helpers - the `max_slots` _property_ and `count_slots`, a method that calculate the current slots being in use. Let's figure out how they work. 
+我們新增兩個助手 - `max_slots` _property_ 和 `count_slots`，這是一種計算目前正在使用的插槽的方法。讓我們弄清楚它們是如何工作的。
 
+(max_slots)=
 ### `.max_slots`
 
-For `max_slots`, remember that `.obj` on the handler is a back-reference to the `EvAdventureCharacter` we  put this handler on. `getattr` is a Python method for retrieving a named property on an object. The `Enum` `Ability.CON.value` is the string `Constitution` (check out the [first Utility and Enums tutorial](./Beginner-Tutorial-Utilities.md) if you don't recall).
+對於 `max_slots`，請記住處理程式上的 `.obj` 是對我們放置此處理程式的 `EvAdventureCharacter` 的反向引用。 `getattr` 是一種用於檢索物件的命名屬性的 Python 方法。 `Enum` `Ability.CON.value` 是字串 `Constitution`（如果您不記得的話，請檢視[第一個實用程式和列舉教學](./Beginner-Tutorial-Utilities.md)）。
 
-So to be clear, 
+所以要明確的是，
 
 ```python 
 getattr(self.obj, Ability.CON.value) + 10
 ```
-is the same as writing 
+和寫作一樣
 
 ```python 
 getattr(your_character, "Constitution") + 10 
 ```
 
-which is the same as doing something like this: 
+這與執行以下操作相同：
 
 ```python 
 your_character.Constitution + 10 
 ```
 
-In our code we write `getattr(self.obj, Ability.CON.value, 1)` - that extra `1`   means that if there  should happen to _not_ be a property "Constitution" on `self.obj`, we should not error out but just  return 1.
+在我們的程式碼中，我們編寫 `getattr(self.obj, Ability.CON.value, 1)` - 額外的 `1` 意味著如果 `self.obj` 上不存在屬性“Constitution”，我們不應該出錯，而應該返回 1。
 
 
+(count_slots)=
 ### `.count_slots`
 
-In this helper we use two Python tools - the `sum()` function and a  [list comprehension](https://www.w3schools.com/python/python_lists_comprehension.asp). The former  simply adds the values of any iterable together. The latter is a more efficient way to create a list: 
+在這個幫助程式中，我們使用兩個 Python 工具 - `sum()` 函式和 [列表理解](https://www.w3schools.com/python/python_lists_comprehension.asp)。前者只是將任何可迭代的值加在一起。後者是建立清單的更有效方法：
 
     new_list = [item for item in some_iterable if condition]
     all_above_5 = [num for num in range(10) if num > 5]  # [6, 7, 8, 9]
     all_below_5 = [num for num in range(10) if num < 5]  # [0, 1, 2, 3, 4]
 
-To make it easier to understand, try reading the last line above as "for every number in the range 0-9,  pick all with a value below 5 and make a list of them". You can also embed such comprehensions directly in a function call like `sum()` without using `[]` around it. 
+為了更容易理解，請嘗試將上面的最後一行讀作「對於 0-9 範圍內的每個數字，選擇所有值低於 5 的數字並列出它們」。您也可以將此類推導式直接嵌入到函式呼叫中，例如 `sum()`，而無需在其周圍使用 `[]`。
 
-In `count_slots` we have this code: 
+在`count_slots`中我們有這樣的程式碼：
 
 ```python 
 wield_usage = sum(
@@ -273,10 +280,10 @@ wield_usage = sum(
 )
 ```
 
-We should be able to follow all except `slots.items()`. Since `slots` is a `dict`, we can use `.items()` to get a sequence of `(key, value)` pairs. We store these in `slot` and `slotobj`. So the above can  be understood as "for every `slot` and `slotobj`-pair in `slots`, check which slot location it is.  If it is _not_ in the backpack, get its size and add it to the list. Sum over all these 
-sizes". 
+我們應該能夠遵循除 `slots.items()` 之外的所有內容。由於 `slots` 是 `dict`，我們可以使用 `.items()` 來取得 `(key, value)` 對的序列。我們將它們儲存在 `slot` 和 `slotobj` 中。所以上面可以理解為「對於`slots`中的每一個`slot`和`slotobj`-對，檢查它在哪個插槽位置。如果它_不在_在揹包中，則獲取它的大小並將其新增到列表中。對所有這些求和
+尺寸」。
 
-A less compact but maybe more readonable way to write this would be: 
+一種不太緊湊但可能更可讀的編寫方法是：
 
 ```python 
 backpack_item_sizes = [] 
@@ -287,16 +294,18 @@ for slot, slotobj in slots.items():
 wield_usage = sum(backpack_item_sizes)
 ```
 
-The same is done for the items actually in the BACKPACK slot. The total sizes are added 
-together. 
+對於 BACKPACK 槽中實際的專案也執行相同的操作。總尺寸已新增
+在一起。
 
-### Validating slots 
+(validating-slots)=
+### 驗證插槽
 
-With these helpers in place, `validate_slot_usage` now becomes simple. We use `max_slots` to see how much we can carry. We then get how many slots we are already using (with `count_slots`) and see if our new `obj`'s size would be too much for us. 
+有了這些助手，`validate_slot_usage` 現在就變得簡單了。我們用`max_slots`來看看我們能攜帶多少。然後，我們取得已經使用的插槽數量（`count_slots`），並檢視新的 `obj` 的大小對我們來說是否太大。
 
-## `.add` and `.remove`
+(add-and-remove)=
+## `.add` 和 `.remove`
 
-We will make it so `.add` puts something in the `BACKPACK` location and `remove` drops it, wherever it is (even if it was in your hands).
+我們會將其設定為 `.add` 將某些東西放入 `BACKPACK` 位置，並且 `remove` 將其丟棄，無論它在哪裡（即使它在您手中）。
 
 ```python 
 # mygame/evadventure/equipment.py 
@@ -351,18 +360,19 @@ class EquipmentHandler:
         return ret
 ```
 
-In `.add`, we make use of `validate_slot_usage` to 
-double-check we can actually fit the thing, then we add the item to the backpack. 
+在`.add`中，我們利用`validate_slot_usage`來
+仔細檢查我們是否確實可以容納該物品，然後將其新增到揹包中。
 
-In `.remove`, we allow emptying both by `WieldLocation` or by explicitly saying which object to remove. Note that the first `if` statement checks if `obj_or_slot` is a slot. So if that fails then code in the other `elif` can safely assume that it must instead be an object!
+在 `.remove` 中，我們允許透過 `WieldLocation` 或明確說明要刪除哪個物件來清空。請注意，第一個 `if` 語句檢查 `obj_or_slot` 是否為一個槽。因此，如果失敗，那麼其他 `elif` 中的程式碼可以安全地假設它必須是一個物件！
 
-Any removed objects are returned. If we gave `BACKPACK` as the slot, we empty the backpack and return all items inside it. 
+任何移除的物件都會被傳回。如果我們指定 `BACKPACK` 作為插槽，我們會清空揹包並返回其中的所有物品。
 
-Whenever we change the equipment loadout we must make sure to `._save()` the result, or it will be lost after a server reload.
+每當我們更改裝置載入時，我們必須確保結果為`._save()`，否則伺服器重新載入後它將遺失。
 
-## Moving things around 
+(moving-things-around)=
+## 移動東西
  
-With the help of `.remove()` and `.add()`  we can get things in and out of the `BACKPACK` equipment location. We also need to grab stuff from the backpack and wield or wear it. We add a `.move` method  on the `EquipmentHandler` to do this:
+在`.remove()`和`.add()`的幫助下，我們可以將東西進出`BACKPACK`裝置位置。我們還需要從揹包中取出東西並使用或穿著它。我們在 `EquipmentHandler` 上新增一個 `.move` 方法來執行此操作：
 
 ```python 
 # mygame/evadventure/equipment.py 
@@ -414,11 +424,12 @@ class EquipmentHandler:
         self._save() 
 ``` 
 
-Here we remember that every `EvAdventureObject` has an `inventory_use_slot` property that tells us where it goes. So we just need to move the object to that slot, replacing whatever is in that place from before. Anything we replace goes back to the backpack, as long as it's actually an item and not `None`, in the case where we are moving an item into an empty slot.
+這裡我們記得每個 `EvAdventureObject` 都有一個 `inventory_use_slot` 屬性告訴我們它去了哪裡。因此，我們只需將物件移動到該插槽，替換先前該位置中的任何內容。我們替換的任何東西都會返回揹包，只要它實際上是一個物品，而不是 `None`（在我們將物品移到空插槽的情況下）。
 
-## Get everything 
+(get-everything)=
+## 得到一切
 
-In order to visualize our inventory, we need some method to get everything we are carrying. 
+為了視覺化我們的庫存，我們需要某種方法來獲取我們攜帶的所有東西。
 
 
 ```python 
@@ -447,12 +458,13 @@ class EquipmentHandler:
         return lst
 ```
 
-Here we get all the equipment locations and add their contents together into a list of tuples 
-`[(item, WieldLocation), ...]`. This is convenient for display.
+在這裡，我們獲取所有裝置位置並將它們的內容一起新增到元組列表中
+`[(item, WieldLocation),...]`。這樣方便顯示。
 
-## Weapon and armor 
+(weapon-and-armor)=
+## 武器和盔甲
 
-It's convenient to have the `EquipmentHandler` easily tell you what weapon is currently wielded and what _armor_ level all worn equipment provides. Otherwise you'd need to figure out what item is in which wield-slot and to add up armor slots manually every time you need to know. 
+讓 `EquipmentHandler` 輕鬆告訴您目前使用的武器以及所有穿戴的裝備提供的_裝甲_等級是很方便的。否則，您需要弄清楚哪個物品位於哪個揮舞槽中，並在每次需要知道時手動新增裝甲槽。
 
 
 ```python 
@@ -496,17 +508,18 @@ class EquipmentHandler:
 
 ```
 
-In the `.armor()` method we get the item (if any) out of each relevant wield-slot (body, shield, head), and grab their `armor` Attribute. We then `sum()` them all up. 
+在`.armor()`方法中，我們從每個相關的揮舞槽（身體、盾牌、頭部）中獲取物品（如果有），並抓住它們的`armor` Attribute。然後我們將它們全部`sum()`起來。
 
-In `.weapon()`, we simply check which of the possible weapon slots (weapon-hand or two-hands) have  something in them. If not we fall back to the 'Bare Hands' object we created in the [Object tutorial lesson](./Beginner-Tutorial-Objects.md#your-bare-hands) earlier.
+在`.weapon()`中，我們只是檢查哪些可能的武器槽（武器手或兩隻手）中有東西。如果不是，我們將退回到我們先前在[物件教學](./Beginner-Tutorial-Objects.md#your-bare-hands)中建立的「Bare Hands」物件。
 
-### Fixing the Character class
+(fixing-the-character-class)=
+### 修復角色類
 
-So we have added our equipment handler which validate what we put in it. This will however lead to a problem when we create things like NPCs in game, e.g. with 
+因此，我們新增了裝置處理程式，以驗證我們放入其中的內容。然而，當我們在遊戲中建立諸如NPCs、e.g之類的東西時，這會導致問題。和
 
     create/drop monster:evadventure.npcs.EvAdventureNPC
 
-The problem is that when the/ monster is created it will briefly appear in your inventory before being dropped, so this code will fire on you when you do that (assuming you are an `EvAdventureCharacter`):
+問題是，當/怪物被建立時，它會在被丟棄之前短暫出現在你的庫存中，因此當你這樣做時，此程式碼會向你觸發（假設你是`EvAdventureCharacter`）：
 
 ```python
 # mygame/evadventure/characters.py
@@ -524,7 +537,7 @@ class EvAdventureCharacter(LivingMixin, DefaultCharacter):
         self.equipment.add(moved_object)
 ```
 
-This means that the equipmenthandler will check the NPC, and since it's not a equippable thing, an `EquipmentError` will be raised, failing the creation. Since we want to be able to create npcs etc easily, we will handle this error with a `try...except` statement like so:
+這意味著裝置處理程式將檢查NPC，並且由於它不是可裝備的東西，因此將引發`EquipmentError`，從而導致建立失敗。由於我們希望能夠輕鬆建立 npc 等，因此我們將使用 `try...except` 語句來處理此錯誤，如下所示：
 
 ```python
 # mygame/evadventure/characters.py
@@ -548,34 +561,36 @@ class EvAdventureCharacter(LivingMixin, DefaultCharacter):
             
 ```
 
-Using Evennia's `logger.log_trace()` we catch the error and direct it to the server log. This allows you to see if there are real errors here as well, but once things work and these errors are spammy, you can also just replace the `logger.log_trace()` line with a `pass` to hide these errors. 
+使用 Evennia 的 `logger.log_trace()` 我們捕獲錯誤並將其定向到伺服器日誌。這允許您檢視這裡是否也存在真正的錯誤，但是一旦一切正常並且這些錯誤是垃圾郵件，您也可以將 `logger.log_trace()` 行替換為 `pass` 來隱藏這些錯誤。
 
-## Extra credits 
+(extra-credits)=
+## 額外學分
 
-This covers the basic functionality of the equipment handler. There are other useful methods that 
-can be added: 
+這涵蓋了裝置處理程式的基本功能。還有其他有用的方法
+可以新增：
 
-- Given an item, figure out which equipment slot it is currently in
-- Make a string representing the current loadout
-- Get everything in the backpack (only)
-- Get all wieldable items (weapons, shields) from backpack 
-- Get all usable items (items with a use-location of `BACKPACK`) from the backpack
+- 給定一個物品，找出它目前位於哪個裝置插槽
+- 製作一個表示當前載入的字串
+- 將所有物品放入揹包（僅限）
+- 從揹包中取得所有可使用的物品（武器、盾牌）
+- 從揹包中取得所有可用物品（使用位置為`BACKPACK`的物品）
 
-Experiment with adding those. A full example is found in 
-[evennia/contrib/tutorials/evadventure/equipment.py](../../../api/evennia.contrib.tutorials.evadventure.equipment.md).
+嘗試新增這些。完整的範例位於
+[evennia/contrib/tutorials/evadventure/equipment.py](../../../api/evennia.contrib.tutorials.evadventure.equipment.md)。
 
-## Unit Testing 
+(unit-testing)=
+## 單元測試
 
-> Create a new module `mygame/evadventure/tests/test_equipment.py`.
+> 建立一個新模組`mygame/evadventure/tests/test_equipment.py`。
 
 ```{sidebar}
-See [evennia/contrib/tutorials/evadventure/tests/test_equipment.py](../../../api/evennia.contrib.tutorials.evadventure.tests.test_equipment.md)
-for a finished testing example.
+請參閱[evennia/contrib/tutorials/evadventure/tests/test_equipment.py](../../../api/evennia.contrib.tutorials.evadventure.tests.test_equipment.md)
+取得完成的測試範例。
 ```
 
-To test the `EquipmentHandler`, easiest is create an `EvAdventureCharacter` (this should by now 
-have `EquipmentHandler` available on itself as `.equipment`) and a few test objects; then test 
-passing these into the handler's methods.
+要測試`EquipmentHandler`，最簡單的是建立一個`EvAdventureCharacter`（現在應該
+有 `EquipmentHandler` 可用作為 `.equipment`) 和一些測試物件；然後測試
+將它們傳遞到處理程式的方法。
 
 
 ```python 
@@ -607,10 +622,11 @@ class TestEquipment(BaseEvenniaTest):
     # ... 
 ```
 
-## Summary 
+(summary)=
+## 概括
 
-_Handlers_ are useful for grouping functionality together. Now that we spent our time making the  `EquipmentHandler`, we shouldn't need to worry about item-slots anymore - the handler 'handles' all  the details for us. As long as we call its methods, the details can be forgotten about.
+_Handlers_ 對於將功能分組在一起非常有用。既然我們花了時間製作`EquipmentHandler`，我們就不必再擔心專案槽了——處理程式為我們「處理」所有細節。只要我們呼叫它的方法，細節就可以忘記。
 
-We also learned to use _hooks_ to tie _Knave_'s custom equipment handling into Evennia.
+我們也學會了使用 _hooks_ 將 _Knave_ 的自訂裝置處理繫結到 Evennia 中。
 
-With `Characters`, `Objects` and now `Equipment` in place, we should be able to move on to character generation - where players get to make their own character!
+`Characters`、`Objects` 和現在 `Equipment` 就位後，我們應該能夠繼續進行角色生成 - 玩家可以建立自己的角色！

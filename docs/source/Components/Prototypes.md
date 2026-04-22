@@ -1,4 +1,5 @@
-# Spawner and Prototypes
+(spawner-and-prototypes)=
+# 生成器和原型
 
 ```shell
 > spawn goblin
@@ -6,29 +7,32 @@
 Spawned Goblin Grunt(#45)
 ```
 
-The *spawner* is a system for defining and creating individual objects from a base template called a *prototype*. It is only designed for use with in-game [Objects](./Objects.md), not any other type of entity.
+*spawner* 是一個用於從稱為「原型」的基本模板定義和建立單個物件的系統。它僅設計用於遊戲中的[物件](./Objects.md)，而不是任何其他型別的實體。
 
-The normal way to create a custom object in Evennia is to make a [Typeclass](./Typeclasses.md). If you haven't read up on Typeclasses yet, think of them as normal Python classes that save to the database behind the scenes. Say you wanted to create a "Goblin" enemy. A common way to do this would be to first create a `Mobile` typeclass that holds everything common to mobiles in the game, like generic AI, combat code and various movement methods. A  `Goblin` subclass is then made to inherit from `Mobile`. The `Goblin` class adds stuff unique to goblins, like group-based AI (because goblins are smarter in a group), the ability to panic, dig for gold etc. 
+在 Evennia 中建立自訂物件的正常方法是建立 [Typeclass](./Typeclasses.md)。如果您還沒有閱讀 Typeclasses ，請將它們視為在背景儲存到資料庫的普通 Python 類別。假設您想建立一個“妖精”敵人。常見的方法是先建立一個 `Mobile` typeclass，其中包含遊戲中行動裝置常見的所有內容，例如通用 AI、戰鬥程式碼和各種行動方法。然後，`Goblin` 子類別將從 `Mobile` 繼承。 `Goblin` 類別新增了妖精獨有的東西，例如基於群體的 AI（因為妖精在群體中更聰明）、驚慌失措的能力、挖掘黃金等。
 
-But now it's time to actually start to create some goblins and put them in the world. What if we wanted those goblins to not all look the same? Maybe we want grey-skinned and green-skinned goblins or some goblins that can cast spells or which wield different weapons? We *could* make subclasses of `Goblin`, like `GreySkinnedGoblin` and `GoblinWieldingClub`. But that seems a bit excessive (and a lot of Python code for every little thing). Using classes can also become impractical when wanting to combine them - what if we want a grey-skinned goblin shaman wielding a spear - setting up a web of classes inheriting each other with multiple inheritance can be tricky.
+但現在是時候真正開始創造一些妖精並將它們放入世界中了。如果我們希望這些妖精看起來不一樣呢？也許我們想要灰皮膚和綠皮膚的妖精，或者一些可以施法或使用不同武器的妖精？我們*可以*建立`Goblin`的子類，例如`GreySkinnedGoblin`和`GoblinWieldingClub`。但這似乎有點過分（而且每件小事都有大量的 Python 程式碼）。當想要組合類別時，使用類別也可能變得不切實際——如果我們想要一個揮舞著長矛的灰皮膚妖精薩滿怎麼辦——建立一個透過多重繼承相互繼承的類別網路可能會很棘手。
 
-This is what the *prototype* is for. It is a Python dictionary that describes these per-instance changes to an object. The prototype also has the advantage of allowing an in-game builder to customize an object without access to the Python backend. Evennia also allows for saving and searching prototypes so other builders can find and use (and tweak) them later. Having a library of interesting prototypes is a good reasource for builders. The OLC system allows for creating, saving, loading and manipulating prototypes using a menu system.
+這就是*原型*的用途。它是一個 Python 字典，描述了物件的這些每個例項的變更。該原型還具有允許遊戲內建構者自訂物件而無需存取 Python 後端的優點。 Evennia 還允許儲存和搜尋原型，以便其他建構者稍後可以找到和使用（和調整）它們。擁有有趣的原型庫對於建構者來說是一個很好的資源。 OLC 系統允許使用選單系統建立、儲存、載入和操作原型。
 
-The *spawner* takes a prototype and uses it to create (spawn) new, custom objects.
+*spawner* 採用原型並使用它來建立（產生）新的自訂物件。
 
-## Working with Prototypes
+(working-with-prototypes)=
+## 使用原型
 
-### Using the OLC
+(using-the-olc)=
+### 使用OLC
 
-Enter the `olc` command or `spawn/olc` to enter the prototype wizard. This is a menu system for creating, loading, saving and manipulating prototypes. It's intended to be used by in-game builders and will give a better understanding of prototypes in general. Use `help` on each node of the menu for more information. Below are further details about how prototypes work and how they are used.
+輸入`olc`指令或`spawn/olc`進入原型精靈。這是一個用於建立、載入、儲存和操作原型的選單系統。它旨在供遊戲內構建者使用，並且總體上可以更好地理解原型。在選單的每個節點上使用 `help` 以獲取更多資訊。以下是有關原型如何運作及其使用方式的更多詳細資訊。
 
-### The prototype
+(the-prototype)=
+### 原型機
 
-The prototype dictionary can either be created for you by the OLC (see above), be  written manually in a Python module (and then referenced by the `spawn` command/OLC), or created on-the-fly and manually loaded into the spawner function or `spawn` command.
+原型字典可以由OLC為您建立（見上文），在Python模組中手動編寫（然後由`spawn`指令/OLC引用），或者即時建立並手動載入到spawner函式或`spawn`指令中。
 
-The dictionary defines all possible database-properties of an Object. It has a fixed set of allowed keys. When preparing to store the prototype in the database (or when using the OLC), some of these keys are mandatory. When just passing a one-time prototype-dict to the spawner the system is more lenient and will use defaults for keys not explicitly provided.
+該字典定義了物件的所有可能的資料庫屬性。它有一組固定的允許鍵。當準備將原型儲存在資料庫中時（或使用OLC時），其中一些鍵是必需的。當僅將一次性原型字典傳遞給生成器時，系統更加寬鬆，並且將使用未明確提供的鍵的預設值。
 
-In dictionary form, a prototype can look something like this:
+在字典形式中，原型可以如下所示：
 
 ```python
 {
@@ -37,77 +41,81 @@ In dictionary form, a prototype can look something like this:
    "typeclass": "typeclasses.rooms.house.House"
  }
 ```
-If you wanted to load it into the spawner in-game you could just put all on one line:
+如果您想將其載入到遊戲中的生成器中，您可以將所有內容放在一行上：
 
     spawn {"prototype_key"="house", "key": "Large house", ...}
 
-> Note that the prototype dict as given on the command line must be a valid Python structure - so you need to put quotes around strings etc. For security reasons, a dict inserted from-in game cannot have any other advanced Python functionality, such as executable code, `lambda` etc. If builders are supposed to be able to use such features, you need to offer them through [$protfuncs](Spawner-and- Prototypes#protfuncs), embedded runnable functions that you have full control to check and vet before running.
+> 請注意，指令列上給出的原型字典必須是有效的 Python 結構 - 因此您需要在字串等處加上引號。出於安全原因，從遊戲內插入的字典不能具有任何其他高階 Python 功能，例如可執行程式碼、`lambda` 等。如果建構器應該能夠使用此類功能，您需要透過 [$protfuncs](Spawner-and- Prototypes#protfuncs) 提供它們，嵌入式可執行函式您可以完全控制在執行之前進行檢查和審查。
 
-### Prototype keys
+(prototype-keys)=
+### 原型鑰匙
 
-All keys starting with `prototype_` are for book keeping.
+所有以`prototype_`開頭的鍵都是用來記帳的。
 
- - `prototype_key` - the 'name' of the prototype, used for referencing the prototype
+ - `prototype_key` - 原型的“名稱”，用於引用原型
     when spawning and inheritance. If defining a prototype in a module and this
     not set, it will be auto-set to the name of the prototype's variable in the module.
- - `prototype_parent` - If given, this should be the `prototype_key` of another prototype stored in the system or available in a module. This makes this prototype *inherit* the keys from the
+ - `prototype_parent` - 如果給出，這應該是系統中儲存或模組中可用的另一個原型的 `prototype_key`。這使得這個原型*繼承*來自
     parent and only override what is needed. Give a tuple `(parent1, parent2, ...)` for multiple left-right inheritance. If this is not given, a `typeclass` should usually be defined (below).
- - `prototype_desc` - this is optional and used when listing the prototype in in-game listings.
- - `protototype_tags` - this is optional and allows for tagging the prototype in order to find it
-   easier later.
- - `prototype_locks` - two lock types are supported: `edit` and `spawn`. The first lock restricts the copying and editing of the prototype when loaded through the OLC. The second determines who may use the prototype to create new objects.
+ - `prototype_desc` - 這是可選的，在遊戲內列表中列出原型時使用。
+ - `protototype_tags` - 這是可選的，允許標記原型以便找到它
+稍後會更容易。
+ - `prototype_locks` - 支援兩種 lock 型別：`edit` 和 `spawn`。第一個lock限制透過OLC載入時原型的複製和編輯。第二個決定誰可以使用原型來建立新物件。
 
 
-The remaining keys determine actual aspects of the objects to spawn from this prototype:
+其餘的鍵確定從此原型生成的物件的實際方面：
 
- - `key` - the main object identifier. Defaults to "Spawned Object *X*", where *X* is a random integer.
- - `typeclass` - A full python-path (from your gamedir) to the typeclass you want to use. If not set, the `prototype_parent` should be defined, with `typeclass` defined somewhere in the parent chain. When creating a one-time prototype dict just for spawning, one could omit this - `settings.BASE_OBJECT_TYPECLASS` will be used instead.
- - `location` - this should be a `#dbref`.
- - `home` - a valid `#dbref`. Defaults to `location` or `settings.DEFAULT_HOME` if location does not exist.
- - `destination` - a valid `#dbref`. Only used by exits.
- - `permissions` - list of permission strings, like `["Accounts", "may_use_red_door"]`
- - `locks` - a [lock-string](./Locks.md) like `"edit:all();control:perm(Builder)"`
- - `aliases` - list of strings for use as aliases
- - `tags` - list [Tags](./Tags.md). These are given as tuples `(tag, category, data)`.
- - `attrs` - list of [Attributes](./Attributes.md). These are given as tuples `(attrname, value, category, lockstring)`
- - Any other keywords are interpreted as non-category [Attributes](./Attributes.md) and their values. This is convenient for simple Attributes - use `attrs` for full control of Attributes.
+ - `key` - 主要物件識別碼。預設為“產生的物件 *X*”，其中 *X* 是隨機整數。
+ - `typeclass` - 到你想要使用的 typeclass 的完整 python 路徑（從你的遊戲目錄）。如果未設定，則應定義 `prototype_parent`，並在父鏈中的某處定義 `typeclass`。當建立一個僅用於生成的一次性原型字典時，可以忽略這一點 - 將使用 `settings.BASE_OBJECT_TYPECLASS` 代替。
+ - `location` - 這應該是 `#dbref`。
+ - `home` - 有效的 `#dbref`。如果位置不存在，則預設為 `location` 或 `settings.DEFAULT_HOME`。
+ - `destination` - 有效的 `#dbref`。僅供出口使用。
+ - `permissions` - 許可權字串列表，例如 `["Accounts", "may_use_red_door"]`
+ - `locks` - [lock-字串](./Locks.md) 就像 `"edit:all();control:perm(Builder)"`
+ - `aliases` - 用作別名的字串列表
+ - `tags` - 列出 [Tags](./Tags.md)。這些以元組 `(tag, category, data)` 的形式給出。
+ - `attrs` - [屬性]列表(./Attributes.md)。這些以元組形式給出 `(attrname, value, category, lockstring)`
+ - 任何其他關鍵字都被解釋為非類別[屬性](./Attributes.md) 及其值。這對於簡單屬性來說很方便 - 使用 `attrs` 來完全控制屬性。
 
-#### More on prototype inheritance
+(more-on-prototype-inheritance)=
+#### 有關原型繼承的更多資訊
 
-- A prototype can inherit by defining a `prototype_parent` pointing to the name (`prototype_key` of another prototype). If a list of `prototype_keys`, this will be stepped through from left to right, giving priority to the first in the list over those appearing later. That is, if your inheritance is `prototype_parent = ('A', 'B,' 'C')`, and all parents contain colliding keys, then the one from `A` will apply.
-- The prototype keys that start with `prototype_*` are all unique to each prototype. They are _never_ inherited from parent to child.
-- The prototype fields `'attr': [(key, value, category, lockstring),...]` and `'tags': [(key, category, data), ...]` are inherited in a _complementary_ fashion. That means that only colliding key+category matches will be replaced, not the entire list. Remember that the category `None` is also considered a valid category!
-- Adding an Attribute as a simple `key:value` will under the hood be translated into an Attribute tuple `(key, value, None, '')` and may replace an Attribute in the parent if it the same key  and a `None` category.
-- All other keys (`permissions`, `destination`, `aliases` etc) are completely _replaced_ by the child's value if given. For the parent's value to be retained, the child must not define these keys at all.
+- 原型可以透過定義指向名稱（另一個原型的`prototype_key`）的`prototype_parent`來繼承。如果清單為 `prototype_keys`，則將從左到右逐步執行，優先考慮清單中的第一個而不是後面出現的清單。也就是說，如果您的繼承是 `prototype_parent = ('A', 'B,' 'C')`，並且所有父級都包含衝突鍵，則 `A` 中的繼承將適用。
+- 以 `prototype_*` 開頭的原型鍵對於每個原型都是唯一的。它們永遠不會從父母遺傳給孩子。
+- 原型欄位 `'attr': [(key, value, category, lockstring),...]` 和 `'tags': [(key, category, data),...]` 以_complementary_ 方式繼承。這意味著只有衝突的鍵+類別匹配才會被替換，而不是整個列表。請記住，類別 `None` 也被視為有效類別！
+- 新增 Attribute 作為簡單的 `key:value` 將在底層轉換為 Attribute 元組 `(key, value, None, '')`，並且如果它具有相同的鍵和 `None` 類別，則可以替換父級中的 Attribute。
+- 所有其他鍵（`permissions`、`destination`、`aliases` 等）將完全被子項的值（如果給定）_替換_。為了保留父級的值，子級根本不能定義這些鍵。
 
-### Prototype values
+(prototype-values)=
+### 原型值
 
-The prototype supports values of several different types.
+此原型支援多種不同型別的值。
 
-It can be a hard-coded value:
+它可以是一個硬編碼值：
 
 ```python
     {"key": "An ugly goblin", ...}
 
 ```
 
-It can also be a *callable*. This callable is called without arguments whenever the prototype is used to spawn a new object:
+它也可以是*可呼叫*。每當使用原型產生新物件時，都會不帶引數地呼叫此可呼叫物件：
 
 ```python
     {"key": _get_a_random_goblin_name, ...}
 
 ```
 
-By use of Python `lambda` one can wrap the callable so as to make immediate settings in the prototype:
+透過使用 Python `lambda` 可以包裝可呼叫物件，以便在原型中立即進行設定：
 
 ```python
     {"key": lambda: random.choice(("Urfgar", "Rick the smelly", "Blargh the foul", ...)), ...}
 
 ```
 
-#### Protfuncs
+(protfuncs)=
+#### 產品功能
 
-Finally, the value can be a *prototype function* (*Protfunc*). These look like simple function calls that you embed in strings and that has a `$` in front, like
+最後，該值可以是*原型函式* (*Protfunc*)。這些看起來像是嵌入在字串中的簡單函式呼叫，並且前面有一個 `$`，例如
 
 ```python
     {"key": "$choice(Urfgar, Rick the smelly, Blargh the foul)",
@@ -115,11 +123,11 @@ Finally, the value can be a *prototype function* (*Protfunc*). These look like s
                        "He has $randint(2,5) skulls in a chain around his neck."}
 ```
 
-> If you want to escape a protfunc and have it appear verbatim, use `$$funcname()`.
+> 如果要轉義 protfunc 並使其逐字顯示，請使用 `$$funcname()`。
 
-At spawn time, the place of the protfunc will be replaced with the result of that protfunc being called (this is always a string). A protfunc is a [FuncParser function](./FuncParser.md) run every time the prototype is used to spawn a new object. See the FuncParse for a lot more information.
+在產生時，protfunc 的位置將會被呼叫該 protfunc 的結果取代（這總是一個字串）。 protfunc 是每次使用原型產生新物件時執行的 [FuncParser 函式](./FuncParser.md)。請參閱 FuncParse 以瞭解更多資訊。
 
-Here is how a protfunc is defined (same as other funcparser functions).
+以下是 protfunc 的定義方式（與其他 funcparser 函式相同）。
 
 ```python
 # this is a silly example, you can just color the text red with |r directly!
@@ -133,14 +141,14 @@ def red(*args, **kwargs):
    return f"|r{args[0]}|n"
 ```
 
-> Note that we must make sure to validate input and raise `ValueError` on failure.
+> 請注意，我們必須確保驗證輸入並在失敗時引發 `ValueError`。
 
-The parser will always include the following reserved `kwargs`: 
-- `session` - the current [Session](evennia.server.ServerSession) performing the spawning. 
-- `prototype` - The Prototype-dict this function is a part of. This is intended to be used _read-only_. Be careful to modify a mutable structure like this from inside the function - you can cause really hard-to-find bugs this way. 
-- `current_key` - The current key of the `prototype` dict under which this protfunc is executed.
+解析器將始終包含以下保留的`kwargs`：
+- `session` - 目前執行產生的 [Session](evennia.server.ServerSession)。
+- `prototype` - 函式所屬的原型字典。這是_唯讀_使用的。從函式內部修改這樣的可變結構時要小心—這可能會導致很難發現的錯誤。
+- `current_key` - 執行此 protfunc 的 `prototype` 字典的目前鍵。
 
-To make this protfunc available to builders in-game, add it to a new module and add the path to that module to `settings.PROT_FUNC_MODULES`:
+要讓這個 protfunc 可供遊戲中的建構者使用，請將其新增至新模組並將該模組的路徑新增至 `settings.PROT_FUNC_MODULES`：
 
 ```python
 # in mygame/server/conf/settings.py
@@ -148,41 +156,43 @@ To make this protfunc available to builders in-game, add it to a new module and 
 PROT_FUNC_MODULES += ["world.myprotfuncs"]
 
 ```
-All *global callables* in your added module will be considered a new protfunc. To avoid this (e.g. to have helper functions that are not protfuncs on their own), name your function something starting with `_`. 
+您新增的模組中的所有*全域可呼叫物件*都將被視為新的 protfunc。為了避免這種情況（e.g。擁有本身不是 protfuncs 的輔助函式），請將函式命名為以 `_` 開頭的名稱。
 
-The default protfuncs available out of the box are defined in `evennia/prototypes/profuncs.py`. To override the ones available, just add the same-named function in your own protfunc module.
+開箱即用的預設 protfunc 在 `evennia/prototypes/profuncs.py` 中定義。要覆寫可用的函式，只需在您自己的 protfunc 模組中新增同名函式即可。
 
-| Protfunc | Description |
+| 普羅特函式 | 描述 |
 | --- | --- |
-| `$random()` | Returns random value in range `[0, 1)` |
-|  `$randint(start, end)` |  Returns random value in range [start, end]  |
-| `$left_justify(<text>)` | Left-justify text |
-|  `$right_justify(<text>)` | Right-justify text to screen width |
-|  `$center_justify(<text>)` | Center-justify text to screen width |
-|  `$full_justify(<text>)` | Spread text across screen width by adding spaces |
-|  `$protkey(<name>)` | Returns value of another key in this prototype (self-reference) |
-|  `$add(<value1>, <value2>)` | Returns value1 + value2. Can also be lists, dicts etc |
-|  `$sub(<value1>, <value2>)` | Returns value1 - value2 |
-|  `$mult(<value1>, <value2>)` | Returns value1 * value2 |
-|  `$div(<value1>, <value2>)` | Returns value2 / value1 |
-|  `$toint(<value>)` | Returns value converted to integer (or value if not possible) |
-|  `$eval(<code>)` | Returns result of [literal-eval](https://docs.python.org/2/library/ast.html#ast.literal_eval) of code string. Only simple python expressions. |
-| `$obj(<query>)` | Returns object searched globally by key, tag or #dbref. Requires `caller` kwarg in `spawner.spawn()` for access checks. See [searching callables](./FuncParser.md#evenniautilsfuncparsersearching_callables).  ($dbref(<query>) is an alias and works the same) |
-| `$objlist(<query>)` | Like `$obj`, except always returns a list of zero, one or more results. Requires `caller` kwarg in `spawner.spawn()` for access checks. See [searching callables](./FuncParser.md#evenniautilsfuncparsersearching_callables). |
+| `$random()` | 傳回 `[0, 1)` 範圍內的隨機值 |
+|  `$randint(start, end)` |  傳回範圍 [start, end] 內的隨機值  |
+| `$left_justify(<text>)` | 左對齊文字 |
+|  `$right_justify(<text>)` | 將文字右對齊到螢幕寬度 |
+|  `$center_justify(<text>)` | 將文字置中對齊到螢幕寬度 |
+|  `$full_justify(<text>)` | 透過新增空格將文字分散到螢幕寬度上 |
+|  `$protkey(<name>)` | 傳回此原型中另一個鍵的值（自引用） |
+|  `$add(<value1>, <value2>)` | 傳回值 1 + 值 2。也可以是列表、字典等 |
+|  `$sub(<value1>, <value2>)` | 傳回值 1 - 值 2 |
+|  `$mult(<value1>, <value2>)` | 傳回值1 * 值2 |
+|  `$div(<value1>, <value2>)` | 傳回值 2 / 值 1 |
+|  `$toint(<value>)` | 傳回轉換為整數的值（如果不可能，則傳回值） |
+|  `$eval(<code>)` | 傳回程式碼字串的 [literal-eval](https://docs.python.org/2/library/ast.html#ast.literal_eval) 的結果。只有簡單的Python表示式。 |
+| `$obj(<query>)` | 傳回按鍵、tag 或#dbref 全域搜尋的物件。需要 `spawner.spawn()` 中的 `caller` kwarg 進行訪問檢查。請參閱[搜尋可呼叫物件](./FuncParser.md#evenniautilsfuncparsersearching_callables)。  （$dbref(<query>) 是個別名，作用相同） |
+| `$objlist(<query>)` | 與 `$obj` 類似， except 總是傳回零、一個或多個結果的清單。需要 `spawner.spawn()` 中的 `caller` kwarg 進行訪問檢查。請參閱[搜尋可呼叫物件](./FuncParser.md#evenniautilsfuncparsersearching_callables)。 |
 
-For developers with access to Python, using protfuncs in prototypes is generally not useful. Passing real Python functions is a lot more powerful and flexible. Their main use is to allow in-game builders to do limited coding/scripting for their prototypes without giving them direct access to raw Python. 
+對於能夠使用 Python 的開發人員來說，在原型中使用 protfuncs 通常沒有什麼用處。傳遞真正的 Python 函式更加強大和靈活。它們的主要用途是允許遊戲內構建者為其原型進行有限的編碼/指令碼編寫，而無需直接訪問原始 Python。
 
-## Database prototypes
+(database-prototypes)=
+## 資料庫原型
 
-Stored as [Scripts](./Scripts.md) in the database. These are sometimes referred to as *database- prototypes* This is the only way for in-game builders to modify and add prototypes. They have the advantage of being easily modifiable and sharable between builders but you need to work with them using in-game tools.
+在資料庫中儲存為 [Scripts](./Scripts.md)。這些有時被稱為“資料庫原型”，這是遊戲內建構者修改和新增原型的唯一方法。它們的優點是可以在建造者之間輕鬆修改和共享，但您需要使用遊戲內工具來使用它們。
 
-## Module-based prototypes
+(module-based-prototypes)=
+## 基於模組的原型
 
-These prototypes are defined as dictionaries assigned to global variables in one of the modules defined in `settings.PROTOTYPE_MODULES`. They can only be modified from outside the game so they are are necessarily "read-only" from in-game and cannot be modified (but copies of them could be made into database-prototypes). These were the only prototypes available before Evennia 0.8. Module based prototypes can be useful in order for developers to provide read-only "starting" or "base" prototypes to build from or if they just prefer to work offline in an external code editor.
+這些原型被定義為分配給 `settings.PROTOTYPE_MODULES` 中定義的模組之一中的全域變數的字典。它們只能從遊戲外部修改，因此它們在遊戲中必然是「只讀」的並且不能被修改（但它們的副本可以製作成資料庫原型）。這些是 Evennia 0.8 之前唯一可用的原型。基於模組的原型對於開發人員提供唯讀的「起始」或「基礎」原型非常有用，或者如果他們只是喜歡在外部程式碼編輯器中離線工作的話。
 
-By default `mygame/world/prototypes.py` is set up for you to add your own prototypes. *All global
-dicts* in this module will be considered by Evennia to be a prototype. You could also tell Evennia
-to look for prototypes in more modules if you want:
+預設設定`mygame/world/prototypes.py`供您新增自己的原型。 *全球所有
+該模組中的 dicts* 將被 Evennia 視為原型。你也可以告訴Evennia
+如果您願意，可以在更多模組中尋找原型：
 
 ```python
 # in mygame/server/conf.py
@@ -191,7 +201,7 @@ PROTOTYPE_MODULES = += ["world.myownprototypes", "combat.prototypes"]
 
 ```
 
-Here is an example of a prototype defined in a module:
+以下是模組中定義的原型範例：
 
     ```python
     # in a module Evennia looks at for prototypes,
@@ -203,16 +213,17 @@ Here is an example of a prototype defined in a module:
 		  "health": 20}
     ```
 
-> Note that in the example above, `"ORC_SHAMAN"` will become the `prototype_key` of this prototype. It's the only case when `prototype_key` can be skipped in a prototype. However, if `prototype_key`was given explicitly, that would take precedence. This is a legacy behavior and it's recommended > that you always add `prototype_key` to be consistent.
+> 請注意，在上面的範例中，`"ORC_SHAMAN"` 將成為該原型的`prototype_key`。這是原型中唯一可以跳過 `prototype_key` 的情況。但是，如果明確給出 `prototype_key`，則該值優先。這是一個遺留行為，建議您始終新增 `prototype_key` 以保持一致。
 
 
-## Spawning 
+(spawning)=
+## 產卵
 
-The spawner can be used from inside the game through the Builder-only `@spawn` command. Assuming the "goblin" typeclass is available to the system (either as a database-prototype or read from module), you can spawn a new goblin with
+可以透過僅建構器的 `@spawn` 指令在遊戲內部使用生成器。假設「妖精」typeclass 可用於系統（作為資料庫原型或從模組讀取），您可以使用以下指令產生一個新的妖精
 
     spawn goblin
 
-You can also specify the prototype directly as a valid Python dictionary:
+您也可以直接將原型指定為有效的 Python 字典：
 
     spawn {"prototype_key": "shaman", \
 	    "key":"Orc shaman", \
@@ -220,24 +231,25 @@ You can also specify the prototype directly as a valid Python dictionary:
             "weapon": "wooden staff", \
             "health": 20}
 
-> Note: The `spawn` command is more lenient about the prototype dictionary than shown here. So you can for example skip the `prototype_key` if you are just testing a throw-away prototype. A random hash will be used to please the validation. You could also skip  `prototype_parent/typeclass` - then the typeclass given by `settings.BASE_OBJECT_TYPECLASS` will be used.
+> 注意：`spawn` 指令對於原型字典比此處顯示的更寬鬆。因此，如果您只是測試一次性原型，則可以跳過 `prototype_key`。將使用隨機雜湊來進行驗證。您也可以跳過`prototype_parent/typeclass` - 然後將使用`settings.BASE_OBJECT_TYPECLASS` 給出的typeclass。
 
-### Using evennia.prototypes.spawner()
+(using-evenniaprototypesspawner)=
+### 使用evennia.prototypes.spawner()
 
-In code you access the spawner mechanism directly via the call
+在程式碼中，您可以直接透過呼叫存取生成器機制
 
 ```python
     new_objects = evennia.prototypes.spawner.spawn(*prototypes)
 ```
 
-All arguments are prototype dictionaries. The function will return a
-matching list of created objects. Example:
+所有引數都是原型字典。該函式將傳回一個
+已建立物件的匹配清單。例子：
 
 ```python
     obj1, obj2 = evennia.prototypes.spawner.spawn({"key": "Obj1", "desc": "A test"},
                                                   {"key": "Obj2", "desc": "Another test"})
 ```
 
-> Hint: Same as when using `spawn`, when spawning from a one-time prototype dict like this, you can skip otherwise required keys, like `prototype_key` or `typeclass`/`prototype_parent`. Defaults will be used.
+> 提示：與使用 `spawn` 時相同，當從像這樣的一次性原型字典產生時，您可以跳過其他必需的鍵，例如 `prototype_key` 或 `typeclass`/`prototype_parent`。將使用預設值。
 
-Note that no `location` will be set automatically when using `evennia.prototypes.spawner.spawn()`, you have to specify `location` explicitly in the prototype dict.  If the prototypes you supply are using `prototype_parent` keywords, the spawner will read prototypes from modules in `settings.PROTOTYPE_MODULES` as well as those saved to the database to determine the body of available parents. The `spawn` command takes many optional keywords, you can find its definition [in the api docs](https://www.evennia.com/docs/latest/api/evennia.prototypes.spawner.html#evennia.prototypes.spawner.spawn)
+請注意，使用 `evennia.prototypes.spawner.spawn()` 時不會自動設定 `location`，您必須在原型字典中明確指定 `location`。  如果您提供的原型使用 `prototype_parent` 關鍵字，則生成器將從 `settings.PROTOTYPE_MODULES` 中的模組以及儲存到資料庫的原型中讀取原型，以確定可用父級的主體。 `spawn` 指令帶有許多可選關鍵字，您可以在[api 檔案中]找到它的定義(https://www.evennia.com/docs/latest/api/evennia.prototypes.spawner.html#evennia.prototypes.spawner.spawn)

@@ -1,33 +1,35 @@
-# Adding a Command Prompt
+(adding-a-command-prompt)=
+# 新增指令提示符
 
-A *prompt* is quite common in MUDs:
+*提示*在 MUDs 中很常見：
 
     HP: 5, MP: 2, SP: 8
     > 
 
-The prompt display useful details about your character that you are likely to want to keep tabs on at all times. It could be health, magical power, gold and current location. It might also show things like in-game time, weather and so on. 
+該提示顯示有關您的角色的有用詳細資訊，您可能希望始終密切關注這些資訊。它可以是生命值、魔力、金幣和當前位置。它還可能顯示遊戲時間、天氣等資訊。
 
-Traditionally, the prompt (changed or not) was returned with every reply from the server and just displayed on its own line. Many modern MUD clients (including Evennia's own webclient) allows for identifying the prompt and have it appear in a fixed location that gets updated in-place (usually just above the input line). 
+傳統上，提示（無論是否更改）都會隨伺服器的每個回復一起返回，並且僅顯示在其自己的行上。許多現代 MUD 用戶端（包括 Evennia 自己的 webclient）允許識別提示並將其顯示在就地更新的固定位置（通常就在輸入行上方）。
 
-## A fixed-location prompt
+(a-fixed-location-prompt)=
+## 固定位置提示
 
-A prompt is sent using the  `prompt` keyword to the `msg()` method on objects. The prompt will be
-sent without any line breaks.
+使用 `prompt` 關鍵字將提示傳送到物件上的 `msg()` 方法。提示將是
+傳送時沒有任何換行符。
 
 ```python
 self.msg(prompt="HP: 5, MP: 2, SP: 8")
 ```
-You can combine the sending of normal text with the sending (updating of the prompt):
+您可以將普通文字的傳送與傳送（提示的更新）結合：
 
 ```python
 self.msg("This is a text", prompt="This is a prompt")
 ```
 
-You can update the prompt on demand, this is normally done using [OOB](../Concepts/OOB.md)-tracking of the relevant
-Attributes (like the character's health). You could also make sure that attacking commands update
-the prompt when they cause a change in health, for example.
+您可以根據需要更新提示，這通常使用 [OOB](../Concepts/OOB.md) 來完成 - 追蹤相關
+屬性（如角色的健康狀況）。您也可以確保攻擊指令更新
+例如，當它們導致健康狀況發生變化時進行提示。
 
-Here is a simple example of the prompt sent/updated from a command class: 
+以下是從指令類別傳送/更新的提示的簡單範例：
 
 ```python
     from evennia import Command
@@ -65,11 +67,12 @@ Here is a simple example of the prompt sent/updated from a command class:
             prompt = f"{hp} HP, {mp} MP, {sp} SP"
             self.caller.msg(text, prompt=prompt)
 ```
-## A prompt with every command
+(a-prompt-with-every-command)=
+## 每個指令都有提示
 
-The prompt sent as described above uses a standard telnet instruction (the Evennia web client gets a special flag). Most MUD telnet clients will understand and allow users to catch this and keep the prompt in place until it updates. So *in principle* you'd not need to update the prompt every command.
+如上所述傳送的提示使用標準 telnet 指令（Evennia Web 使用者端獲得特殊標誌）。大多數 MUD telnet 使用者端會理解並允許使用者捕獲此資訊並保留提示直到其更新。所以*原則上*您不需要更新每個指令的提示。
 
-However, with a varying user base it can be unclear which clients are used and which skill level the users have. So sending a prompt with every command is a safe catch-all. You don't need to manually go in and edit every command you have though. Instead you edit the base command class for your custom commands (like `MuxCommand` in your `mygame/commands/command.py` folder) and overload the `at_post_cmd()` hook. This hook is always called *after* the main `func()` method of the Command.
+然而，由於使用者群不同，可能不清楚使用了哪些用戶端以及使用者具有何種技能水平。因此，為每個指令傳送提示是一個安全的包羅永珍的方法。不過，您不需要手動進入並編輯您擁有的每個指令。相反，您可以編輯自訂指令的基本指令類別（例如 `mygame/commands/command.py` 資料夾中的 `MuxCommand`）並過載 `at_post_cmd()` 掛鉤。此掛鉤始終在指令的主要 `func()` 方法*之後呼叫。
 
 ```python
 from evennia import default_cmds
@@ -84,9 +87,10 @@ class MuxCommand(default_cmds.MuxCommand):
 
 ```
 
-### Modifying default commands
+(modifying-default-commands)=
+### 修改預設指令
 
-If you want to add something small like this to Evennia's default commands without modifying them directly the easiest way is to just wrap those with a multiple inheritance to your own base class:
+如果你想將像這樣的小東西新增到 Evennia 的預設指令中而不直接修改它們，最簡單的方法是將那些具有多重繼承的指令包裝到你自己的基類中：
 
 ```python
 # in (for example) mygame/commands/mycommands.py
@@ -100,8 +104,8 @@ class CmdLook(default_cmds.CmdLook, MuxCommand):
     pass
 ```
 
-The result of this is that the hooks from your custom `MuxCommand` will be mixed into the default
-`CmdLook` through multiple inheritance. Next you just add this to your default command set:
+這樣做的結果是，自訂 `MuxCommand` 中的鉤子將混合到預設值中
+`CmdLook` 透過多重繼承。接下來，您只需將其新增至預設指令集中：
 
 ```python
 # in mygame/commands/default_cmdsets.py
@@ -116,4 +120,4 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(mycommands.CmdLook())
 ```
 
-This will automatically replace the default `look` command in your game with your own version. 
+這將自動用您自己的版本替換遊戲中預設的 `look` 指令。

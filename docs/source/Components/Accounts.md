@@ -1,4 +1,5 @@
-# Accounts
+(accounts)=
+# 帳戶
 
 ```
 ┌──────┐ │   ┌───────┐    ┌───────┐   ┌──────┐
@@ -7,35 +8,36 @@
                               ^
 ```
 
-An _Account_ represents a unique game account - one player playing the game. Whereas a player can potentially connect to the game from several Clients/Sessions, they will normally have only one Account. 
+_Account_ 代表一個唯一的遊戲帳號 - 一個玩家在玩遊戲。儘管一名玩家可能會從多個用戶端/Sessions 連線到遊戲，但他們通常只有一個帳戶。
 
-The Account object has no in-game representation. In order to actually get on the game the Account must *puppet* an [Object](./Objects.md) (normally a [Character](./Objects.md#characters)).
+帳號物件沒有遊戲內的表示。為了真正進入遊戲，帳戶必須「操縱」一個[物件](./Objects.md)（通常是[角色](./Objects.md#characters)）。
 
-Exactly how many Sessions can interact with an Account and its Puppets at once is determined by
-Evennia's [MULTISESSION_MODE](../Concepts/Connection-Styles.md#multisession-mode-and-multiplaying)
+到底有多少 Sessions 可以同時與帳號及其傀儡互動取決於
+Evennia的[MULTISESSION_MODE](../Concepts/Connection-Styles.md#multisession-mode-and-multiplaying)
 
-Apart from storing login information and other account-specific data, the Account object is what is chatting on Evennia's default [Channels](./Channels.md).  It is also a good place to store [Permissions](./Locks.md) to be consistent between different in-game characters. It can also hold player-level configuration options. 
+除了儲存登入資訊和其他特定帳戶的資料之外，帳戶物件是在 Evennia 的預設 [頻道](./Channels.md) 上聊天的物件。  它也是儲存[許可權](./Locks.md)的好地方，以便在不同的遊戲角色之間保持一致。它還可以儲存玩家級別的設定選項。
 
-The Account object has its own default [CmdSet](./Command-Sets.md), the `AccountCmdSet`. The commands in this set are available to the player no matter which character they are puppeting. Most notably the default game's `exit`, `who` and chat-channel commands are in the Account cmdset.
+帳戶物件有自己的預設值 [CmdSet](./Command-Sets.md)，`AccountCmdSet`。無論玩家扮演哪個角色，都可以使用該集的指令。最值得注意的是，預設遊戲的 `exit`、`who` 和聊天頻道指令位於帳戶 cmdset 中。
 
     > ooc 
 
-The default  `ooc` command causes you to leave your current puppet and go into OOC mode. In this mode you have no location and have only the Account-cmdset available. It acts a staging area for switching characters (if your game supports that) as well as a safety fallback if your character gets accidentally deleted. 
+預設的 `ooc` 指令會導致您離開當前的人偶並進入 OOC 模式。在此模式下，您沒有位置，只有 Account-cmdset 可用。它充當切換角色的暫存區域（如果您的遊戲支援），以及如果您的角色被意外刪除時的安全性回退。
 
     > ic 
 
-This re-puppets the latest character.
+這重新傀儡了最新的角色。
 
-Note that the Account object can have, and often does have, a different set of [Permissions](./Permissions.md) from the Character they control.  Normally you should put your permissions on the Account level - this will overrule permissions set on the Character level. For the permissions of the Character to come into play the default `quell` command can be used. This allows for exploring the game using a different permission set (but you can't escalate your permissions this way - for hierarchical permissions like `Builder`, `Admin` etc, the *lower* of the permissions on the Character/Account will always be used). 
+請注意，帳戶物件可以（並且通常確實）擁有與其控制的角色不同的一組[許可權](./Permissions.md)。  通常，您應該將許可權置於帳戶層級 - 這將推翻角色層級上設定的許可權。為了使角色的許可權發揮作用，可以使用預設的`quell`指令。這允許使用不同的許可權集探索遊戲（但您不能以這種方式升級許可權 - 對於 `Builder`、`Admin` 等分層許可權，將始終使用角色/帳戶上的*較低*許可權）。
 
 
-## Working with Accounts
+(working-with-accounts)=
+## 使用帳戶
 
-You will usually not want more than one Account typeclass for all new accounts.
+對於所有新帳戶，您通常不需要多個帳戶 typeclass。
 
-An Evennia Account is, per definition, a Python class that includes `evennia.DefaultAccount` among its parents. In `mygame/typeclasses/accounts.py` there is an empty class ready for you to modify. Evennia defaults to using this (it inherits directly from `DefaultAccount`).
+根據定義，Evennia 帳戶是一個在其父類別中包含 `evennia.DefaultAccount` 的 Python 類別。在`mygame/typeclasses/accounts.py`中有一個空類別可供您修改。 Evennia 預設使用這個（它直接繼承自 `DefaultAccount`）。
 
-Here's an example of modifying the default Account class in code:
+以下是在程式碼中修改預設 Account 類別的範例：
 
 ```python
     # in mygame/typeclasses/accounts.py
@@ -55,9 +57,9 @@ Here's an example of modifying the default Account class in code:
     	    # ... whatever else our game needs to know 
 ``` 
 
-Reload the server with `reload`.
+使用`reload`重新載入伺服器。
 
-... However, if you use `examine *self` (the asterisk makes you examine your Account object rather than your Character), you won't see your new Attributes yet. This is because `at_account_creation` is only called the very *first* time the Account is called and your Account object already exists (any new Accounts that connect will see them though). To update yourself you need to make sure to re-fire the hook on all the Accounts you have already created. Here is an example of how to do this using `py`:
+……但是，如果您使用`examine *self`（星號讓您檢查您的帳戶物件而不是您的角色），您將看不到新屬性。這是因為 `at_account_creation` 僅在「第一次」呼叫該帳戶並且您的帳戶物件已經存在時才被呼叫（但任何連線的新帳戶都會看到它們）。要更新自己，您需要確保重新觸發您已建立的所有帳戶的掛鉤。以下是如何使用 `py` 執行此操作的範例：
 
 ``` py [account.at_account_creation() for account in evennia.managers.accounts.all()] ```
 

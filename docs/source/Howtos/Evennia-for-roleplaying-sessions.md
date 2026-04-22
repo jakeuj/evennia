@@ -1,64 +1,68 @@
-# Evennia for roleplaying sessions
+(evennia-for-roleplaying-sessions)=
+# Evennia 用於角色扮演 sessions
 
-This tutorial will explain how to set up a realtime or play-by-post tabletop style game using a
-fresh Evennia server.
+本教學將說明如何使用
+新鮮Evennia伺服器。
 
-The scenario is thus: You and a bunch of friends want to play a tabletop role playing game online.
-One of you will be the game master and you are all okay with playing using written text. You want
-both the ability to role play in real-time (when people happen to be online at the same time) as
-well as the ability for people to post when they can and catch up on what happened since they were
-last online.
+場景是這樣的：你和一群朋友想玩線上桌上角色扮演遊戲。
+你們中的一位將成為遊戲大師，你們都可以使用書寫文字進行遊戲。你想要
+即時角色扮演的能力（當人們碰巧同時線上時）
+以及人們能夠在可能的情況下發布並瞭解自發布以來發生的事情的能力
+最後線上。
 
-This is the functionality we will be needing and using:
+這是我們需要和使用的功能：
 
-* The ability to make one of you the *GM* (game master), with special abilities.
-* A *Character sheet* that players can create, view and fill in. It can also be locked so only the
-GM can modify it.
-* A *dice roller* mechanism, for whatever type of dice the RPG rules require.
-* *Rooms*, to give a sense of location and to compartmentalize play going on- This means both
-Character movements from location to location and GM explicitly moving them around.
-* *Channels*, for easily sending text to all subscribing accounts, regardless of location.
-* Account-to-Account *messaging* capability, including sending to multiple recipients
-simultaneously, regardless of location.
+* 使你們中的一個人成為*GM*（遊戲大師）的能力，具有特殊能力。
+* 玩家可以建立、檢視和填寫的*角色表*。它也可以被鎖定，這樣只有
+GM可以修改。
+* *骰子滾輪*機制，適用於 RPG 規則所需的任何型別的骰子。
+* *房間*，提供位置感並劃分正在進行的遊戲 - 這意味著兩者
+角色從一個位置移動到另一個位置，並且GM明確地移動它們。
+* *頻道*，用於輕鬆向所有訂閱帳戶傳送文字，無論其位置如何。
+* 帳戶到帳戶*訊息傳送*功能，包括傳送給多個收件者
+同時，無論位置如何。
 
-We will find most of these things are already part of vanilla Evennia, but that we can expand on the
-defaults for our particular use-case. Below we will flesh out these components from start to finish.
+我們會發現其中大部分內容已經是原版Evennia的一部分，但我們可以對其進行擴充套件
+我們特定用例的預設值。下面我們將從頭到尾充實這些元件。
 
-## Starting out
+(starting-out)=
+## 開始
 
-We will assume you start from scratch. You need Evennia installed, as per the [Setup Quickstart](../Setup/Installation.md) 
-instructions. Initialize a new game directory with `evennia init
-<gamedirname>`. In this tutorial we assume your game dir is simply named `mygame`. You can use the default database and keep all other settings to default for now. Familiarize yourself with the
-`mygame` folder before continuing. You might want to browse the  [Beginner Tutorial](Beginner-Tutorial/Part1/Beginner-Tutorial-Part1-Overview.md) tutorial, just to see roughly where things are modified.
+我們假設您從頭開始。您需要安裝 Evennia，依照[安裝快速入門](../Setup/Installation.md)
+說明操作。使用 `evennia init <gamedirname>` 初始化一個新的遊戲目錄。在本教學中，我們假設您的遊戲目錄就叫做 `mygame`。目前可以使用預設資料庫，其他設定也先保持預設值。熟悉一下
+`mygame` 資料夾，然後再繼續。您也可以先瀏覽[初學者教學](Beginner-Tutorial/Part1/Beginner-Tutorial-Part1-Overview.md)，大致看看哪些地方會被修改。
 
-## The Game Master role
+(the-game-master-role)=
+## 遊戲大師角色
 
-In brief: 
+簡而言之：
 
-* Simplest way: Being an admin, just give one account `Admins` permission using the standard `perm` command.
-* Better but more work: Make a custom command to set/unset the above, while tweaking the Character to show your renewed GM status to the other accounts.
+* 最簡單的方法：身為管理員，只需使用標準 `perm` 指令授予一個帳戶 `Admins` 許可權。
+* 更好但更多的工作：建立自訂指令來設定/取消設定上述內容，同時調整角色以向其他帳戶顯示您更新的 GM 狀態。
 
-### The permission hierarchy
+(the-permission-hierarchy)=
+### 許可權層次結構
 
-Evennia has the following [permission hierarchy](../Components/Permissions.md) out of the box: *Players, Helpers, Builders, Admins* and finally *Developers*. We could change these but then we'd need to update our Default commands to use the changes. We want to keep this simple, so instead we map our different roles on top of this permission ladder.
+Evennia 具有以下開箱即用的[許可權層次結構](../Components/Permissions.md)：*玩家、助手、建構者、管理者*，最後是*開發者*。我們可以更改這些，但隨後我們需要更新預設指令才能使用更改。我們希望保持簡單，因此我們將不同的角色對應到這個許可權階梯之上。
 
-1. `Players` is the permission set on normal players. This is the default for anyone creating a new
-account on the server.
-2. `Helpers` are like `Players` except they also have the ability to create/edit new help entries.
-This could be granted to players who are willing to help with writing lore or custom logs for
-everyone.
-3. `Builders` is not used in our case since the GM should be the only world-builder.
-4. `Admins` is the permission level the GM should have. Admins can do everything builders can
-(create/describe rooms etc) but also kick accounts, rename them and things like that.
-5. `Developers`-level permission are the server administrators, the ones with the ability to
-restart/shutdown the server as well as changing the permission levels.
+1. `Players`是給普通玩家設定的許可權。這是任何建立新專案的人的預設設定
+伺服器上的帳戶。
+2. `Helpers` 與 `Players` 類似，只不過它們也能夠建立/編輯新的幫助條目。
+這可以授予願意幫助編寫傳說或自訂日誌的玩家
+大家。
+3. 在我們的例子中沒有使用`Builders`，因為GM應該是唯一的世界建構者。
+4. `Admins` 是 GM 應具有的許可權等級。管理員可以做建構者可以做的一切
+（建立/描述房間等）還可以踢帳戶，重新命名它們等等。
+5. `Developers`級許可權是伺服器管理員，有能力
+重新啟動/關閉伺服器以及變更許可權等級。
 
-> The _superuser_ is not part of the hierarchy and actually completely bypasses it. We'll assume server admin(s) will "just" be Developers.
+> _superuser_ 不是層次結構的一部分，實際上完全繞過了它。我們假設伺服器管理員“只是”開發人員。
 
-### How to grant permissions
+(how-to-grant-permissions)=
+### 如何授予許可權
 
-Only `Developers` can (by default) change permission level. Only they have access to the `@perm`
-command:
+只有 `Developers` 可以（預設）更改許可權等級。只有他們有權訪問 `@perm`
+指令：
 
 ```
 > perm Yvonne
@@ -73,32 +77,34 @@ Permissions on Yvonne: accounts, admins
 Permissions on Yvonne: accounts
 ```
 
-There is no need to remove the basic `Players` permission when adding the higher permission: the
-highest will be used. Permission level names are *not* case sensitive. You can also use both plural
-and singular, so "Admins" gives the same powers as "Admin".
+新增更高許可權時無需刪除基本`Players`許可權：
+將使用最高的。許可權等級名稱*不*區分大小寫。您也可以同時使用複數
+並且是單數，因此“Admins”具有與“Admin”相同的權力。
 
 
-### Optional: Making a GM-granting command
+(optional-making-a-gm-granting-command)=
+### 可選：建立GM-授予指令
 
-Use of `perm` works out of the box, but it's really the bare minimum. Would it not be nice if other
-accounts could tell at a glance who the GM is? Also, we shouldn't really need to remember that the
-permission level is called "Admins". It would be easier if we could just do `@gm <account>` and
-`@notgm <account>` and at the same time change something make the new GM status apparent.
+`perm` 的使用是開箱即用的，但這實際上是最低限度的。如果是其他的豈不是很好
+帳戶一眼就能看出GM是誰？另外，我們真的不需要記住
+許可權級別稱為“管理員”。如果我們可以只做 `@gm <account>` 並且會更容易
+`@notgm <account>` 並同時更改某些內容，使新的 GM 狀態變得明顯。
 
-So let's make this possible. This is what we'll do:
+讓我們讓這一切成為可能。這就是我們要做的：
 
-1. We'll customize the default Character class. If an object of this class has a particular flag,
-its name will have the string`(GM)` added to the end.
-2. We'll add a new command, for the server admin to assign the GM-flag properly.
+1. 我們將自訂預設的字元類別。如果此類的物件具有特定標誌，
+它的名稱將在末尾新增字串`(GM)`。
+2. 我們將新增一個指令，以便伺服器管理員正確分配 GM- 標誌。
 
-#### Character modification
+(character-modification)=
+#### 人物修改
 
-Let's first start by customizing the Character. We recommend you browse the beginning of the
-[Account](../Components/Accounts.md) page to make sure you know how Evennia differentiates between the OOC "Account
-objects" (not to be confused with the `Accounts` permission, which is just a string specifying your
-access) and the IC "Character objects".
+讓我們先從自訂角色開始。我們建議您瀏覽開頭部分
+[帳戶](../Components/Accounts.md) 頁面，以確保您瞭解 Evennia 如何區分 OOC「帳戶
+物件」（不要與 `Accounts` 許可權混淆，後者只是一個指定您的字串
+訪問）和IC“字元物件”。
 
-Open `mygame/typeclasses/characters.py` and modify the default `Character` class:
+開啟`mygame/typeclasses/characters.py`並修改預設的`Character`類：
 
 ```python
 # in mygame/typeclasses/characters.py
@@ -129,25 +135,26 @@ class Character(DefaultCharacter):
         return name
 ```
 
-Above, we change how the Character's name is displayed: If the account controlling this Character is
-a GM, we attach the string `(GM)` to the Character's name so everyone can tell who's the boss. If we
-ourselves are Developers or GM's we will see database ids attached to Characters names, which can
-help if doing database searches against Characters of exactly the same name. We base the "gm-
-ingness" on having an flag (an [Attribute](../Components/Attributes.md)) named `is_gm`. We'll make sure new GM's
-actually get this flag below.
+上面，我們更改了角色名稱的顯示方式：如果控制該角色的帳戶是
+a GM，我們將字串`(GM)`附加到角色的名字上，這樣每個人都可以知道誰是老闆。如果我們
+我們自己是開發人員或GM，我們將看到資料庫 ID 附加到角色名稱，這可以
+如果對完全相同名稱的字元進行資料庫搜尋，會有所幫助。我們以「gm-
+ingness”，具有名為 `is_gm` 的標誌（[Attribute](../Components/Attributes.md)）。我們將確保新的GM
+實際上得到下面這個標誌。
 
-> **Extra exercise:** This will only show the `(GM)` text on *Characters* puppeted by a GM account,
-that is, it will show only to those in the same location. If we wanted it to also pop up in, say,
-`who` listings and channels, we'd need to make a similar change to the `Account` typeclass in
-`mygame/typeclasses/accounts.py`. We leave this as an exercise to the reader.
+> **額外練習：** 這只會顯示由 GM 帳戶操縱的*字元*上的 `(GM)` 文字，
+也就是說，它只會顯示給位於相同位置的人。如果我們希望它也彈出，比如說，
+`who` 清單和頻道，我們需要對 `Account` typeclass 進行類似的更改
+`mygame/typeclasses/accounts.py`。我們將其作為練習留給讀者。
 
-#### New @gm/@ungm command
+(new-gmungm-command)=
+#### 新@gm/@ungm指令
 
-We will describe in some detail how to create and add an Evennia [command](../Components/Commands.md) here with the
-hope that we don't need to be as detailed when adding commands in the future. We will build on
-Evennia's default "mux-like" commands here.
+我們將在這裡詳細描述如何建立和新增 Evennia [指令](../Components/Commands.md)
+希望以後加上指令的時候不需要那麼詳細。我們將在此基礎上
+Evennia 的預設“mux-like”指令在這裡。
 
-Open `mygame/commands/command.py` and add a new Command class at the bottom:
+開啟`mygame/commands/command.py`並在底部新增一個新的Command類別：
 
 ```python
 # in mygame/commands/command.py
@@ -212,13 +219,13 @@ class CmdMakeGM(default_cmds.MuxCommand):
 
 ```
 
-All the command does is to locate the account target and assign it the `Admins` permission if we
-used `gm` or revoke it if using the `ungm` alias. We also set/unset the `is_gm` Attribute that is
-expected by our new `Character.get_display_name` method from earlier.
+該指令所做的只是找到帳戶目標並為其分配 `Admins` 許可權（如果我們
+使用 `gm` 或撤銷它（如果使用 `ungm` 別名）。我們也設定/取消設定 `is_gm` Attribute 即
+我們之前的新 `Character.get_display_name` 方法預期如此。
 
-> We could have made this into two separate commands or opted for a syntax like `gm/revoke <accountname>`. Instead we examine how this command was called (stored in `self.cmdstring`) in order to act accordingly. Either way works, practicality and coding style decides which to go with.
+> 我們可以將其分成兩個單獨的指令，或者選擇像 `gm/revoke <accountname>` 這樣的語法。相反，我們檢查該指令是如何呼叫的（儲存在 `self.cmdstring` 中）以便採取相應的行動。無論哪種方式都有效，實用性和程式設計風格決定採用哪種方式。
 
-To actually make this command available (only to Developers, due to the lock on it), we add it to the default Account command set. Open the file `mygame/commands/default_cmdsets.py` and find the `AccountCmdSet` class:
+為了真正使該指令可用（僅對開發人員可用，因為其上有 lock），我們將其新增至預設帳戶指令集中。開啟檔案`mygame/commands/default_cmdsets.py`並找到`AccountCmdSet`類：
 
 ```python
 # mygame/commands/default_cmdsets.py
@@ -234,27 +241,30 @@ class AccountCmdSet(default_cmds.AccountCmdSet):
 
 ```
 
-Finally, issue the `reload` command to update the server to your changes. Developer-level players
-(or the superuser) should now have the `gm/ungm` command available.
+最後，發出 `reload` 指令將伺服器更新為您的變更。開發者級玩家
+（或超級使用者）現在應該可以使用 `gm/ungm` 指令。
 
-## Character sheet
+(character-sheet)=
+## 字元表
 
-In brief: 
+簡而言之：
 
-* Use Evennia's EvTable/EvForm to build a Character sheet
-* Tie individual sheets to a given Character.
-* Add new commands to modify the Character sheet, both by Accounts and GMs.
-* Make the Character sheet lockable by a GM, so the Player can no longer modify it.
+* 使用Evennia的EvTable/EvForm建立角色表
+* 將單獨的紙張綁在給定的角色上。
+* 新增指令以透過帳戶和 GM 修改角色表。
+* 讓角色表可鎖定GM，讓玩家無法再修改它。
 
-### Building a Character sheet
+(building-a-character-sheet)=
+### 建構角色表
 
-There are many ways to build a Character sheet in text, from manually pasting strings together to more automated ways. Exactly what is the best/easiest way depends on the sheet one tries to create. We will here show two examples using the *EvTable* and *EvForm* utilities.Later we will create Commands to edit and display the output from those utilities.
+在文字中建立字元表的方法有很多，從手動將字串貼到一起到更自動化的方法。到底什麼是最好/最簡單的方法取決於人們試圖建立的工作表。我們將在這裡展示兩個使用 *EvTable* 和 *EvForm* 實用程式的範例。稍後我們將建立指令來編輯和顯示這些實用程式的輸出。
 
-> Note that these docs don't show the color.  see [the text tag documentation](../Concepts/Tags-Parsed-By-Evennia.md) for how to add color to the tables and forms.
+> 請注意，這些檔案不顯示顏色。  有關如何向表格和表單新增顏色的資訊，請參閱[文字tag 檔案](../Concepts/Tags-Parsed-By-Evennia.md)。
 
-#### Making a sheet with EvTable
+(making-a-sheet-with-evtable)=
+#### 用 EvTable 製作一張紙
 
-[EvTable](../Components/EvTable.md) is a text-table generator. It helps with displaying text in ordered rows and columns. This is an example of using it in code:
+[EvTable](../Components/EvTable.md) 是一個文字表產生器。它有助於以有序的行和列顯示文字。這是在程式碼中使用它的範例：
 
 ````python
 # this can be tried out in a Python shell like iPython
@@ -271,9 +281,9 @@ table = evtable.EvTable("Attr", "Value",
                         ], align='r', border="incols")
 ````
 
-Above, we create a two-column table by supplying the two columns directly. We also tell the table to be right-aligned and to use the "incols" border type (borders drawns only in between columns). The `EvTable` class takes a lot of arguments for customizing its look, you can see [some of the possible keyword arguments here](github:evennia.utils.evtable#evtable__init__). Once you have the `table` you could also retroactively add new columns and rows to it with `table.add_row()` and `table.add_column()`: if necessary the table will expand with empty rows/columns to always remain rectangular.
+上面，我們透過直接提供兩列來建立一個兩個清單。我們還告訴表格右對齊並使用“incols”邊框型別（僅在列之間繪製邊框）。 `EvTable` 類別需要很多引數來自訂其外觀，您可以在此處檢視[一些可能的關鍵字引數](github:evennia.utils.evtable#evtable__init__)。一旦您擁有`table`，您還可以使用`table.add_row()` 和`table.add_column()` 追溯新增新的列和行：如有必要，表格將用空行/列擴充套件以始終保持矩形。
 
-The result from printing the above table will be
+列印上表的結果將是
 
 ```python
 table_string = str(table)
@@ -290,26 +300,27 @@ print(table_string)
   CHA |    13
 ```
 
-This is a minimalistic but effective Character sheet. By combining the `table_string` with other
-strings one could build up a reasonably full graphical representation of a Character. For more
-advanced layouts we'll look into EvForm next.
+這是一個簡約但有效的角色表。透過將 `table_string` 與其他組合
+字串可以建構一個字元的相當完整的圖形表示。瞭解更多
+接下來我們將研究 EvForm 的高階佈局。
 
-#### Making a sheet with EvForm
+(making-a-sheet-with-evform)=
+#### 用 EvForm 製作一張紙
 
-[EvForm](../Components/EvForm.md) allows the creation of a two-dimensional "graphic" made by text characters. On this surface, one marks and tags rectangular regions ("cells") to be filled with content. This content can be either normal strings or `EvTable` instances (see the previous section, one such instance would be the `table` variable in that example).
+[EvForm](../Components/EvForm.md) 允許建立由文字字元組成的二維「圖形」。在此表面上，一個標記和 tags 矩形區域（「單元格」）將被填滿內容。此內容可以是普通字串或 `EvTable` 例項（請參閱上一節，其中一個例項是該範例中的 `table` 變數）。
 
-In the case of a Character sheet, these cells would be comparable to a line or box where you could
-enter the name of your character or their strength score. EvMenu also easily allows to update the
-content of those fields in code (it use EvTables so you rebuild the table first before re-sending it
-to EvForm).
+在字元表的情況下，這些儲存格相當於一行或一個框，您可以在其中
+輸入你的角色的名字或他們的力量分數。 EvMenu 還可以輕鬆地允許更新
+程式碼中這些欄位的內容（它使用EvTables，因此您在重新傳送之前先重建表
+至EvForm）。
 
-The drawback of EvForm is that its shape is static; if you try to put more text in a region than it
-was sized for, the text will be cropped. Similarly, if you try to put an EvTable instance in a field
-too small for it, the EvTable will do its best to try to resize to fit, but will eventually resort
-to cropping its data or even give an error if too small to fit any data.
+EvForm的缺點是它的形狀是靜態的；如果您嘗試在某個區域中放置比該區域更多的文字
+調整大小後，文字將被裁剪。同樣，如果您嘗試將 EvTable 例項放入欄位中
+對於它來說太小了，EvTable 將盡力嘗試調整大小以適應，但最終會採取
+裁剪其資料，如果太小而無法容納任何資料，甚至會給出錯誤。
 
-An EvForm is defined in a Python module. Create a new file `mygame/world/charsheetform.py` and
-modify it thus:
+Python 模組中定義了 EvForm。建立一個新檔案 `mygame/world/charsheetform.py` 並
+修改如下：
 
 ````python
 #coding=utf-8
@@ -339,14 +350,14 @@ FORM = """
 +--------------------------------------+
 """
 ````
-The `#coding` statement (which must be put on the very first line to work) tells Python to use the
-utf-8 encoding for the file. Using the `FORMCHAR` and `TABLECHAR` we define what single-character we
-want to use to "mark" the regions of the character sheet holding cells and tables respectively.
-Within each block (which must be separated from one another by at least one non-marking character) we embed identifiers 1-4 to identify each block. The identifier could be any single character except for the `FORMCHAR` and `TABLECHAR`
+`#coding` 語句（必須放在第一行才能運作）告訴 Python 使用
+檔案的 utf-8 編碼。使用 `FORMCHAR` 和 `TABLECHAR` 我們定義我們要做什麼的單字元
+想要用來「標記」分別包含儲存格和表格的字元表區域。
+在每個區塊（必須至少用一個非標記字元彼此分隔）內，我們嵌入識別符號 1-4 來標識每個區塊。識別符號可以是除 `FORMCHAR` 和 `TABLECHAR` 之外的任何單個字元
 
-> You can still use `FORMCHAR` and `TABLECHAR` elsewhere in your sheet, but not in a way that it would identify a cell/table. The smallest identifiable cell/table area is 3 characters wide including the identifier (for example `x2x`).
+> 您仍然可以在工作表的其他位置使用 `FORMCHAR` 和 `TABLECHAR`，但不能以識別儲存格/表格的方式使用。最小的可識別儲存格/表格區域為 3 個字元寬，包括識別符（例如 `x2x`）。
 
-Now we will map content to this form.
+現在我們將把內容對應到這個表單。
 
 ````python
 # again, this can be tested in a Python shell
@@ -369,12 +380,12 @@ form.map(cells={"1":NAME, "3": ADVANTAGES, "4": DISADVANTAGES},
          tables={"2":table})
 ````
 
-We create some RP-sounding input and re-use the `table` variable from the previous `EvTable`
-example.
+我們建立一些 RP- 聲音輸入並重新使用先前 `EvTable` 中的 `table` 變數
+範例。
 
-> Note, that if you didn't want to create the form in a separate module you *could* also load it directly into the `EvForm` call like this: `EvForm(form={"FORMCHAR":"x", "TABLECHAR":"c", "FORM": formstring})` where `FORM` specifies the form as a string in the same way as listed in the module above. Note however that the very first line of the `FORM` string is ignored, so start with a `\n`.
+> 請注意，如果您不想在單獨的模組中建立表單，您*也可以*將其直接載入到 `EvForm` 呼叫中，如下所示：`EvForm(form={"FORMCHAR":"x", "TABLECHAR":"c", "FORM": formstring})` 其中 `FORM` 以與上面模組中列出的相同方式將表單指定為字串。但請注意，`FORM` 字串的第一行將被忽略，因此以 `\n` 開頭。
 
-We then map those to the cells of the form:
+然後我們將它們對映到表單的單元格：
 
 ````python
 print(form)
@@ -399,11 +410,12 @@ print(form)
 +--------------------------------------+
 ````
 
-As seen, the texts and tables have been slotted into the text areas and line breaks have been added where needed. We chose to just enter the Advantages/Disadvantages as plain strings here, meaning long names ended up split between rows. If we wanted more control over the display we could have inserted `\n` line breaks after each line or used a borderless `EvTable` to display those as well. 
+如圖所示，文字和表格已放入文字區域，並在需要的地方新增了換行符。我們選擇在此處僅以純字串形式輸入優點/缺點，這意味著長名稱最終會在行之間分割。如果我們想要對顯示進行更多控制，我們可以在每行後面插入 `\n` 換行符，或者使用無邊框 `EvTable` 來顯示這些內容。
 
-### Tie a Character sheet to a Character
+(tie-a-character-sheet-to-a-character)=
+### 將角色表與角色繫結
 
-We will assume we go with the `EvForm` example above. We now need to attach this to a Character so it can be modified. For this we will modify our `Character` class a little more:
+我們假設我們採用上面的 `EvForm` 範例。我們現在需要將其附加到角色上，以便可以對其進行修改。為此，我們將稍微修改一下 `Character` 類別：
 
 ```python
 # mygame/typeclasses/character.py
@@ -449,19 +461,20 @@ class Character(DefaultCharacter):
 
 ```
 
-Use `reload` to make this change available to all *newly created* Characters. *Already existing*
-Characters will *not* have the charsheet defined, since `at_object_creation` is only called once.
-The easiest to force an existing Character to re-fire its `at_object_creation` is to use the
-`typeclass` command in-game:
+使用 `reload` 使此變更適用於所有*新建立的*角色。 *已經存在*
+字元將「不」定義字元表，因為 `at_object_creation` 只被呼叫一次。
+強制現有角色重新發射其 `at_object_creation` 最簡單的方法是使用
+`typeclass` 遊戲中指令：
 
 ```
 typeclass/force <Character Name>
 ```
 
-### Command for Account to change Character sheet
+(command-for-account-to-change-character-sheet)=
+### 帳戶更改字元表的指令
 
-We will add a command to edit the sections of our Character sheet. Open
-`mygame/commands/command.py`.
+我們將新增一個指令來編輯角色表的各個部分。開啟
+`mygame/commands/command.py`。
 
 ```python
 # at the end of mygame/commands/command.py
@@ -537,13 +550,14 @@ class CmdSheet(MuxCommand):
 
 ```
 
-Most of this command is error-checking to make sure the right type of data was input. Note how the `sheet_locked` Attribute is checked and will return if not set.
+該指令的大部分內容是錯誤檢查，以確保輸入的資料型別正確。請注意 `sheet_locked` Attribute 是如何檢查的，如果未設定，則會返回。
 
-This command you import into `mygame/commands/default_cmdsets.py` and add to the `CharacterCmdSet`, in the same way the `@gm` command was added to the `AccountCmdSet` earlier.
+將此指令匯入至 `mygame/commands/default_cmdsets.py` 並新增至 `CharacterCmdSet`，與先前將 `@gm` 指令新增至 `AccountCmdSet` 的方式相同。
 
-### Commands for GM to change Character sheet
+(commands-for-gm-to-change-character-sheet)=
+### GM 更改字元表的指令
 
-Game masters use basically the same input as Players do to edit a character sheet, except they can do it on other players than themselves. They are also not stopped by any `sheet_locked` flags.
+遊戲大師使用與玩家基本相同的輸入來編輯角色表，除了他們可以對自己以外的其他玩家進行編輯。它們也不會被任何 `sheet_locked` 標誌阻止。
 
 ```python
 # continuing in mygame/commands/command.py
@@ -621,57 +635,61 @@ class CmdGMsheet(MuxCommand):
             caller.msg(character.db.charsheet)
 ```
 
-The `gmsheet` command takes an additional argument to specify which Character's character sheet to edit. It also takes `/lock` and `/unlock` switches to block the Player from tweaking their sheet.
+`gmsheet` 指令需要一個附加引數來指定要編輯哪個角色的字元表。它還需要 `/lock` 和 `/unlock` 開關來阻止玩家調整他們的表。
 
-Before this can be used, it should be added to the default `CharacterCmdSet` in the same way as the normal `sheet`. Due to the lock set on it, this command will only be available to `Admins` (i.e. GMs) or higher permission levels.
+在使用之前，應以與正常 `sheet` 相同的方式將其新增至預設 `CharacterCmdSet` 中。由於設定了lock，該指令僅對`Admins`（i.e.GMs）或更高許可權等級可用。
 
-## Dice roller
+(dice-roller)=
+## 骰滾筒
 
-Evennia's *contrib* folder already comes with a full dice roller. To add it to the game, simply import `contrib.dice.CmdDice` into `mygame/commands/default_cmdsets.py` and add `CmdDice` to the `CharacterCmdset` as done with other commands in this tutorial. After a `@reload` you will be able
-to roll dice using normal RPG-style format:
+Evennia 的 *contrib* 資料夾已附帶完整的骰子滾筒。要將其新增到遊戲中，只需將 `contrib.dice.CmdDice` 匯入 `mygame/commands/default_cmdsets.py` 並將 `CmdDice` 新增到 `CharacterCmdset` 中，就像本教學中的其他指令一樣。 `@reload`之後你將能夠
+使用正常的 RPG- 樣式格式擲骰子：
 
 ```
 roll 2d6 + 3
 7
 ```
 
-Use `help dice` to see what syntax is supported or look at `evennia/contrib/dice.py` to see how it's implemented.
+使用 `help dice` 檢視支援哪些語法，或檢視 `evennia/contrib/dice.py` 檢視其實作方式。
 
-## Rooms
+(rooms)=
+## 客房
 
-Evennia comes with rooms out of the box, so no extra work needed. A GM will automatically have all needed building commands available. A fuller go-through is found in the [Building tutorial](Beginner-Tutorial/Part1/Beginner-Tutorial-Building-Quickstart.md).
-Here are some useful highlights:
+Evennia 附帶開箱即用的房間，因此不需要額外的工作。 GM 將自動提供所有需要的建置指令。在[建構教學](Beginner-Tutorial/Part1/Beginner-Tutorial-Building-Quickstart.md) 中可以找到更完整的詳細說明。
+以下是一些有用的亮點：
 
-* `dig roomname;alias = exit_there;alias, exit_back;alias` - this is the basic command for digging a new room. You can specify any exit-names and just enter the name of that exit to go there.
-* `tunnel direction = roomname` - this is a specialized command that only accepts directions in the cardinal directions (n,ne,e,se,s,sw,w,nw) as well as in/out and up/down. It also automatically builds "matching" exits back in the opposite direction.
-* `create/drop objectname` - this creates and drops a new simple object in the current location.
-* `desc obj` - change the look-description of the object.
-* `tel object = location` - teleport an object to a named location.
-* `search objectname` - locate an object in the database.
+* `dig roomname;alias = exit_there;alias, exit_back;alias` - 這是挖掘新房間的基本指令。您可以指定任何出口名稱，只需輸入該出口的名稱即可到達那裡。
+* `tunnel direction = roomname` - 這是一個專門的指令，僅接受基本方向（n，ne，e，se，s，sw，w，nw）以及進/出和上/下方向。它還會自動在相反方向建立“匹配”出口。
+* `create/drop objectname` - 這將在目前位置建立並刪除一個新的簡單物件。
+* `desc obj` - 更改物件的外觀描述。
+* `tel object = location` - 將物件傳送到指定位置。
+* `search objectname` - 在資料庫中尋找物件。
 
-> TODO: Describe how to add a logging room, that logs says and poses to a log file that people can access after the fact.
+> TODO：描述如何新增一個日誌記錄室，該日誌記錄並構成一個人們可以在事後存取的日誌檔案。
 
-## Channels
+(channels)=
+## 頻道
 
-Evennia comes with [Channels](../Components/Channels.md) in-built and they are described fully in the documentation. For brevity, here are the relevant commands for normal use:
+Evennia 內建[通道](../Components/Channels.md)，並且在檔案中對其進行了完整描述。為了簡潔起見，以下是正常使用的相關指令：
 
-* `channel/create = new_channel;alias;alias = short description` - Creates a new channel.
-* `channel/sub channel` - subscribe to a channel.
-* `channel/unsub channel` - unsubscribel from a channel. 
-* `channels` lists all available channels, including your subscriptions and any aliases you have set up for them.
+* `channel/create = new_channel;alias;alias = short description` - 建立一個新頻道。
+* `channel/sub channel` - 訂閱頻道。
+* `channel/unsub channel` - 取消訂閱頻道。
+* `channels` 列出所有可用頻道，包括您的訂閱以及您為其設定的任何別名。
 
-You can read channel history: if you for example are chatting on the `public` channel you can do
-`public/history` to see the 20 last posts to that channel or `public/history 32` to view twenty
-posts backwards, starting with the 32nd from the end.
+您可以讀取頻道歷史記錄：例如，如果您正在 `public` 頻道上聊天，您可以執行以下操作
+`public/history` 檢視該頻道的最後 20 條帖子，或 `public/history 32` 檢視 20 條
+從倒數第 32 篇文章開始向後倒數。
 
-## PMs
+(pms)=
+## 專案經理
 
-To send PMs to one another, players can use the `page` (or `tell`) command:
+要互相傳送私信，玩家可以使用`page`（或`tell`）指令：
 
 ```
 page recipient = message
 page recipient, recipient, ... = message
 ```
 
-Players can use `page` alone to see the latest messages. This also works if they were not online
-when the message was sent.
+玩家可以單獨使用`page`檢視最新訊息。如果他們不線上，這也適用
+訊息傳送時。

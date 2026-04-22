@@ -1,34 +1,37 @@
-# Choosing a database 
+(choosing-a-database)=
+# 選擇資料庫
 
 
-This page gives an overview of the supported SQL databases as well as instructions on install:
+本頁概述了受支援的 SQL 資料庫以及安裝說明：
 
- - SQLite3 (default)
+ - SQLite3（預設）
  - PostgreSQL
  - MySQL / MariaDB
 
-Since Evennia uses [Django](https://djangoproject.com), most of our notes are based off of what we know from the community and their documentation. While the information below may be useful, you can always find the most up-to-date and "correct" information at Django's [Notes about supported Databases](https://docs.djangoproject.com/en/4.1/ref/databases/#ref-databases) page.
+由於 Evennia 使用 [Django](https://djangoproject.com)，我們的大部分註釋都是基於我們從社群及其檔案中瞭解到的資訊。雖然下面的資訊可能有用，但您始終可以在 Django 的[有關支援的資料庫的註釋](https://docs.djangoproject.com/en/4.1/ref/databases/#ref-databases) 頁面找到最新且「正確」的資訊。
 
-## SQLite3 (default)
+(sqlite3-default)=
+## SQLite3（預設）
 
-[SQLite3](https://sqlite.org/) is a light weight single-file database. It is our default database and Evennia will set this up for you automatically if you give no other options. 
+[SQLite3](https://sqlite.org/) 是一個輕量級單一檔案資料庫。這是我們的預設資料庫，如果您沒有提供其他選項，Evennia 會自動為您設定。
 
-SQLite stores the database in a single file (`mygame/server/evennia.db3`). This means it's very easy to reset this database - just delete (or move) that `evennia.db3` file and run `evennia migrate` again! No server process is needed and the administrative overhead and resource consumption is tiny. It is also very fast since it's run in-memory. For the vast majority of Evennia installs it will probably be all that's ever needed.  
+SQLite 將資料庫儲存在單一檔案中 (`mygame/server/evennia.db3`)。這意味著重置此資料庫非常容易 - 只需刪除（或移動）該 `evennia.db3` 檔案並再次執行 `evennia migrate` 即可！不需要伺服器程式，管理開銷和資源消耗很小。由於它在記憶體中執行，因此速度也非常快。對於絕大多數 Evennia 安裝來說，它可能就是所需要的。
 
-SQLite will generally be much faster than MySQL/PostgreSQL but its performance comes with two drawbacks:
+SQLite 通常比 MySQL/PostgreSQL 快得多，但其效能有兩個缺點：
 
-* SQLite [ignores length constraints by design](https://www.sqlite.org/faq.html#q9); it is possible to store very large strings and numbers in fields that technically should not accept them. This is not something you will notice; your game will read and write them and function normally, but this *can* create some data migration problems requiring careful thought if you do need to change databases later.
-* SQLite can scale well to storage of millions of objects, but if you end up with a thundering herd of users trying to access your MUD and web site at the same time, or you find yourself writing long- running functions to update large numbers of objects on a live game, either will yield errors and interference. SQLite does not work reliably with multiple concurrent threads or processes accessing its records. This has to do with file-locking clashes of the database file. So for a production server making heavy use of process- or thread pools, a proper database is a more appropriate choice.
+* SQLite [忽略設計的長度限制](https://www.sqlite.org/faq.html#q9);可以在技術上不應該接受的欄位中儲存非常大的字串和數字。這不是你會注意到的事情；您的遊戲將讀取和寫入它們並正常執行，但這*可能*會產生一些資料遷移問題，如果您以後確實需要更改資料庫，則需要仔細考慮。
+* SQLite 可以很好地擴充套件到儲存數百萬個物件，但是如果您最終遇到一大群使用者試圖同時訪問您的 MUD 和網站，或者您發現自己編寫了長時間執行的函式來更新實時遊戲中的大量物件，那麼這兩種情況都會產生錯誤和乾擾。 SQLite 無法在多個並發執行緒或程式存取其記錄的情況下可靠地工作。這與資料庫檔案的檔案鎖定衝突有關。因此，對於大量使用程式池或執行緒池的生產伺服器來說，合適的資料庫是更合適的選擇。
 
-### Install of SQlite3
+(install-of-sqlite3)=
+### 安裝SQlite3
 
-This is installed and configured as part of Evennia. The database file is created as `mygame/server/evennia.db3` when you run
+它作為 Evennia 的一部分進行安裝和設定。執行時資料庫檔案被建立為`mygame/server/evennia.db3`
 
     evennia migrate
 
-without changing any database options. An optional requirement is the `sqlite3` client program - this is required if you want to inspect the database data manually. A shortcut for using it with the evennia database is `evennia dbshell`. Linux users should look for the `sqlite3` package for their distro while Mac/Windows should get the [sqlite-tools package from this page](https://sqlite.org/download.html).
+無需更改任何資料庫選項。一個可選的要求是 `sqlite3` 客戶端程式 - 如果您想手動檢查資料庫資料，則這是必需的。將其與 evennia 資料庫一起使用的快捷方式是 `evennia dbshell`。 Linux 使用者應為其發行版尋找 `sqlite3` 軟體包，而 Mac/Windows 則應從本頁取得 [sqlite-tools 軟體包](https://sqlite.org/download.html)。
 
-To inspect the default Evennia database (once it's been created), go to your game dir and do
+若要檢查預設的 Evennia 資料庫（建立後），請前往您的遊戲目錄並執行下列操作
 
 ```bash
     sqlite3 server/evennia.db3
@@ -36,24 +39,27 @@ To inspect the default Evennia database (once it's been created), go to your gam
     evennia dbshell
 ```
 
-This will bring you into the sqlite command line. Use `.help` for instructions and `.quit` to exit.
-See [here](https://gist.github.com/vincent178/10889334) for a cheat-sheet of commands.
+這將帶您進入 sqlite 指令列。使用 `.help` 進行指示，使用 `.quit` 退出。
+有關指令備忘單，請參閱[此處](https://gist.github.com/vincent178/10889334)。
 
-### Resetting SQLite3 
+(resetting-sqlite3)=
+### 正在重置SQLite3
 
-If you want to reset your SQLite3 database, see [here](./Updating-Evennia.md#sqlite3-default).
+如果您想重設 SQLite3 資料庫，請參閱[此處](./Updating-Evennia.md#sqlite3-default)。
 
+(postgresql)=
 ## PostgreSQL
 
-[PostgreSQL](https://www.postgresql.org/) is an open-source database engine, recommended by Django. While not as fast as SQLite for normal usage, it will scale better than SQLite, especially if your game has an very large database and/or extensive web presence through a separate server process.
+[PostgreSQL](https://www.postgresql.org/)是Django推薦的開源資料庫引擎。雖然正常使用情況下速度不如 SQLite，但其擴充套件性會比 SQLite 更好，特別是如果您的遊戲透過單獨的伺服器程式擁有非常大的資料庫和/或廣泛的 Web 存在。
 
-### Install and initial setup of PostgreSQL
+(install-and-initial-setup-of-postgresql)=
+### 安裝並初始設定 PostgreSQL
 
-First, install the posgresql server. Version `9.6` is tested with Evennia. Packages are readily available for all distributions. You need to also get the `psql` client (this is called `postgresql- client` on debian-derived systems). Windows/Mac users can [find what they need on the postgresql download page](https://www.postgresql.org/download/). You should be setting up a password for your database-superuser (always called `postgres`) when you install. 
+首先，安裝 posgresql 伺服器。版本 `9.6` 使用 Evennia 進行測試。所有發行版均可輕鬆獲得軟體包。您還需要取得 `psql` 客戶端（在 debian 衍生系統上稱為 `postgresql- client`）。 Windows/Mac使用者可以[在postgresql下載頁面找到他們需要的東西](https://www.postgresql.org/download/)。安裝時，您應該為資料庫超級使用者（始終稱為 `postgres`）設定密碼。
 
-For interaction with Evennia you need to also install `psycopg` (psycopg3) to your Evennia install (`pip install psycopg[binary]` in your virtualenv). This acts as the python bridge to the database server.
+為了與 Evennia 互動，您還需要將 `psycopg` (psycopg3) 安裝到您的 Evennia 安裝中（virtualenv 中的 `pip install psycopg[binary]`）。這充當到資料庫伺服器的 python 橋。
 
-Next, start the postgres client:
+接下來，啟動 postgres 客戶端：
 
 ```bash
     psql -U postgres --password
@@ -61,12 +67,12 @@ Next, start the postgres client:
 
 ```{warning}
 
-  With the `--password` argument, Postgres should prompt you for a password. If it won't, replace that with `-p yourpassword` instead. Do not use the `-p` argument unless you have to since the resulting command, and your password, will be logged in the shell history.
+使用 `--password` 引數，Postgres 應該會提示您輸入密碼。如果不是，請將其替換為 `-p yourpassword`。除非必要，否則請勿使用 `-p` 引數，因為產生的指令和您的密碼將記錄在 shell 歷史記錄中。
 ```
 
-This will open a console to the postgres service using the psql client.
+這將使用 psql 客戶端開啟 postgres 服務的控制檯。
 
-On the psql command line:
+在 psql 指令列上：
 
 ```sql
 CREATE USER evennia WITH PASSWORD 'somepassword';
@@ -87,13 +93,14 @@ ALTER DATABASE evennia owner to evennia;
 --  \q       (exit)
 
 ```
-[Here](https://gist.github.com/Kartones/dd3ff5ec5ea238d4c546) is a cheat-sheet for psql commands.
+[此處](https://gist.github.com/Kartones/dd3ff5ec5ea238d4c546) 是 psql 指令的備忘單。
 
-We create a database user 'evennia' and a new database named `evennia` (you can call them whatever you want though). We then grant the 'evennia' user full privileges to the new database so it can read/write etc to it. If you in the future wanted to completely wipe the database, an easy way to do is to log in as the `postgres` superuser again, then do `DROP DATABASE evennia;`, then `CREATE` and `GRANT` steps above again to recreate the database and grant privileges.
+我們建立一個資料庫使用者「evennia」和一個名為`evennia` 的新資料庫（您可以隨意稱呼它們）。然後，我們授予「evennia」使用者對新資料庫的完全許可權，以便它可以對其進行讀取/寫入等操作。如果您將來想要完全擦除資料庫，一個簡單的方法是再次以 `postgres` 超級使用者身份登入，然後執行 `DROP DATABASE evennia;`，然後再次執行上述 `CREATE` 和 `GRANT` 步驟來重新建立資料庫並授予許可權。
 
-### Evennia PostgreSQL configuration
+(evennia-postgresql-configuration)=
+### Evennia PostgreSQL 設定
 
-Edit `mygame/server/conf/secret_settings.py` and add the following section:
+編輯 `mygame/server/conf/secret_settings.py` 並新增以下部分：
 
 ```python
 #
@@ -110,36 +117,38 @@ DATABASES = {
         }}
 ```
 
-If you used some other name for the database and user, enter those instead. Run
+如果您對資料庫和使用者使用了其他名稱，請輸入這些名稱。跑步
 
     evennia migrate
 
-to populate your database. Should you ever want to inspect the database directly you can from now on also use
+填充您的資料庫。如果您想直接檢查資料庫，從現在開始也可以使用
 
     evennia dbshell
 
-as a shortcut to get into the postgres command line for the right database and user.
+作為進入正確資料庫和使用者的 postgres 指令列的捷徑。
 
-With the database setup you should now be able to start start Evennia normally with your new database.
+透過資料庫設定，您現在應該能夠正常啟動新資料庫的 Evennia。
 
-### Resetting PostgreSQL
+(resetting-postgresql)=
+### 正在重置PostgreSQL
 
-If you want to reset your PostgreSQL datbase, see [here](./Updating-Evennia.md#postgresql)
+如果您想重設 PostgreSQL 資料庫，請參閱[此處](./Updating-Evennia.md#postgresql)
 
-### Advanced PostgreSQL Usage (Remote Server)
+(advanced-postgresql-usage-remote-server)=
+### 進階 PostgreSQL 使用情況（遠端伺服器）
 
 ```{warning}
 
-  The example below is for a server within a private network that is not open to
-  the Internet.  Be sure to understand the details before making any changes to
-  an Internet-accessible server.
+以下的範例適用於未開放的專用網路中的伺服器
+  網際網路。  在進行任何更改之前，請務必瞭解詳細資訊
+  可存取 Internet 的伺服器。
 ```
 
-The above discussion is for hosting a local server. In certain configurations it may make sense host the database on a server remote to the one Evennia is running on. One example case is where code development may be done on multiple machines by multiple users. In this configuration, a local data base (such as SQLite3) is not feasible since all the machines and developers do not have access to the file.
+上面的討論是針對託管本地伺服器的。在某些設定中，將資料庫託管在遠離執行 Evennia 的伺服器上可能是有意義的。一個範例是多個使用者可以在多臺機器上完成程式碼開發。在此設定中，本機資料庫（例如SQLite3）不可行，因為所有電腦和開發人員都無法存取該檔案。
 
-Choose a remote machine to host the database and PostgreSQl server. Follow the instructions [above](#install-and-initial-setup-of-postgresql) on that server to set up the database. Depending on distribution, PostgreSQL will only accept connections on the local machine (localhost).  In order to enable remote access, two files need to be changed.
+選擇一臺遠端電腦來託管資料庫和 PostgreSQl 伺服器。依照該伺服器上的[上述](#install-and-initial-setup-of-postgresql) 說明設定資料庫。根據發行版的不同，PostgreSQL 將僅接受本機電腦 (localhost) 上的連線。  為了啟用遠端訪問，需要更改兩個檔案。
 
-First, determine which cluster is running your database. Use `pg_lscluster`:
+首先，確定哪個叢集正在執行您的資料庫。使用`pg_lscluster`：
 
 ```bash
 $ pg_lsclusters
@@ -147,9 +156,9 @@ Ver Cluster Port Status Owner    Data directory              Log file
 12  main    5432 online postgres /var/lib/postgresql/12/main /var/log/postgresql/postgresql-12-main.log
 ```
 
-Next, edit the database's `postgresql.conf`.  This is found on Ubuntu systems in `/etc/postgresql/<ver>/<cluster>`, where `<ver>` and `<cluster>` are what are reported in the `pg_lscluster` output.  So, for the above example, the file is `/etc/postgresql/12/main/postgresql.conf`. 
+接下來，編輯資料庫的`postgresql.conf`。  這可以在 Ubuntu 系統的 `/etc/postgresql/<ver>/<cluster>` 中找到，其中 `<ver>` 和 `<cluster>` 是 `pg_lscluster` 輸出中報告的內容。  因此，對於上面的範例，檔案是`/etc/postgresql/12/main/postgresql.conf`。
 
-In this file, look for the line with `listen_addresses`.  For example:
+在此檔案中，尋找帶有 `listen_addresses` 的行。  例如：
 
 ```
 listen_address = 'localhost'    # What IP address(es) to listen on;
@@ -158,66 +167,68 @@ listen_address = 'localhost'    # What IP address(es) to listen on;
 ```
 
 ```{warning}
-  Misconfiguring the wrong cluster may cause problems
-  with existing clusters.
+錯誤設定錯誤的叢集可能會導致問題
+  與現有叢集。
 ```
 
-Also, note the line with `port =` and keep the port number in mind.
+另外，請記下帶有 `port =` 的行並記住連線埠號碼。
 
-Set `listen_addresses` to `'*'`.  This permits postgresql to accept connections
-on any interface.
+將 `listen_addresses` 設定為 `'*'`。  這允許 postgresql 接受連線
+在任何介面上。
 
 ```{warning}
-  Setting `listen_addresses` to `'*'` opens a port on all interfaces.  If your
-  server has access to the Internet, ensure your firewall is configured
-  appropriately to limit access to this port as necessary.  (You may also list
-  explicit addresses and subnets to listen.  See the postgresql documentation
-  for more details.)
+將 `listen_addresses` 設定為 `'*'` 將在所有介面上開啟一個連線埠。  如果你的
+  伺服器可以存取網際網路，確保您的防火牆已設定
+  根據需要適當限制對此連線埠的存取。  （您也可以列出
+  要偵聽的明確位址和子網路。  請參閱 postgresql 文件
+  瞭解更多詳情。）
 ```
 
-Finally, modify the `pg_hba.conf` (in the same directory as `postgresql.conf`). Look for a line with:
+最後修改`pg_hba.conf`（與`postgresql.conf`同目錄）。尋找包含以下內容的行：
 ```
 # IPv4 local connections:
 host    all             all             127.0.0.1/32            md5
 ```
-Add a line with:
+新增一行：
 ```
 host    all             all             0.0.0.0/0               md5
 ```
 
 ```{warning}
-  This permits incoming connections from *all* IPs.  See
-  the PosgreSQL documentation on how to limit this.
+這允許來自*所有* IP 的傳入連線。  參見
+  有關如何限制此行為的 PosgreSQL 檔案。
 ```
 
-Now, restart your cluster:
+現在，重新啟動叢集：
 ```bash
 $ pg_ctlcluster 12 main restart
 ```
 
-Finally, update the database settings in your Evennia secret_settings.py (as described [above](#evennia-postgresql-configuration) modifying `SERVER` and `PORT` to match your server. 
+最後，更新 Evennia secret_settings.py 中的資料庫設定（如上所述）(#evennia-postgresql-configuration)，修改 `SERVER` 和 `PORT` 以符合您的伺服器。
 
-Now your Evennia installation should be able to connect and talk with a remote server.
+現在您的 Evennia 安裝應該能夠連線遠端伺服器並與其通訊。
 
+(mysql-mariadb)=
 ## MySQL / MariaDB
 
-[MySQL](https://www.mysql.com/) is a commonly used proprietary database system, on par with PostgreSQL. There is an open-source alternative called [MariaDB](https://mariadb.org/) that mimics all functionality and command syntax of the former. So this section covers both.
+[MySQL](https://www.mysql.com/) 是常用的專有資料庫系統，與PostgreSQL 同等。有一個名為 [MariaDB](https://mariadb.org/) 的開源替代方案，它模仿了前者的所有功能和指令語法。所以本節涵蓋了兩者。
 
-### Installing and initial setup of MySQL/MariaDB
+(installing-and-initial-setup-of-mysqlmariadb)=
+### MySQL/MariaDB 的安裝和初始設定
 
- First, install and setup MariaDB or MySQL for your specific server. Linux users should look for the `mysql-server` or `mariadb-server` packages for their respective distributions. Windows/Mac users will find what they need from the [MySQL downloads](https://www.mysql.com/downloads/) or [MariaDB downloads](https://mariadb.org/download/) pages. You also need the respective database clients (`mysql`, `mariadb-client`), so you can setup the database itself. When you install the server you should usually be asked to set up the database root user and password.
+首先，為您的特定伺服器安裝並設定 MariaDB 或 MySQL。 Linux 使用者應尋找各自發行版的 `mysql-server` 或 `mariadb-server` 軟體套件。 Windows/Mac 使用者可以從 [MySQL 下載](https://www.mysql.com/downloads/) 或 [MariaDB 下載](https://mariadb.org/download/) 頁面找到他們需要的內容。您還需要相應的資料庫使用者端（`mysql`、`mariadb-client`），以便您可以設定資料庫本身。當您安裝伺服器時，通常會要求您設定資料庫 root 使用者和密碼。
 
-Finally, you will also need a Python interface to allow Evennia to talk to the database. Django recommends the  `mysqlclient` one. Install this into the evennia virtualenv with `pip install mysqlclient`.
+最後，您還需要一個 Python 介面來允許 Evennia 與資料庫對話。 Django 推薦`mysqlclient` 之一。使用 `pip install mysqlclient` 將其安裝到 evennia virtualenv 中。
 
-Start the database client (this is named the same for both mysql and mariadb):
+啟動資料庫客戶端（mysql 和 mariadb 的名稱相同）：
 
 ```bash
 mysql -u root -p
 ```
 
-You should get to enter your database root password (set this up when you installed the database server).
+您應該輸入資料庫根密碼（在安裝資料庫伺服器時設定）。
 
-Inside the database client interface:
+資料庫客戶端介面內部：
 
 ```sql
 CREATE USER 'evennia'@'localhost' IDENTIFIED BY 'somepassword';
@@ -228,17 +239,18 @@ GRANT ALL PRIVILEGES ON evennia.* TO 'evennia'@'localhost';
 FLUSH PRIVILEGES;
 -- use 'exit' to quit client
 ```
-[Here](https://gist.github.com/hofmannsven/9164408) is a mysql command cheat sheet.
+[這裡](https://gist.github.com/hofmannsven/9164408) 是 mysql 指令備忘單。
 
-Above we created a new local user and database (we called both 'evennia' here, you can name them what you prefer). We set the character set to `utf8` to avoid an issue with prefix character length that can pop up on some installs otherwise. Next we grant the 'evennia' user all privileges on the `evennia` database and make sure the privileges are applied. Exiting the client brings us back to the normal terminal/console.
+上面我們建立了一個新的本地使用者和資料庫（我們在這裡將它們命名為“evennia”，您可以將它們命名為您喜歡的名稱）。我們將字元集設定為 `utf8` 以避免在某些安裝中可能出現的字首字元長度問題。接下來，我們授予「evennia」使用者對 `evennia` 資料庫的所有許可權，並確保應用這些許可權。退出客戶端使我們回到正常的終端機/控制檯。
 
-> If you are not using MySQL for anything else you might consider granting the 'evennia' user full privileges with `GRANT ALL PRIVILEGES ON *.* TO 'evennia'@'localhost';`. If you do, it means you can use `evennia dbshell` later to connect to mysql, drop your database and re-create it as a way of easy reset. Without this extra privilege you will be able to drop the database but not re create it without first switching to the database-root user.
+> 如果您沒有將 MySQL 用於其他用途，您可以考慮使用 `GRANT ALL PRIVILEGES ON *.* TO 'evennia'@'localhost';` 授予「evennia」使用者完全許可權。如果這樣做，這意味著您可以稍後使用 `evennia dbshell` 連線到 mysql，刪除資料庫並重新建立它作為輕鬆重置的方式。如果沒有這個額外的許可權，您將能夠刪除資料庫，但在不先切換到資料庫根使用者的情況下無法重新建立它。
 
-### Add MySQL/MariaDB configuration to Evennia
+(add-mysqlmariadb-configuration-to-evennia)=
+### 將 MySQL/MariaDB 設定新增至 Evennia
 
-To tell Evennia to use your new database you need to edit `mygame/server/conf/settings.py` (or `secret_settings.py` if you don't want your db info passed around on git repositories).
+要告訴 Evennia 使用您的新資料庫，您需要編輯 `mygame/server/conf/settings.py` （如果您不希望您的資料庫資訊在 git 儲存庫上傳遞，則編輯 `secret_settings.py`）。
 
-> The Django documentation suggests using an external `db.cnf` or other external conf- formatted file. Evennia users have however found that this leads to problems (see e.g. [issue #1184](https://git.io/vQdiN)). To avoid trouble we recommend you simply put the configuration in your settings as below.
+> Django 檔案建議使用外部 `db.cnf` 或其他外部設定檔。然而，Evennia 使用者發現這會導致問題（請參閱 e.g。[問題 #1184](https://git.io/vQdiN)）。為了避免麻煩，我們建議您只需將設定放入您的設定中，如下所示。
 
 ```python
     #
@@ -255,24 +267,26 @@ To tell Evennia to use your new database you need to edit `mygame/server/conf/se
        }
     }
 ```
-The `mysql` backend is used by `MariaDB` as well.
+`mysql` 後端也由 `MariaDB` 使用。
 
-Change this to fit your database setup. Next, run:
+更改此設定以適合您的資料庫設定。接下來，執行：
 
     evennia migrate
     
-to populate your database. Should you ever want to inspect the database directly you can from now on also use 
+填充您的資料庫。如果您想直接檢查資料庫，從現在開始也可以使用
  
     evennia dbshell
 
-as a shortcut to get into the postgres command line for the right database and user.
+作為進入正確資料庫和使用者的 postgres 指令列的捷徑。
 
-With the database setup you should now be able to start start Evennia normally with your new database.
+透過資料庫設定，您現在應該能夠正常啟動新資料庫的 Evennia。
 
-### Resetting MySQL/MariaDB
+(resetting-mysqlmariadb)=
+### 正在重置MySQL/MariaDB
 
-If you want to reset your MySQL/MariaDB datbase, see [here](./Updating-Evennia.md#mysql-mariadb). 
+如果您想重設 MySQL/MariaDB 資料庫，請參閱[此處](./Updating-Evennia.md#mysql-mariadb)。
 
-## Other databases
+(other-databases)=
+## 其他資料庫
 
-No testing has been performed with Oracle, but it is also supported through Django. There are community maintained drivers for [MS SQL](https://code.google.com/p/django-mssql/) and possibly a few others. If you try other databases out, consider contributing to this page with instructions. 
+尚未使用 Oracle 進行測試，但也透過 Django 支援。有 [MS SQL](https://code.google.com/p/django-mssql/) 以及可能還有其他一些社群維護的驅動程式。如果您嘗試其他資料庫，請考慮為此頁面提供說明。

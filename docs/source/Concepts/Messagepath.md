@@ -1,4 +1,5 @@
-# The Message path
+(the-message-path)=
+# 訊息路徑
 
 ```shell
 > look
@@ -11,11 +12,12 @@ You see: a flower
 Exits: north, east
 ```
 
-When you send a command like `look` into Evennia - what actually happens? How does that `look` string end up being handled by the `CmdLook` class? What happens when we use e.g. `caller.msg()` to send the message back?
+當您將 `look` 之類的指令傳送到 Evennia 時 - 實際會發生什麼？ `CmdLook` 類別最終如何處理 `look` 字串？當我們使用 e.g 時會發生什麼。 `caller.msg()` 發回訊息嗎？
 
-Understanding this flow of data - the _message path_ is important in order to understand how Evennia works.
+瞭解此資料流 - _訊息路徑_ 對於理解 Evennia 的工作原理非常重要。
 
-## Ingoing message path 
+(ingoing-message-path)=
+## 傳入訊息路徑
 
 ```
             Internet│
@@ -27,48 +29,51 @@ Understanding this flow of data - the _message path_ is important in order to un
                     │Evennia
 ```
 
-### Incoming command tuples 
+(incoming-command-tuples)=
+### 傳入指令元組
 
-Ingoing data from the client (coming in as raw strings or serialized JSON) is converted by Evennia to a `commandtuple`. Thesa are the same regardless of what client or connection was used. A `commandtuple` is a simple tuple with three elements: 
+來自用戶端的傳入資料（作為原始字串或序列化 JSON 傳入）將以 Evennia 轉換為 `commandtuple`。無論使用什麼用戶端或連線，主題都是相同的。 `commandtuple` 是一個包含三個元素的簡單元組：
 
 ```python
 (commandname, (args), {kwargs})
 ```
 
-For the `look`-command (and anything else written by the player), the `text` `commandtuple` is generated: 
+對於 `look` 指令（以及玩家編寫的任何其他指令），將產生 `text` `commandtuple`：
 
 ```python
 ("text", ("look",), {})
 ```
 
-### Inputfuncs 
+(inputfuncs)=
+### 輸入函式
 
-On the Evennia server side, a list of [inputfuncs](../Components/Inputfuncs.md) are registered. You can add your own by extending `settings.INPUT_FUNC_MODULES`.
+在 Evennia 伺服器端，註冊了 [inputfuncs](../Components/Inputfuncs.md) 清單。您可以透過擴充套件 `settings.INPUT_FUNC_MODULES` 新增您自己的。
 
 ```python
 inputfunc_commandname(session, *args, **kwargs)
 ```
-Here the `session` represents the unique client connection this is coming from (that is, it's identifying just _who_ is sending this input). 
+這裡的 `session` 表示來自的唯一用戶端連線（也就是說，它僅標識_誰_正在傳送此輸入）。
 
-One such inputfunc is named `text`. For sending a `look`, it will be called as 
+其中一種輸入函式名為 `text`。對於傳送`look`，它將被稱為
 ```{sidebar}
-If you know how `*args` and `**kwargs` work in Python, you'll see that this is the same as a call `text(session, "look")`
+如果您知道 `*args` 和 `**kwargs` 在 Python 中如何運作，您會發現這與呼叫 `text(session, "look")` 相同
 ```
 
 ```python
 text(session, *("look",), **{})  
 ```
 
-What an `inputfunc` does with this depends. For an [Out-of-band](./OOB.md) instruction, it could fetch the health of a player or tick down some counter. 
+`inputfunc` 對此的作用取決於。對於[帶外](./OOB.md)指令，它可以取得玩家的生命值或減少某些計數器的值。
 
-```{sidebar} No text parsing happens before this
-If you send `look here`, the call would be `text(session, *("look here", **{})`. All parsing of the text input happens in the command-parser, after this step.
+```{sidebar} 在此之前沒有發生任何文字解析
+如果您傳送 `look here`，則呼叫將為 `text(session, *("look here", **{})`。在此步驟之後，所有文字輸入的解析都發生在指令解析器中。
 ```
-For the `text` `inputfunc` the Evennia [CommandHandler](../Components/Commands.md) is invoked and the argument is parsed further in order to figure which command was intended. 
+對於 `text` `inputfunc`，將呼叫 Evennia [CommandHandler](../Components/Commands.md) 並進一步分析引數，以便確定要執行哪個指令。
 
-In the example of `look`, the `CmdLook` command-class will be invoked. This will retrieve the description of the current location.
+在 `look` 的範例中，將呼叫 `CmdLook` 指令類別。這將檢索當前位置的描述。
 
-## Outgoing message path
+(outgoing-message-path)=
+## 傳出訊息路徑
 
 ```
             Internet│
@@ -80,62 +85,66 @@ In the example of `look`, the `CmdLook` command-class will be invoked. This will
                     │Evennia
 ```
 
-### `msg`  to outgoing commandtuple
+(msg-to-outgoing-commandtuple)=
+### `msg` 到傳出指令元組
 
-When the `inputfunc` has finished whatever it is supposed to, the server may or may not decide to return a result (Some types of `inputcommands` may not expect or require a response at all). The server also often sends outgoing messages without any prior matching ingoing data.
+當 `inputfunc` 完成了它應該做的事情時，伺服器可能會也可能不會決定回傳結果（某些型別的 `inputcommands` 可能根本不期望或不需要回應）。伺服器也經常在沒有任何先前匹配的傳入資料的情況下傳送傳出訊息。
 
-Whenever data needs to be sent "out" of Evennia,  we must generalize it into a (now outgoing) `commandtuple` `(commandname, (args), {kwargs})`. This we do with the  `msg()` method. For convenience, this methods is available on every major entity, such as `Object.msg()` and `Account.msg()`. They all link back to `Session.msg()`.
+每當需要將資料「傳送」到 Evennia 時，我們必須將其概括為（現在正在傳出）`commandtuple` `(commandname, (args), {kwargs})`。我們使用 `msg()` 方法來做到這一點。為了方便起見，每個主要實體都可以使用此方法，例如 `Object.msg()` 和 `Account.msg()`。它們都連結回`Session.msg()`。
 
 ```python
 msg(text=None, from_obj=None, session=None, options=None, **kwargs)
 ```
 
-`text` is so common that it is given as the default: 
+`text` 非常常見，因此它被作為預設值：
 
 ```python
 msg("A meadow\n\nThis is a beautiful meadow...")
 ```
 
-This is converted to a `commandtuple`  looking like this:
+這將轉換為 `commandtuple`，如下所示：
 ```python
 ("text", ("A meadow\n\nThis is a beutiful meadow...",) {})
 ```
 
-The `msg()` method allows you to define the `commandtuple` directly, for whatever outgoing instruction you want to find: 
+`msg()` 方法可讓您直接定義 `commandtuple`，用於您想要尋找的任何傳出指令：
 
 ```python
 msg(current_status=(("healthy", "charged"), {"hp": 12, "mp": 20}))
 ```
 
-This will be converted to a `commandtuple` looking like this: 
+這將轉換為 `commandtuple`，如下所示：
 
 ```python
 ("current_status", ("healthy", "charged"), {"hp": 12, "mp": 20})
 ```
 
-### outputfuncs 
+(outputfuncs)=
+### 輸出函式
 
 ```{sidebar}
-`outputfuncs` are tightly coupled to the protocol and you usually don't need to touch them, unless you are [adding a new protocol](./Protocols.md) entirely.
+`outputfuncs` 與協議緊密耦合，您通常不需要接觸它們，除非您完全[新增協議](./Protocols.md)。
 ```
-Since `msg()` is aware of which [Session](../Components/Sessions.md) to send to, the outgoing `commandtuple` is always end up pointed at the right client. 
+由於 `msg()` 知道要傳送到哪一個 [Session](../Components/Sessions.md)，因此傳出的 `commandtuple` 最終總是指向正確的用戶端。
 
-Each supported Evennia Protocol (Telnet, SSH, Webclient etc) has their own `outputfunc`, which converts the generic `commandtuple` into a form that particular protocol understands, such as telnet instructions or JSON. 
+每個受支援的 Evennia 協定（Telnet、SSH、Webclient 等）都有自己的 `outputfunc`，它將通用 `commandtuple` 轉換為特定協定可以理解的形式，例如 telnet 指令或 JSON。
 
-For telnet (no SSL), the `look` will return over the wire as plain text:
+對於 telnet（無 SSL），`look` 將透過線路以純文字形式傳回：
 
     A meadow\n\nThis is a beautiful meadow...
 
-When sending to the webclient, the `commandtuple` is converted as serialized JSON, like this:
+當傳送到 webclient 時，`commandtuple` 被轉換為序列化的 JSON，如下所示：
 
     '["look", ["A meadow\\n\\nThis is a beautiful meadow..."], {}]'
 
-This is then sent to the client over the wire. It's then up to the client to interpret and handle the data properly.
+然後透過線路將其傳送到用戶端。然後由客戶來正確解釋和處理資料。
 
 
-## Components along the path
+(components-along-the-path)=
+## 沿路徑的元件
 
-### Ingoing 
+(ingoing)=
+### 傳入
 
 ```
                 ┌──────┐                ┌─────────────────────────┐
@@ -155,15 +164,16 @@ This is then sent to the client over the wire. It's then up to the client to int
 └─────────────────────────┘             └─────────────────────────┘
 ```
 
-1. Client - sends handshake or commands over the wire. This is received by the Evennia [Portal](../Components/Portal-And-Server.md).
-2. `PortalSession` represents one client connection. It understands the communiation protocol used. It converts the protocol-specific input to a generic  `commandtuple` structure `(cmdname, (args), {kwargs})`. 
-3. `PortalSessionHandler` handles all connections. It pickles the `commandtuple` together with the session-id. 
-4.  Pickled data is sent  across the `AMP` (Asynchronous Message Protocol) connection to the [Server](Server-And-Portal) part of Evennia.
-5. `ServerSessionHandler` unpickles the `commandtuple` and matches the session-id to a matching `SessionSession`.
-6. `ServerSession` represents the session-connection on the Server side. It looks through its registry of [Inputfuncs](../Components/Inputfuncs.md) to find a match. 
-7. The appropriate `Inputfunc` is called with the args/kwargs included in the `commandtuple`. Depending on `Inputfunc`, this could have different effects. For the `text` inputfunc, it fires the [CommandHandler](../Components/Commands.md).
+1. 用戶端 - 透過線路傳送握手或指令。此資訊由 Evennia [Portal](../Components/Portal-And-Server.md) 接收。
+2. `PortalSession`代表一個用戶端連線。它瞭解所使用的通訊協定。它將協定特定的輸入轉換為通用的 `commandtuple` 結構 `(cmdname, (args), {kwargs})`。
+3. `PortalSessionHandler` 處理所有連線。它將 `commandtuple` 與 session-id 一起醃製。
+4.  Pickled 資料透過 `AMP`（非同步訊息協定）連線傳送到 Evennia 的 [伺服器](Server-And-Portal) 部分。
+5. `ServerSessionHandler` 取消 `commandtuple` 並將 session-id 與匹配的 `SessionSession` 進行配對。
+6. `ServerSession`代表伺服器端的session-連線。它透過其登錄檔 [Inputfuncs](../Components/Inputfuncs.md) 來尋找匹配項。
+7. 使用 `commandtuple` 中包含的 args/kwargs 呼叫適當的 `Inputfunc`。根據`Inputfunc`，這可能會產生不同的效果。對於 `text` inputfunc，它會觸發 [CommandHandler](../Components/Commands.md)。
 
-### Outgoing 
+(outgoing)=
+### 傳出
 
 ```
                 ┌──────┐                ┌─────────────────────────┐
@@ -183,10 +193,10 @@ This is then sent to the client over the wire. It's then up to the client to int
 └─────────────────────────┘             └─────────────────────────┘
 ```
 
-1. The `msg()` method is called
-2. `ServerSession` and in particular `ServerSession.msg()`  is the central point through which all `msg()` calls are routed in order to send data to that [Session](../Components/Sessions.md). 
-3. `ServerSessionHandler` converts the `msg` input to a proper `commandtuple` structure `(cmdname, (args), {kwargs})`.   It pickles the `commandtuple` together with the session-id.
-4.  Pickled data is sent across across the `AMP` (Asynchronous Message Protocol) connection to the [Portal](Server-And-Portal) part of Evennia.
-5. `PortalSessionHandler` unpickles the `commandtuple` and matches its session id to a matching `PortalSession`.
-6. The `PortalSession` is now responsible for converting the generic `commandtuple` to the communication protocol used by that particular connection.
-7. The Client receives the data and can act on it. 
+1. `msg()` 方法被呼叫
+2. `ServerSession`，特別是 `ServerSession.msg()` 是中心點，所有 `msg()` 呼叫都透過它進行路由，以便將資料傳送到該 [Session](../Components/Sessions.md)。
+3. `ServerSessionHandler` 將`msg` 輸入轉換為正確的`commandtuple` 結構`(cmdname, (args), {kwargs})`。   It pickles the `commandtuple` together with the session-id.
+4.  Pickled 資料透過 `AMP`（非同步訊息協定）連線傳送到 Evennia 的 [Portal](Server-And-Portal) 部分。
+5. `PortalSessionHandler` 取消 `commandtuple` 並將其 session id 與匹配的 `PortalSession` 進行配對。
+6. `PortalSession` 現在負責將通用 `commandtuple` 轉換為該特定連線使用的通訊協定。
+7. 用戶端接收資料並可以對其採取行動。

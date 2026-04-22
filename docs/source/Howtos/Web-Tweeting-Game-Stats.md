@@ -1,10 +1,11 @@
-# Automatically Tweet game stats
+(automatically-tweet-game-stats)=
+# 自動發布遊戲統計資料
 
 
-This tutorial will create a simple script that will send a tweet to your already configured twitter account. Please see: [How to connect Evennia to Twitter](../Setup/Channels-to-Twitter.md) if you haven't already done so.
+本教學將建立一個簡單的 script ，它將向您已設定的 Twitter 帳戶傳送推文。如果您還沒有這樣做，請參閱：[如何將 Evennia 連線到 Twitter](../Setup/Channels-to-Twitter.md)。
 
-The script could be expanded to cover a variety of statistics you might wish to tweet about
-regularly, from player deaths to how much currency is in the economy etc.
+script 可以擴充套件涵蓋您可能希望發布推文的各種統計資料
+定期，從玩家死亡到經濟中有多少貨幣等。
 
 ```python
 # evennia/typeclasses/tweet_stats.py
@@ -73,14 +74,14 @@ class TweetStats(DefaultScript):
             logger.log_trace(f"Tweet Error: When attempting to tweet {tweet}")
 ```
 
-In the `at_script_creation` method, we configure the script to fire immediately (useful for testing)
-and setup the delay (1 day) as well as script information seen when you use `@scripts`
+在`at_script_creation`方法中，我們將script設定為立即觸發（對於測試有用）
+並設定延遲（1天）以及使用`@scripts`時看到的script訊息
 
-In the `at_repeat` method (which is called immediately and then at interval seconds later) we setup
-the Twitter API (just like in the initial configuration of twitter). We then show the number of Player Characters, Rooms and Other/Objects.
+在 `at_repeat` 方法中（立即呼叫，然後每隔幾秒鐘呼叫）我們設定
+Twitter API（就像 Twitter 的初始設定一樣）。然後我們顯示玩家角色、房間和其他/物體的數量。
 
-The [Scripts docs](../Components/Scripts.md) will show you how to add it as a Global script, however, for testing
-it may be useful to start/stop it quickly from within the game.  Assuming that you create the file
-as `mygame/typeclasses/tweet_stats.py` it can be started by using the following command
+[Scripts 檔案](../Components/Scripts.md) 將向您展示如何將其新增為全域 script，但是用於測試
+從遊戲中快速啟動/停止它可能很有用。  假設您建立該檔案
+如 `mygame/typeclasses/tweet_stats.py` 可以使用以下指令啟動
 
     script Here = tweet_stats.TweetStats

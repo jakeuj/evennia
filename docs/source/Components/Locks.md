@@ -1,28 +1,30 @@
-# Locks
+(locks)=
+# 鎖具
 
 
-For most games it is a good idea to restrict what people can do. In Evennia such restrictions are applied and checked by something called *locks*. All Evennia entities ([Commands](./Commands.md), [Objects](./Objects.md), [Scripts](./Scripts.md), [Accounts](./Accounts.md), [Help System](./Help-System.md), [messages](./Msg.md) and [channels](./Channels.md)) are accessed through locks. 
+對於大多數遊戲來說，限制人們可以做的事情是個好主意。在 Evennia 中，此類限制由稱為「鎖」的東西應用和檢查。所有 Evennia)、[Scripts](./Scripts.md)、[帳戶](./Accounts.md)、[幫助系統](./Help-System.md)、[訊息](./Msg.md) 和 [通道](./Channels.md) 均透過鎖定存取。
 
-A lock can be thought of as an "access rule" restricting a particular use of an Evennia entity.
-Whenever another entity wants that kind of access the lock will analyze that entity in different ways to determine if access should be granted or not. Evennia implements a "lockdown" philosophy - all entities are inaccessible unless you explicitly define a lock that allows some or full access.
+lock 可以被視為限制 Evennia 實體的特定使用的「存取規則」。
+每當另一個實體想要這種存取許可權時，lock 將以不同的方式分析該實體，以確定是否應授予存取許可權。 Evennia 實現了「鎖定」理念 - 所有實體都不可訪問，除非您明確定義允許部分或完全訪問的 lock。
 
-Let's take an example: An object has a lock on itself that restricts how people may "delete" that object. Apart from knowing that it restricts deletion, the lock also knows that only players with the specific ID of, say, `34` are allowed to delete it. So whenever a player tries to run `delete` on the object, the `delete` command makes sure to check if this player is really allowed to do so. It calls the lock, which in turn checks if the player's id is `34`. Only then will it allow `delete` to go on with its job.
+讓我們舉個例子：一個物件本身有一個lock，它限制了人們「刪除」該物件的方式。除了知道它限制刪除之外，lock 還知道只有特定 ID（例如 `34`）的玩家才允許刪除它。因此，每當玩家嘗試在物件上執行 `delete` 時，`delete` 指令都會確保檢查該玩家是否真的被允許這樣做。它呼叫 lock，後者檢查玩家的 id 是否為 `34`。只有這樣，它才會允許 `delete` 繼續其工作。
 
-## Working with locks
+(working-with-locks)=
+## 使用鎖
 
-The in-game command for setting locks on objects is `lock`:
+遊戲中設定物件鎖定的指令是`lock`：
 
      > lock obj = <lockstring>
 
-The `<lockstring>` is a string of a certain form that defines the behaviour of the lock. We will go into more detail on how `<lockstring>` should look in the next section.
+`<lockstring>` 是某種形式的字串，定義了 lock 的行為。我們將在下一節中更詳細地介紹 `<lockstring>` 的外觀。
 
-Code-wise, Evennia handles locks through what is usually called `locks` on all relevant entities. This is a handler that allows you to add, delete and check locks.
+從程式碼角度來看，Evennia 透過所有相關實體上通常稱為 `locks` 的方式處理鎖定。這是一個允許您新增、刪除和檢查鎖定的處理程式。
 
 ```python
      myobj.locks.add(<lockstring>)
 ```
 
-One can call `locks.check()` to perform a lock check, but to hide the underlying implementation all objects also have a convenience function called `access`. This should preferably be used. In the example below, `accessing_obj` is the object requesting the 'delete' access whereas `obj` is the object that might get deleted. This is how it would look (and does look) from inside the `delete` command:
+人們可以呼叫 `locks.check()` 來執行 lock 檢查，但為了隱藏底層實現，所有物件還具有一個名為 `access` 的便利函式。最好應該使用這個。在下面的範例中，`accessing_obj` 是請求「刪除」存取的物件，而 `obj` 是可能被刪除的物件。這就是 `delete` 指令內部的樣子（而且確實如此）：
 
 ```python
      if not obj.access(accessing_obj, 'delete'):
@@ -30,12 +32,13 @@ One can call `locks.check()` to perform a lock check, but to hide the underlying
          return
 ```
 
-### Defining locks
+(defining-locks)=
+### 定義鎖
 
-Defining a lock (i.e. an access restriction) in Evennia is done by adding simple strings of lock
-definitions to the object's `locks` property using `obj.locks.add()`.
+在 Evennia 中定義 lock（i.e。存取限制）是透過新增 lock 的簡單字串來完成的
+使用 `obj.locks.add()` 定義物件的 `locks` 屬性。
 
-Here are some examples of lock strings (not including the quotes):
+以下是 lock 字串的一些範例（不包括引號）：
 
 ```python
      delete:id(34)   # only allow obj #34 to delete
@@ -44,77 +47,79 @@ Here are some examples of lock strings (not including the quotes):
      get: not attr(very_weak) or perm(Admin)
 ```
 
-Formally, a lockstring has the following syntax:
+形式上，鎖字串具有以下語法：
 
 ```python
      access_type: [NOT] lockfunc1([arg1,..]) [AND|OR] [NOT] lockfunc2([arg1,...]) [...]
 ```
 
-where `[]` marks optional parts. `AND`, `OR` and `NOT` are not case sensitive and excess spaces are ignored. `lockfunc1, lockfunc2` etc are special _lock functions_ available to the lock system.
+其中 `[]` 標記可選部分。 `AND`、`OR` 和 `NOT` 不區分大小寫，多餘的空格將被忽略。 `lockfunc1, lockfunc2` 等是 lock 系統可用的特殊_鎖定函式_。
 
-So, a lockstring consists of the type of restriction (the `access_type`), a colon (`:`) and then an expression involving function calls that determine what is needed to pass the lock. Each function returns either `True` or `False`. `AND`, `OR` and `NOT` work as they do normally in Python. If the total result is `True`, the lock is passed.
+因此，鎖字串由限制型別（`access_type`）、冒號（`:`）和涉及函式呼叫的表示式組成，該函式呼叫確定透過lock 所需的內容。每個函式傳回 `True` 或 `False`。 `AND`、`OR` 和 `NOT` 的運作方式與 Python 中的正常運作方式相同。如果總結果是`True`，則lock透過。
 
-You can create several lock types one after the other by separating them with a semicolon (`;`) in the lockstring. The string below yields the same result as the previous example:
+您可以透過在鎖定字串中以分號 (`;`) 分隔來依序建立多個 lock 型別。下面的字串產生與前面的範例相同的結果：
 
     delete:id(34);edit:all();get: not attr(very_weak) or perm(Admin)
 
 
-### Valid access_types
+(valid-access_types)=
+### 有效access_types
 
-An `access_type`, the first part of a lockstring, defines what kind of capability a lock controls, such as "delete" or "edit". You may in principle name your `access_type` anything as long as it is unique for the particular object. The name of the access types is not case-sensitive.
+`access_type` 是鎖定字串的第一部分，定義 lock 控制哪種功能，例如「刪除」或「編輯」。原則上您可以為 `access_type` 命名任何名稱，只要它對於特定物件是唯一的即可。存取型別的名稱不區分大小寫。
 
-If you want to make sure the lock is used however, you should pick `access_type` names that you (or the default command set) actually checks for, as in the example of `delete` above that uses the 'delete' `access_type`.
+但是，如果您想確保使用 lock，則應選擇您（或預設指令集）實際檢查的 `access_type` 名稱，如上面使用「刪除」`access_type` 的 `delete` 範例。
 
-Below are the access_types checked by the default commandset.
+以下是預設指令集檢查的access_types。
 
-- [Commands](./Commands.md) 
-    - `cmd` - this defines who may call this command at all.
-- [Objects](./Objects.md): 
-    - `control` - who is the "owner" of the object. Can set locks, delete it etc. Defaults to the creator of the object.
-    - `call` - who may call Object-commands stored on this Object except for the Object itself. By default, Objects share their Commands with anyone in the same location (e.g. so you can 'press' a `Button` object in the room). For Characters and Mobs (who likely only use those Commands for themselves and don't want to share them) this should usually be turned off completely, using something like `call:false()`.
-    - `examine` - who may examine this object's properties.
-   - `delete` - who may delete the object.
-   - `edit` - who may edit properties and attributes of the object.
-   - `view` - if the `look` command will display/list this object in descriptions and if you will be able to see its description. Note that if you target it specifically by name, the system will still find it, just not be able to look at it. See `search` lock to completely hide the item.
-   - `search` - this controls if the object can be found with the `DefaultObject.search` method (usually referred to with `caller.search` in Commands). This is how to create entirely 'undetectable' in-game objects. If not setting this lock explicitly, all objects are assumed searchable.
-   - `get`- who may pick up the object and carry it around.
-   - `puppet` - who may "become" this object and control it as their "character".
-   - `attrcreate` - who may create new attributes on the object (default True)
-- [Characters](./Objects.md#characters):
-  - Same as for Objects
-- [Exits](./Objects.md#exits):
-  - Same as for Objects
-  - `traverse` - who may pass the exit.
-- [Accounts](./Accounts.md):
-  - `examine` - who may examine the account's properties.
-  - `delete` - who may delete the account.
-  - `edit` - who may edit the account's attributes and properties.
-  - `msg` - who may send messages to the account.
-  - `boot` - who may boot the account.
-- [Attributes](./Attributes.md): (only checked by `obj.secure_attr`)
-  - `attrread` - see/access attribute
-  - `attredit` - change/delete attribute
-- [Channels](./Channels.md):
-  - `control` - who is administrating the channel. This means the ability to delete the channel, boot listeners etc.
-  - `send` - who may send to the channel.
-  - `listen` - who may subscribe and listen to the channel.
+- [指令](./Commands.md)
+    - `cmd` - 這定義了誰可以呼叫此指令。
+- [物件](./Objects.md):
+    - `control` - 誰是物件的「所有者」。可以設定鎖、刪除等。預設為物件的建立者。
+    - `call` - 誰可以呼叫儲存在該物件上的物件指令（物件本身除外）。預設情況下，物件與同一位置的任何人共用其指令（e.g。因此您可以「按下」房間中的 `Button` 物件）。對於角色和生物（他們可能只為自己使用這些指令並且不想共享它們），通常應該完全關閉它，使用類似 `call:false()` 的東西。
+    - `examine` - 誰可以檢查該物件的屬性。
+   - `delete` - 誰可以刪除該物件。
+   - `edit` - 誰可以編輯物件的特性和屬性。
+   - `view` - `look` 指令是否會在描述中顯示/列出此物件，以及您是否能夠看到其描述。請注意，如果您專門透過名稱來定位它，系統仍然會找到它，只是無法檢視它。請參閱 `search` lock 以完全隱藏該專案。
+   - `search` - 這控制是否可以使用 `DefaultObject.search` 方法找到物件（通常在指令中以 `caller.search` 引用）。這就是建立完全「不可檢測」的遊戲內物件的方法。如果未明確設定此 lock，則假定所有物件均可搜尋。
+   - `get`- 誰可以撿起該物體並隨身攜帶。
+   - `puppet` - 誰可以「成為」這個物件並控制它作為他們的「角色」。
+   - `attrcreate` - 誰可以在物件上建立新屬性（預設 True）
+- [字](./Objects.md#characters):
+  - 與物件相同
+- [退出](./Objects.md#exits):
+  - 與物件相同
+  - `traverse` - 誰可以透過出口。
+- [帳戶](./Accounts.md):
+  - `examine` - 誰可以檢查帳戶的屬性。
+  - `delete` - 誰可以刪除該帳戶。
+  - `edit` - 誰可以編輯帳戶的屬性和特性。
+  - `msg` - 誰可以向該帳戶傳送訊息。
+  - `boot` - 誰可以啟動該帳戶。
+- [屬性](./Attributes.md)：（僅由`obj.secure_attr`檢查）
+  - `attrread` - 檢視/訪問 attribute
+  - `attredit` - 更改/刪除 attribute
+- [頻道](./Channels.md):
+  - `control` - 誰在管理頻道。這意味著能夠刪除頻道、啟動偵聽器等。
+  - `send` - 誰可以傳送到頻道。
+  - `listen` - 誰可以訂閱和收聽該頻道。
 - [HelpEntry](./Help-System.md):
-  - `view` - if the help entry header should show up in the help index
-  - `read` - who may view this help entry (usually everyone)
-  - `edit` - who may edit this help entry.
+  - `view` - 幫助條目標題是否應顯示在幫助索引中
+  - `read` - 誰可以檢視此幫助條目（通常是所有人）
+  - `edit` - 誰可以編輯此幫助條目。
 
-So to take an example, whenever an exit is to be traversed, a lock of the type *traverse* will be checked. Defining a suitable lock type for an exit object would thus involve a lockstring `traverse: <lock functions>`.
-### Custom access_types
+舉個例子，每當要遍歷出口時，都會檢查*traverse*型別的lock。因此，為退出物件定義適當的 lock 型別將涉及鎖定字串 `traverse: <lock functions>`。
+(custom-access_types)=
+### 自訂access_types
 
-As stated above, the `access_type` part of the lock is simply the 'name' or 'type' of the lock. The text is an arbitrary string that must be unique for an object. If adding a lock with the same `access_type` as one that already exists on the object, the new one override the old one. 
+如上所述，lock 的 `access_type` 部分只是 lock 的「名稱」或「型別」。文字是任意字串，對於物件來說必須是唯一的。如果新增與物件上已存在的`access_type` 相同的lock，則新的lock 會覆蓋舊的lock。
 
-For example, if you wanted to create a bulletin board system and wanted to restrict who can either read a board or post to a board. You could then define locks such as:
+例如，如果您想要建立一個公告板系統並想要限制誰可以閱讀公告板或在公告板上釋出。然後您可以定義鎖，例如：
 
 ```python
      obj.locks.add("read:perm(Player);post:perm(Admin)")
 ```
 
-This will create a 'read' access type for Characters having the `Player` permission or above and a 'post' access type for those with `Admin` permissions or above (see below how the `perm()` lock function works).  When it comes time to test these permissions, simply check like this (in this example, the `obj` may be a board on the bulletin board system and `accessing_obj` is the player trying to read the board):
+這將為具有 `Player` 或以上許可權的角色建立「讀取」存取型別，並為具有 `Admin` 或以上許可權的角色建立「發布」存取型別（請參閱下方 `perm()` lock 函式的工作原理）。  當需要測試這些許可權時，只需像這樣檢查（在本範例中，`obj` 可能是公告板系統上的一塊板，`accessing_obj` 是嘗試讀取板的玩家）：
 
 ```python
      if not obj.access(accessing_obj, 'read'):
@@ -122,23 +127,24 @@ This will create a 'read' access type for Characters having the `Player` permiss
          return
 ```
 
-### Lock functions
+(lock-functions)=
+### Lock 函式
 
-A _lock function_ is a normal Python function put in a place Evennia looks for such functions. The modules Evennia looks at is the list `settings.LOCK_FUNC_MODULES`. *All functions* in any of those modules will automatically be considered a valid lock function. The default ones are found in `evennia/locks/lockfuncs.py` and you can start adding your own in `mygame/server/conf/lockfuncs.py`. You can append the setting to add more module paths. To replace a default lock function, just add your own with the same name.
+_lock 函式_ 是一個普通的 Python 函式，放​​置在 Evennia 尋找此類函式的位置。模組Evennia檢視的是清單`settings.LOCK_FUNC_MODULES`。 *任何這些模組中的所有函式*將自動被視為有效的 lock 函式。預設值位於 `evennia/locks/lockfuncs.py` 中，您可以在 `mygame/server/conf/lockfuncs.py` 中開始新增自己的值。您可以附加設定以新增更多模組路徑。要替換預設的 lock 函式，只需新增您自己的同名函式即可。
 
-This is the basic definition of a lock function: 
+這是 lock 函式的基本定義：
 
 ```python 
 def lockfunc_name(accessing_obj, accessed_obj, *args, **kwargs):
     return True # or False
 ```
-The `accessing object` is the object wanting to get access.  The `accessed object` is the object being accessed (the object with the lock). The function always return a boolean determining if the lock is passed or not.
+`accessing object` 是想要存取的物件。  `accessed object` 是正在訪問的物件（帶有 lock 的物件）。該函式始終傳回一個布林值，確定 lock 是否透過。
 
-The `*args` will become the tuple of arguments given to the lockfunc. So for a lockstring `"edit:id(3)"` (a lockfunc named `id`), `*args` in the lockfunc would be `(3,)` . 
+`*args` 將成為賦予 lockfunc 的引數元組。因此，對於鎖定字串 `"edit:id(3)"` （名為 `id` 的 lockfunc）， lockfunc 中的 `*args` 將是 `(3,)` 。
 
-The `**kwargs` dict has one default keyword always provided by Evennia, the `access_type`, which is a string with the access type being checked for. For the lockstring `"edit:id(3)"`, `access_type"` would be `"edit"`. This is unused by default Evennia.
+`**kwargs` 字典有一個始終由 Evennia 提供的預設關鍵字，即 `access_type`，它是一個正在檢查存取型別的字串。對於鎖定字串 `"edit:id(3)"`，`access_type"` 將是 `"edit"`。預設未使用此值 Evennia。
 
-Any arguments explicitly given in the lock definition will appear as extra arguments. 
+lock 定義中明確給出的任何引數都會顯示為額外引數。
 
 ```python
 # A simple example lock function. Called with e.g. `id(34)`. This is
@@ -151,14 +157,14 @@ def id(accessing_obj, accessed_obj, *args, **kwargs):
     return False
 ```
 
-The above could for example be used in a lock function like this:
+例如，上面的內容可以用在 lock 函式中，如下所示：
 
 ```python
     # we have `obj` and `owner_object` from before
     obj.locks.add(f"edit: id({owner_object.id})")
 ```
 
-We could check if the "edit" lock is passed with something like this:
+我們可以檢查“edit”lock 是否透過，如下所示：
 
 ```python
     # as part of a Command's func() method, for example
@@ -167,32 +173,33 @@ We could check if the "edit" lock is passed with something like this:
         return
 ```
 
-In this example, everyone except the `caller` with the right `id` will get the error.
+在此範例中，除了具有正確 `id` 的 `caller` 之外，每個人都會收到錯誤。
 
-> (Using the `*` and `**` syntax causes Python to magically put all extra arguments into a list `args` and all keyword arguments into a dictionary `kwargs` respectively. If you are unfamiliar with how `*args` and `**kwargs` work, see the Python manuals).
+> （使用 `*` 和 `**` 語法會導致 Python 神奇地將所有額外引數分別放入清單 `args` 中，並將所有關鍵字引數放入字典 `kwargs` 中。如果您不熟悉 `*args` 和 `**kwargs` 的工作原理，請參閱 Python 手冊）。
 
-Some useful default lockfuncs (see `src/locks/lockfuncs.py` for more):
+一些有用的預設值lockfuncs（有關更多資訊，請參閱`src/locks/lockfuncs.py`）：
 
-- `true()/all()` - give access to everyone
-- `false()/none()/superuser()` - give access to none. Superusers bypass the check entirely and are thus the only ones who will pass this check.
-- `perm(perm)` - this tries to match a given `permission` property, on an Account firsthand, on a Character second. See [below](./Permissions.md).
-- `perm_above(perm)` - like `perm` but requires a "higher" permission level than the one given.
-- `id(num)/dbref(num)` - checks so the access_object has a certain dbref/id.
-- `attr(attrname)` - checks if a certain [Attribute](./Attributes.md) exists on accessing_object.
-- `attr(attrname, value)` - checks so an attribute exists on accessing_object *and* has the given value.
-- `attr_gt(attrname, value)` - checks so accessing_object has a value larger (`>`) than the given value.
-- `attr_ge, attr_lt, attr_le, attr_ne` - corresponding for `>=`, `<`, `<=` and `!=`.
-- `tag(tagkey[, category])` - checks if the accessing_object has the specified tag and optional category.
-- `objtag(tagkey[, category])` - checks if the *accessed_object* has the specified tag and optional category.
-- `objloctag(tagkey[, category])` - checks if the *accessed_obj*'s location has the specified tag and optional category.
-- `holds(objid)` - checks so the accessing objects contains an object of given name or dbref.
-- `inside()` - checks so the accessing object is inside the accessed object (the inverse of `holds()`).
-- `pperm(perm)`, `pid(num)/pdbref(num)` - same as `perm`, `id/dbref` but always looks for permissions and dbrefs of *Accounts*, not on Characters.
-- `serversetting(settingname, value)` - Only returns True if Evennia has a given setting or a setting set to a given value.
+- `true()/all()` - 授予所有人存取許可權
+- `false()/none()/superuser()` - 不授予任何存取許可權。超級使用者完全繞過檢查，因此是唯一能夠透過此檢查的使用者。
+- `perm(perm)` - 這嘗試匹配給定的 `permission` 屬性，首先在帳戶上，其次在角色上。參見[下文](./Permissions.md)。
+- `perm_above(perm)` - 與 `perm` 類似，但需要比給定的許可權等級「更高」的許可權。
+- `id(num)/dbref(num)` - 檢查 access_object 是否有特定的 dbref/id。
+- `attr(attrname)` - 檢查 accessing_object 上是否存在某個 [Attribute](./Attributes.md)。
+- `attr(attrname, value)` - 檢查 accessing_object 上是否存在 attribute *並且* 具有給定值。
+- `attr_gt(attrname, value)` - 檢查 accessing_object 的值是否大於給定值 (`>`)。
+- `attr_ge, attr_lt, attr_le, attr_ne` - 對應於 `>=`、`<`、`<=` 和 `!=`。
+- `tag(tagkey[, category])` - 檢查 accessing_object 是否有指定的 tag 和可選類別。
+- `objtag(tagkey[, category])` - 檢查 *accessed_object* 是否有指定的 tag 和選用類別。
+- `objloctag(tagkey[, category])` - 檢查 *accessed_obj* 的位置是否有指定的 tag 和可選類別。
+- `holds(objid)` - 檢查存取物件是否包含給定名稱或資料庫參考的物件。
+- `inside()` - 檢查訪問對像是否位於被訪問物件內部（`holds()` 的相反）。
+- `pperm(perm)`、`pid(num)/pdbref(num)` - 與 `perm`、`id/dbref` 相同，但始終尋找 *帳戶* 的許可權和 dbref，而不是字元。
+- `serversetting(settingname, value)` - 僅當 Evennia 具有給定設定或設定為給定值時才傳回 True。
 
-### Checking simple strings
+(checking-simple-strings)=
+### 檢查簡單字串
 
-Sometimes you don't really need to look up a certain lock, you just want to check a lockstring. A common use is inside Commands, in order to check if a user has a certain permission. The lockhandler has a method `check_lockstring(accessing_obj, lockstring, bypass_superuser=False)` that allows this.
+有時你並不真的需要查詢某個lock，你只是想檢查一個鎖定字串。常見用途是在指令內部，以檢查使用者是否具有特定許可權。鎖定處理程式有一個方法 `check_lockstring(accessing_obj, lockstring, bypass_superuser=False)` 允許這樣做。
 
 ```python
      # inside command definition
@@ -201,30 +208,32 @@ Sometimes you don't really need to look up a certain lock, you just want to chec
          return
 ```
 
-Note here that the `access_type` can be left to a dummy value since this method does not actually do a Lock lookup. 
+請注意，此處 `access_type` 可以保留為虛擬值，因為此方法實際上並未執行 Lock 查詢。
 
-### Default locks
+(default-locks)=
+### 預設鎖
 
-Evennia sets up a few basic locks on all new objects and accounts (if we didn't, noone would have any access to anything from the start).  This is all defined in the root [Typeclasses](./Typeclasses.md) of the respective entity, in the hook method `basetype_setup()` (which you usually don't want to edit unless you want to change how basic stuff like rooms and exits store their internal variables). This is called once, before `at_object_creation`, so just put them in the latter method on your child object to change the default. Also creation commands like `create` changes the locks of objects you create - for example it sets the `control` lock_type so as to allow you, its creator, to control and delete the object.
+Evennia 在所有新物件和帳戶上設定一些基本鎖（如果我們不這樣做，那麼從一開始就沒有人可以存取任何內容）。  這些都是在相應實體的根 [Typeclasses](./Typeclasses.md) 中定義的，在鉤子方法 `basetype_setup()` 中（您通常不想編輯它，除非您想更改房間和出口等基本內容儲存其內部變數的方式）。這在 `at_object_creation` 之前被呼叫一次，因此只需將它們放入子物件的後一個方法中即可更改預設值。此外，像 `create` 這樣的建立指令會更改您建立的物件的鎖定 - 例如，它設定 `control` lock_type 以便允許您（其建立者）控制和刪除該物件。
 
 
-## More Lock definition examples
+(more-lock-definition-examples)=
+## 更多 Lock 定義範例
 
     examine: attr(eyesight, excellent) or perm(Builders)
 
-You are only allowed to do *examine* on this object if you have 'excellent' eyesight (that is, has an Attribute `eyesight` with the value `excellent` defined on yourself) or if you have the "Builders" permission string assigned to you.
+只有當您具有「優秀」視力（即具有您自己定義的 Attribute `eyesight` 且值為 `excellent` 的值）或分配有「Builders」許可權字串時，您才可以對此物件進行*檢查*。
 
     open: holds('the green key') or perm(Builder)
 
-This could be called by the `open` command on a "door" object. The check is passed if you are a Builder or has the right key in your inventory.
+這可以透過「門」物件上的 `open` 指令來呼叫。如果您是建造者或庫存中有正確的鑰匙，則檢查透過。
 
     cmd: perm(Builders)
 
-Evennia's command handler looks for a lock of type `cmd` to determine if a user is allowed to even call upon a particular command or not.  When you define a command, this is the kind of lock you must set. See the default command set for lots of examples. If a character/account don't pass the `cmd` lock type the command will not even appear in their `help` list.
+Evennia 的指令處理程式會尋找 `cmd` 型別的 lock 以確定是否允許使用者呼叫特定指令。  當你定義一個指令時，這是你必須設定的lock。請參閱預設指令集以取得大量範例。如果角色/帳戶未透過 `cmd` lock 型別，則該指令甚至不會出現在其 `help` 清單中。
 
     cmd: not perm(no_tell)
 
-"Permissions" can also be used to block users or implement highly specific bans. The above example would be be added as a lock string to the `tell` command. This will allow everyone *not* having the "permission" `no_tell` to use the `tell` command. You could easily give an account the "permission" `no_tell` to disable their use of this particular command henceforth.
+「許可權」也可用於阻止使用者或實施高度具體的禁令。上面的範例將作為 lock 字串新增至 `tell` 指令中。這將允許每個*不*具有「許可權」`no_tell` 的人使用 `tell` 指令。您可以輕鬆地授予帳戶“許可權”`no_tell`，以禁止其使用此特定指令。
 
 
 ```python
@@ -234,21 +243,22 @@ Evennia's command handler looks for a lock of type `cmd` to determine if a user 
     new_obj.locks.add(lockstring)
 ```
 
-This is how the `create` command sets up new objects. In sequence, this permission string sets the owner of this object be the creator (the one  running `create`). Builders may examine the object whereas only Admins and the creator may delete it. Everyone can pick it up.
+這就是 `create` 指令設定新物件的方式。依序，此許可權字串將此物件的擁有者設定為建立者（執行 `create` 的人）。建構者可以檢查物件，而只有管理員和建立者可以刪除它。大家都可以撿起來。
 
-### A complete example of setting locks on an object
+(a-complete-example-of-setting-locks-on-an-object)=
+### 給物件設定鎖的完整範例
 
-Assume we have two objects - one is ourselves (not superuser) and the other is an [Object](./Objects.md)
-called `box`.
+假設我們有兩個物件 - 一個是我們自己（不是超級使用者），另一個是 [Object](./Objects.md)
+稱為`box`。
 
      > create/drop box
      > desc box = "This is a very big and heavy box."
 
-We want to limit which objects can pick up this heavy box. Let's say that to do that we require the would-be lifter to to have an attribute *strength* on themselves, with a value greater than 50. We assign it to ourselves to begin with.
+我們想要限制哪些物體可以拿起這個沉重的盒子。假設要做到這一點，我們要求未來的舉重運動員本身俱有 attribute *力量*，其值大於 50。我們首先將其分配給我們自己。
 
      > set self/strength = 45
 
-Ok, so for testing we made ourselves strong, but not strong enough.  Now we need to look at what happens when someone tries to pick up the the box - they use the `get` command (in the default set). This is defined in `evennia/commands/default/general.py`. In its code we find this snippet:
+好的，為了測試我們讓自己變得強大，但還不夠強大。  現在我們需要看看當有人試圖拿起盒子時會發生什麼 - 他們使用 `get` 指令（在預設設定中）。這是在 `evennia/commands/default/general.py` 中定義的。在它的程式碼中我們找到這個片段：
 
 ```python
     if not obj.access(caller, 'get'):
@@ -259,19 +269,19 @@ Ok, so for testing we made ourselves strong, but not strong enough.  Now we need
         return
 ```
 
-So the `get` command looks for a lock with the type *get* (not so surprising). It also looks for an [Attribute](./Attributes.md) on the checked object called _get_err_msg_ in order to return a customized error message. Sounds good! Let's start by setting that on the box:
+因此 `get` 指令會找出型別為 *get* 的 lock （這並不奇怪）。它也在名為 _get_err_msg_ 的已檢查物件上尋找 [Attribute](./Attributes.md)，以便傳回自訂錯誤訊息。聽起來不錯！讓我們從在盒子上設定它開始：
 
      > set box/get_err_msg = You are not strong enough to lift this box.
 
-Next we need to craft a Lock of type *get* on our box. We want it to only be passed if the accessing object has the attribute *strength* of the right value. For this we would need to create a lock function that checks if attributes have a value greater than a given value. Luckily there is already such a one included in Evennia (see `evennia/locks/lockfuncs.py`), called `attr_gt`.
+接下來我們需要在我們的盒子上製作一個*get*型別的Lock。我們希望僅當訪問物件具有正確值的 attribute *強度* 時才傳遞它。為此，我們需要建立一個 lock 函式來檢查屬性的值是否大於給定值。幸運的是，Evennia 中已經包含了這樣一個（參見 `evennia/locks/lockfuncs.py`），稱為 `attr_gt`。
 
-So the lock string will look like this: `get:attr_gt(strength, 50)`.  We put this on the box now:
+因此 lock 字串將如下所示：`get:attr_gt(strength, 50)`。  我們現在把它放在盒子上：
 
      lock box = get:attr_gt(strength, 50)
 
-Try to `get` the object and you should get the message that we are not strong enough. Increase your strength above 50 however and you'll pick it up no problem. Done! A very heavy box!
+嘗試`get`該物體，你應該會收到我們不夠強大的訊息。然而，將你的力量提高到 50 以上，你就會毫無問題地拿起它。完畢！好重的一個箱子！
 
-If you wanted to set this up in python code, it would look something like this:
+如果你想在 python 程式碼中設定它，它看起來像這樣：
 
 ```python
 
@@ -291,8 +301,9 @@ If you wanted to set this up in python code, it would look something like this:
     # one heavy box, ready to withstand all but the strongest...
 ```
 
-## On Django's permission system
+(on-djangos-permission-system)=
+## 淺談Django的許可權系統
 
-Django also implements a comprehensive permission/security system of its own.  The reason we don't use that is because it is app-centric (app in the Django sense).  Its permission strings are of the form `appname.permstring` and it automatically adds three of them for each database model in the app - for the app evennia/object this would be for example 'object.create', 'object.admin' and 'object.edit'. This makes a lot of sense for a web application, not so much for a MUD, especially when we try to hide away as much of the underlying architecture as possible. 
+Django 也實現了自己的全面許可權/安全系統。  我們不使用它的原因是因為它是以應用程式為中心的（Django 意義上的應用程式）。  其許可權字串的格式為`appname.permstring`，並且它會自動為應用程式中的每個資料庫模型新增其中三個 - 對於應用程式evennia/物件，這將是例如“object.create”、“object.admin”和“object.edit”。這對於 Web 應用程式來說很有意義，但對於 MUD 來說意義不大，尤其是當我們試圖隱藏盡可能多的底層架構時。
 
-The django permissions are not completely gone however. We use it for validating passwords during login. It is also used exclusively for managing Evennia's web-based admin site, which is a graphical front-end for the database of Evennia. You edit and assign such permissions directly from the web interface. It's stand-alone from the permissions described above.
+然而 django 許可權並沒有完全消失。我們用它來在登入期間驗證密碼。它還專門用於管理 Evennia 的基於 Web 的管理站點，這是 Evennia 資料庫的圖形前端。您可以直接從 Web 介面編輯和指派此類許可權。它獨立於上述許可權。

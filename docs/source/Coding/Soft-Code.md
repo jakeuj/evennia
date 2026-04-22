@@ -1,64 +1,70 @@
-# Soft Code
+(soft-code)=
+# 軟程式碼
 
 
-Softcode is a simple programming language that was created for in-game development on TinyMUD derivatives such as MUX, PennMUSH, TinyMUSH, and RhostMUSH. The idea was that by providing a stripped down, minimalistic language for in-game use, you could allow quick and easy building and game development to happen without builders having to learn the 'hardcode' language for those servers (C/C++). There is an added benefit of not having to have to hand out shell access to all developers. Permissions in softcode can be used to alleviate many security problems.
+軟程式碼是一種簡單的程式語言，專為 TinyMUD 衍生性商品（例如 MUX、PennMUSH、TinyMUSH 和 RhostMUSH）的遊戲內開發而建立。我們的想法是，透過提供一種精簡、簡約的語言供遊戲內使用，您可以快速輕鬆地進行構建和遊戲開發，而構建者無需學習這些伺服器的「硬程式碼」語言（C/C++）。還有一個額外的好處是不必向所有開發人員授予 shell 存取許可權。軟程式碼中的許可權可用於緩解許多安全性問題。
 
-Writing and installing softcode is done through a MUD client. Thus it is not a formatted language. Each softcode function is a single line of varying size. Some functions can be a half of a page long or more which is obviously not very readable nor (easily) maintainable over time.
+編寫和安裝軟程式碼是透過 MUD 用戶端完成的。因此它不是一種格式化語言。每個軟程式碼函式都是不同大小的一行。有些函式可能有半頁長或更長，這顯然不是很容易閱讀，也隨著時間的推移（容易）維護。
 
-## Examples of Softcode
+(examples-of-softcode)=
+## 軟程式碼範例
 
-Here is a simple 'Hello World!' command:
+這是一個簡單的「Hello World！」指令：
 
 ```bash
     @set me=HELLO_WORLD.C:$hello:@pemit %#=Hello World!
 ```
 
- Pasting this into a MUD client, sending it to a MUX/MUSH server and typing 'hello' will theoretically yield 'Hello World!', assuming certain flags are not set on your account object.
+將其貼到 MUD 用戶端，將其傳送到 MUX/MUSH 伺服器並輸入「hello」理論上會產生「Hello World!」（假設您的帳戶物件上未設定某些標誌）。
 
-Setting attributes in Softcode is done via `@set`. Softcode also allows the use of the ampersand (`&`) symbol. This shorter version looks like this:
+在 Softcode 中設定屬性是透過 `@set` 完成的。軟程式碼也允許使用 & 符號 (`&`)。這個較短的版本如下所示：
 
 ```bash
     &HELLO_WORLD.C me=$hello:@pemit %#=Hello World!
 ```
 
-We could also read the text from an attribute which is retrieved when emitting:
+我們也可以從發出時檢索的 attribute 讀取文字：
 
 ```bash
     &HELLO_VALUE.D me=Hello World
     &HELLO_WORLD.C me=$hello:@pemit %#=[v(HELLO_VALUE.D)]
 ```
 
-The `v()` function returns the `HELLO_VALUE.D` attribute on the object that the command resides (`me`, which is yourself in this case). This should yield the same output as the first example.
+`v()` 函式傳回指令所在物件的 `HELLO_VALUE.D` attribute（`me`，在本例中是您自己）。這應該會產生與第一個範例相同的輸出。
 
-If you are curious about how MUSH/MUX Softcode works, take a look at some external resources:
+如果您對 MUSH/MUX Softcode 的工作原理感到好奇，請檢視一些外部資源：
 
 - https://wiki.tinymux.org/index.php/Softcode
 - https://www.duh.com/discordia/mushman/man2x1
 
-## Problems with Softcode
+(problems-with-softcode)=
+## 軟程式碼問題
 
-Softcode is excellent at what it was intended for: *simple things*. It is a great tool for making an interactive object, a room with ambiance, simple global commands, simple economies and coded systems.  However, once you start to try to write something like a complex combat system or a higher end economy, you're likely to find yourself buried under a mountain of functions that span multiple objects across your entire code.
+軟程式碼非常適合它的用途：*簡單的事情*。它是製作互動式物件、具有氛圍的房間、簡單的全域性指令、簡單的經濟和編碼系統的絕佳工具。  然而，一旦您開始嘗試編寫複雜的戰鬥系統或高階經濟之類的東西，您可能會發現自己被埋在橫跨整個程式碼中的多個物件的函式山下。
 
-Not to mention, softcode is not an inherently fast language. It is not compiled, it is parsed with each calling of a function. While MUX and MUSH parsers have jumped light years ahead of where they once were, they can still stutter under the weight of more complex systems if those are not designed properly.
+更不用說，軟程式碼本質上並不是一種快速語言。它不會被編譯，而是在每次呼叫函式時進行解析。雖然 MUX 和 MUSH 解析器比以前進步了好幾光年，但如果設計不當，它們仍然會在更複雜的系統的重壓下出現問題。
 
-Also, Softcode is not a standardized language. Different servers each have their own slight variations. Code tools and resources are also limited to the documentation from those servers.
+此外，軟程式碼不是標準化語言。不同的伺服器都有自己的細微差別。程式碼工具和資源也僅限於這些伺服器的文件。
 
-## Changing Times
+(changing-times)=
+## 時代變遷
 
-Now that starting text-based games is easy and an option for even the most technically inarticulate, new projects are a dime a dozen. People are starting new MUDs every day with varying levels of commitment and ability. Because of this shift from fewer, larger, well-staffed games to a bunch of small, one or two developer games, the benefit of softcode fades.
+現在開始基於文字的遊戲很容易，即使是技術最不懂的人也可以選擇，新專案比比皆是。人們每天都以不同程度的承諾和能力開始新的MUDs。由於從數量較少、規模較大、人員配備齊全的遊戲向一堆小型、一兩個開發者遊戲的轉變，軟程式碼的優勢逐漸消失。
 
-Softcode is great in that it allows a mid to large sized staff all work on the same game without stepping on one another's toes without shell access. However, the rise of modern code collaboration tools (such as private github/gitlab repos) has made it trivial to collaborate on code. 
+軟程式碼的偉大之處在於，它允許大中型員工在同一個遊戲上工作，而無需在沒有 shell 訪問許可權的情況下互相打擾。然而，現代程式碼協作工具（例如私人 github/gitlab 儲存庫）的興起使得程式碼協作變得微不足道。
 
-## Our Solution
+(our-solution)=
+## 我們的解決方案
 
-Evennia shuns in-game softcode for on-disk Python modules. Python is a popular, mature and professional programming language. Evennia developers have access to the entire library of Python modules out there in the wild - not to mention the vast online help resources available. Python code is not bound to one-line functions on objects; complex systems may be organized neatly into real source code modules, sub-modules, or even broken out into entire Python packages as desired.
+Evennia 避開磁碟上 Python 模組的遊戲內軟程式碼。 Python是一種流行、成熟、專業的程式語言。 Evennia 開發人員可以直接存取整個 Python 模組庫 - 更不用說大量可用的線上說明資源了。 Python 程式碼不會繫結到物件上的單行函式；複雜的系統可以整齊地組織成真正的原始程式碼模組、子模組，甚至根據需要分解成整個Python套件。
 
-So what is *not* included in Evennia is a MUX/MOO-like online player-coding system (aka Softcode).  Advanced coding in Evennia is primarily intended to be done outside the game, in full-fledged Python modules (what MUSH would call 'hardcode'). Advanced building is best handled by extending Evennia's command system with your own sophisticated building commands.
+因此，Evennia 中*不*包含的是 MUX/MOO- 之類的線上玩家編碼系統（又稱軟程式碼）。  Evennia 中的高階編碼主要是在遊戲之外、在成熟的 Python 模組中完成的（MUSH 稱為「硬編碼」）。高階建置最好透過使用您自己的複雜建置指令擴充套件 Evennia 的指令系統來處理。
 
-In Evennia you develop your MU like you would any piece of modern software - using your favorite code editor/IDE and online code sharing tools.
+在 Evennia 中，您可以像開發任何現代軟體一樣開發您的 MU - 使用您最喜歡的程式碼編輯器/IDE 和線上程式碼共享工具。
 
-## Your Solution
+(your-solution)=
+## 您的解決方案
  
-Adding advanced and flexible building commands to your game is easy and will probably be enough to satisfy most creative builders. However, if you really, *really* want to offer online coding, there is of course nothing stopping you from adding that to Evennia, no matter our recommendations. You could even re-implement MUX' softcode in Python should you be very ambitious. 
+為您的遊戲新增高階且靈活的構建指令非常簡單，並且可能足以滿足大多數創意構建者的需求。然而，如果您真的、*真的*想要提供線上編碼，當然沒有什麼可以阻止您將其新增到 Evennia 中，無論我們的建議如何。如果您雄心勃勃，甚至可以在 Python 中重新實現 MUX' 軟程式碼。
 
-In default Evennia, the [Funcparser](Funcparser) system allows for simple remapping of text on-demand without becomeing a full softcode language. The [contribs](Contrib-Overview) has several tools and utililities to start from when adding more complex in-game building. 
+在預設的 Evennia 中，[Funcparser](Funcparser) 系統允許根據需要簡單地重新對映文​​件，而無需成為完整的軟程式碼語言。在新增更複雜的遊戲內建置時，[contribs](Contrib-Overview) 有多種工具和實用程式可供使用。

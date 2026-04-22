@@ -1,162 +1,169 @@
-# Intro to using Python with Evennia
+(intro-to-using-python-with-evennia)=
+# 使用 Python 和 Evennia 的簡介
 
-Time to dip our toe into some coding! Evennia is written and extended in [Python](https://python.org). Python is a mature and professional programming language that is very fast to work with.
+是時候嘗試一些編碼了！ Evennia是用[Python](https://python.org)編寫和擴充套件的。 Python 是一種成熟且專業的程式語言，使用起來非常快。
 
-That said, even though Python is widely considered easy to learn, we can only cover the basics in these lessons. While we will hopefully get you started with the most important bits you need, you may likely need to compliment with some learning on your own. Luckily there's a vast amount of free online learning resources available for Python. See our [link section](../../../Links.md) for some examples.
+也就是說，儘管 Python 被廣泛認為易於學習，但我們在這些課程中只能涵蓋基礎知識。雖然我們希望讓您開始瞭解您需要的最重要的部分，但您可能需要自己學習一些知識來補充。幸運的是，有大量免費的 Python 線上學習資源。請參閱我們的[連結部分](../../../Links.md) 以瞭解一些範例。
 
-> While this will be quite basic if you are an experienced developer, you may want to at least stay around for the first few sections where we cover how to run Python from inside Evennia.
+> 雖然如果您是一位經驗豐富的開發人員，這將是非常基本的，但您可能至少希望繼續閱讀前幾節，我們將介紹如何從 Evennia 內部執行 Python。
 
-First, if you were quelling yourself to play the tutorial world, make sure to get your
-superuser powers back:
+首先，如果你想抑制自己去玩教學世界，請確保你的
+超級使用者恢復權力：
 
        unquell
 
-## Evennia Hello world
+(evennia-hello-world)=
+## Evennia 世界你好
 
-The `py` Command (or `!`, which is an alias) allows you as a superuser to execute raw Python from in-game. This is useful for quick testing. From the game's input line, enter the following:
+`py` 指令（或 `!`，這是一個別名）允許您作為超級使用者在遊戲中執行原始 Python。這對於快速測試很有用。在遊戲的輸入行中，輸入以下內容：
 
     > py print("Hello World!")
 
 
-```{sidebar} Command input
+```{sidebar} 指令輸入
 
-The line with `>` indicates input to enter in-game, while the lines below are the
-expected return from that input.
+帶`>`的行表示進入遊戲的輸入，下面的行是
+該輸入的預期回報。
 ```
 
-You will see
+你會看到
 
     > print("Hello world!")
     Hello World!
 
-The `print(...)` *function* is the basic, in-built way to output text in Python. We are sending "Hello World" as a single _argument_ to this function. If we were to send multiple arguments, they'd be separated by commas.
+`print(...)` *函式* 是 Python 中輸出文字的基本內建方法。我們將“Hello World”作為單一_引數_傳送到此函式。如果我們要傳送多個引數，它們將用逗號分隔。
 
-The quotes `"..."` mean that you are inputting a *string* (i.e. text). You could also have used single-quotes `'...'` - Python accepts both. 
+引號 `"..."` 表示您正在輸入*字串*（i.e.文字）。您也可以使用單引號 `'...'` - Python 兩者都接受。
 
-> A third way to enter Python strings is to use triple-quotes (`"""..."""` or `'''...'''`. This is used for longer strings stretching across multiple lines. When we insert code directly to `py` like this we can only use one line though.
+> 輸入Python字串的第三種方法是使用三引號（`"""..."""`或`'''...'''`。這用於跨多行的較長字串。當我們像這樣直接將程式碼插入到`py`時，我們只能使用一行。
 
-## Making some text 'graphics'
+(making-some-text-graphics)=
+## 製作一些文字“圖形”
 
-When making a text-game you will, unsurprisingly, be working a lot with text. Even if you have the occational button or even graphical element, the normal process is for the user to input commands as text and get text back. As we saw above, a piece of text is called a _string_ in Python and is enclosed in either single- or double-quotes.
+毫不奇怪，在製作文字遊戲時，您會大量使用文字。即使您有偶爾的按鈕甚至圖形元素，正常的過程也是使用者以文字形式輸入指令並獲取文字。正如我們在上面看到的，一段文字在 Python 中被稱為_string_，並用單引號或雙引號括起來。
 
-Strings can be added together:
+字串可以相加：
 
     > py print("This is a " + "breaking change.")
     This is a breaking change.
 
-A string multiplied with a number will repeat that string as many times:
+字串乘以數字將重複該字串多次：
 
     > py print("|" + "-" * 40 + "|")
     |----------------------------------------|
 
- or
+或者
 
     > py print("A" + "a" * 5 + "rgh!")
     Aaaaaargh!
 
-### .format()
+(format)=
+### 。格式（）
 
-```{sidebar} Functions and Methods
-- Function: Something that performs an action when you call it with zero or more `arguments`. A function is stand-alone in a python module, like `print()`
-- Method: A function that sits "on" an object. It is accessed via the `.` operator, like `obj.msg()` or, in this case, `<string>.format()`.
+```{sidebar} 函式和方法
+- 函式：當您使用零個或多個 `arguments` 呼叫它時執行操作的東西。函式在 python 模組中是獨立的，例如 `print()`
+- 方法：位於物件「之上」的函式。它是透過 `.` 運運算元存取的，例如 `obj.msg()`，或在本例中為 `<string>.format()`。
 ```
 
-While combining different strings is useful, even more powerful is the ability to modify the contents of the string in-place. There are several ways to do this in Python and we'll show two of them here. The first is to use the `.format` _method_ of the string:
+雖然組合不同的字串很有用，但更強大的是就地修改字串內容的能力。在 Python 中，有多種方法可以實現此目的，我們將在這裡展示其中的兩種方法。第一種是使用字串的 `.format`_method_：
 
     > py print("This is a {} idea!".format("good"))
     This is a good idea!
 
 
-A method can be thought of as a resource "on" another object. The method knows on which object it sits and can thus affect it in various ways. You access it with the period `.`. In this case, the string has a resource `format(...)` that modifies it. More specifically, it replaced the `{}` marker inside the string with the value passed to the format. You can do so many times:
+方法可以被認為是另一個物件「上」的資源。此方法知道它位於哪個物件上，因此可以以各種方式影響它。您可以使用句點 `.` 存取它。在本例中，該字串有一個資源 `format(...)` 對其進行修改。更具體地說，它用傳遞給格式的值替換了字串內的 `{}` 標記。你可以做很多次：
 
     > py print("This is a {} idea!".format("good"))
     This is a good idea!
 
-or
+或者
 
     > py print("This is the {} and {} {} idea!".format("first", "second", "great"))
     This is the first and second great idea!
 
-> Note the double-parenthesis at the end - the first closes the `format(...` method and the outermost closes the `print(...`. Not closing them will give you a scary `SyntaxError`. We will talk a little more about errors in the next section, for now just fix until it prints as expected.
+> 請注意末尾的雙括號 - 第一個關閉 `format(...` 方法，最外面的雙括號關閉 `print(...`。不關閉它們會給你帶來可怕的`SyntaxError`。我們將在下一節中更多地討論錯誤，現在只需修復，直到它按預期列印為止。
 
-Here we passed three comma-separated strings as _arguments_ to the string's `format` method. These replaced the `{}` markers in the same order as they were given.
+這裡我們將三個逗號分隔的字串作為_arguments_傳遞給字串的`format`方法。它們按照給出的順序替換了 `{}` 標記。
 
-The input does not have to be strings either:
+輸入也不必是字串：
 
     > py print("STR: {}, DEX: {}, INT: {}".format(12, 14, 8))
     STR: 12, DEX: 14, INT: 8
 
-To separate two Python instructions on the same line, you use the semi-colon, `;`. Try this:
+若要分隔同一行上的兩個 Python 指令，請使用分號 `;`。試試這個：
 
     > py a = "awesome sauce" ; print("This is {}!".format(a))
     This is awesome sauce!
 
-```{warning} MUD clients and semi-colon
+```{warning} MUD 使用者端和分號
 
-Some MUD clients use the semi-colon `;` to split client-inputs
-into separate sends. If so, the above will give an error. Most clients allow you to run in 'verbatim' mode or to remap to use some other separator than `;`. If you still have trouble, use the Evennia web client.
+有些 MUD 用戶端使用分號 `;` 來分割用戶端輸入
+分成單獨的傳送。如果是這樣的話，上面就會報錯。大多數用戶端允許您在「逐字」模式下執行或重新對映以使用 `;` 之外的其他分隔符號。如果仍然遇到問題，請使用 Evennia Web 使用者端。
 ```
 
-What happened here was that we _assigned_ the string `"awesome sauce"` to a _variable_ we chose to name `a`. In the next statement, Python remembered what `a` was and we passed that into `format()` to get the output. If you replaced the value of `a` with something else in between, _that_ would be printed instead.
+這裡發生的事情是，我們將字串 `"awesome sauce"` 分配給我們選擇命名為 `a` 的變數。在下一條語句中，Python 記住了 `a` 是什麼，我們將其傳遞給 `format()` 以獲得輸出。如果您將 `a` 的值替換為中間的其他值，則會列印 _that_ 。
 
-Here's the stat-example again, moving the stats to variables (here we just set them, but in a real game they may be changed over time, or modified by circumstance):
+這是一個統計資料範例，將統計資料移至變數（這裡我們只是設定它們，但在真實遊戲中它們可能會隨著時間的推移而改變，或根據情況進行修改）：
 
     > py stren, dext, intel = 13, 14, 8 ; print("STR: {}, DEX: {}, INT: {}".format(stren, dext, intel))
     STR: 13, DEX: 14, INT: 8
 
-The point is that even if the values of the stats change, the print() statement would not change - it just keeps pretty-printing whatever is given to it.
+關鍵是，即使統計資料的值發生變化， print() 語句也不會改變－它只是保持漂亮的列印任何給它的內容。
 
-You can also use named markers, like this: 
+您也可以使用命名標記，如下所示：
 
      > py print("STR: {stren}, INT: {intel}, STR again: {stren}".format(dext=10, intel=18, stren=9))
      STR: 9, INT: 18, Str again: 9
 
-the `key=value` pairs we add are called _keyword arguments_ for the `format()` method. Each named argument will go to the matching `{key}` in the string. When using keywords, the order we add them doesn't matter. We have no `{dext}` and two `{stren}` in the string, and that works fine.
+我們新增的 `key=value` 對稱為 `format()` 方法的_關鍵字引數_。每個命名引數將轉到字串中匹配的 `{key}`。使用關鍵字時，新增它們的順序並不重要。字串中沒有 `{dext}` 和兩個 `{stren}`，效果很好。
 
-### f-strings
+(f-strings)=
+### F 弦
 
-Using `.format()` is powerful (and there is a [lot more](https://www.w3schools.com/python/ref_string_format.asp) you can do with it). But the _f-string_ can be even more convenient. An f-string looks like a normal string ... except there is an `f` front of it, like this:
+使用 `.format()` 非常強大（並且您可以用它做[更多](https://www.w3schools.com/python/ref_string_format.asp)）。但 _f-string_ 可能更方便。 f 字串看起來像普通字串......除了它前面有一個 `f` ，如下所示：
 
     f"this is now an f-string."
 
-An f-string on its own is just like any other string. But let's redo the example we did before, using an f-string:
+f 字串本身就像任何其他字串一樣。但讓我們使用 f 字串重做之前的範例：
 
     > py a = "awesome sauce" ; print(f"This is {a}!")
     This is awesome sauce!
 
-We insert that `a` variable directly into the f-string using `{a}`. Fewer parentheses to
-remember and arguable easier to read as well!
+我們使用 `{a}` 將該 `a` 變數直接插入 f 字串中。更少的括號
+記住和爭論也更容易閱讀！
 
     > py stren, dext, intel = 13, 14, 8 ; print(f"STR: {stren}, DEX: {dext}, INT: {intel}")
     STR: 13, DEX: 14, INT: 8
 
-In modern Python code, f-strings are more often used than `.format()` but to read code you need to be aware of both.
+在現代 Python 程式碼中，f 字串比 `.format()` 更常用，但要閱讀程式碼，您需要了解兩者。
 
-We will be exploring more complex string concepts when we get to creating Commands and need to parse and understand player input.
+當我們開始建立指令並需要解析和理解玩家輸入時，我們將探索更複雜的字串概念。
 
-### Colored text
+(colored-text)=
+### 彩色文字
 
-Python itself knows nothing about colored text, this is an Evennia thing. Evennia supports the standard color schemes of traditional MUDs.
+Python 本身對彩色文字一無所知，這是Evennia 的事情。 Evennia支援傳統MUDs的標準配色。
 
     > py print("|rThis is red text!|n This is normal color.")
 
-Adding that `|r` at the start will turn our output bright red. `|R` will make it dark red. `|n`
-gives the normal text color. You can also use RGB (Red-Green-Blue) values from 0-5 (Xterm256 colors):
+在開始處新增 `|r` 將使我們的輸出變成亮紅色。 `|R` 會使它變成深紅色。 `|n`
+給出正常的文字顏色。您也可以使用 0-5 之間的 RGB（紅色-綠色-藍色）值（Xterm256 顏色）：
 
     > py print("|043This is a blue-green color.|[530|003 Now dark blue text on orange background.")
 
-> If you don't see the expected color, your client or terminal may not support Xterm256 (or
-  color at all). Use the Evennia webclient.
+> 如果您沒有看到預期的顏色，則您的使用者端或終端可能不支援 Xterm256（或
+完全沒有顏色）。使用Evennia webclient。
 
-Use the commands `color ansi` or `color xterm` to see which colors are available. Experiment! You can also read a lot more in the [Colors](../../../Concepts/Colors.md) documentation.
+使用指令 `color ansi` 或 `color xterm` 檢視哪些顏色可用。實驗！您也可以在[顏色](../../../Concepts/Colors.md) 檔案中閱讀更多內容。
 
-## Importing code from other modules
+(importing-code-from-other-modules)=
+## 從其他模組匯入程式碼
 
-As we saw in the previous sections, we used `.format` to format strings and `me.msg` to access the `msg` method on `me`. This use of the full-stop character is used to access all sorts of resources, including that in other Python modules.
+正如我們在前面幾節中看到的，我們使用 `.format` 來格式化字串，並使用 `me.msg` 來存取 `me` 上的 `msg` 方法。句號字元的這種使用用於存取各種資源，包括其他 Python 模組中的資源。
 
-Keep your game running, then open a text editor of your choice. If your game folder is called
-`mygame`, create a new text file `test.py` in the subfolder `mygame/world`. This is how the file
-structure should look:
+保持遊戲執行，然後開啟您選擇的文字編輯器。如果你的遊戲資料夾名為
+`mygame`，在子資料夾`mygame/world`中建立一個新的文字檔案`test.py`。檔案是這樣的
+結構應該看起來：
 
 ```
 mygame/
@@ -164,57 +171,58 @@ mygame/
         test.py
 ```
 
-For now, only add one line to `test.py`:
+目前，只需在 `test.py` 中新增一行：
 
 ```python
 print("Hello World!")
 ```
 
-```{sidebar} Python module
-This is a text file with the `.py` file ending. A module
-contains Python source code and from within Python one can
-access its contents by importing it via its python-path.
+```{sidebar} Python模組
+這是一個以 `.py` 檔案結尾的文字檔。一個模組
+包含 Python 原始碼，並且可以從 Python 內部
+透過其 python 路徑匯入來存取其內容。
 ```
 
-Don't forget to _save_ the file. We just created our first Python _module_!
-To use this in-game we have to *import* it. Try this:
+不要忘記_儲存_檔。我們剛剛建立了第一個 Python 模組！
+要在遊戲中使用它，我們必須「匯入」它。試試這個：
 
     > py import world.test
     Hello World
 
-If you make some error (we'll cover how to handle errors below), make sure the text looks exactly like above and then run the `reload` command in-game for your changes to take effect.
+如果您犯了一些錯誤（我們將在下面介紹如何處理錯誤），請確保文字與上面完全相同，然後在遊戲中執行 `reload` 指令以使您的更改生效。
 
-... So as you can see, importing `world.test` actually means importing `world/test.py`. Think of the period `.` as replacing `/` (or `\` for Windows) in your path. 
+……所以如你所見，匯入`world.test`實際上意味著匯入`world/test.py`。將句點 `.` 視為替換路徑中的 `/`（或 Windows 的 `\`）。
 
-The `.py` ending of `test.py` is never included in this "Python-path", but _only_ files with that ending can be imported this way. Where is `mygame` in that Python-path? The answer is that Evennia has already told Python that your `mygame` folder is a good place to look for imports. So we should not  include `mygame` in the path - Evennia handles this for us.
+`test.py` 的 `.py` 結尾永遠不會包含在此「Python 路徑」中，但_僅_具有該結尾的檔案可以透過這種方式匯入。 Python 路徑中的 `mygame` 在哪裡？答案是 Evennia 已經告訴 Python 你的 `mygame` 資料夾是尋找匯入的好地方。所以我們不應該在路徑中包含 `mygame` - Evennia 為我們處理這個問題。
 
-When you import the module, the top "level" of it will execute. In this case, it will immediately
-print "Hello World".
+當您匯入模組時，它將執行其頂層“級別”。在這種情況下，它會立即
+列印“你好世界”。
 
-Now try to run this a second time:
+現在嘗試第二次執行：
 
     > py import world.test
 
-You will *not* see any output this or any subsequent times! This is not a bug. Rather it is because of how Python importing works - it stores all imported modules and will avoid importing them more than once. So your `print` will only run the first time, when the module is first imported.
+您將*看不到*這次或任何後續時間的任何輸出！這不是一個錯誤。相反，這是因為 Python 匯入的工作方式 - 它儲存所有匯入的模組，並且會避免多次匯入它們。因此，您的`print`只會在第一次匯入模組時執行。
 
-Try this:
+試試這個：
 
     > reload
 
-And then
+進而
 
     > py import world.test
     Hello World!
 
-Now we see it again. The `reload` wiped the server's memory of what was imported, so it had to import it anew. You'd have to do this every time you wanted the hello-world to show, which is not very useful.
+現在我們又看到了。 `reload` 擦除了伺服器記憶體中匯入的內容，因此必須重新匯入。每次想要顯示 hello-world 時都必須執行此操作，這不是很有用。
 
-> We'll get back to more advanced ways to import code in [a later lesson](./Beginner-Tutorial-Python-classes-and-objects.md#importing-things) - this is an important topic. But for now, let's press on and resolve this particular problem.
+> 我們將在[稍後的課程](./Beginner-Tutorial-Python-classes-and-objects.md#importing-things) 中回顧更高階的匯入程式碼的方法 - 這是一個重要的主題。但現在，讓我們繼續解決這個特定問題。
 
 
-### Our first own function
+(our-first-own-function)=
+### 我們的第一個自己的函式
 
-We want to be able to print our hello-world message at any time, not just once after a server
-reload. Change your `mygame/world/test.py` file to look like this:
+我們希望能夠隨時列印我們的 hello-world 訊息，而不僅僅是在伺服器之後列印一次
+重新載入。將 `mygame/world/test.py` 檔案更改為如下所示：
 
 ```python
 def hello_world():
@@ -222,78 +230,80 @@ def hello_world():
 ```
 
 ```{sidebar}
-If you are coming from some other language like Javascript or C you may be familiar with variables and functions mixing cases in names, like `helloWorld()`. While you _could_ choose to name things this way, it will clash with other Python code - Python standard is to use lower-case and underscores `_` for all variables and methods.
+如果您來自其他語言（例如 Javascript 或 C），您可能會熟悉名稱中混合大小寫的變數和函式，例如 `helloWorld()`。雖然您可以選擇以這種方式命名，但它會與其他 Python 程式碼發生衝突 - Python 標準是對所有變數和方法使用小寫字母和下劃線 `_`。
 ```
-As we are moving to multi-line Python code, there are some important things to remember:
+當我們轉向多行 Python 程式碼時，需要記住一些重要的事情：
 
-- Capitalization matters in Python. It must be `def` and not `DEF`, `hello_world()` is not the same as `Hello_World()`.
-- Indentation matters in Python. The second line must be indented or it's not valid code. You should also use a consistent indentation length. We *strongly* recommend that you, for your own sanity's sake, set up your editor to always indent *4 spaces* (**not** a single tab-character) when you press the TAB key.
+- Python 中大小寫很重要。它必須是 `def` 而不是 `DEF`，`hello_world()` 與 `Hello_World()` 不同。
+- 縮排在 Python 中很重要。第二行必須縮排，否則它不是有效的程式碼。您還應該使用一致的縮排長度。我們「強烈」建議您，為了您自己的理智，將編輯器設定為在您按 TAB 鍵時始終縮排 *4 個空格*（**不是**單一製表符）。
 
-So about that function. Line 1:
+那麼關於這個功能。 1號線：
 
-- `def` is short for "define" and defines a *function* (or a *method*, if sitting on an object). This is a [reserved Python keyword](https://docs.python.org/2.5/ref/keywords.html); try not to use these words anywhere else.
-- A function name can not have spaces but otherwise we could have called it almost anything. We call it `hello_world`. Evennia follows [Python's standard naming style](../../../Coding/Evennia-Code-Style.md) with lowercase letters and underscores. We recommend you do the same.
-- The colon (`:`) at the end of line 1 indicates that the header of the function is complete.
+- `def` 是「define」的縮寫，定義一個*函式*（或一個*方法*，如果位於一個物件上）。這是一個[保留的Python關鍵字](https://docs.python.org/2.5/ref/keywords.html)；盡量不要在其他地方使用這些字。
+- 函式名稱不能有空格，否則我們幾乎可以稱之為任何名稱。我們稱之為`hello_world`。 Evennia 遵循[Python 的標準命名風格](../../../Coding/Evennia-Code-Style.md)，使用小寫字母和底線。我們建議您也這樣做。
+- 第 1 行末尾的冒號（`:`）表示函式頭已完成。
 
-Line 2:
+2號線：
 
-- The indentation marks the beginning of the actual operating code of the function (the function's *body*). If we wanted more lines to belong to this function those lines would all have to start at least at this indentation level.
+- 縮排標記了函式實際操作程式碼的開始（函式的*主體*）。如果我們想要更多的行屬於這個函式，那麼這些行都必須至少從這個縮排層級開始。
 
-Now let's try this out. First `reload` your game to have it pick up our updated Python module, then import it.
+現在讓我們試試看。首先`reload`你的遊戲讓它取得我們更新的Python模組，然後匯入它。
 
     > reload
     > py import world.test
 
-Nothing happened! That is because the function in our module won't do anything just by importing it (this is what we wanted). It will only act when we *call* it. So we need to first import the module and then access the function within:
+什麼也沒發生！這是因為我們模組中的函式僅透過匯入它不會執行任何操作（這就是我們想要的）。只有當我們“呼叫”它時它才會起作用。所以我們需要先匯入模組，然後再訪問其中的函式：
 
     > py import world.test ; world.test.hello_world()
     Hello world!
 
-There is our "Hello World"! As mentioned earlier, use use semi-colon to put multiple Python-statements on one line. Note also the previous warning about mud-clients using the `;` to their own ends.
+這就是我們的「Hello World」！如前所述，使用分號將多個 Python 語句放在一行上。另請注意先前關於 mud 使用者端使用 `;` 達到自己目的的警告。
 
-So what happened there? First we imported `world.test` as usual. But this time the 'top level' of the module only defined a function. It didn't actually execute the body of that function.
+那麼那裡發生了什麼事？首先我們像往常一樣匯入`world.test`。但這次模組的「頂層」只定義了一個函式。它實際上並沒有執行該函式的主體。
 
-By adding `()` to the `hello_world` function we _call_ it. That is, we execute the body of the function and print our text. We can now redo this as many times as we want without having to `reload` in between:
+透過將 `()` 加到 `hello_world` 函式，我們_呼叫_它。也就是說，我們執行函式體並列印文字。現在，我們可以根據需要多次重做此操作，而無需在中間進行`reload`：
 
     > py import world.test ; world.test.hello_world()
     Hello world!
     > py import world.test ; world.test.hello_world()
     Hello world!
 
-## Sending text to others
+(sending-text-to-others)=
+## 向他人傳送文字
 
-The `print` command is a standard Python structure. We can use that here in the `py` command since we can se the output. It's great for debugging and quick testing. But if you need to send a text to an actual player, `print` won't do, because it doesn't know _who_ to send to. Try this:
+`print` 指令是標準的 Python 結構。我們可以在 `py` 指令中使用它，因為我們可以看到輸出。它非常適合除錯和快速測試。但如果您需要向實際玩家傳送文字，`print` 就不行，因為它不知道要傳送給_誰_。試試這個：
 
     > py me.msg("Hello world!")
     Hello world!
 
-This looks the same as the `print` result, but we are now actually messaging a specific *object*, `me`. The `me` is a shortcut to 'us', the one running the `py` command. It is not some special Python thing, but something Evennia just makes available in the `py` command for convenience (`self` is an alias).
+這看起來與 `print` 結果相同，但我們現在實際上正在向特定*物件* `me` 傳送訊息。 `me` 是「us」的捷徑，也就是執行 `py` 指令的。它不是一些特殊的 Python 東西，而是 Evennia 只是為了方便而在 `py` 指令中提供的東西（`self` 是一個別名）。
 
-The `me` is an example of an *Object instance*. Objects are fundamental in Python and Evennia. The `me` object also contains a lot of useful resources for doing things with that object. We access those resources with '`.`'.
+`me` 是*物件例項*的範例。物件是 Python 中的基礎，Evennia。 `me` 物件還包含許多用於處理該物件的有用資源。我們使用“`.`”存取這些資源。
 
-One such resource is `msg`, which works like `print` except it sends the text to the object it
-is attached to. So if we, for example, had an object `you`, doing `you.msg(...)` would send a message to the object `you`.
+其中一種資源是 `msg`，其工作方式與 `print` 類似，只不過它將文字傳送到它所在的物件
+附於.因此，例如，如果我們有一個物件 `you`，執行 `you.msg(...)` 將會向物件 `you` 傳送一條訊息。
 
-For now, `print` and `me.msg` behaves the same, just remember that `print` is mainly used for
-debugging and `.msg()` will be more useful for you in the future.
+目前，`print` 和 `me.msg` 的行為相同，只需記住 `print` 主要用於
+除錯和 `.msg()` 將來對你會更有用。
 
 
-## Parsing Python errors
+(parsing-python-errors)=
+## 解析Python錯誤
 
-Let's try this new text-sending in the function we just created.  Go back to
-your `test.py` file and Replace the function with this instead:
+讓我們在剛剛建立的函式中嘗試這個新的文字傳送功能。  返回
+您的 `test.py` 檔案並將函式替換為以下內容：
 
 ```python
 def hello_world():
     me.msg("Hello World!")
 ```
 
-Save your file and `reload` your server to tell Evennia to re-import new code,
-then run it like before:
+儲存您的檔案和`reload`您的伺服器以告訴Evennia重新匯入新程式碼，
+然後像以前一樣執行它：
 
      > py import world.test ; world.test.hello_world()
 
-No go - this time you get an _error_!
+不行－這次你會得到一個_錯誤_！
 
 ```python
 File "./world/test.py", line 2, in hello_world
@@ -301,118 +311,121 @@ File "./world/test.py", line 2, in hello_world
 NameError: name 'me' is not defined
 ```
 
-```{sidebar} Errors in the logs
+```{sidebar} 日誌中的錯誤
 
-In regular use, tracebacks will often appear in the log rather than
-in the game. Use `evennia --log` to view the log in the terminal. Make
-sure to scroll back if you expect an error and don't see it. Use
-`Ctrl-C` (or `Cmd-C` on Mac) to exit the log-view.
+在常規使用中，回溯通常會出現在日誌中，而不是
+在遊戲中。使用`evennia --log`在終端中檢視日誌。製造
+如果您預計會出現錯誤但沒有看到它，請務必向後滾動。使用
+`Ctrl-C`（或 Mac 上的 `Cmd-C`）退出日誌檢視。
 ```
 
-This is called a *traceback*. Python's errors are very friendly and will most of the time tell you exactly what and where things go wrong. It's important that you learn to parse tracebacks so you know how to fix your code.
+這稱為“回溯”。 Python 的錯誤非常友好，大多數時候會告訴您到底出了什麼問題以及出在哪裡。學習解析回溯非常重要，這樣您才能知道如何修復程式碼。
 
-A traceback is to be read from the _bottom up_:
+回溯將從_由下而上_讀取：
 
-- (line 3) An error of type `NameError` is the problem ...
-- (line 3)  ... more specifically it is due to the variable `me` not being defined.
-- (line 2) This happened on the line `me.msg("Hello world!")` ...
-- (line 1)  ... which is on line `2` of the file `./world/test.py`.
+- （第 3 行）問題是 `NameError` 型別的錯誤...
+- （第 3 行）...更具體地說，這是由於變數 `me` 未定義。
+- （第2行）這發生在`me.msg("Hello world!")`線上...
+- （第 1 行）...位於檔案 `./world/test.py` 的第 `2` 行。
 
-In our case the traceback is short. There may be many more lines above it, tracking just how
-different modules called each other until the program got to the faulty line. That can
-sometimes be useful information, but reading from the bottom is always a good start.
+在我們的例子中，回溯很短。上面可能還有更多行，追蹤如何
+不同的模組互相呼叫，直到程式到達故障線路。那可以
+有時是有用的資訊，但從底層開始閱讀總是一個好的開始。
 
-The `NameError` we see here is due to a module being its own isolated thing. It knows nothing about the environment into which it is imported. It knew what `print` is because that is a special [reserved Python keyword](https://docs.python.org/2.5/ref/keywords.html). But `me` is *not* such a reserved word (as mentioned, it's just something Evennia came up with for convenience in the `py` command). As far as the module is concerned `me` is an unfamiliar name, appearing out of nowhere. Hence the `NameError`.
+我們在這裡看到的 `NameError` 是因為模組是它自己獨立的東西。它對其匯入的環境一無所知。它知道`print`是什麼，因為那是一個特殊的[保留的Python關鍵字](https://docs.python.org/2.5/ref/keywords.html)。但 `me` *不是*這樣的保留字（如前所述，它只是 Evennia 為了在 `py` 指令中方便起見而提出的）。就模組而言，`me` 是一個陌生的名字，不知從何而來。因此是`NameError`。
 
-## Passing arguments to functions
+(passing-arguments-to-functions)=
+## 將引數傳遞給函式
 
-We know that `me` exists at the point when we run the `py` command, because we can do `py me.msg("Hello World!")` with no problem. So let's _pass_ that me along to the function so it knows what it should be. Go back to your `test.py` and change it to this:
+我們知道，當我們執行 `py` 指令時，`me` 就存在，因為我們可以毫無問題地執行 `py me.msg("Hello World!")`。因此，讓我們將我傳遞給該函式，以便它知道它應該是什麼。返回您的 `test.py` 並將其更改為：
 
 ```python
 def hello_world(who):
     who.msg("Hello World!")
 ```
-We now added an _argument_ to the function. We could have named it anything. Whatever `who` is, we will call a method `.msg()` on it.
+我們現在為函式新增了一個_引數_。我們可以給它取任何名字。無論 `who` 是什麼，我們都會對其呼叫方法 `.msg()`。
 
-As usual, `reload` the server to make sure the new code is available.
+像往常一樣，`reload` 伺服器以確保新程式碼可用。
 
     > py import world.test ; world.test.hello_world(me)
     Hello World!
 
-Now it worked. We _passed_ `me` to our function. It will appear inside the function renamed as `who` and now the function works and prints as expected. Note how the `hello_world` function doesn't care _what_ you pass into it as long as it has a `.msg()` method on it. So you could reuse this function over and over for other suitable targets.
+現在它起作用了。我們_傳遞_ `me` 給我們的函式。它將出現在重新命名為 `who` 的函式內，現在該函式可以正常工作並按預期列印。請注意，`hello_world` 函式並不關心您傳遞給它的內容，只要它有 `.msg()` 方法即可。因此，您可以針對其他合適的目標一遍又一遍地重複使用此函式。
 
-> **Extra Credit:** As an exercise, try to pass something else into `hello_world`. Try for example
-> to pass the number `5` or the string `"foo"`. You'll get errors telling you that they don't have
->the attribute `msg`. They don't care about `me` itself not being a string or a number. If you are
->familiar with other programming languages (especially C/Java) you may be tempted to start *validating* `who` to make sure it's of the right type before you send it. This is usually not recommended in Python. Python philosophy is to [handle](https://docs.python.org/2/tutorial/errors.html) the error if it happens
->rather than to add a lot of code to prevent it from happening. See [duck typing](https://en.wikipedia.org/wiki/Duck_typing)
->and the concept of _Leap before you Look_.
+> **額外加分：** 作為練習，嘗試將其他內容傳遞到 `hello_world` 中。嘗試例如
+> 傳遞數字 `5` 或字串 `"foo"`。你會收到錯誤訊息，告訴你他們沒有
+>attribute `msg`。他們不關心 `me` 本身不是字串或數字。如果你是
+>熟悉其他程式語言（尤其是 C/Java），您可能會想在傳送之前開始*驗證* `who` 以確保其型別正確。在 Python 中通常不建議這樣做。 Python 的哲學是在發生錯誤時[處理](https://docs.python.org/2/tutorial/errors.html)
+>而不是新增大量程式碼來防止它發生。請參閱[鴨子打字](https://en.wikipedia.org/wiki/Duck_typing)
+>以及「先行一步，再看」的概念。
 
 
-## Finding others to send to
+(finding-others-to-send-to)=
+## 尋找其他人傳送給
 
-Let's wrap up this first Python `py` crash-course by finding someone else to send to.
+讓我們透過找其他人傳送來結束第一個 Python `py` 速成課程。
 
-In Evennia's `contrib/` folder (`evennia/contrib/tutorial_examples/mirror.py`) is a handy little object called the `TutorialMirror`. The mirror will echo whatever is being sent to it to
-the room it is in.
+在Evennia 的`contrib/` 資料夾(`evennia/contrib/tutorial_examples/mirror.py`) 中有一個方便的小物件，稱為`TutorialMirror`。鏡子將回顯傳送給它的任何內容
+它所在的房間。
 
-On the game command-line, let's create a mirror:
+在遊戲指令列上，我們建立一個映象：
 
     > create/drop mirror:contrib.tutorials.mirror.TutorialMirror
 
-```{sidebar} Creating objects
-The `create` command was first used to create boxes in the
-[Building Stuff](./Beginner-Tutorial-Building-Quickstart.md) tutorial. You should now recognize 
-that it uses a "python-path" to tell Evennia where to load the mirror's code from.
+```{sidebar} 建立物件
+`create` 指令首先用於在
+[建築材料](./Beginner-Tutorial-Building-Quickstart.md) 教學。你現在應該認識到
+它使用“python-path”來告訴 Evennia 從哪裡載入映象的程式碼。
 ```
 
-A mirror should appear in your location.
+您所在的位置應該會出現一面鏡子。
 
     > look mirror
     mirror shows your reflection:
     This is User #1
 
-What you are seeing is actually your own avatar in the game, the same thing that is available as `me` in the `py` command.
+你所看到的實際上是你自己在遊戲中的頭像，與`py`指令中的`me`相同。
 
-What we are aiming for now is the equivalent of `mirror.msg("Mirror Mirror on the wall")`. But the first thing that comes to mind will not work:
+我們現在的目標相當於`mirror.msg("Mirror Mirror on the wall")`。但我想到的第一件事是行不通的：
 
     > py mirror.msg("Mirror, Mirror on the wall ...")
     NameError: name 'mirror' is not defined.
 
-This is not surprising: Python knows nothing about "mirrors" or locations or anything. The `me` we've been using is, as mentioned, just a convenient thing the Evennia devs makes available to the `py` command. They couldn't possibly predict that you wanted to talk to mirrors.
+這並不奇怪：Python 對「映象」、位置或任何東西一無所知。如前所述，我們一直在使用的 `me` 只是 Evennia 開發人員為 `py` 指令提供的一個方便的東西。他們不可能預測你想和鏡子說話。
 
-Instead we will need to _search_ for that `mirror` object before we can send to it. Make sure you are in the same location as the mirror and try:
+相反，我們需要_搜尋_該 `mirror` 物件，然後才能傳送給它。確保您與鏡子位於同一位置，然後嘗試：
 
     > py me.search("mirror")
     mirror
 
-`me.search("name")` will, by default, search and _return_ an object with the given name found in _the same location_ as the `me` object is. If it can't find anything you'll see an error.
+預設情況下，`me.search("name")` 將搜尋並_傳回_在與 `me` 物件相同的位置_找到的具有給定名稱的物件。如果找不到任何內容，您會看到錯誤。
 
-```{sidebar} Function returns
+```{sidebar} 函式返回
 
-Whereas a function like `print` only prints its arguments, it's very common
-for functions/methods to `return` a result of some kind. Think of the function
-as a machine - you put something in and out comes a result you can use. In the case of `me.search`, it will perform a database search and spit out the object it finds.
+雖然像 `print` 這樣的函式只列印它的引數，但它很常見
+`return` 的函式/方法是某種結果。想想功能
+作為一臺機器——你輸入一些東西，然後輸出你可以使用的結果。在`me.search`的情況下，它將執行資料庫搜尋並吐出它找到的物件。
 ```
 
     > py me.search("dummy")
     Could not find 'dummy'.
 
-Wanting to find things in the same location is very common, but as we continue we'll
-find that Evennia provides ample tools for tagging, searching and finding things from all over your game.
+想要在同一位置找到東西是很常見的，但隨著我們繼續，我們會
+發現 Evennia 提供了充足的工具來標記、搜尋和尋找整個遊戲中的內容。
 
-Now that we know how to find the 'mirror' object, we just need to use that instead of `me`!
+現在我們知道如何找到「映象」物件，我們只需要使用它而不是`me`！
 
     > py mirror = self.search("mirror") ; mirror.msg("Mirror, Mirror on the wall ...")
     mirror echoes back to you:
     "Mirror, Mirror on the wall ..."
 
-The mirror is useful for testing  because its `.msg` method just echoes whatever is sent to it back to the room. More common would be to talk to a player character, in which case the text you sent would have appeared in their game client.
+鏡子對於測試很有用，因為它的 `.msg` 方法只是將傳送給它的任何內容回顯到房間。更常見的是與玩家角色交談，在這種情況下，您傳送的文字將出現在他們的遊戲使用者端中。
 
 
-## Multi-line py
+(multi-line-py)=
+## 多行py
 
-So far we have use `py` in single-line mode, using `;` to separate multiple inputs. This is very convenient when you want to do some quick testing. But you can also start a full multi-line Python interactive interpreter inside Evennia.
+到目前為止我們已經在單行模式下使用了`py`，使用`;`來分隔多個輸入。當您想要進行一些快速測試時，這非常方便。但您也可以在 Evennia 內啟動完整的多行 Python 互動式直譯器。
 
     > py
     Evennia Interactive Python mode
@@ -420,9 +433,9 @@ So far we have use `py` in single-line mode, using `;` to separate multiple inpu
     [GCC 8.2.0] on Linux
     [py mode - quit() to exit]
 
-(the details of the output will vary with your Python version and OS). You are now in python interpreter mode. It means
-that _everything_ you insert from now on will become a line of Python (you can no longer look around or do other
-commands).
+（輸出的詳細資訊將根據您的Python版本和OS而有所不同）。您現在處於 python 解譯器模式。這意味著
+從現在開始你插入的所有內容都將成為Python的一行（你不能再環顧四周或做其他事情）
+指令）。
 
     > print("Hello World")
 
@@ -430,7 +443,7 @@ commands).
     Hello World
     [py mode - quit() to exit]
 
-Note that we didn't need to put `py` in front now. The system will also echo your input (that's the bit after the `>>>`). For brevity in this tutorial we'll turn the echo off. First exit `py` and then start again with the `/noecho` flag.
+請注意，我們現在不需要將 `py` 放在前面。系統也會回顯您的輸入（即 `>>>` 之後的位元）。為了簡潔起見，在本教學中我們將關閉迴聲。首先退出 `py`，然後使用 `/noecho` 標誌重新開始。
 
     > quit()
     Closing the Python console.
@@ -440,21 +453,21 @@ Note that we didn't need to put `py` in front now. The system will also echo you
     [GCC 8.2.0] on Linux
     [py mode - quit() to exit]
 
-```{sidebar} interactive py
+```{sidebar} 互動式py
 
-- Start with `py`.
-- Use `py/noecho` if you don't want your input to be echoed for every line.
-- _All_ your inputs will now be interpreted as Python code.
-- Exit with `quit()`.
+- 從 `py` 開始。
+- 如果您不希望每行都回顯您的輸入，請使用 `py/noecho`。
+- 您的所有輸入現在都將解釋為 Python 程式碼。
+- 使用 `quit()` 退出。
 ```
 
-We can now enter multi-line Python code:
+我們現在可以輸入多行Python程式碼：
 
     > a = "Test"
     > print(f"This is a {a}.")
     This is a Test.
 
-Let's try to define a function:
+讓我們試著定義一個函式：
 
     > def hello_world(who, txt):
     ...
@@ -463,68 +476,70 @@ Let's try to define a function:
     >
     [py mode - quit() to exit]
 
-Some important things above:
+上面一些重要的事情：
 
-- Defining a function with `def` means we are starting a new code block. Python works so that you mark the content
-  of the block with indention. So the next line must be manually indented (4 spaces is a good standard) in order
-  for Python to know it's part of the function body.
-- We expand the `hello_world` function with another argument `txt`. This allows us to send any text, not just
-  "Hello World" over and over.
-- To tell `py` that no more lines will be added to the function body, we end with an empty input. When the normal prompt returns, we know we are done.
+- 用 `def` 定義函式意味著我們正在開始一個新的程式碼區塊。 Python 的工作原理是讓你標記內容
+帶有縮排的區塊。因此下一行必須手動縮排（4個空格是一個很好的標準）以便
+  讓 Python 知道它是函式體的一部分。
+- 我們用另一個引數 `txt` 來擴充 `hello_world` 函式。這允許我們傳送任何文字，而不僅僅是
+一遍又一遍地「你好世界」。
+- 為了告訴 `py` 不再在函式體內新增任何行，我們以空輸入結束。當正常提示返回時，我們知道我們已經完成了。
 
-Now we have defined a new function. Let's try it out:
+現在我們定義了一個新函式。讓我們試試看：
 
     > hello_world(me, "Hello world to me!")
     Hello world to me!
 
-The `me` is still available to us, so we pass that as the `who` argument, along with a little longer
-string. Let's combine this with searching for the mirror.
+`me` 仍然可供我們使用，因此我們將其作為 `who` 引數以及更長一點的引數傳遞
+字串。讓我們將其與尋找鏡子結合。
 
     > mirror = me.search("mirror")
     > hello_world(mirror, "Mirror, Mirror on the wall ...")
     mirror echoes back to you:
     "Mirror, Mirror on the wall ..."
 
-Exit the `py` mode with
+退出 `py` 模式
 
     > quit()
     Closing the Python console.
 
-## Other ways to test Python code
+(other-ways-to-test-python-code)=
+## 測試 Python 程式碼的其他方法
 
-The `py` command is very powerful for experimenting with Python in-game. It's great for quick testing.
-But you are still limited to working over telnet or the webclient, interfaces that doesn't know anything
-about Python per-se.
+`py` 指令對於在遊戲中試驗 Python 非常有用。這非常適合快速測試。
+但您仍然僅限於透過 telnet 或 webclient 進行工作，這些介面什麼都不知道
+關於 Python 本身。
 
-Outside the game, go to the terminal where you ran Evennia (or any terminal where the `evennia` command
-is available).
+在遊戲外，請前往執行 Evennia 的終端（或執行 `evennia` 指令的任何終端
+可用）。
 
-- `cd` to your game dir.
+- `cd` 到你的遊戲目錄。
 - `evennia shell`
 
-A Python shell opens. This works like `py` did inside the game, with the exception that you don't have
-`me` available out of the box. If you want `me`, you need to first find yourself:
+Python shell 將會開啟。這就像 `py` 在遊戲中所做的那樣，除了你沒有
+`me` 開箱即用。如果你想要`me`，你需要先找到自己：
 
     > import evennia
     > me = evennia.search_object("YourChar")[0]
 
-Here we make use of one of evennia's search functions, available by importing `evennia` directly.
-We will cover more advanced searching later, but suffice to say, you put your own character name instead of
-"YourChar" above.
+這裡我們利用 evennia 的搜尋功能之一，可以透過直接匯入 `evennia` 來使用。
+我們稍後將介紹更高階的搜尋，但可以說，您輸入自己的角色名稱而不是
+上面的“YourChar”。
 
-> The `[0]` at the end is because `.search_object` returns a list of objects and we want to
-get at the first of them (counting starts from 0).
+> 最後的 `[0]` 是因為 `.search_object` 回傳一個物件列表，我們想要
+找到其中的第一個（從 0 開始計數）。
 
-Use `Ctrl-D` (`Cmd-D` on Mac) or `quit()` to exit the Python console.
+使用`Ctrl-D`（Mac 上為`Cmd-D`）或`quit()` 退出Python 控制檯。
 
-## ipython
+(ipython)=
+## 蟒蛇
 
-The default Python shell is quite limited and ugly. It's *highly* recommended to install `ipython` instead. This
+The default Python shell is quite limited and ugly. It's *highly* recommended to install `ipython` instead.這個
 is a much nicer, third-party Python interpreter with colors and many usability improvements.
 
     pip install ipython
 
-If `ipython` is installed, `evennia shell` will use it automatically.
+如果安裝了 `ipython`，`evennia shell` 將自動使用它。
 
     evennia shell
     ...
@@ -534,30 +549,31 @@ If `ipython` is installed, `evennia shell` will use it automatically.
     > import evennia
     > evennia.<TAB>
 
-That is, enter `evennia.` and then press the TAB key - you will be given a list of all the resources
-available on the `evennia` object. This is great for exploring what Evennia has to offer. For example,
-use your arrow keys to scroll to `search_object()` to fill it in.
+也就是說，輸入`evennia.`，然後按TAB鍵 - 您將獲得所有資源的列表
+可用於 `evennia` 物件。這對於探索 Evennia 所提供的內容非常有用。例如，
+使用箭頭鍵滾動到 `search_object()` 進行填充。
 
     > evennia.search_object?
 
-Adding a `?` and pressing return will give you the full documentation for `.search_object`. Use `??` if you
-want to see the entire source code.
+新增 `?` 並按回車鍵將為您提供 `.search_object` 的完整檔案。如果您有以下情況，請使用 `??`
+想看完整的原始碼。
 
-As for the normal python interpreter, use `Ctrl-D`/`Cmd-D` or `quit()` to exit ipython.
+對於普通的python直譯器，使用`Ctrl-D`/`Cmd-D`或`quit()`退出ipython。
 
-```{important} Persistent code
+```{important} 持久化程式碼
 
-Common for both `py` and `python`/`ipython` is that the code you write is not persistent - it will
-be gone after you shut down the interpreter (but ipython will remember your input history). For making long-lasting
-Python code, we need to save it in a Python module, like we did for `world/test.py`.
+`py` 和 `python`/`ipython` 的共同點是您編寫的程式碼不是永續性的 - 它會
+關閉直譯器後就消失了（但 ipython 會記住你的輸入歷史記錄）。為了製作持久
+Python 程式碼，我們需要將其儲存在 Python 模組中，就像我們對 `world/test.py` 所做的那樣。
 ```
 
 
-## Conclusions
+(conclusions)=
+## 結論
 
-This covers quite a lot of basic Python usage. We printed and formatted strings, defined our own
-first function, fixed an error and even searched and talked to a mirror! Being able to access
-python inside and outside of the game is an important skill for testing and debugging, but in
-practice you will be writing most your code in Python modules.
+這涵蓋了相當多的基本 Python 用法。我們列印並格式化字串，定義我們自己的
+第一個功能，修復了錯誤，甚至搜尋並與鏡子交談！能夠訪問
+遊戲內外的python是測試和除錯的重要技能，但在
+實作中，您將在 Python 模組中編寫大部分程式碼。
 
-To that end we also created a first new Python module in the `mygame/` game dir, then imported and used it. Now let's look at the rest of the stuff you've got going on inside that `mygame/` folder ...
+為此，我們還在 `mygame/` 遊戲目錄中建立了第一個新的 Python 模組，然後匯入並使用它。現在讓我們看看 `mygame/` 資料夾中的其餘內容...

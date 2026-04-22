@@ -1,5 +1,6 @@
-# Characters 
-**Inheritance Tree:
+(characters)=
+# 人物
+**繼承樹：
 ```
 ┌─────────────┐
 │DefaultObject│
@@ -16,14 +17,14 @@
   └─────────┘
 ```
 
-_Characters_ is an in-game [Object](./Objects.md) commonly used to represent the player's in-game avatar. The empty `Character` class is found in `mygame/typeclasses/characters.py`. It inherits from [DefaultCharacter](evennia.objects.objects.DefaultCharacter) and the (by default empty) `ObjectParent` class (used if wanting to add share properties between all in-game Objects). 
+_Characters_是遊戲中的[物件](./Objects.md)，通常用於代表玩家在遊戲中的頭像。在 `mygame/typeclasses/characters.py` 中找到空的 `Character` 類。它繼承自 [DefaultCharacter](evennia.objects.objects.DefaultCharacter) 和（預設為空）`ObjectParent` 類別（如果想要在所有遊戲內物件之間新增共享屬性，則使用）。
 
-When a new [Account](./Accounts.md) logs in to Evennia for the first time, a new `Character` object is created and the [Account](./Accounts.md) will be set to _puppet_ it. By default this first Character will get the same name as the Account (but Evennia supports [alternative connection-styles](../Concepts/Connection-Styles.md) if so desired). 
+當新的[帳戶](./Accounts.md)第一次登入Evennia時，會建立一個新的`Character`物件，並且[帳戶](./Accounts.md)將被設定為_傀儡_它。預設情況下，第一個角色將獲得與帳戶相同的名稱（但如果需要，Evennia 支援[替代連線樣式](../Concepts/Connection-Styles.md)）。
 
-A `Character` object will usually have a [Default Commandset](./Command-Sets.md) set on itself at creation, or the account will not be able to issue any in-game commands! 
+`Character` 物件通常會在建立時為其自身設定一個[預設指令集](./Command-Sets.md)，否則該帳戶將無法發出任何遊戲內指令！
 
-If you want to change the default character created by the default commands, you can change it in settings: 
+如果你想更改預設指令建立的預設字元，可以在設定中更改：
 
     BASE_CHARACTER_TYPECLASS = "typeclasses.characters.Character"
     
-This deafult points at the empty class in  `mygame/typeclasses/characters.py` , ready for you to modify as you please.
+這個預設指向 `mygame/typeclasses/characters.py` 中的空類，你可以隨意修改。

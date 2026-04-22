@@ -1,40 +1,42 @@
-# Red Button example
+(red-button-example)=
+# 紅色按鈕範例
 
-Contribution by Griatch, 2011
+Griatch 的貢獻，2011 年
 
-A red button that you can press to have an effect. This is a more advanced example 
-object with its own functionality and state tracking.
+一個紅色按鈕，按下即可產生效果。這是一個更高階的例子
+具有自己的功能和狀態追蹤的物件。
 
-Create the button with
+建立按鈕
 
     create/drop button:contrib.tutorials.red_button.RedButton
 
-Note that you must drop the button before you can see its messages! It's
-imperative that you press the red button. You know you want to.
+請注意，您必須先放下按鈕才能看到其訊息！這是
+您必須按下紅色按鈕。你知道你想要。
 
-Use `del button` to destroy/stop the button when you are done playing.
+玩完後使用 `del button` 銷毀/停止按鈕。
 
-## Technical
+(technical)=
+## 技術的
 
-The button's functionality is controlled by CmdSets that gets added and removed
-depending on the 'state' the button is in.
+按鈕的功能由新增和刪除的 CmdSets 控制
+取決於按鈕所處的「狀態」。
 
-- Lid-closed state: In this state the button is covered by a glass cover and
-  trying to 'push' it will fail. You can 'nudge', 'smash' or 'open' the lid.
-- Lid-open state: In this state the lid is open but will close again after a
-  certain time. Using 'push' now will press the button and trigger the
-  Blind-state.
-- Blind-state: In this mode you are blinded by a bright flash. This will affect
-  your normal commands like 'look' and help until the blindness wears off after
-  a certain time.
+- 合蓋狀態：在此狀態下按鈕被玻璃蓋覆蓋且
+試圖「推動」它將會失敗。您可以「輕推」、「粉碎」或「開啟」蓋子。
+- 開蓋狀態：在此狀態下，蓋子開啟，但在一段時間後會再次關閉。
+一定的時間。現在使用“push”將按下按鈕並觸發
+  盲態。
+- 失明狀態：在此模式下，您會被明亮的閃光致盲。這會影響
+你的正常指令，如“看”和幫助，直到失明消失
+  某個時間。
 
-Timers are handled by persistent delays on the button. These are examples of
-`evennia.utils.utils.delay` calls that wait a certain time before calling a
-method - such as when closing the lid and un-blinding a character.
+計時器是透過按鈕上的持續延遲來處理的。這些都是例子
+`evennia.utils.utils.delay` 呼叫在呼叫之前等待一定時間
+方法 - 例如關閉蓋子並解除角色失明時。
 
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/tutorials/red_button/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\tutorials\red_button\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

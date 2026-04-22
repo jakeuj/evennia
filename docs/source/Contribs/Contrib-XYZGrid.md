@@ -1,18 +1,20 @@
+(xyzgrid)=
 # XYZgrid
 
-Contribution by Griatch 2021
+Gratch 2021 的貢獻
 
-Places Evennia's game world on an xy (z being different maps) coordinate grid.
-Grid is created and maintained externally by drawing and parsing 2D ASCII maps,
-including teleports, map transitions and special markers to aid pathfinding.
-Supports very fast shortest-route pathfinding on each map. Also includes a
-fast view function for seeing only a limited number of steps away from your
-current location (useful for displaying the grid as an in-game, updating map).
+將 Evennia 的遊戲世界放置在 xy（z 是不同的地圖）座標網格上。
+網格是透過繪製和解析 2D ASCII 地圖在外部建立和維護的，
+包括傳送、地圖轉換和幫助尋路的特殊標記。
+支援在每個地圖上非常快速的最短路徑尋路。還包括一個
+快速檢視功能，僅檢視距離您有限的步數
+目前位置（對於將網格顯示為遊戲中的更新地圖很有用）。
 
-Grid-management is done outside of the game using a new evennia-launcher
-option.
+網格管理是在遊戲外使用新的evennia啟動器完成的
+選項。
 
-## Examples
+(examples)=
+## 範例
 
 <script id="asciicast-Zz36JuVAiPF0fSUR09Ii7lcxc" src="https://asciinema.org/a/Zz36JuVAiPF0fSUR09Ii7lcxc.js" async></script>
 
@@ -42,182 +44,186 @@ Exits: northeast and east
 
 ```
 
-## Installation
+(installation)=
+## 安裝
 
-1. XYZGrid requires the `scipy` library. Easiest is to get the 'extra'
-   dependencies of Evennia with
+1. XYZGrid 需要 `scipy` 函式庫。最簡單的就是獲得“額外”
+Evennia 的依賴關係
 
        pip install evennia[extra]
 
-   If you use the `git` install, you can also
+如果您使用`git`安裝，還可以
 
        (cd to evennia/ folder)
        pip install --upgrade -e .[extra]
 
-   This will install all optional requirements of Evennia.
-2. Import and [add] the `evennia.contrib.grid.xyzgrid.commands.XYZGridCmdSet` to the
-   `CharacterCmdset` cmdset in `mygame/commands.default_cmds.py`. Reload
-   the server. This makes the `map`, `goto/path` and the modified `teleport` and
-   `open` commands available in-game.
+這將安裝 Evennia 的所有可選要求。
+2. 匯入並將 `evennia.contrib.grid.xyzgrid.commands.XYZGridCmdSet` 新增到
+`CharacterCmdset` cmdset 在 `mygame/commands.default_cmds.py` 中。重新載入
+   伺服器。這使得 `map`、`goto/path` 和修改後的 `teleport` 和
+   `open` 遊戲中可用指令。
 
 [add]: ../Components/Command-Sets
 
-3. Edit `mygame/server/conf/settings.py` and add
+3. 編輯`mygame/server/conf/settings.py`並新增
 
        EXTRA_LAUNCHER_COMMANDS['xyzgrid'] = 'evennia.contrib.grid.xyzgrid.launchcmd.xyzcommand'
        PROTOTYPE_MODULES += ['evennia.contrib.grid.xyzgrid.prototypes']
 
-   This will add the new ability to enter `evennia xyzgrid <option>` on the
-   command line.  It will also make the `xyz_room` and `xyz_exit` prototypes
-   available for use as prototype-parents when spawning the grid.
+這將新增在 `evennia xyzgrid <option>` 上輸入的新功能
+   指令列。  它還將製作 `xyz_room` 和 `xyz_exit` 原型
+   在生成網格時可用作原型父母。
 
-4. Run `evennia xyzgrid help` for available options.
+4. 執行 `evennia xyzgrid help` 以獲取可用選項。
 
-5. (Optional): By default, the xyzgrid will only spawn module-based
-   [prototypes]. This is an optimization and usually makes sense
-   since the grid is entirely defined outside the game anyway. If you want to
-   also make use of in-game (db-) created prototypes, add
-   `XYZGRID_USE_DB_PROTOTYPES = True` to settings.
+5. （可選）：預設情況下，xyzgrid 將僅產生基於模組的
+[原型]。這是一種最佳化，通常是有意義的
+   因為無論如何，網格完全是在遊戲之外定義的。如果你想
+   也利用遊戲中（db-）建立的原型，新增
+   `XYZGRID_USE_DB_PROTOTYPES = True` 到設定。
 
 [prototypes]: ../Components/Prototypes
 
-## Overview
+(overview)=
+## 概述
 
-The grid contrib consists of multiple components.
+網格contrib由多個元件組成。
 
-1. The `XYMap` - This class parses modules with special _Map strings_
-   and _Map legends_ into one Python object. It has helpers for pathfinding and
-   visual-range handling.
-2. The `XYZGrid` - This is a singleton [Script](../Components/Scripts.md) that
-   stores all `XYMaps` in the game. It is the central point for managing the 'grid'
-   of the game.
-3. `XYZRoom` and `XYZExit`are custom typeclasses that use
-   [Tags](../Components/Tags.md)
-   to know which X,Y,Z coordinate they are located at. The `XYZGrid` is
-   abstract until it is used to _spawn_ these database entities into
-   something you can actually interract with in the game. The `XYZRoom`
-   typeclass is using its `return_appearance` hook to display the in-game map.
-4. Custom _Commands_ have been added for interacting with XYZ-aware locations.
-5. A new custom _Launcher command_, `evennia xyzgrid <options>` is used to
-   manage the grid from the terminal (no game login is needed).
+1. `XYMap` - 該類別使用特殊的 _Map strings_ 解析模組
+和 _Map legends_ 到一個 Python 物件中。它有尋路助手和
+   視覺範圍處理。
+2. `XYZGrid` - 這是一個單例 [Script](../Components/Scripts.md)
+儲存遊戲中的所有`XYMaps`。它是管理“網格”的中心點
+   遊戲的。
+3. `XYZRoom` 和 `XYZExit` 是使用的自訂 typeclasses
+[Tags](../Components/Tags.md)
+   知道它們位於哪個 X、Y、Z 座標。 `XYZGrid` 是
+   抽象化直到它被用來_spawn_這些資料庫實體到
+   您可以在遊戲中實際互動的東西。 `XYZRoom`
+   typeclass 正在使用其 `return_appearance` 掛鉤來顯示遊戲中的地圖。
+4. 已新增自訂_指令_用於與XYZ-感知位置進行互動。
+5. 新的自訂_啟動器指令_，`evennia xyzgrid <options>` 用於
+從終端管理網格（無需登入遊戲）。
 
-We'll start exploring these components with an example.
+我們將透過一個範例開始探索這些元件。
 
-## First example usage
+(first-example-usage)=
+## 第一個範例用法
 
-After installation, do the following from your command line (where the
-`evennia` command is available):
+安裝後，從指令列執行以下操作（其中
+`evennia` 指令可用）：
 
     $ evennia xyzgrid init
 
-use `evennia xyzgrid help` to see all options)
-This will create a new `XYZGrid` [Script](../Components/Scripts.md) if one didn't already exist.
-The `evennia xyzgrid` is a custom launch option added only for this contrib.
+使用`evennia xyzgrid help`檢視所有選項）
+如果尚不存在，這將建立一個新的 `XYZGrid` [Script](../Components/Scripts.md)。
+`evennia xyzgrid` 僅為此 contrib 新增的自訂啟動選項。
 
-The xyzgrid-contrib comes with a full grid example. Let's add it:
+xyzgrid-contrib 有完整的網格範例。讓我們新增它：
 
     $ evennia xyzgrid add evennia.contrib.grid.xyzgrid.example
 
-You can now list the maps on your grid:
+現在您可以在網格上列出地圖：
 
     $ evennia xyzgrid list
 
-You'll find there are two new maps added. You can find a lot of extra info
-about each map with the `show` subcommand:
+您會發現新增了兩張新地圖。你可以找到很多額外的資訊
+使用 `show` 子指令檢視每個地圖：
 
     $ evennia xyzgrid show "the large tree"
     $ evennia xyzgrid show "the small cave"
 
-If you want to peek at how the grid's code, open
-[evennia/contrib/grid/xyzgrid/example.py](evennia.contrib.grid.xyzgrid.example).
-(We'll explain the details in later sections).
+如果您想檢視網格的程式碼，請開啟
+[evennia/contrib/grid/xyzgrid/example.py](evennia.contrib.grid.xyzgrid.example)。
+（我們將在後面的部分中解釋詳細資訊）。
 
-So far the grid is 'abstract' and has no actual in-game presence. Let's
-spawn actual rooms/exits from it. This will take a little while.
+到目前為止，網格是“抽象的”，並且在遊戲中沒有實際存在。讓我們
+產生實際的房間/出口。這需要一些時間。
 
     $ evennia xyzgrid spawn
 
-This will take prototypes stored with each map's _map legend_ and use that
-to build XYZ-aware rooms there. It will also parse all links to make suitable
-exits between locations. You should rerun this command if you ever modify the
-layout/prototypes of your grid. Running it multiple times is safe.
+這將採用與每個地圖的_地圖圖例_一起儲存的原型並使用它
+在那裡建造XYZ-感知房間。它還會解析所有連結以做出合適的
+在位置之間退出。如果您修改過，您應該重新執行此指令
+網格的佈局/原型。多次執行它是安全的。
 
     $ evennia reload
 
-(or `evennia start` if server was not running). This is important to do after
-every spawning operation, since the `evennia xyzgrid` operates outside of the
-regular evennia process. Reloading makes sure all caches are refreshed.
+（如果伺服器未執行，則為 `evennia start`）。這很重要
+每次產生操作，因為 `evennia xyzgrid` 在
+常規 evennia 程式。重新載入可確保重新整理所有快取。
 
-Now you can log into the server. Some new commands should be available to you.
+現在您可以登入伺服器了。您應該可以使用一些新指令。
 
     teleport (3,0,the large tree)
 
-The `teleport` command now accepts an optional (X, Y, Z) coordinate. Teleporting
-to a room-name or `#dbref` still works the same. This will teleport you onto the
-grid. You should see a map-display. Try walking around.
+`teleport` 指令現在接受可選的（X、Y、Z）座標。傳送
+房間名稱或 `#dbref` 的作用仍然相同。這會將你傳送到
+網格。您應該會看到地圖顯示。嘗試四處走走。
 
     map
 
-This new builder-only command shows the current map in its full form (also
-showing 'invisible' markers usually not visible to users.
+這個新的僅限建構器的指令以完整形式顯示當前地圖（也
+顯示使用者通常不可見的「不可見」標記。
 
     teleport (3, 0)
 
-Once you are in a grid-room, you can teleport to another grid room _on the same
-map_ without specifying the Z coordinate/map name.
+一旦你進入一個網格房間，你可以傳送到另一個網格房間_在同一房間
+map_ 不指定 Z 座標/地圖名稱。
 
-You can use `open` to make an exit back to the 'non-grid', but remember that you
-mustn't use a cardinal direction to do so - if you do, the `evennia xyzgrid spawn`
-will likely remove it next time you run it.
+您可以使用 `open` 退出回到“非網格”，但請記住您
+不得使用基本方向來執行此操作 - 如果這樣做，`evennia xyzgrid spawn`
+下次執行它時可能會刪除它。
 
     open To limbo;limbo = #2
     limbo
 
-You are back in Limbo (which doesn't know anything about XYZ coordinates). You
-can however make a permanent link back into the gridmap:
+你回到了 Limbo（它不知道關於 XYZ 座標的任何資訊）。你
+但是可以將永久連結返回到網格地圖：
 
     open To grid;grid = (3,0,the large tree)
     grid
 
-This is how you link non-grid and grid locations together. You could for example
-embed a house 'inside' the grid this way.
+這就是將非網格位置和網格位置連結在一起的方式。例如你可以
+以這種方式將房屋嵌入網格“內部”。
 
-the `(3,0,the large tree)` is a 'Dungeon entrance'. If you walk east you'll
-_transition_ into "the small cave" map. This is a small underground dungeon
-with limited visibility. Go back outside again (back on "the large tree" map).
+`(3,0,the large tree)` 是「地下城入口」。如果你向東走你會
+_過渡_進入「小洞穴」地圖。這是一個小型的地下迷宮
+能見度有限。再次回到外面（回到「大樹」地圖）。
 
     path view
 
-This finds the shortest path to the "A gorgeous view" room, high up in the large
-tree. If you have color in your client, you should see the start of the path
-visualized in yellow.
+這找到了通往“A beautiful view”房間的最短路徑，該房間位於大房間的高處
+樹。如果你的用戶端有顏色，你應該會看到路徑的起點
+以黃色顯示。
 
     goto view
 
-This will start auto-walking you to the view. On the way you'll both move up
-into the tree as well as traverse an in-map teleporter. Use `goto` on its own
-to abort the auto-walk.
+這將開始自動帶您前往檢視。在路上你們都會進步
+進入樹並穿越地圖內的傳送器。單獨使用 `goto`
+中止自動行走。
 
-When you are done exploring, open the terminal (outside the game) again and
-remove everything:
+完成探索後，再次開啟終端（在遊戲外）並
+刪除所有內容：
 
     $ evennia xyzgrid delete
 
-You will be asked to confirm the deletion of the grid and unloading of the
-XYZGrid script. Reload the server afterwards. If you were on a map that was
-deleted you will have been moved back to your home location.
+系統將要求您確認刪除網格並解除安裝
+XYZGrid Script。之後重新載入伺服器。如果你在一張地圖上
+刪除後，您將被移回您的家庭位置。
 
-## Defining an XYMap
+(defining-an-xymap)=
+## 定義XYMap
 
-For a module to be suitable to pass to `evennia xyzgrid add <module>`, the
-module must contain one of the following variables:
+對於適合傳遞到 `evennia xyzgrid add <module>` 的模組，
+模組必須包含以下變數之一：
 
-- `XYMAP_DATA` - a dict containing data that fully defines the XYMap
-- `XYMAP_DATA_LIST` - a list of `XYMAP_DATA` dicts. If this exists, it will take
-  precedence. This allows for storing multiple maps in one module.
+- `XYMAP_DATA` - 包含完全定義 XYMap 的資料的字典
+- `XYMAP_DATA_LIST` - `XYMAP_DATA` 字典的列表。如果存在，則需要
+優先。這允許在一個模組中儲存多個地圖。
 
 
-The `XYMAP_DATA` dict has the following form:
+`XYMAP_DATA` 字典有以下形式：
 
 ```
 XYMAP_DATA = {
@@ -230,19 +236,19 @@ XYMAP_DATA = {
 
 ```
 
-- `"zcoord"` (str): The Z-coordinate/map name of the map.
-- `"map"` (str): A _Map string_ describing the topology of the map.
-- `"legend"` (dict, optional): Maps each symbol on the map to Python code. This
-  dict can be left out or only partially filled - any symbol not specified will
-  instead use the default legend from the contrib.
-- `"prototypes"` (dict, optional): This is a dict that maps map-coordinates
-  to custom prototype overrides. This is used when spawning the map into
-  actual rooms/exits.
-- `"options"` (dict, optional): These are passed into the `return_appearance`
-  hook of the room and allows for customizing how a map should be displayed,
-  how pathfinding should work etc.
+- `"zcoord"` (str)：地圖的 Z 座標/地圖名稱。
+- `"map"` (str)：描述地圖拓樸的_地圖字串_。
+- `"legend"`（字典，可選）：將地圖上的每個符號對應到Python程式碼。這
+dict 可以省略或僅部分填充 - 任何未指定的符號都會
+  而是使用 contrib 中的預設圖例。
+- `"prototypes"`（字典，可選）：這是對映地圖座標的字典
+自訂原型覆蓋。當地圖生成到
+  實際的房間/出口。
+- `"options"`（字典，可選）：這些被傳遞到`return_appearance`
+房間的掛鉤並允許自訂地圖的顯示方式，
+  尋路應該如何進行等等。
 
-Here's a minimal example of the whole setup:
+這是整個設定的最小範例：
 
 ```
 # In, say, a module gamedir/world/mymap.py
@@ -303,51 +309,53 @@ XYMAP_DATA_LIST = [
 ]
 ```
 
-The above map would be added to the grid with
+上面的地圖將會被加入到網格中
 
     $ evennia xyzgrid add world.mymap
 
-In the following sections we'll discuss each component in turn.
+在下面的部分中，我們將依次討論每個元件。
 
-### The Zcoord
+(the-zcoord)=
+### Z座標
 
-Each XYMap on the grid has a Z-coordinate which usually can be treated just as
-the name of the map. The Z-coordinate can be either a string or an integer, and must
-be unique across the entire grid. It is added as the key 'zcoord' to `XYMAP_DATA`.
+網格上的每個 XYMap 都有一個 Z 座標，通常可以視為
+地圖的名稱。 Z 座標可以是字串或整數，且必須
+在整個網格中是唯一的。它作為鍵“zcoord”新增到`XYMAP_DATA`。
 
-Most users will want to just treat each map as a location, and name the
-"Z-coordinate" things like `Dungeon of Doom`, `The ice queen's palace` or `City
-of Blackhaven`. But you could also name it -1, 0, 1, 2, 3 if you wanted.
+大多數使用者只想將每張地圖視為一個位置，並為其命名
+“Z 座標”，例如 `Dungeon of Doom`、`The ice queen's palace` 或“城市”
+布萊克黑文`。但如果您願意，也可以將其命名為 -1, 0, 1, 2, 3。
 
-> Note that the Zcoord is searched *non-case senstively* in the
+> 請注意，在中搜尋 Zcoord *不區分大小寫*
 
-Pathfinding happens only within each XYMap (up/down is normally 'faked' by moving
-sideways to a new area of the XY plane).
+尋路僅在每個 XYMap 內發生（上/下通常是透過移動來「偽造」的）
+橫向到 XY 平面的新區域）。
 
-#### A true 3D map
+(a-true-3d-map)=
+#### 真正的 3D 地圖
 
-Even for the most hardcore of sci-fi space game, consider sticking to 2D
-movement. It's hard enough for players to visualize a 3D volume with graphics.
-In text it's even harder.
+即使是最硬派的科幻太空遊戲，也可以考慮堅持 2D
+運動。對玩家來說，用圖形來視覺化 3D 體積已經夠困難的了。
+在文字中就更難了。
 
-That said, if you want to set up a true X, Y, Z 3D coordinate system (where
-you can move up/down from every point), you can do that too.
+也就是說，如果您想建立一個真正的 X、Y、Z 3D 座標系（其中
+您可以從每個點向上/向下移動），您也可以這樣做。
 
-This contrib provides an example command `commands.CmdFlyAndDive` that provides the player
-with the ability to use `fly` and `dive` to move straight up/down between Z
-coordinates. Just add it (or its cmdset `commands.XYZGridFlyDiveCmdSet`) to your
-Character cmdset and reload to try it out.
+這contrib提供了一個範例指令`commands.CmdFlyAndDive`，該指令為玩家提供了
+能夠使用 `fly` 和 `dive` 在 Z 之間直接向上/向下移動
+座標。只需將其（或其 cmdset `commands.XYZGridFlyDiveCmdSet`）新增到您的
+角色cmdset並重新載入來嘗試。
 
-For the fly/dive to work you need to build your grid as a 'stack' of XY-grid maps
-and name them by their Z-coordinate as an integer. The fly/dive actions will
-only work if there is actually a matching room directly above/below.
+為了使飛行/潛水工作，您需要將網格建構成 XY-網格地圖的“堆疊”
+並透過它們的 Z 座標作為整數命名它們。飛行/俯衝動作將
+僅當上方/下方確實有匹配的房間時才有效。
 
-> Note that since pathfinding only works within each XYmap, the player will not
-> be able to include fly/dive in their autowalking - this is always a manual
-> action.
+> 請注意，由於尋路僅在每個 XY 地圖內有效，因此玩家不會
+> 能夠在自動行走中包含飛行/潛水 - 這始終是手冊
+> 行動。
 
-As an example, let's assume coordinate `(1, 1, -3)`
-is the bottom of a deep well leading up to the surface (at level 0)
+作為範例，我們假設座標 `(1, 1, -3)`
+是通往地面的深井底部（0 級）
 
 ```
 LEVEL_MINUS_3 = r"""
@@ -398,23 +406,24 @@ XYMAP_DATA_LIST = [
 ]
 ```
 
-In this example, if we arrive to the bottom of the well at `(1, 1, -3)` we
-`fly` straight up three levels until we arrive at `(1, 1, 0)`, at the corner
-of some sort of open field.
+在此範例中，如果我們在 `(1, 1, -3)` 到達井底，我們
+`fly` 直上三層，直到到達轉角處的 `(1, 1, 0)`
+某種開放領域。
 
-We can dive down from `(1, 1, 0)`. In the default implementation you must `dive` 3 times
-to get to the bottom. If you wanted you could tweak the command so you
-automatically fall to the bottom and take damage etc.
+我們可以從`(1, 1, 0)`跳下去。在預設實作中，您必須 `dive` 3 次
+追根究底。如果你願意，你可以調整指令，這樣你
+自動落到底部並受到傷害等。
 
-We can't fly/dive up/down from any other XY positions because there are no open rooms at the
-adjacent Z coordinates.
+我們無法從任何其他 XY 位置飛行/俯衝/俯衝，因為該位置沒有開放房間
+相鄰的 Z 座標。
 
 
-### Map String
+(map-string)=
+### 地圖字串
 
-The creation of a new map starts with a _Map string_. This allows you to 'draw'
-your map, describing and how rooms are positioned in an X,Y coordinate system.
-It is added to `XYMAP_DATA` with the key 'map'.
+新地圖的建立從_地圖字串_開始。這可以讓你“畫畫”
+您的地圖，描述房間在 X、Y 座標系中的位置。
+它透過鍵“map”新增到`XYMAP_DATA`。
 
 ```
 MAPSTR = r"""
@@ -433,8 +442,8 @@ MAPSTR = r"""
 
 ```
 
-On the coordinate axes, only the two `+` are significant - the numbers are
-_optional_, so this is equivalent:
+在座標軸上，只有兩個 `+` 是有意義的 - 數字是
+_可選_，所以這是等效的：
 
 ```
 MAPSTR = r"""
@@ -451,20 +460,20 @@ MAPSTR = r"""
 
 """
 ```
-> Even though it's optional, it's highly recommended that you add numbers to
-> your axes - if only for your own sanity.
+> 儘管它是可選的，但強烈建議您新增數字
+> 你的斧頭——如果只是為了你自己的理智。
 
-The coordinate area starts _two spaces to the right_ and _two spaces
-below/above_ the mandatory `+` signs (which marks the corners of the map area).
-Origo `(0,0)` is in the bottom left (so X-coordinate increases to the right and
-Y-coordinate increases towards the top). There is no limit to how high/wide the
-map can be, but splitting a large world into multiple maps can make it easier
-to organize.
+座標區開始_向右兩格_和_兩格
+下面/上面_強制`+`標誌（標記地圖區域的角落）。
+Origo `(0,0)` 位於左下角（因此 X 座標向右增加，
+Y 座標向頂部增加）。高度/寬度沒有限制
+地圖可以，但是將一個大世界分成多個地圖可以更容易
+組織。
 
-Position is important on the grid. Full coordinates are placed on every _second_
-space along all axes. Between these 'full' coordinates are `.5` coordinates.
-Note that there are _no_ `.5` coordinates spawned in-game; they are only used
-in the map string to have space to describe how rooms/nodes link to one another.
+網格上的位置很重要。每隔_秒_放置完整座標
+沿所有軸的空間。這些「完整」座標之間是 `.5` 座標。
+請注意，遊戲中產生了 _no_ `.5` 座標；它們只被使用
+在地圖字串中留出空間來描述房間/節點如何相互連結。
 
     + 0 1 2 3 4 5
 
@@ -480,31 +489,32 @@ in the map string to have space to describe how rooms/nodes link to one another.
 
     + 0 1 2 3 4 5
 
-- `A` is at origo, `(0, 0)` (a 'full' coordinate)
-- `B` is at `(0.5, 3.5)`
-- `C` is at `(1.5, 1)`
-- `D` is at `(4, 2)` (a 'full' coordinate).
-- `E` is the top-right corner of the map, at `(5, 4)` (a 'full' coordinate)
+- `A` 位於原點，`(0, 0)`（「完整」座標）
+- `B` 位於 `(0.5, 3.5)`
+- `C` 位於 `(1.5, 1)`
+- `D` 位於 `(4, 2)`（「完整」座標）。
+- `E` 是地圖的右上角，位於 `(5, 4)`（「完整」座標）
 
-The map string consists of two main classes of entities - _nodes_ and _links_.
-- A _node_ usually represents a _room_ in-game (but not always). Nodes must
-  _always_ be placed on a 'full' coordinate.
-- A _link_ describes a connection between two nodes. In-game, links are usuallyj
-  represented by _exits_. A link can be placed
-  anywhere in the coordinate space (both on full and 0.5 coordinates). Multiple
-  links are often _chained_ together, but the chain must always end in nodes
-  on both sides.
+地圖字串由兩個主要的實體類別組成 - _nodes_ 和 _links_。
+- _node_ 通常代表遊戲中的_room_（但並非總是如此）。節點必須
+_始終_放置在「完整」座標上。
+- _link_ 描述兩個節點之間的連線。在遊戲中，連結通常是
+由_exits_表示。可以放一個連結
+  座標空間中的任何位置（全座標和 0.5 座標）。多個
+  連結通常「連結」在一起，但鏈必須始終以節點結束
+  兩側。
 
-> Even though a link-chain may consist of several steps, like `#-----#`,
-> in-game it will still only represent one 'step' (e.g. you go 'east' only once
-> to move from leftmost to the rightmost node/room).
+> 即使連結鏈可能由多個步驟組成，例如 `#-----#`，
+> 在遊戲中它仍然只代表一個「步驟」（e.g。你只往「東」走一次
+> 從最左邊移動到最右邊的節點/房間）。
 
 
-### Map legend
+(map-legend)=
+### 地圖圖例
 
-There can be many different types of _nodes_ and _links_. Whereas the map
-string describes where they are located, the _Map Legend_ connects each symbol
-on the map to Python code.
+可以有許多不同型別的_節點_和_連結_。而地圖
+字串描述它們所在的位置，_地圖圖例_連線每個符號
+在Python程式碼的地圖上。
 
 ```
 
@@ -517,107 +527,108 @@ LEGEND = {
 
 ```
 
-The legend is optional, and any symbol not explicitly given in your legend will
-fall back to its value in the default legend [outlined below](#default-legend).
+圖例是可選的，圖例中未明確給出的任何符號都將
+回退到預設圖例中的值[如下所述](#default-legend)。
 
 - [MapNode](evennia.contrib.grid.xyzgrid.xymap_legend.MapNode)
-  is the base class for all nodes.
+是所有節點的基底類別。
 - [MapLink](evennia.contrib.grid.xyzgrid.xymap_legend.MapLink)
-  is the base class for all links.
+是所有連結的基底類別。
 
-As the _Map String_ is parsed, each found symbol is looked up in the legend and
-initialized into the corresponding MapNode/Link instance.
+當解析 _Map String_ 時，會在圖例中尋找每個找到的符號並
+初始化到對應的MapNode/Link例項。
 
-#### Important node/link properties
+(important-nodelink-properties)=
+#### 重要的節點/連結屬性
 
-These are relevant if you want to customize the map. The contrib already comes
-with a full set of map elements that use these properties in various ways
-(described in the next section).
+如果您想自訂地圖，這些都是相關的。 contrib已經來了
+具有以各種方式使用這些屬性的全套地圖元素
+（在下一節中描述）。
 
-Some useful properties of the
+的一些有用的屬性
 [MapNode](evennia.contrib.grid.xyzgrid.xymap_legend.MapNode)
-class (see class doc for hook methods):
+類別（有關鉤子方法，請參閱類別檔案）：
 
-- `symbol` (str) - The character to parse from the map into this node. By default this
-  is `'#'` and _must_ be a single character (with the exception of `\\` that must
-  be escaped to be used). Whatever this value defaults to, it is replaced at
-  run-time by the symbol used in the legend-dict.
-- `display_symbol` (str or `None`) - This is what is used to visualize this node
-  in-game. This symbol must still only have a visual size of 1, but you could e.g.
-  use some fancy unicode character (be aware of encodings to different clients
-  though) or, commonly, add color tags around it. The `.get_display_symbol`
-  of this class can be customized to generate this dynamically; by default it
-  just returns `.display_symbol`. If set to `None` (default), the `symbol` is
-  used.
-- `interrupt_path` (bool): If this is set, the shortest-path algorithm will
-  include this node normally, but the auto-stepper will stop when reaching it,
-  even if not having reached its target yet. This is useful for marking 'points of
-  interest' along a route, or places where you are not expected to be able to
-  continue without some
-  further in-game action not covered by the map (such as a guard or locked gate
-  etc).
-- `prototype` (dict) - The default `prototype` dict to use for reproducing this
-  map component on the game grid. This is used if not overridden specifically
-  for this coordinate in the "prototype" dict of `XYMAP_DATA`.. If this is not
-  given, nothing will be spawned for this coordinate (a 'virtual' node can be
-  useful for various reasons, mostly map-transitions).
+- `symbol` (str) - 要從對映解析到此節點的字元。預設情況下這個
+是 `'#'` 並且_必須_是單一字元（`\\` 除外，它必須
+  被轉義以供使用）。無論這個值預設是什麼，它都會被替換為
+  執行時由 legend-dict 中使用的符號執行。
+- `display_symbol`（str 或 `None`）- 用於視覺化此節點
+遊戲中。該符號的視覺大小仍然只能為 1，但您可以e.g。
+  使用一些奇特的 unicode 字元（注意不同用戶端的編碼
+  不過），或通常在其周圍新增顏色tags。 `.get_display_symbol`
+  可以自訂該類別以動態產生該類別；預設情況下
+  只回`.display_symbol`。如果設定為 `None`（預設），則 `symbol` 為
+  使用過。
+- `interrupt_path` (bool): 如果設定了此項，最短路徑演演算法將
+正常包含該節點，但自動步進器在到達該節點時將停止，
+  即使還沒有達到目標。這對於標記“點”很有用
+  沿途或您預計無法到達的地方的興趣
+  繼續沒有一些
+  地圖未涵蓋的其他遊戲內動作（例如守衛或上鎖的門）
+  等）。
+- `prototype` (dict) - 用於重現此內容的預設 `prototype` dict
+遊戲網格上的地圖元件。如果沒有專門覆蓋，則使用此值
+  對於 `XYMAP_DATA` 的“原型”字典中的這個座標..如果不是
+  給定，該座標不會產生任何內容（“虛擬”節點可以是
+  由於各種原因很有用，主要是地圖轉換）。
 
-Some useful properties of the
+的一些有用的屬性
 [MapLink](evennia.contrib.grid.xyzgrid.xymap_legend.MapLink)
-class (see class doc for hook methods):
+類別（有關鉤子方法，請參閱類別檔案）：
 
-- `symbol` (str) - The character to parse from the map into this node. This must
-  be a single character, with the exception of `\\`. This will be replaced
-  at run-time by the symbol used in the legend-dict.
-- `display_symbol` (str or None)  - This is what is used to visualize this node
-  later. This symbol must still only have a visual size of 1, but you could e.g.
-  use some fancy unicode character (be aware of encodings to different clients
-  though) or, commonly, add color tags around it. For further customization, the
-  `.get_display_symbol` can be used.
-- `default_weight` (int) - Each link direction covered by this link can have its
-  separate weight (used for pathfinding). This is used if none specific weight
-  is specified in a particular link direction.  This value must be >= 1, and can
-  be higher than 1 if a link should be less favored.
-- `directions` (dict) - this specifies which from which link edge to which other
-  link-edge this link is connected; A link connecting the link's sw edge to its
-  easted edge would be written as `{'sw': 'e'}` and read 'connects from southwest
-  to east' This ONLY takes cardinal directions (not up/down). Note that if you
-  want the link to go both ways, also the inverse (east to southwest) must be
-  added.
-- `weights (dict)` This maps a link's start direction to a weight. So for the
-  `{'sw': 'e'}` link, a weight would be given as `{'sw': 2}`. If not given, a
-  link will use the `default_weight`.
-- `average_long_link_weights` (bool): This applies to the *first* link out of a
-  node only.  When tracing links to another node, multiple links could be
-  involved, each with a weight.  So for a link chain with default weights, `#---#`
-  would give a total weight of 3. With this setting (default), the weight will
-  be (1+1+1) / 3 = 1.  That is, for evenly weighted links, the length of the
-  link-chain doesn't matter (this is usually what makes most sense).
-- `direction_aliases` (dict): When displaying a direction during pathfinding,
-  one may want to display a different 'direction' than the cardinal on-map one.
-  For example 'up' may be visualized on the map as a 'n' movement, but the found
-  path over this link should show as 'u'. In that case, the alias would be
-  `{'n': 'u'}`.
-- `multilink` (bool): If set, this link accepts links from all directions. It
-  will usually use a custom `.get_direction` method to determine what these are
-  based on surrounding topology. This setting is necessary to avoid infinite
-  loops when such multilinks are next to each other.
-- `interrupt_path` (bool): If set, a shortest-path solution will include this
-  link as normal, but auto-stepper will stop short of actually moving past this
-  link.
-- `prototype` (dict) - The default `prototype` dict to use for reproducing this
-  map component on the game grid. This is only relevant for the *first* link out
-  of a Node (the continuation of the link is only used to determine its
-  destination). This can be overridden on a per-direction basis.
-- `spawn_aliases` (dict): A mapping `{direction: (key, alias, alias, ...),}`to
-  use when spawning actual exits from this link. If not given, a sane set of
-  defaults (`n=(north, n)` etc) will be used. This is required if you use any
-  custom directions outside of the cardinal directions + up/down. The exit's key
-  (useful for auto-walk) is usually retrieved by calling
+- `symbol` (str) - 要從對映解析到此節點的字元。這必須
+可以是單一字元，`\\` 除外。這將被替換
+  在執行時透過 legend-dict 中使用的符號。
+- `display_symbol`（str 或 None）- 用於視覺化該節點
+之後。此符號的視覺大小仍必須僅為 1，但您可以e.g。
+  使用一些奇特的 unicode 字元（注意不同用戶端的編碼
+  不過），或通常在其周圍新增顏色 tags 。為了進一步定製，
+  可以使用`.get_display_symbol`。
+- `default_weight` (int) - 此連結所涵蓋的每個連結方向都可以有其
+單獨的重量（用於尋路）。如果沒有特定重量，則使用此
+  在特定的連結方向上指定。  該值必須 >= 1，並且可以
+  如果連結不那麼受歡迎，則應高於 1。
+- `directions` (dict) - 這指定從哪條連結邊緣到哪條其他邊緣
+link-edge 此連結已連線；將連結的 sw 邊緣連線到其
+  東邊將寫為 `{'sw': 'e'}` 並讀取“從西南連線”
+  向東' 這個 ONLY 採用基本方向（不是向上/向下）。請注意，如果您
+  想要雙向連結，也必須反向（東向西南）
+  補充道。
+- `weights (dict)` 這將連結的起始方向對應到權重。所以對於
+`{'sw': 'e'}` 連結，權重將指定為 `{'sw': 2}`。如果沒有給出，則
+  連結將使用`default_weight`。
+- `average_long_link_weights` (bool)：這適用於某個連結中的*第一個*連結
+僅節點。  當追蹤到另一個節點的連結時，可能會出現多個連結
+  涉及其中，各有分量。  因此對於具有預設權重的連結鏈，`#---#`
+  則總權重為 3。使用此設定（預設），權重將
+  為 (1+1+1) / 3 = 1。也就是說，對於均勻加權的連結，
+  連結鏈並不重要（這通常是最有意義的）。
+- `direction_aliases` (dict): 尋路時顯示方向時，
+人們可能想要顯示與地圖上主要方向不同的「方向」。
+  例如，“向上”可能在地圖上視覺化為“n”運動，但找到的
+  此連結的路徑應顯示為“u”。在這種情況下，別名將是
+  `{'n': 'u'}`。
+- `multilink` (bool)：如果設定，此連結接受來自所有方向的連結。它
+通常會使用自訂 `.get_direction` 方法來確定這些是什麼
+  基於周圍的拓撲。此設定對於避免無限
+  當此類多重連結彼此相鄰時會發生迴圈。
+- `interrupt_path` (bool)：如果設定，最短路徑解決方案將包含此
+連結正常，但自動步進器將停止實際移動超過此
+  連結。
+- `prototype` (dict) - 用於重現此內容的預設 `prototype` dict
+遊戲網格上的地圖元件。這僅與*第一個*連結輸出相關
+  節點的（連結的延續僅用於確定其
+  目的地）。這可以在每個方向的基礎上被覆蓋。
+- `spawn_aliases`（字典）：對映 `{direction: (key, alias, alias,...),}` 到
+從此連結產生實際退出時使用。如果沒有給出，則提供一組健全的
+  將使用預設值（`n=(north, n)` 等）。如果您使用任何一個，則這是必需的
+  基本方向+上/下之外的自訂方向。出口的鑰匙
+  （對於自動行走很有用）通常透過呼叫來檢索
   `node.get_exit_spawn_name(direction)`
 
-Below is an example that changes the map's nodes to show up as red
-(maybe for a lava map?):
+下面是一個將地圖節點更改為紅色的範例
+（也許是熔岩地圖？）：
 
 ```
 from evennia.contrib.grid.xyzgrid import xymap_legend
@@ -632,14 +643,15 @@ LEGEND = {
 
 ```
 
-#### Default Legend
+(default-legend)=
+#### 預設圖例
 
 
-Below is the default map legend. The `symbol` is what should be put in the Map
-string. It must always be a single character. The `display-symbol` is what is
-actually visualized when displaying the map to players in-game. This could have
-colors etc. All classes are found in `evennia.contrib.grid.xyzgrid.xymap_legend` and
-their names are included to make it easy to know what to override.
+下面是預設的地圖圖例。 `symbol` 是應該放在地圖中的內容
+字串。它必須始終是單一字元。 `display-symbol` 是什麼
+在遊戲中向玩家顯示地圖時實際上是視覺化的。這可能有
+顏色等。所有類別都可以在 `evennia.contrib.grid.xyzgrid.xymap_legend` 中找到並且
+包含它們的名稱是為了方便了解要涵蓋的內容。
 
 ```{eval-rst}
 =============  ==============  ====  ===================  =========================================
@@ -679,12 +691,13 @@ t                              link  `TeleporterMapLink`  Inter-map teleporter; 
 
 
 
-#### Map Nodes
+(map-nodes)=
+#### 地圖節點
 
-The basic map node (`#`) usually represents a 'room' in the game world. Links
-can connect to the node from any of the 8 cardinal directions, but since nodes
-must _only_ exist on full coordinates, they can never appear directly next to
-each other.
+基本地圖節點（`#`）通常代表遊戲世界中的一個「房間」。友情連結
+可以從 8 個基本方向中的任何一個連線到節點，但由於節點
+必須_僅_存在於完整座標上，它們永遠不能直接出現在
+彼此。
 
     \|/
     -#-
@@ -692,40 +705,42 @@ each other.
 
     ##     invalid!
 
-All links or link-chains _must_ end in nodes on both sides.
+所有連結或連結鏈_必須_以兩側的節點結束。
 
 
     #-#-----#
 
     #-#-----   invalid!
 
-#### One-way links
+(one-way-links)=
+#### 單向連結
 
-`>`,`<`, `v`, `^` are used to indicate one-way links. These indicators should
-either be _first_ or _last_ in a link chain (think of them as arrows):
+`>`、`<`、`v`、`^` 用於表示單向連結。這些指標應該
+可以是連結鏈中的_first_或_last_（將它們視為箭頭）：
 
     #----->#
     #>-----#
 
-These two are equivalent, but the first one is arguably easier to read. It is also
-faster to parse since the parser on the rightmost node immediately sees that the
-link in that direction is impassable from that direction.
+這兩個是等效的，但第一個可以說更容易閱讀。這也是
+解析速度更快，因為最右邊節點上的解析器立即看到
+那個方向的連結是無法從那個方向透過的。
 
-> Note that there are no one-way equivalents to the `\` and `/` directions. This
-> is not because it can't be done but because there are no obvious ASCII
-> characters to represent diagonal arrows. If you want them, it's easy enough to
-> subclass the existing one-way map-legend to add one-way versions of diagonal
-> movement as well.
+> 請注意，`\` 和 `/` 方向沒有單向等效項。這
+> 不是因為做不到而是因為沒有明顯的ASCII
+> 表示對角箭頭的字元。如果你想要它們，很容易
+> 子類化現有的單向地圖圖例以新增對角線的單向版本
+> 運動也是如此。
 
-#### Up- and Down-links
+(up-and-down-links)=
+#### 上行鏈路和下行鏈路
 
-Links like `u` and `d` don't have a clear indicator which directions they
-connect (unlike e.g. `|` and `-`).
+像 `u` 和 `d` 這樣的連結沒有明確的指示它們的方向
+連線（與 e.g、`|` 和 `-` 不同）。
 
-So placing them (and many similar types of map elements) requires that the
-directions are visually clear. For example, multiple links cannot connect to the
-up-down links (it'd be unclear which leads where) and if adjacent to a node, the
-link will prioritize connecting to the node. Here are some examples:
+因此，放置它們（以及許多類似型別的地圖元素）需要
+方向視覺上清晰。例如，多個連結無法連線到
+上下連結（不清楚哪個通往哪裡），如果與一個節點相鄰，則
+link 將優先連線到該節點。以下是一些範例：
 
         #
         u    - moving up in BOTH directions will bring you to the other node (two-way)
@@ -755,88 +770,92 @@ link will prioritize connecting to the node. Here are some examples:
         #     |
 
 
-#### Interrupt-nodes
+(interrupt-nodes)=
+#### 中斷節點
 
-An interrupt-node (`I`, `InterruptMapNode`) is a node that acts like any other
-node except it is considered a 'point of interest' and the auto-walk of the
-`goto` command will always stop auto-stepping at this location.
+中斷節點（`I`、`InterruptMapNode`）是像其他節點一樣運作的節點。
+節點，除非它被認為是“興趣點”並且該節點的自動行走
+`goto` 指令將始終在此位置停止自動步進。
 
-	#-#-I-#-#
+＃-＃-我-＃-＃
 
-So if auto-walking from left to right, the auto-walk will correctly map a path
-to the end room, but will always stop at the `I` node. If the user _starts_ from
-the `I` room, they will move away from it without interruption (so you can
-manually run the `goto` again to resume the auto-step).
+因此，如果從左到右自動行走，自動行走將正確地繪製路徑
+到最後的房間，但總是停在`I`節點。如果使用者_開始_於
+`I` 房間，他們會不間斷地離開它（所以你可以
+再次手動執行 `goto` 以恢復自動步驟）。
 
-The use of this room is to anticipate blocks not covered by the map. For example
-there could be a guard standing in this room that will arrest you unless you
-show them the right paperwork - trying to auto-walk past them would be bad!
+這個房間的用途是預測地圖未涵蓋的街區。例如
+這個房間裡可能有一名警衛會逮捕你，除非你
+向他們展示正確的檔案——試圖自動走過他們是很糟糕的！
 
-By default, this node looks just like a normal `#` to the player.
+預設情況下，這個節點對玩家來說就像一個普通的`#`。
 
-#### Interrupt-links
+(interrupt-links)=
+#### 中斷連結
 
-The interrupt-link (`i`, `InterruptMapLink`) is equivalent to the
-`InterruptMapNode` except it applies to a link. While the pathfinder will
-correctly trace a path to the other side, the auto-stepper will never cross an
-interrupting link - you have to do so 'manually'. Similarly to up/down links,
-the InterruptMapLink must be placed so that its direction is un-ambiguous (with
-a priority of linking to nearby nodes).
+中斷連結（`i`，`InterruptMapLink`）相當於
+`InterruptMapNode`，但它適用於連結。雖然探路者將
+正確地追蹤到另一側的路徑，自動步進器將永遠不會穿過
+中斷連結 - 您必須「手動」執行此操作。與上/下連結類似，
+InterruptMapLink 的放置必須確保其方向明確（使用
+連結到附近節點的優先權）。
 
-	#-#-#i#-#
+＃-＃-＃我＃-＃
 
-When pathfinding from left to right, the pathfinder will find the end room just
-fine, but when auto-stepping, it will always stop at the node just to the left
-of the `i` link. Rerunning `goto` will not matter.
+當從左向右尋路時，尋路者會剛好找到最後一個房間
+可以，但是自動步進時，它總是停在左邊的節點處
+`i` 連結的。重新執行 `goto` 並不重要。
 
-This is useful for automatically handle in-game blocks not part of the map.
-An example would be a locked door - rather than having the auto-stepper trying
-to walk accross the door exit (and failing), it should stop and let the user
-cross the threshold manually before they can continue.
+這對於自動處理不屬於地圖的遊戲內區塊很有用。
+一個例子是鎖著的門 - 而不是讓自動步進器嘗試
+要穿過門出口（並且失敗），它應該停下來讓使用者
+在他們可以繼續之前手動跨越閾值。
 
-Same as for interrupt-nodes, the interrupt-link looks like the expected link to the user
-(so in the above example, it would show as `-`).
+與中斷節點相同，中斷連結看起來像是使用者預期的連結
+（所以在上面的例子中，它將顯示為`-`）。
 
-#### Blocked links
+(blocked-links)=
+#### 被阻止的連結
 
-Blockers (`b`, `BlockedMapLink`) indicates a route that the pathfinder should not use. The
-pathfinder will treat it as impassable even though it will be spawned as a
-normal exit in-game.
-
-
-	#-#-#b#-#
-
-There is no way to auto-step from left to right because the pathfinder will
-treat the `b` (block) as if there was no link there (technically it sets the
-link's `weight` to a very high number). The player will need to auto-walk to the
-room just to the left of the block, manually step over the block and then
-continue from there.
-
-This is useful both for actual blocks (maybe the room is full of rubble?) and in
-order to avoid players auto-walking into hidden areas or finding the way out of
-a labyrinth etc. Just hide the labyrinth's exit behind a block and `goto exit`
-will not work (admittedly one may want to turn off pathfinding altogether on
-such maps).
+攔截者（`b`、`BlockedMapLink`）表示探路者不應使用的路線。的
+探路者會將其視為不可通行，即使它將作為一個生成
+遊戲中正常退出。
 
 
-#### Router-links
+#-#-#b#-#
 
-Routers (`o`, `RouterMapLink`) allow for connecting nodes with links at an
-angle, by creating a 'knee'.
+無法從左到右自動步進，因為探路器會
+將`b`（塊）視為那裡沒有連結（從技術上講，它設定了
+連結的 `weight` 到非常高的數字）。玩家需要自動走到
+房間就在街區左側，手動跨過街區，然後
+從那裡繼續。
 
-	#----o
-	|     \
-	#-#-#  o
+這對於實際的街區（也許房間裡充滿了瓦礫？）和在
+為了避免玩家自動走進隱藏區域或找到出去的路
+迷宮等。只需將迷宮的出口隱藏在方塊後面即可`goto exit`
+將無法運作（誠然，人們可能想完全關閉尋路功能
+此類地圖）。
+
+
+(router-links)=
+#### 路由器連結
+
+路由器（`o`、`RouterMapLink`）允許透過連結連線節點
+透過創造「膝蓋」來調整角度。
+
+#----o
+	| \
+	#-#-# o
 	       |
-	     #-o
+#-o
 
-Above, you can move east between from the top-left room and the bottommost
-room. Remember that the length of links does not matter, so in-game this will
-only be one step (one exit `east` in each of the two rooms).
+在上面，您可以從左上角的房間和最底部的房間之間向東移動
+房間。請記住，連結的長度並不重要，因此在遊戲中這將
+僅一步（兩個房間各有一個出口 `east`）。
 
-Routers can link connect multiple connections as long as there as as many
-'ingoing' as there are 'outgoing' links. If in doubt, the system will assume a
-link will continue to the outgoing link on the opposite side of the router.
+路由器可以連結多個連線，只要有盡可能多的連線
+「傳入」因為有「傳出」連結。如果有疑問，系統將假定
+連結將繼續到路由器另一側的傳出連結。
 
           /
         -o    - this is ok, there can only be one path, w-ne
@@ -856,36 +875,37 @@ link will continue to the outgoing link on the opposite side of the router.
         /|
 
 
-#### Teleporter Links
+(teleporter-links)=
+#### 傳送器連結
 
-Teleporters (`TeleportMapLink`) always come in pairs using the same map symbol
-(`'t'` by default).  When moving into one link, movement continues out the
-matching teleport link. The pair must both be on the same XYMap and both sides
-must connect/chain to a node (like all links). Only a single link (or node) may
-connect to the teleport link.
+傳送器 (`TeleportMapLink`) 總是成對使用相同的地圖符號
+（預設為`'t'`）。  當移動到一個連結時，移動會繼續進行
+匹配傳送連結。該對必須位於同一 XYMap 且兩側
+必須連線/連結到一個節點（像所有連結一樣）。只有單一連結（或節點）可以
+連線到傳送連結。
 
-Pathfinding will also work correctly across the teleport.
+尋路也會在傳送過程中正常運作。
 
-	#-t     t-#
+#-t t-#
 
-Moving east from the leftmost node will have you appear at the rightmost node
-and vice versa (think of the two `t` as thinking they are in the same location).
+從最左邊的節點向東移動將使您出現在最右邊的節點
+反之亦然（將兩個 `t` 視為認為它們位於同一位置）。
 
-Teleportation movement is always two-way, but you can use one-way links to
-create the effect of a one-way teleport:
+傳送運動始終是雙向的，但您可以使用單向連結
+建立單向傳送的效果：
 
-	#-t    t>#
+#-tt>#
 
-In this example you can move east across the teleport, but not west since the
-teleporter-link is hidden behind a one-way exit.
+在此範例中，您可以透過傳送向東移動，但不能向西移動，因為
+傳送連結隱藏在單向出口後面。
 
-	#-t#     (invalid!)
+#-t#（無效！）
 
-The above is invalid since only one link/node may connect to the teleport at a
-time.
+上述內容無效，因為只有一個連結/節點可以連線到傳送點
+時間。
 
-You can have multiple teleports on the same map, by assigning each pair a
-different (unused) unique symbol in your map legend:
+您可以在同一張地圖上擁有多個傳送，透過為每一對分配一個
+地圖圖例中不同的（未使用的）獨特符號：
 
 
 ```python
@@ -916,26 +936,27 @@ LEGEND = {
 
 ```
 
-#### Map-Transition Nodes
+(map-transition-nodes)=
+#### 地圖轉換節點
 
-The map transition (`MapTransitionNode`) teleports between XYMaps (a
-Z-coordinate transition, if you will), like walking from the "Dungeon" map to
-the "Castle" map. Unlike other nodes, the MapTransitionNode is never spawned
-into an actual room (it has no prototype). It just holds an XYZ
-coordinate pointing to somewhere on the other map. The link leading _to_ the
-node will use those coordinates to make an exit pointing there. Only one single
-link may lead to this type of node.
+地圖轉換 (`MapTransitionNode`) 在 XYMaps（a
+Z 座標過渡，如果你願意的話），就像從「Dungeon」地圖步行到
+「城堡」地圖。與其他節點不同，MapTransitionNode 永遠不會生成
+進入一個實際的房間（它沒有原型）。它只持有XYZ
+座標指向另一張地圖上的某個位置。通往 _to_ 的連結
+節點將使用這些座標來建立指向那裡的出口。只有一張
+連結可能會導致這種型別的節點。
 
-Unlike for `TeleporterMapLink`, there need _not_ be a matching
-`MapTransitionNode` on the other map - the transition can choose to send the
-player to _any_ valid coordinate on the other map.
+與 `TeleporterMapLink` 不同，不需要匹配
+`MapTransitionNode` 在另一張地圖上 - 過渡可以選擇傳送
+玩家到另一張地圖上的_任何_有效座標。
 
-Each MapTransitionNode has a property `target_map_xyz` that holds the XYZ
-coordinate the player should end up in when going towards this node. This
-must be customized in a child class for every transition.
+每個 MapTransitionNode 都有一個屬性 `target_map_xyz` 儲存 XYZ
+玩家走向這個節點時應該到達的座標。這個
+必須在子類別中為每次轉換進行自訂。
 
-If there are more than one transition, separate transition classes should be
-added, with different map-legend symbols:
+如果有多個轉換，則應設定單獨的轉換類
+新增了不同的地圖圖例符號：
 
 
 ```python
@@ -981,56 +1002,57 @@ XYMAP_DATA = {
 
 ```
 
-Moving west from `(1,0)` will bring you to `(1,4)` of MapA, and moving east from
-`(1,2)` will bring you to `(12,14)` on MapC (assuming those maps exist).
+從 `(1,0)` 向西移動將到達 MapA 的 `(1,4)`，從
+`(1,2)` 會將您帶到 MapC 上的 `(12,14)`（假設這些地圖存在）。
 
-A map transition is always one-way, and can lead to the coordinates of _any_
-existing node on the other map:
+地圖轉換總是單向的，並且可以導致 _any_ 的座標
+另一張地圖上的現有節點：
 
-	map1        map2
+地圖1 地圖2
 
-	#-T         #-#---#-#-#-#
+#-T#-#---#-#-#-#
 
-A player moving east towards `T` could for example end up at the 4th `#` from
-the left on map2 if so desired (even though it doesn't make sense visually).
-There is no way to get back to map1 from there.
+例如，向東向 `T` 移動的玩家最終可能會到達從 `#` 開始的第 4 個位置
+如果需要的話，可以在map2的左邊（即使它在視覺上沒有意義）。
+無法從那裡返回map1。
 
-To create the effect of a two-way transition, one can set up a mirrored
-transition-node on the other map:
+若要創造雙向過渡的效果，可以設定映象
+另一張地圖上的轉換節點：
 
-	citymap    dungeonmap
+城市地圖 地下城地圖
 
-	#-T        T-#
+#-T T-#
 
 
-The transition-node of each map above has `target_map_xyz` pointing to the
-coordinate of the `#` node of the other map (_not_ to the other `T`, that is not
-spawned and would lead to the exit finding no destination!). The result is that
-one can go east into the dungeon and then immediately go back west to the city
-across the map boundary.
+上面每張地圖的轉換節點都有 `target_map_xyz` 指向
+其他地圖的 `#` 節點的座標（_不是_其他 `T`，即不是
+產生並導致出口找不到目的地！）。結果是
+可以向東進入地牢，然後立即向西返回城市
+跨越地圖邊界。
 
-### Prototypes
+(prototypes)=
+### 原型
 
-[Prototypes](../Components/Prototypes.md) are dicts that describe how to _spawn_ a new instance
-of an object. Each of the _nodes_ and _links_ above have a default prototype
-that allows the `evennia xyzgrid spawn` command to convert them to
-a [XYZRoom](evennia.contrib.grid.xyzgrid.xyzroom.XYZRoom)
-or an [XYZExit](evennia.contrib.grid.xyzgrid.xyzroom.XYZRoom) respectively.
+[原型](../Components/Prototypes.md) 是描述如何_產生_新例項的字典
+一個物體的。上面的每個_節點_和_連結_都有一個預設原型
+允許 `evennia xyzgrid spawn` 指令將它們轉換為
+[XYZRoom](evennia.contrib.grid.xyzgrid.xyzroom.XYZRoom)
+或分別為 [XYZExit](evennia.contrib.grid.xyzgrid.xyzroom.XYZRoom)。
 
-The default prototypes are found in `evennia.contrib.grid.xyzgrid.prototypes` (added
-during installation of this contrib), with `prototype_key`s `"xyz_room"` and
-`"xyz_exit"` - use these as `prototype_parent` to add your own custom prototypes.
+預設原型位於`evennia.contrib.grid.xyzgrid.prototypes`（已新增
+在安裝此 contrib) 期間，`prototype_key`s `"xyz_room"` 和
+`"xyz_exit"` - 使用這些作為 `prototype_parent` 新增您自己的自訂原型。
 
-The `"prototypes"` key of the XYMap-data dict allows you to customize which
-prototype is used for each coordinate in your XYMap. The coordinate is given as
-`(X, Y)` for nodes/rooms and `(X, Y, direction)` for links/exits, where the
-direction is one of "n", "ne", "e", "se", "s", "sw", "w", "nw", "u" or "d". For
-exits, it's recommended to _not_ set a `key` since this is generated
-automatically by the grid spawner to be as expected ("north" with alias "n", for
-example).
+XYMap-data 字典的 `"prototypes"` 鍵可讓您自訂
+原型用於 XYMap 中的每個座標。坐標給出為
+`(X, Y)` 用於節點/房間，`(X, Y, direction)` 用於連結/出口，其中
+方向是「n」、「ne」、「e」、「se」、「s」、「sw」、「w」、「nw」、「u」或「d」之一。對於
+退出，建議_不_設定 `key`，因為這是產生的
+自動由網格產生器按預期進行（“north”，別名“n”，對於
+範例）。
 
-A special coordinate is `*`. This acts as a wild card for that coordinate and
-allows you to add 'default' prototypes to be used for rooms.
+特殊座標是`*`。這充當該座標的萬用字元並且
+允許您新增用於房間的“預設”原型。
 
 
 ```python
@@ -1085,46 +1107,48 @@ XYMAP_DATA = {
 
 ```
 
-When spawning the above map, the room at the bottom-left and top-right of the
-map will get custom descriptions and names, while the others will have default
-values. One exit (the east exit out of the room in the bottom-left will have a
-custom description.
+當產生上面的地圖時，位於地圖左下角和右上角的房間
+地圖將獲得自訂描述和名稱，而其他地圖將具有預設描述和名稱
+價值觀。一個出口（左下房間的東出口會有一個
+自訂描述。
 
-> If you are used to using prototypes, you may notice that we didn't add a
-> `prototype_key` for the above prototypes. This is normally required for every
-> prototype. This is for convenience - if
-> you don't add a `prototype_key`, the grid will automatically generate one for
-> you - a hash based on the current XYZ (+ direction) of the node/link to spawn.
+> 如果您習慣使用原型，您可能會注意到我們沒有新增
+> `prototype_key` 對於上述原型。這通常是每個人都需要的
+> 原型。這是為了方便 - 如果
+> 你不加`prototype_key`，網格會自動產生一個
+> you - 基於要產生的節點/連結的當前 XYZ（+ 方向）的雜湊值。
 
-If you find yourself changing your prototypes after already spawning the
-grid/map, you can rerun `evennia xyzgrid spawn` again; The changes will be
-picked up and applied to the existing objects.
+如果您發現自己在生成後更改了原型
+網格/地圖，您可以再次重新執行`evennia xyzgrid spawn`；變化將是
+拾取並應用於現有物件。
 
-#### Extending the base prototypes
+(extending-the-base-prototypes)=
+#### 擴充套件基礎原型
 
-The default prototypes are found in `evennia.contrib.grid.xyzgrid.prototypes` and
-should be included as `prototype_parents` for prototypes on the map. Would it
-not be nice to be able to change these and have the change apply to all of the
-grid? You can, by adding the following to your `mygame/server/conf/settings.py`:
+預設原型位於 `evennia.contrib.grid.xyzgrid.prototypes` 和
+對於地圖上的原型，應包含為 `prototype_parents`。會嗎
+能夠更改這些並將更改應用到所有
+網格？您可以透過將以下內容新增至 `mygame/server/conf/settings.py` ：
 
     XYZROOM_PROTOTYPE_OVERRIDE = {"typeclass": "myxyzroom.MyXYZRoom"}
     XYZEXIT_PROTOTYPE_OVERRIDE = {...}
 
 
-> If you override the typeclass in your prototypes, the typeclass used  **MUST**
-> inherit from `XYZRoom` and/or `XYZExit`. The `BASE_ROOM_TYPECLASS` and
-> `BASE_EXIT_TYPECLASS` settings will not help - these are still useful for
-> non-xyzgrid rooms/exits though.
+> 如果您涵蓋原型中的 typeclass，則 typeclass 使用 **MUST**
+> 從 `XYZRoom` 和/或 `XYZExit` 繼承。 `BASE_ROOM_TYPECLASS` 和
+> `BASE_EXIT_TYPECLASS` 設定不會有幫助 - 這些仍然有用
+> 但非 xyzgrid 房間/出口。
 
-Only add what you want to change - these dicts will _extend_ the default parent
-prototypes rather than replace them. As long as you define your map's prototypes
-to use a `prototype_parent` of `"xyz_room"` and/or `"xyz_exit"`, your changes
-will now be applied. You may need to respawn your grid and reload the server
-after a change like this.
+僅新增您想要更改的內容 - 這些字典將_擴充套件_預設父級
+原型而不是取代它們。只要您定義地圖的原型
+要使用 `"xyz_room"` 和/或 `"xyz_exit"` 的 `prototype_parent`，您的更改
+現在將被應用。您可能需要重新生成網格並重新載入伺服器
+經過這樣的改變之後。
 
-### Options
+(options)=
+### 選項
 
-The last element of the `XYMAP_DATA` dict is the `"options"`, for example
+例如，`XYMAP_DATA` 字典的最後一個元素是 `"options"`
 
 ```
 XYMAP_DATA = {
@@ -1136,13 +1160,13 @@ XYMAP_DATA = {
 
 ```
 
-The `options` dict is passed as `**kwargs` to `XYZRoom.return_appearance`
-when visualizing the map in-game. It allows for making different maps display
-differently from one another (note that while these options are convenient one
-could of course also override `return_appearance` entirely by inheriting from
-`XYZRoom` and then pointing to it in your prototypes).
+`options` 字典作為 `**kwargs` 傳遞到 `XYZRoom.return_appearance`
+在遊戲中視覺化地圖時。它允許顯示不同的地圖
+彼此不同（請注意，雖然這些選項很方便，但
+當然也可以透過繼承來完全涵蓋 `return_appearance`
+`XYZRoom` 然後在你的原型中指向它）。
 
-The default visualization is this:
+預設的視覺化是這樣的：
 
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1156,17 +1180,17 @@ Exits: northeast and east
 
 ```
 
-- `map_display` (bool): This turns off the display entirely for this map.
-- `map_character_symbol` (str): The symbol used to show 'you' on the map. It can
-  have colors but should only take up one character space. By default this is a
-  green `@`.
-- `map_visual_range` (int): This how far away from your current location you can
-  see.
-- `map_mode` (str): This is either "node" or "scan" and affects how the visual
-  range is calculated.
-  In "node" mode, the range shows how many _nodes_ away from that you can see. In "scan"
-  mode you can instead see that many _on-screen characters_ away from your character.
-  To visualize, assume this is the full map (where '@' is the character location):
+- `map_display`（布林值）：這將完全關閉該地圖的顯示。
+- `map_character_symbol` (str)：用於在地圖上顯示「您」的符號。它可以
+有顏色，但只能佔用一個字元空間。預設情況下這是一個
+  綠色`@`。
+- `map_visual_range` (int): 這是距離你目前位置的距離
+看。
+- `map_mode` (str)：這是“節點”或“掃描”，影響視覺效果
+計算範圍。
+  在「節點」模式下，範圍顯示距離您可以看到的_節點_數量。在“掃描”中
+  在模式下，您可以看到許多_螢幕上的角色_遠離您的角色。
+  為了視覺化，假設這是完整的地圖（其中“@”是字元位置）：
 
       #----------------#
       |                |
@@ -1175,11 +1199,11 @@ Exits: northeast and east
       |                |
       #----------------#
 
-  This is what the player will see in 'nodes' mode with `map_visual_range=2`:
+這是玩家在「節點」模式下看到的 `map_visual_range=2` 的內容：
 
       @------------#-#
 
-  ... and in 'scan' mode:
+....並且在“掃描”模式下：
 
       |
       |
@@ -1187,134 +1211,137 @@ Exits: northeast and east
       |
       #----
 
-  The 'nodes' mode has the advantage of showing only connected links and is
-  great for navigation but depending on the map it can include nodes quite
-  visually far away from you. The 'scan' mode can accidentally reveal unconnected
-  parts of the map (see example above), but limiting the range can be used as a
-  way to hide information.
+“節點”模式的優點是僅顯示連線的連結，並且
+  非常適合導航，但根據地圖，它可以包含相當多的節點
+  視覺上離你很遠。 「掃描」模式可能會意外顯示未連線的情況
+  地圖的一部分（請參閱上面的範例），但限制範圍可以用作
+  隱藏訊息的方式。
 
-  This is what the player will see in 'nodes' mode with `map_visual_range=1`:
+這是玩家在「節點」模式下看到的 `map_visual_range=1` 的內容：
 
       @------------#
 
-  ... and in 'scan' mode:
+....並且在“掃描”模式下：
 
       @-
 
-  One could for example use 'nodes' for outdoor/town maps and 'scan' for
-  exploring dungeons.
+例如，可以使用“節點”來繪製戶外/城鎮地圖，並使用“掃描”來繪製
+  探索地牢。
 
-- `map_align` (str): One of 'r', 'c' or 'l'. This shifts the map relative to
-  the room text. By default it's centered.
-- `map_target_path_style`: How to visualize the path to a target. This is a
-  string that takes the `{display_symbol}` formatting tag. This will be replaced
-  with the `display_symbol` of each map element in the path. By default this is
-  `"|y{display_symbol}|n"`, that is, the path is colored yellow.
-- `map_fill_all` (bool): If the map area should fill the entire client width
-  (default) or change to always only be as wide as the room description. Note
-  that in the latter case, the map can end up 'dancing around' in the client window
-  if descriptions vary a lot in width.
-- `map_separator_char` (str): The char to use for the separator-lines between the map
-  and the room description. Defaults to `"|x~|n"` - wavy, dark-grey lines.
-
-
-Changing the options of an already spawned map does not require re-spawning the
-map, but you _do_ need to reload the server!
-
-### About the Pathfinder
-
-The new `goto` command exemplifies the use of the _Pathfinder_. This
-is an algorithm that calculates the shortest route between nodes (rooms) on an
-XY-map of arbitrary size and complexity. It allows players to quickly move to
-a location if they know that location's name. Here are some details about
-
-- The pathfinder parses the nodes and links to build a matrix of distances
-  of moving from each node to _all_ other nodes on one XYMap. The path
-  is solved using the
-  [Dijkstra algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm).
-- The pathfinder's matrices can take a long time to build for very large maps.
-  Therefore they are are cached as pickled binary files in
-  `mygame/server/.cache/` and only rebuilt if the map changes. They are safe to
-  delete (you can also use `evennia xyzgrid initpath` to force-create/rebuild the cache files).
-- Once cached, the pathfinder is fast (Finding a 500-step shortest-path over
-  20 000 nodes/rooms takes below 0.1s).
-- It's important to remember that the pathfinder only works within _one_ XYMap.
-  It will not find paths across map transitions. If this is a concern, one can consider
-  making all regions of the game as one XYMap. This probably works fine, but makes it
-  harder to add/remove new maps to/from the grid.
-- The pathfinder will actually sum up the 'weight' of each link to determine which is
-  the 'cheapest' (shortest) route. By default every link except blocking links have
-  a cost of 1 (so cost is equal to the number of steps to move between nodes).
-  Individual links can however change this to a higher/lower weight (must be >=1).
-  A higher weight means the pathfinder will be less likely to use that route
-  compared to others (this can also be vidually confusing for the user, so use with care).
-- The pathfinder will _average_ the weight of long link-chains. Since all links
-  default to having the same weight (=1), this means that
-  `#-#` has the same movement cost as `#----#` even though it is visually 'shorter'.
-  This behavior can be changed per-link by using links with
-`average_long_link_weights = False`.
+- `map_align` (str)：「r」、「c」或「l」之一。這會相對於地圖移動
+房間文字。預設情況下它是居中的。
+- `map_target_path_style`：如何視覺化到達目標的路徑。這是一個
+採用 `{display_symbol}` 格式 tag 的字串。這將被替換
+  路徑中每個地圖元素的`display_symbol`。預設情況下這是
+  `"|y{display_symbol}|n"`，即路徑為黃色。
+- `map_fill_all` (bool): 地圖區域是否應填滿整個用戶端寬度
+（預設）或變更為始終僅與房間描述一樣寬。注意事項
+  在後一種情況下，地圖最終可能會在用戶端視窗中“跳舞”
+  如果描述的寬度差異很大。
+- `map_separator_char` (str)：用於地圖之間分隔線的字元
+以及房間描述。預設為 `"|x~|n"` - 深灰色波浪線。
 
 
-##  XYZGrid
+更改已生成的地圖的選項不需要重新生成
+地圖，但你_確實_需要重新載入伺服器！
 
-The `XYZGrid` is a [Global Script](../Components/Scripts.md) that holds all `XYMap` objects on
-the grid. There should be only one XYZGrid created at any time.
+(about-the-pathfinder)=
+### 關於探路者
 
-To access the grid in-code, there are several ways:
+新的 `goto` 指令舉例說明瞭 _Pathfinder_ 的使用。這個
+是一種計算節點（房間）之間最短路徑的演演算法
+XY-任意大小和複雜度的地圖。可以讓玩家快速移動到
+某個位置（如果他們知道該位置的名稱）。以下是一些有關的詳細資訊
 
-- You can search for the grid like any other Script. It's named "XYZGrid".
+- 探路器解析節點和連結以建立距離矩陣
+從每個節點移動到 XYMap 上的_所有_其他節點。路徑
+  使用以下方法解決
+  [Dijkstra演演算法](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)。
+- 對於非常大的地圖，探路者的矩陣可能需要很長時間才能建造。
+因此它們被快取為 pickled 二進位檔案
+  `mygame/server/.cache/` 並且僅在地圖更改時才重建。他們可以安全地
+  刪除（您也可以使用 `evennia xyzgrid initpath` 強制建立/重建快取檔案）。
+- 一旦被快取，探路器就會很快（在上面找到 500 步的最短路徑）
+20 000 個節點/房間耗時低於 0.1 秒）。
+- 重要的是要記住，探路器只能在 _one_ XYMap 內工作。
+它不會找到跨越地圖轉換的路徑。如果這是一個問題，可以考慮
+  使遊戲的所有區域成為一個XYMap。這可能工作得很好，但使它
+  更難向網格新增新地圖或從網格中刪除新地圖。
+- 探路器實際上會總結每個連結的「權重」來確定哪個是
+「最便宜」（最短）的路線。預設情況下，除阻止連結之外的每個連結都有
+  成本為 1（因此成本等於在節點之間移動的步數）。
+  然而，單一連結可以將其更改為更高/更低的權重（必須 >=1）。
+  權重越高意味著探路者使用該路線的可能性就越小
+  與其他相比（這也可能讓使用者感到困惑，因此請小心使用）。
+- 探路者將_平均_長鏈條的重量。由於所有連結
+預設具有相同的權重 (=1)，這意味著
+  `#-#` 與 `#----#` 具有相同的移動成本，儘管它在視覺上「更短」。
+  可以透過使用連結來更改每個連結的此行為
+`average_long_link_weights = False`。
 
-	grid = evennia.search_script("XYZGrid")[0]
 
-  (`search_script` always returns a list)
-- You can get it with `evennia.contrib.grid.xyzgrid.xyzgrid.get_xyzgrid`
+(xyzgrid-1)=
+## XYZGrid
 
-	from evennia.contrib.grid.xyzgrid.xyzgrid import get_xyzgrid
-	grid = get_xyzgrid()
+`XYZGrid` 是一個 [全域 Script](../Components/Scripts.md)，它儲存了所有 `XYMap` 物件
+網格。任何時候都只能創造一個 XYZGrid。
 
-  This will *always* return a grid, creating an empty grid if one didn't
-  previously exist. So this is also the recommended way of creating a fresh grid
-  in-code.
-- You can get it from an existing XYZRoom/Exit by accessing their `.xyzgrid`
-  property
+要在程式碼中存取網格，有多種方法：
 
-	grid = self.caller.location.xyzgrid  # if currently in grid room
+- 您可以像搜尋其他Script 一樣搜尋網格。它被命名為“XYZGrid”。
 
-Most tools on the grid class have to do with loading/adding and deleting maps,
-something you are expected to use the `evennia xyzgrid` commands for. But there
-are also several methods that are generally useful:
+網格 = evennia.search_script("XYZGrid")[0]
 
-- `.get_room(xyz)` - Get a room at a specific coordinate `(X, Y, Z)`. This will
-  only work if the map has been actually spawned first. For example
-  `.get_room((0,4,"the dark castle))`. Use `'*'` as a wild card, so
-  `.get_room(('*','*',"the dark castle))` will get you all rooms spawned on the dark
- castle map.
-- `.get_exit(xyz, name)` - get a particular exit, e.g.
-  `.get_exit((0,4,"the dark castle", "north")`. You can also use `'*'` as
-  wildcards.
+（`search_script` 總是回傳一個清單）
+- 你可以用`evennia.contrib.grid.xyzgrid.xyzgrid.get_xyzgrid`得到它
 
-One can also access particular parsed `XYMap` objects on the `XYZGrid` directly:
+從evennia.contrib.grid.xyzgrid.xyzgrid匯入get_xyzgrid
+	網格=get_xyzgrid()
 
-- `.grid` - this is the actual (cached) store of all XYMaps, as `{zcoord: XYMap, ...}`
-- `.get_map(zcoord)` - get a specific XYMap.
-- `.all_maps()` - get a list of all XYMaps.
+這將“總是”返回一個網格，如果沒有，則建立一個空網格
+  以前存在。所以這也是建立新網格的建議方法
+  在程式碼中。
+- 您可以透過造訪現有的 XYZRoom/Exit 的 `.xyzgrid` 來取得它
+財產
 
-Unless you want to heavily change how the map works (or learn what it does), you
-will probably never need to modify the `XYZMap` object itself. You may want to
-know how to call find the pathfinder though:
+grid = self.caller.location.xyzgrid # 如果目前在網格房間
+
+網格類別上的大多數工具都與載入/新增和刪除地圖有關，
+您應該使用 `evennia xyzgrid` 指令來執行某些操作。但有
+還有幾種普遍有用的方法：
+
+- `.get_room(xyz)` - 在特定座標`(X, Y, Z)`處取得房間。這將
+僅當地圖實際上首先生成時才有效。例如
+  `.get_room((0,4,"the dark castle))`。使用 `'*'` 作為萬用字元，所以
+  `.get_room(('*','*',"the dark castle))` 會讓你在黑暗中產生所有房間
+ 城堡地圖。
+- `.get_exit(xyz, name)` - 獲得特定出口，e.g。
+`.get_exit((0,4,"the dark castle", "north")`。您也可以使用 `'*'` 作為
+  萬用字元。
+
+也可以直接存取 `XYZGrid` 上特定的已解析 `XYMap` 物件：
+
+- `.grid` - 這是所有 XYMaps 的實際（快取）儲存，如 `{zcoord: XYMap,...}`
+- `.get_map(zcoord)` - 取得特定的XYMap。
+- `.all_maps()` - 取得所有 XYMaps 的清單。
+
+除非您想大幅改變地圖的工作方式（或瞭解它的作用），否則您
+可能永遠不需要修改 `XYZMap` 物件本身。你可能想要
+但知道如何呼叫 find 探路者：
 
 - `xymap.get_shortest_path(start_xy, end_xy)`
 - `xymap.get_visual_range(xy, dist=2, **kwargs)`
 
-See the [XYMap](xymap) documentation for
-details.
+請參閱 [XYMap](xymap) 檔案瞭解
+詳細資訊。
 
 
-## XYZRoom and XYZExit
+(xyzroom-and-xyzexit)=
+## XYZRoom 和 XYZExit
 
-These are new custom [Typeclasses](../Components/Typeclasses.md) located in
-`evennia.contrib.xyzgrid.xyzroom`. They extend the base `DefaultRoom` and
-`DefaultExit` to be aware of their `X`, `Y` and `Z` coordinates.
+這些是新的自訂 [Typeclasses](../Components/Typeclasses.md)，位於
+`evennia.contrib.xyzgrid.xyzroom`。他們擴充套件了基礎`DefaultRoom`並且
+`DefaultExit` 瞭解它們的 `X`、`Y` 和 `Z` 座標。
 
 ```{warning}
 
@@ -1330,27 +1357,27 @@ These are new custom [Typeclasses](../Components/Typeclasses.md) located in
 
 ```
 
-Useful (extra) properties on `XYZRoom`, `XYZExit`:
+`XYZRoom`、`XYZExit` 上有用的（額外）屬性：
 
-- `xyz` The `(X, Y, Z)` coordinate of the entity, for example `(23, 1, "greenforest")`
-- `xyzmap` The `XYMap` this belongs to.
-- `get_display_name(looker)` - this has been modified to show the coordinates of
-  the entity as well as the `#dbref` if you have Builder or higher privileges.
-- `return_appearance(looker, **kwargs)` - this has been extensively modified for
-  `XYZRoom`, to display the map. The `options` given in `XYMAP_DATA` will appear
-  as `**kwargs` to this method and if you override this you can customize the
-  map display in depth.
-- `xyz_destination` (only for `XYZExits`) - this gives the xyz-coordinate of
-  the exit's destination.
+- `xyz` 實體的`(X, Y, Z)`座標，例如`(23, 1, "greenforest")`
+- `xyzmap` 這屬於`XYMap`。
+- `get_display_name(looker)` - 這已修改為顯示座標
+如果您具有 Builder 或更高許可權，則實體以及 `#dbref`。
+- `return_appearance(looker, **kwargs)` - 這已被廣泛修改為
+`XYZRoom`，顯示地圖。將出現 `XYMAP_DATA` 中給出的 `options`
+  作為此方法的`**kwargs`，如果您覆寫此方法，您可以自訂
+  深度地圖顯示。
+- `xyz_destination`（僅適用於`XYZExits`） - 這給出了 xyz 座標
+出口的目的地。
 
-The coordinates are stored as [Tags](../Components/Tags.md) where both rooms and exits tag
-categories `room_x_coordinate`, `room_y_coordinate` and `room_z_coordinate`
-while exits use the same in addition to tags for their destination, with tag
-categories `exit_dest_x_coordinate`, `exit_dest_y_coordinate` and
-`exit_dest_z_coordinate`.
+座標儲存為 [Tags](../Components/Tags.md)，其中房間和出口均為 tag
+類別 `room_x_coordinate`、`room_y_coordinate` 和 `room_z_coordinate`
+而出口除了 tags 之外還使用相同的內容作為其目的地，並使用 tag
+類別 `exit_dest_x_coordinate`、`exit_dest_y_coordinate` 和
+`exit_dest_z_coordinate`。
 
-The make it easier to query the database by coordinates, each typeclass offers
-custom manager methods. The filter methods allow for `'*'` as a wildcard.
+這使得透過座標查詢資料庫變得更容易，每個typeclass提供
+自訂管理器方法。過濾器方法允許使用 `'*'` 作為萬用字元。
 
 ```python
 
@@ -1380,78 +1407,82 @@ exit = XYZExit.objects.get_xyz_exit(xyz=(0, 12, 'foo'), xyz_destination=(5, 2, '
 
 ```
 
-You can customize the XYZRoom/Exit by having the grid spawn your own subclasses
-of them. To do this you need to override the prototype used to spawn rooms on
-the grid. Easiest is to modify the base prototype-parents in settings (see the
-[XYZRoom and XYZExit](#xyzroom-and-xyzexit) section above).
+您可以透過讓網格產生您自己的子類別來自訂 XYZRoom/Exit
+其中。為此，您需要覆蓋用於生成房間的原型
+網格。最簡單的方法是修改設定中的基本原型父母（請參閱
+[XYZRoom 和 XYZExit](#xyzroom-and-xyzexit) 以上部分）。
 
-## Working with the grid
+(working-with-the-grid)=
+## 使用網格
 
-The work flow of working with the grid is usually as follows:
+使用網格的工作流程通常如下：
 
-1. Prepare a module with a _Map String_, _Map Legend_, _Prototypes_ and
-   _Options_ packaged into a dict `XYMAP_DATA`. Include multiple maps per module
-   by adding several `XYMAP_DATA` to a variable `XYMAP_DATA_LIST` instead.
-2. If your map contains `TransitionMapNodes`, the target map must either also be
-   added or already exist in the grid. If not, you should skip that node for
-   now (otherwise you'll face errors when spawning because the exit-destination
-   does not exist).
-2. Run `evennia xyzgrid add <module>` to register the maps with the grid. If no
-   grid existed, it will be created by this. Fix any errors reported by the
-   parser.
-3. Inspect the parsed map(s) with `evennia xyzgrid show <zcoord>` and make sure
-   they look okay.
-4. Run `evennia xyzgrid spawn` to spawn/update maps into actual `XYZRoom`s and
-   `XYZExit`s.
-5. If you want you can now tweak your grid manually by usual building commands.
-   Anything you do _not_ specify in your grid prototypes you can
-   modify locally in your game - as long as the whole room/exit is not deleted,
-   those will be untouched by `evennia xyzgrid spawn`.  You can also dig/open
-   exits to other rooms 'embedded' in your grid. These exits must _not_ be named
-   one of the grid directions (north, northeast, etc, nor up/down) or the grid
-   will delete it next `evennia xyzgrid spawn` runs (since it's not on the map).
-6. If you want to add new grid-rooms/exits you should _always_ do so by
-   modifying the _Map String_ and then rerunning `evennia xyzgrid spawn` to
-   apply the changes.
+1. 準備一個有_Map String_、_Map Legend_、_Prototypes_和的模組
+_Options_ 打包成字典`XYMAP_DATA`。每個模組包含多個地圖
+   透過將幾個 `XYMAP_DATA` 加到變數 `XYMAP_DATA_LIST` 來代替。
+2. 如果您的地圖包含`TransitionMapNodes`，則目標地圖也必須是
+新增或已存在於網格中。如果沒有，您應該跳過該節點
+   現在（否則在生成時你會遇到錯誤，因為退出目的地
+   不存在）。
+2. 執行 `evennia xyzgrid add <module>` 將地圖註冊到網格中。如果沒有
+網格已經存在，它將由此建立。修復報告的任何錯誤
+   解析器。
+3. 使用 `evennia xyzgrid show <zcoord>` 檢查已解析的對映並確保
+他們看起來還不錯。
+4. 執行 `evennia xyzgrid spawn` 將地圖產生/更新為實際的 `XYZRoom`s 並且
+`XYZExit`s。
+5. 如果您願意，現在可以透過常用的建置指令手動調整網格。
+您可以在網格原型中執行_未_指定的任何操作
+   在遊戲中本地修改 - 只要整個房間/出口不被刪除，
+   `evennia xyzgrid spawn` 不會影響這些。  您也可以挖掘/開啟
+   退出到「嵌入」網格中的其他房間。這些出口不得命名
+   網格方向之一（北、東北等，也不是上/下）或網格
+   將在下一次 `evennia xyzgrid spawn` 執行中刪除它（因為它不在地圖上）。
+6. 如果您想新增新的網格房間/出口，您應該_始終_這樣做
+修改 _Map String_ 然後重新執行 `evennia xyzgrid spawn` 到
+   應用更改。
 
-## Details
+(details)=
+## 細節
 
-The default Evennia's rooms are non-euclidian - they can connect
-to each other with any types of exits without necessarily having a clear
-position relative to each other. This gives maximum flexibility, but many games
-want to use cardinal movements (north, east etc) and also features like finding
-the shortest-path between two points.
+預設 Evennia 的房間是非歐幾裡得的 - 他們可以連線
+彼此之間可以有任何型別的退出，而不必有明確的
+相對於彼此的位置。這提供了最大的靈活性，但許多遊戲
+想要使用基本運動（向北、向東等）以及尋找等功能
+兩點之間的最短路徑。
 
-This contrib forces each room to exist on a 3-dimensional XYZ grid and also
-implements very efficient pathfinding along with tools for displaying
-your current visual-range and a lot of related features.
+這 contrib 強制每個房間存在於 3 維 XYZ 網格上，並且
+實現非常有效率的尋路以及顯示工具
+您目前的視覺範圍和許多相關功能。
 
-The rooms of the grid are entirely controlled from outside the game, using
-python modules with strings and dicts defining the map(s) of the game. It's
-possible to combine grid- with non-grid rooms, and you can decorate
-grid rooms as much as you like in-game, but you cannot spawn new grid
-rooms without editing the map files outside of the game.
+網格的房間完全由遊戲外部控制，使用
+python 模組，帶有定義遊戲地圖的字串和字典。這是
+可以將網格房間與非網格房間結合起來，並且您可以裝飾
+網格房間在遊戲中隨心所欲，但不能產生新的網格
+房間，無需在遊戲外編輯地圖檔。
 
-## Installation
+(installation-1)=
+## 安裝
 
-1. If you haven't before, install the extra contrib requirements.
-   You can do so by doing `pip install evennia[extra]`, or if you used `git` to
-   install, do `pip install --upgrade -e .[extra]` from the `evennia/` repo
-   folder.
-2. Import and add the `evennia.contrib.grid.xyzgrid.commands.XYZGridCmdSet` to the
-   `CharacterCmdset` cmdset in `mygame/commands.default_cmds.py`. Reload
-   the server. This makes the `map`, `goto/path` and modified `teleport`  and
-   `open` commands available in-game.
-3. Edit `mygame/server/conf/settings.py` and set
+1. 如果您以前沒有安裝過，請安裝額外的 contrib 要求。
+您可以透過執行 `pip install evennia[extra]` 來執行此操作，或者如果您使用 `git` 來執行此操作
+   安裝，從 `evennia/` 儲存庫執行 `pip install --upgrade -e.[extra]`
+   資料夾。
+2. 匯入並將 `evennia.contrib.grid.xyzgrid.commands.XYZGridCmdSet` 新增到
+`CharacterCmdset` cmdset 在 `mygame/commands.default_cmds.py` 中。重新載入
+   伺服器。這使得 `map`、`goto/path` 和修改後的 `teleport` 和
+   `open` 遊戲中可用指令。
+3. 編輯`mygame/server/conf/settings.py`並設定
 
         EXTRA_LAUNCHER_COMMANDS['xyzgrid'] = 'evennia.contrib.grid.xyzgrid.launchcmd.xyzcommand'
 
-4. Run the new `evennia xyzgrid help` for instructions on how to spawn the grid.
+4. 執行新的 `evennia xyzgrid help` 以取得有關如何產生網格的說明。
 
-## Example usage
+(example-usage)=
+## 用法範例
 
-After installation, do the following (from your command line, where the
-`evennia` command is available) to install an example grid:
+安裝後，執行以下操作（從指令列，其中
+`evennia` 指令可用）來安裝範例網格：
 
     evennia xyzgrid init
     evennia xyzgrid add evennia.contrib.grid.xyzgrid.example
@@ -1461,21 +1492,21 @@ After installation, do the following (from your command line, where the
     evennia xyzgrid spawn
     evennia reload
 
-(remember to reload the server after spawn operations).
+（記住在生成操作後重新載入伺服器）。
 
-Now you can log into the
-server and do `teleport (3,0,the large tree)` to teleport into the map.
+現在您可以登入
+伺服器並執行 `teleport (3,0,the large tree)` 傳送到地圖中。
 
-You can use `open togrid = (3, 0, the large tree)` to open a permanent (one-way)
-exit from your current location into the grid. To make a way back to a non-grid
-location just stand in a grid room and open a new exit out of it:
-`open tolimbo = #2`.
+您可以使用`open togrid = (3, 0, the large tree)`開啟永久（單向）
+從目前位置退出到網格中。回到無網格狀態
+位置只需站在網格房間中並開啟一個新的出口即可：
+`open tolimbo = #2`。
 
-Try `goto view` to go to the top of the tree and `goto dungeon` to go down to
-the dungeon entrance at the bottom of the tree.
+嘗試 `goto view` 到樹頂，`goto dungeon` 到樹下
+地牢入口在樹的底部。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/grid/xyzgrid/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\grid\xyzgrid\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

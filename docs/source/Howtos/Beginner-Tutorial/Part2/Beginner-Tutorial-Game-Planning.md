@@ -1,206 +1,221 @@
-# On Planning a Game
+(on-planning-a-game)=
+# 關於策劃遊戲
 
-Last lesson we asked ourselves some questions about our motivation. In this one we'll present
-some more technical questions to consider. In the next lesson we'll answer them for the sake of
-our tutorial game.
+上一課我們問了自己一些關於動機的問題。在這一期中我們將介紹
+一些需要考慮的更多技術問題。在下一課我們將回答這些問題
+我們的教學遊戲。
 
-Note that the suggestions on this page are just that - suggestions. Also, they are primarily aimed at a lone
-hobby designer or a small team developing a game in their free time.
+請注意，此頁面上的建議只是建議。此外，它們主要針對孤獨的人
+業餘愛好設計師或在空閒時間開發遊戲的小團隊。
 
 ```{important}
 
-  Your first all overshadowing goal is to beat the odds and get **something** out the door!
-  Even if it's a scaled-down version of your dream game, lacking many "must-have" features!
+你的首要目標是克服困難並獲得**一些東西**！
+  即使它是您夢想遊戲的縮小版，缺少許多“必備”功能！
 
 ```
 
-Remember: *99.99999% of all great game ideas never lead to a game*. Especially not to an online
-game that people can actually play and enjoy. It's better to get your game out there and expand on it
-later than to code in isolation until you burn out, lose interest or your hard drive crashes.
+請記住：*99.99999% 出色的遊戲創意從未最終轉化為遊戲*。尤其是不要上線
+人們可以真正玩和享受的遊戲。最好將您的遊戲推出並擴充套件它
+晚於孤立地編碼，直到你精疲力盡、失去興趣或硬碟崩潰。
 
-- Keep the scope of your initial release down. Way down.
-- Start small, with an eye towards expansions later, after first release.
-- If the suggestions here seems boring or a chore to you, do it your way instead. Everyone's different.
-- Keep having _fun_. You must keep your motivation up, whichever way works for _you_.
+- 縮小初始版本的範圍。太低了。
+- 從小規模開始，在首次發布後著眼於稍後的擴充套件。
+- 如果這裡的建議對您來說似乎很無聊或很麻煩，那就按照您的方式去做吧。每個人都不同。
+- 繼續享受_樂趣_。無論哪種方式對你有效，你都必須保持動力。
 
 
-## The steps
+(the-steps)=
+## 步驟
 
-Here are the rough steps towards your goal.
+以下是實現您的目標的大致步驟。
 
-1. Planning
-2. Coding + Gradually building a tech-demo
-3. Building the actual game world
-4. Release
-5. Celebrate
+1. 規劃
+2. 編碼 + 逐步建立技術演示
+3. 建構真實的遊戲世界
+4. 發布
+5. 慶祝
 
-## Planning
+(planning)=
+## 規劃
 
-You need to have at least a rough idea about what you want to create. Some like a lot of planning, others
-do it more seat-of-the-pants style. Regardless, while _some_ planning is always good to do, it's common
-to have your plans change on you as you create your code prototypes. So don't get _too_ bogged down in
-the details out of the gate.
+您至少需要對您想要建立的內容有一個粗略的瞭解。有些人喜歡做很多計劃，有些人喜歡
+採取更憑感覺行事的風格。無論如何，雖然做一些計劃總是好的，但這很常見
+當您建立程式碼原型時，您的計劃會發生變化。所以不要_太_陷入困境
+細節一目瞭然。
 
-Many prospective game developers are very good at *parts* of this process, namely in defining what their
-world is "about": The theme, the world concept, cool monsters and so on. Such things are very important. But
-unfortunately, they are not enough to make your game. You need to figure out how to accomplish your ideas in
-Evennia.
+許多未來的遊戲開發者都非常擅長這個過程的“部分”，即定義他們的內容
+世界是「關於」：主題、世界觀、酷炫的怪物等等。這些事情非常重要。但是
+不幸的是，它們不足以製作你的遊戲。你需要弄清楚如何實現你的想法
+Evennia。
 
-Below are some questions to get you going. In the next lesson we will try to answer them for our particular
-tutorial game. There are of course many more questions you could be asking yourself.
+以下是一些幫助您繼續前進的問題。在下一課中，我們將嘗試針對我們的具體情況回答這些問題
+教學遊戲。當然，您也可以問自己更多的問題。
 
-### Administration
+(administration)=
+### 行政
 
-- Should your game rules be enforced by coded systems or by human game masters?
-- What is the staff hierarchy in your game? Is vanilla Evennia roles enough or do you need something else?
-- Should players be able to post out-of-characters on channels and via other means like bulletin-boards?
+- 你的遊戲規則應該由編碼系統還是人類遊戲大師來執行？
+- 你的遊戲中的人員等級是怎樣的？普通的 Evennia 角色就夠了還是你還需要別的東西？
+- 玩家是否應該能夠在頻道上或透過公告板等其他方式發布不符合角色的內容？
 
-### Building
+(building)=
+### 大樓
 
-- How will the world be built? Traditionally (from in-game with build-commands) or externally (by batchcmds/code
-  or directly with custom code)?
-- Can only privileged Builders create things or should regular players also have limited build-capability?
+- 世界將如何建構？傳統上（透過遊戲內的建置指令）或外部（透過batchcmds/code
+或直接使用自訂程式碼）？
+- 只有特權建造者才能創造東西，還是普通玩家也應該擁有有限的建造能力？
 
-### Systems
+(systems)=
+### 系統
 
-- Do you base your game off an existing RPG system or make up your own?
-- What are the game mechanics? How do you decide if an action succeeds or fails?
-- Does the flow of time matter in your game - does night and day change? What about seasons?
-- Do you want changing, global weather or should weather just be set manually in roleplay?
-- Do you want a coded world-economy or just a simple barter system? Or no formal economy at all?
-- Do you have concepts like reputation and influence?
-- Will your characters be known by their name or only by their physical appearance?
+- 您的遊戲是基於現有的 RPG 系統還是自己建造？
+- 遊戲機制是什麼？您如何決定某項操作是成功還是失敗？
+- 時間的流動在你的遊戲中重要嗎──白天和黑夜會改變嗎？季節又如何呢？
+- 您想要改變全球天氣還是應該在角色扮演中手動設定天氣？
+- 您想要一個編碼的世界經濟還是隻是一個簡單的以物易物系統？還是根本沒有正規經濟？
+- 你有聲譽、影響力這樣的概念嗎？
+- 你的角色會透過他們的名字還是僅僅透過他們的外表而被認識？
 
-### Rooms
+(rooms)=
+### 客房
 
-- Is a simple room description enough or should the description be able to change (such as with time, by
-light conditions, weather or season)?
-- Should the room have different statuses? Can it have smells, sounds? Can it be affected by
-dramatic weather, fire or magical effects? If so, how would this affect things in the room? Or are
-these things something admins/game masters should handle manually?
-- Can objects be hidden in the room? Can a person hide in the room? How does the room display this?
+- 簡單的房間描述是否足夠，或者描述是否應該能夠改變（例如隨著時間的推移，透過
+光照條件、天氣或季節）？
+- 房間應該有不同的狀態嗎？它可以有氣味、聲音嗎？是否會受到影響
+戲劇性的天氣、火災還是魔法效果？如果是這樣，這會對房間裡的東西產生什麼影響？或者是
+這些事情是管理員/遊戲大師應該手動處理的嗎？
+- 房間裡可以藏東西嗎？一個人可以躲在房間裡嗎？房間如何顯示這一點？
 
-### Objects / items
+(objects-items)=
+### 物體/物品
 
-- How numerous are your objects? Do you want large loot-lists or are objects just role playing props
-created on demand?
-- If you use money, is each coin a separate object or do you just store a bank account value?
-- Do multiple similar objects form stacks and how are those stacks handled in that case?
-- Does an object have weight or volume (so you cannot carry an infinite amount of them)?
-- Can objects be broken? Can they be repaired?
-- Can you fight with a chair or a flower or must you use a specific 'weapon' kind of thing?
-- Will characters be able to craft new objects?
-- Should mobs/NPCs have some sort of AI?
-- Are NPCs and mobs different entities? How do they differ?
-- Should there be NPCs giving quests? If so, how do you track Quest status?
+- 你的對像有多少？你想要大量的戰利品清單還是隻是角色扮演道具
+按需建立？
+- 如果您使用貨幣，每個硬幣是單獨的物件還是您只是儲存銀行帳戶價值？
+- 多個相似的物件是否形成堆疊？在這種情況下如何處理這些堆疊？
+- 物體有重量或體積嗎（所以你不能攜帶無限數量的物體）？
+- 物體可以被破壞嗎？它們可以修復嗎？
+- 你可以用椅子或花打架，還是必須使用特定的「武器」之類的東西？
+- 角色能夠製作新物品嗎？
+- mobs/NPCs 應該有某種 AI 嗎？
+- NPCs 和生物是不同的實體嗎？它們有何不同？
+- 應該有NPCs給予任務嗎？如果是這樣，您如何追蹤任務狀態？
 
-### Characters
+(characters)=
+### 人物
 
-- Can players have more than one Character active at a time or are they allowed to multi-play?
-- How does the character-generation work? Walk from room-to-room? A menu?
-- How do you implement different "classes" or "races"? Are they separate types of objects or do you
-simply load different stats on a basic object depending on what the Player wants?
-- If a Character can hide in a room, what skill will decide if they are detected?
-- What does the skill tree look like? Can a Character gain experience to improve? By killing
-enemies? Solving quests? By roleplaying?
-- May player-characters attack each other (PvP)?
-- What are the penalties of defeat? Permanent death? Quick respawn? Time in prison?
+- 玩家是否可以同時擁有多個活躍角色，或者是否允許他們進行多人遊戲？
+- 角色生成是如何運作的？從一個房間走到另一個房間？選單？
+- 如何實現不同的「階級」或「種族」？它們是不同型別的物件還是您
+只需根據玩家的需求在基本物件上載入不同的統計資料？
+- 如果角色可以隱藏在房間裡，那麼什麼技能將決定他們是否被發現？
+- 技能樹是什麼樣的？角色可以獲得經驗來提升嗎？透過殺戮
+敵人？解決任務？透過角色扮演？
+- 玩家角色可以互相攻擊（PvP）嗎？
+- 失敗的懲罰是什麼？永久死亡？快速重生？入獄時間？
 
-A MUD's a lot more involved than you would think and these things hang together in a complex web. It
-can easily become overwhelming and it's tempting to want *all* functionality right out of the door.
-Try to identify the basic things that "make" your game and focus *only* on them for your first
-release. Make a list. Keep future expansions in mind but limit yourself.
+MUD 的參與程度比你想像的要多得多，而且這些東西在一個複雜的網路中緊密相連。它
+很容易變得難以承受，並且很容易想要立即獲得“所有”功能。
+嘗試確定“製作”遊戲的基本要素，並“僅”首先關注它們
+釋放。列出一個清單。牢記未來的擴充套件但限制自己。
 
-## Coding and Tech demo
+(coding-and-tech-demo)=
+## 編碼和技術演示
 
-This is the actual work of creating the "game" part of your game. As you code and test systems you should
-build a little "tech demo" along the way.
+這是建立遊戲的“遊戲”部分的實際工作。當您編碼和測試系統時，您應該
+在此過程中建立一個小“技術演示”。
 
-```{sidebar} Tech demo
+```{sidebar} 技術演示
 
-With "tech demo" we mean a small example of your code in-action: A room with a mob, a way to jump into and test character-creation etc. The tech demo need not be pretty, it's there to test functionality. It's not the beginning of your game world (unless you find that to be more fun).
+對於“技術演示”，我們指的是正在執行的程式碼的一個小範例：一個有怪物的房間，一種跳入並測試角色建立的方法等。技術演示不需要很漂亮，它是為了測試功能。這不是你的遊戲世界的開始（除非你發現這更有趣）。
 
 ```
 
-Try to avoid going wild with building a huge game world before you have a tech-demo showing off all parts
-you expect to have in the first version of your game. Otherwise you run the risk of having to redo it all
-again.
+在進行技術演示展示所有部分之前，盡量避免瘋狂地建立一個巨大的遊戲世界
+您希望在遊戲的第一個版本中擁有。否則你將面臨必須重做一切的風險
+再次。
 
-Evennia tries hard to make the coding easier for you, but there is no way around the fact that if you want
-anything but a basic chat room you *will* have to bite the bullet and code your game (or find a coder willing
-to do it for you).
+Evennia 努力讓你的程式設計變得更容易，但沒有辦法解決這樣的事實：如果你想要
+除了基本的聊天室之外，你*將*必須硬著頭皮編寫你的遊戲（或找到一個願意的編碼員）
+為你做）。
 
-> Even if you won't code anything yourself, as a designer you need to at least understand the basic
-paradigms and components of Evennia. It's recommended you look over the rest of this Beginner Tutorial to learn
-what tools you have available.
+> 即使您不會自己編寫任何程式碼，作為設計師，您至少需要了解基本的
+Evennia 的範例和元件。建議您閱讀本初學者教學的其餘部分來學習
+你有什麼可用的工具。
 
-During Coding you look back at the things you wanted during the **Planning** phase and try to
-implement them. Don't be shy to update your plans if you find things easier/harder than you thought.
-The earlier you revise problems, the easier they will be to fix.
+在編碼期間，您回顧一下您在**規劃**階段想要的東西，並嘗試
+實施它們。如果您發現事情比您想像的更容易/更困難，請不要羞於更新您的計劃。
+越早修改問題，解決它們就越容易。
 
-A good idea is to host your code online using _version control_. Github.com offers free Private repos
-these days if you don't want the world to learn your secrets. Not only version control
-make it easy for your team to collaborate, it also means
-your work is backed up at all times. The page on [Version Control](../../../Coding/Version-Control.md)
-will help you to setting up a sane developer environment with proper version control.
+一個好主意是使用_版本控制_線上託管您的程式碼。 Github.com 提供免費的私人儲存庫
+如今，如果你不想讓全世界知道你的秘密。不僅僅是版本控制
+讓您的團隊輕鬆協作，這也意味著
+您的工作始終得到備份。 [版本控制]頁(../../../Coding/Version-Control.md)
+將幫助您建立一個具有適當版本控制的健全的開發人員環境。
 
-## World Building
+(world-building)=
+## 世界大廈
 
-Up until this point we've only had a few tech-demo objects in the database. This step is the act of
-populating the database with a larger, thematic world. Too many would-be developers jump to this
-stage too soon (skipping the **Coding** or even **Planning** stages).  What if the rooms you build
-now doesn't include all the nice weather messages the code grows to support? Or the way you store
-data changes under the hood? Your building work would at best require some rework and at worst you
-would have to redo the whole thing. You could be in for a *lot* of unnecessary work if you build stuff
-en masse without having the underlying code systems in some reasonable shape first.
+到目前為止，我們的資料庫中只有一些技術演示物件。這一步的行為是
+用更大的主題世界填滿資料庫。太多潛在的開發人員跳入此領域
+階段太早（跳過**編碼**甚至**規劃**階段）。  如果你建造的房間怎麼辦
+現在不包括程式碼增長支援的所有好天氣訊息嗎？或者你儲存的方式
+資料在幕後發生變化？您的建築工作最多需要一些返工，最糟的情況是您
+將不得不重做整個事情。如果你建造東西，你可能會做很多不必要的工作
+沒有先讓底層程式碼系統處於某種合理的形狀，就全部進行了。
 
-So before starting to build, the "game" bit (**Coding** + **Testing**) should be more or less
-**complete**, *at least to the level of your initial release*.
+因此，在開始建造之前，「遊戲」位元（**編碼** + **測試**）應該或多或少
+**完整**，*至少達到初始版本的水平*。
 
-Make sure it is clear to yourself and your eventual builders just which parts of the world you want
-for your initial release. Establish for everyone which style, quality and level of detail you expect.
+確保你自己和你最終的建造者都清楚你想要世界的哪些地方
+用於您的初始版本。為每個人確定您期望的風格、品質和細節程度。
 
-Your goal should *not* be to complete your entire world in one go. You want just enough to make the
-game's "feel" come across. You want a minimal but functioning world where the intended game play can
-be tested and roughly balanced. You can always add new areas later.
+你的目標不應該是一次完成你的整個世界。你想要的只是足夠的
+遊戲的「感覺」就出現了。您想要一個最小但功能正常的世界，其中預期的遊戲可以
+進行測試並大致平衡。您以後隨時可以新增區域。
 
-During building you get free and extensive testing of whatever custom build commands and systems you
-have made at this point. If Builders and coders are different people you also
-get a chance to hear if some things are hard to understand or non-intuitive.  Make sure to respond
-to this feedback.
+在建置過程中，您可以對任何自訂建置指令和系統進行免費且廣泛的測試
+已經做到了這一點。如果建構者和編碼員是不同的人，那麼您也
+有機會聽聽是否有些事情難以理解或不直觀。  確保回覆
+對此反饋。
 
 
-## Alpha Release
+(alpha-release)=
+## 阿爾法版本
 
-As mentioned, don't hold onto your world more than necessary. *Get it out there* with a huge *Alpha*
-flag and let people try it!
+如前所述，除非必要，不要過度執著於你的世界。 *用巨大的*阿爾法*把它拿出來*
+標記並讓人們嘗試！
 
-Call upon your alpha-players to try everything - they *will* find ways to break your game in ways that
-you never could have imagined. In Alpha you might be best off to
-focus on inviting friends and maybe other MUD developers, people who you can pester to give proper
-feedback and bug reports (there *will* be bugs, there is no way around it).
+號召你的阿爾法玩家嘗試一切 - 他們*會*找到方法來破壞你的遊戲
+你絕對無法想像。在阿爾法你可能最好去
+專注於邀請朋友，或許還有其他 MUD 開發者，你可以纏著他們給予適當的幫助
+回饋和錯誤報告（肯定會有錯誤，沒有辦法解決）。
 
-Follow the quick instructions for [Online Setup](../../../Setup/Online-Setup.md) to make your
-game visible online.
+按照[線上設定](../../../Setup/Online-Setup.md) 的快速說明進行操作
+遊戲線上可見。
 
-If you hadn't already, make sure to put up your game on the
-[Evennia game index](http://games.evennia.com/) so people know it's in the works (actually, even
-pre-alpha games are allowed in the index so don't be shy)!
+如果您還沒有，請確保將您的遊戲釋出到
+[Evennia 遊戲索引](http://games.evennia.com/) 所以人們知道它正在開發中（實際上，甚至
+索引中允許預阿爾法遊戲，所以不要害羞）！
 
-## Beta Release/Perpetual Beta
+(beta-releaseperpetual-beta)=
+## 測試版發布/永久測試版
 
-Once things stabilize in Alpha you can move to *Beta* and let more people in. Many MUDs are in
-[perpetual beta](https://en.wikipedia.org/wiki/Perpetual_beta), meaning they are never considered
-"finished", but just repeat the cycle of Planning, Coding, Testing and Building over and over as new
-features get implemented or Players come with suggestions. As the game designer it is now up to you
-to gradually perfect your vision.
+一旦 Alpha 階段的情況穩定下來，您就可以轉向 *Beta* 並讓更多的人加入。許多 MUDs 都在
+[永久測試版](https://en.wikipedia.org/wiki/Perpetual_beta)，這意味著它們從未被考慮過
+“完成”，但只是一遍又一遍地重複規劃、編碼、測試和構建的迴圈
+功能實現或玩家提出建議。身為遊戲設計師，現在由你決定
+逐步完善你的願景。
 
-## Congratulate yourself!
+(congratulate-yourself)=
+## 恭喜你自己！
 
-You are worthy of a celebration since at this point you have joined the small, exclusive crowd who
-have made their dream game a reality!
+你值得慶祝，因為此時你已經加入了一小群獨特的人群
+讓他們的夢想遊戲成為現實！
 
-## Planning our tutorial game
+(planning-our-tutorial-game)=
+## 規劃我們的教學遊戲
 
-In the next lesson we'll make use of these general points and try to plan out our tutorial game.
+在下一課中，我們將利用這些一般要點並嘗試規劃我們的教學遊戲。
 

@@ -1,20 +1,22 @@
-# Barter system
+(barter-system)=
+# 以物易物系統
 
-Contribution by Griatch, 2012
+Griatch 的貢獻，2012 年
 
-This implements a full barter system - a way for players to safely
-trade items between each other in code rather than simple `give/get`
-commands. This increases both safety (at no time will one player have 
-both goods and payment in-hand) and speed, since agreed goods will 
-be moved automatically). By just replacing one side with coin objects,
-(or a mix of coins and goods), this also works fine for regular money 
-transactions.
+這實現了完整的以物易物系統 - 讓玩家安全地進行交易的方式
+用程式碼而不是簡單的`give/get`相互之間交易物品
+指令。這增加了安全性（任何時候一個玩家都不會
+貨物和付款在手）和速度，因為約定的貨物將
+自動移動）。只需用硬幣物體替換一側，
+（或硬幣和商品的混合），這也適用於普通貨幣
+交易。
 
-## Installation
+(installation)=
+## 安裝
 
-Just import the CmdsetTrade command into (for example) the default
-cmdset. This will make the trade (or barter) command available
-in-game.
+只需將 CmdsetTrade 指令匯入（例如）預設值
+cmdset。這將使交易（或以物易物）指令可用
+遊戲中。
 
 ```python
 # in mygame/commands/default_cmdsets.py
@@ -30,14 +32,15 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
 
 ```
 
-## Usage
+(usage)=
+## 用法
 
-In this module, a "barter" is generally referred to as a "trade".
+在本模組中，「以物易物」通常被稱為「貿易」。
 
-Below is an example of a barter sequence. A and B are the parties.
-The `A>` and `B>` are their inputs.
+以下是易貨序列的範例。 A、B 為當事人。
+`A>` 和 `B>` 是他們的輸入。
 
-1) opening a trade
+1) 開倉交易
 
     A> trade B: Hi, I have a nice extra sword. You wanna trade?
 
@@ -54,7 +57,7 @@ The `A>` and `B>` are their inputs.
     B sees:
     You are now trading with A. Use 'trade help' for aid.
 
-2) negotiating
+2）談判
 
     A> offer sword: This is a nice sword. I would need some rations in trade.
 
@@ -93,38 +96,40 @@ The `A>` and `B>` are their inputs.
     A sees: B says: "Good, nice making business with you."
       B accepts the deal. Deal is made and goods changed hands.
 
-At this point the trading system is exited and the negotiated items
-are automatically exchanged between the parties. In this example B was
-the only one changing their offer, but also A could have changed their
-offer until the two parties found something they could agree on. The
-emotes are optional but useful for RP-heavy worlds.
+此時退出交易系統，協商的專案
+雙方之間自動交換。在此範例中，B 是
+唯一改變報價的人，而且 A 也可以改變他們的報價
+直到雙方找到可以達成協議的東西。的
+表情是可選的，但對於 RP- 重的世界很有用。
 
-## Technical info
+(technical-info)=
+## 科技資訊
 
-The trade is implemented by use of a TradeHandler. This object is a
-common place for storing the current status of negotiations. It is
-created on the object initiating the trade, and also stored on the
-other party once that party agrees to trade. The trade request times
-out after a certain time - this is handled by a Script. Once trade
-starts, the CmdsetTrade cmdset is initiated on both parties along with
-the commands relevant for the trading.
+交易是透過使用TradeHandler來實現的。這個物件是一個
+儲存當前談判狀態的公共場所。它是
+在發起交易的物件上建立，並儲存在
+一旦另一方同意交易。交易請求時間
+在一定時間後退出 - 這是由 Script 處理的。一旦交易
+開始，CmdsetTrade cmdset 在雙方啟動
+與交易相關的指令。
 
-## Ideas for NPC bartering
+(ideas-for-npc-bartering)=
+## NPC以物易物的想法
 
-This module is primarily intended for trade between two players. But
-it can also in principle be used for a player negotiating with an
-AI-controlled NPC. If the NPC uses normal commands they can use it
-directly -- but more efficient is to have the NPC object send its
-replies directly through the tradehandler to the player. One may want
-to add some functionality to the decline command, so players can
-decline specific objects in the NPC offer (decline <object>) and allow
-the AI to maybe offer something else and make it into a proper
-barter.  Along with an AI that "needs" things or has some sort of
-personality in the trading, this can make bartering with NPCs at least
-moderately more interesting than just plain 'buy'.
+此模組主要用於兩個玩家之間的交易。但是
+原則上它也可以用於玩家與
+AI-控制了NPC。如果 NPC 使用普通指令，他們可以使用它
+直接 - 但更有效的是讓 NPC 物件傳送其
+直接透過交易處理程式回覆玩家。一個人可能想要
+為拒絕指令新增一些功能，以便玩家可以
+拒絕 NPC 報價中的特定物件（拒絕 <object>）並允許
+AI 也許可以提供其他東西並將其變成適當的
+以物易物。  伴隨著「需要」東西或有某種東西的AI
+交易中的個性，這至少可以與NPCs進行以物易物
+比簡單的「購買」更有趣。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/game_systems/barter/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\game_systems\barter\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

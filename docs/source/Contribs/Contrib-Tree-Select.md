@@ -1,32 +1,33 @@
-# Easy menu selection tree
+(easy-menu-selection-tree)=
+# 簡單的選單選擇樹
 
-Contribution by Tim Ashley Jenkins, 2017
+蒂姆·阿什利·詹金斯 (Tim Ashley Jenkins) 貢獻，2017 年
 
-This utility allows you to create and initialize an entire branching EvMenu
-instance from a multi-line string passed to one function.
+該實用程式可讓您建立並初始化整個分支EvMenu
+傳遞給一個函式的多行字串的例項。
 
-> Note: Since the time this contrib was created, EvMenu itself got its own templating 
-> language that has more features and is not compatible with the style used in 
-> this contrib. Both can still be used in parallel.
+> 注意：自從建立 contrib 以來，EvMenu 本身就有了自己的模板
+> 具有更多功能且與所使用的風格不相容的語言
+> 這個contrib。兩者仍然可以並行使用。
 
-`EvMenu` is incredibly powerful and flexible but it can be a little overwhelming
-and offers a lot of power that may not be needed for a simple multiple-choice menu.
+`EvMenu` 非常強大和靈活，但可能有點讓人不知所措
+並提供簡單的多選選單可能不需要的大量功能。
 
-This module provides a function, `init_tree_selection`, which acts as a frontend
-for EvMenu, dynamically sourcing the options from a multi-line string you
-provide.  For example, if you define a string as such:
+這個模組提供了一個函式`init_tree_selection`，它充當前端
+對於 EvMenu，從您的多行字串中動態取得選項
+提供。  例如，如果您這樣定義一個字串：
 
     TEST_MENU = '''Foo
     Bar
     Baz
     Qux'''
 
-And then use `TEST_MENU` as the 'treestr' source when you call
-`init_tree_selection` on a player:
+然後在呼叫時使用 `TEST_MENU` 作為 'treestr' 來源
+`init_tree_selection` 對玩家：
 
     init_tree_selection(TEST_MENU, caller, callback)
 
-The player will be presented with an EvMenu, like so:
+玩家將看到 EvMenu，如下所示：
 
     ___________________________
 
@@ -38,24 +39,24 @@ The player will be presented with an EvMenu, like so:
     Baz
     Qux
 
-Making a selection will pass the selection's key to the specified callback as a
-string along with the caller, as well as the index of the selection (the line
-number on the source string) along with the source string for the tree itself.
+進行選擇會將選擇的鍵作為指定的回撥傳遞給
+字串以及呼叫者，以及選擇的索引（行
+來源字串上的數字）以及樹本身的來源字串。
 
-In addition to specifying selections on the menu, you can also specify
-categories.  Categories are indicated by putting options below it preceded with
-a '-' character.  If a selection is a category, then choosing it will bring up a
-new menu node, prompting the player to select between those options, or to go
-back to the previous menu. In addition, categories are marked by default with a
-'[+]' at the end of their key. Both this marker and the option to go back can be
-disabled.
+除了指定選單上的選項外，您還可以指定
+類別。  類別透過在其下方放置選項來表示，前面帶有
+一個“-”字元。  如果選擇的是一個類別，那麼選擇它會彈出一個
+新的選單節點，提示玩家在這些選項之間進行選擇，或繼續
+返回上一級選單。此外，類別預設標記有
+金鑰末尾有“[+]”。該標記和返回選項都可以
+禁用。
 
-Categories can be nested in other categories as well - just go another '-'
-deeper. You can do this as many times as you like. There's no hard limit to the
-number of categories you can go down.
+類別也可以巢狀在其他類別中 - 只需再新增一個“-”
+更深。您可以根據需要多次執行此操作。沒有硬性限制
+您可以向下檢視的類別數量。
 
-For example, let's add some more options to our menu, turning 'Bar' into a
-category.
+例如，讓我們為選單新增更多選項，將“Bar”變成
+類別。
 
     TEST_MENU = '''Foo
     Bar
@@ -66,8 +67,8 @@ category.
     Baz
     Qux'''
 
-Now when we call the menu, we can see that 'Bar' has become a category instead of a
-selectable option.
+現在當我們呼叫選單時，我們可以看到「Bar」已經變成了一個類別而不是一個
+可選擇的選項。
 
     _______________________________
 
@@ -79,8 +80,8 @@ selectable option.
     Baz
     Qux
 
-Note the [+] next to 'Bar'. If we select 'Bar', it'll show us the option listed
-under it.
+請注意「欄」旁邊的 [+]。如果我們選擇“Bar”，它會向我們顯示列出的選項
+在它下面。
 
     ________________________________________________________________
 
@@ -90,8 +91,8 @@ under it.
     You've got to know [+]
     << Go Back: Return to the previous menu.
 
-Just the one option, which is a category itself, and the option to go back,
-which will take us back to the previous menu. Let's select 'You've got to know'.
+只有一個選項，它本身就是一個類別，以及返回的選項，
+這將帶我們回到上一個選單。讓我們選擇“你必須知道”。
 
     ________________________________________________________________
 
@@ -103,13 +104,13 @@ which will take us back to the previous menu. Let's select 'You've got to know'.
     When to walk away
     << Go Back: Return to the previous menu.
 
-Now we see the three options listed under it, too. We can select one of them or
-use 'Go Back' to return to the 'Bar' menu we were just at before. It's very
-simple to make a branching tree of selections!
+現在我們也看到它下面列出的三個選項。我們可以選擇其中之一或者
+使用“返回”返回到我們之前所在的“酒吧”選單。這是非常
+簡單地製作選擇的分支樹！
 
-One last thing - you can set the descriptions for the various options simply by
-adding a ':' character followed by the description to the option's line. For
-example, let's add a description to 'Baz' in our menu:
+最後一件事 - 您只需透過以下方式即可設定各種選項的描述
+新增“:”字元，後面接著選項行的說明。對於
+例如，讓我們為選單中的「Baz」新增描述：
 
     TEST_MENU = '''Foo
     Bar
@@ -120,7 +121,7 @@ example, let's add a description to 'Baz' in our menu:
     Baz: Look at this one: the best option.
     Qux'''
 
-Now we see that the Baz option has a description attached that's separate from its key:
+現在我們看到 Baz 選項附加了與其鍵分開的描述：
 
     _______________________________________________________________
 
@@ -132,38 +133,38 @@ Now we see that the Baz option has a description attached that's separate from i
     Baz: Look at this one: the best option.
     Qux
 
-Once the player makes a selection - let's say, 'Foo' - the menu will terminate
-and call your specified callback with the selection, like so:
+一旦玩家做出選擇 - 例如說「Foo」 - 選單就會終止
+並使用選擇呼叫指定的回撥，如下所示：
 
     callback(caller, TEST_MENU, 0, "Foo")
 
-The index of the selection is given along with a string containing the
-selection's key.  That way, if you have two selections in the menu with the same
-key, you can still differentiate between them.
+選擇的索引與包含以下內容的字串一起給出
+選擇的關鍵。  這樣，如果選單中有兩個選項相同
+關鍵，你仍然可以區分它們。
 
-And that's all there is to it! For simple branching-tree selections, using this
-system is much easier than manually creating EvMenu nodes. It also makes
-generating menus with dynamic options much easier - since the source of the menu
-tree is just a string, you could easily generate that string procedurally before
-passing it to the `init_tree_selection` function.  For example, if a player casts
-a spell or does an attack without specifying a target, instead of giving them an
-error, you could present them with a list of valid targets to select by
-generating a multi-line string of targets and passing it to
-`init_tree_selection`, with the callable performing the maneuver once a
-selection is made.
+這就是全部！對於簡單的分支樹選擇，使用這個
+系統比手動建立EvMenu節點容易得多。這也使得
+產生具有動態選項的選單要容易得多 - 因為選單的來源
+樹只是一個字串，您可以在之前輕鬆地透過程式生成該字串
+將其傳遞給 `init_tree_selection` 函式。  例如，如果玩家施放
+在沒有指定目標的情況下施咒或進行攻擊，而不是給他們一個
+錯誤，您可以向他們提供有效目標清單以供選擇
+產生多行目標字串並將其傳遞給
+`init_tree_selection`，可呼叫的執行一次操作
+做出選擇。
 
-This selection system only works for simple branching trees - doing anything
-really complicated like jumping between categories or prompting for arbitrary
-input would still require a full EvMenu implementation. For simple selections,
-however, I'm sure you will find using this function to be much easier!
+這個選擇系統只適用於簡單的分支樹 - 做任何事
+非常複雜，例如在類別之間跳躍或提示任意
+輸入仍然需要完整的 EvMenu 實現。對於簡單的選擇，
+但是，我相信您會發現使用此功能要容易得多！
 
-Included in this module is a sample menu and function which will let a player
-change the color of their name - feel free to mess with it to get a feel for how
-this system works by importing this module in your game's `default_cmdsets.py`
-module and adding `CmdNameColor` to your default character's command set.
+此模組中包含一個範例選單和功能，可讓玩家
+改變他們名字的顏色 - 隨意改變它來感受一下如何
+該系統的工作原理是將此模組匯入到您遊戲的`default_cmdsets.py`中
+模組並將 `CmdNameColor` 新增至預設角色的指令集中。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/utils/tree_select/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\utils\tree_select\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

@@ -1,60 +1,64 @@
-# Evennia Tutorial World
+(evennia-tutorial-world)=
+# Evennia教學世界
 
-Contribution by Griatch 2011, 2015
+Griatch 2011、2015 撰稿
 
-A stand-alone tutorial area for an unmodified Evennia install.
-Think of it as a sort of single-player adventure rather than a
-full-fledged multi-player game world. The various rooms and objects
-are designed to show off features of Evennia, not to be a
-very challenging (nor long) gaming experience. As such it's of course
-only skimming the surface of what is possible. Taking this apart 
-is a great way to start learning the system.
+用於未修改的 Evennia 安裝的獨立教學區域。
+將其視為一種單人冒險而不是
+成熟的多人遊戲世界。各種房間和物體
+旨在炫耀 Evennia 的功能，而不是成為
+非常具有挑戰性（也不長）的遊戲體驗。既然如此，那當然是
+只瀏覽了可能發生的事情的表面。把這個拆開
+是開始學習該系統的好方法。
 
-The tutorial world also includes a game tutor menu example, exemplifying
-Evmenu.
+教學世界還包括一個遊戲導師選單範例，舉例說明
+Evmenu。
 
-## Installation
+(installation)=
+## 安裝
 
-Log in as superuser (#1), then run
+以超級使用者 (#1) 登入，然後執行
 
     batchcommand contrib.tutorials.tutorial_world.build
 
-Wait a little while for building to complete and don't run the command
-again even if it's slow. This builds the world and connect it to Limbo
-and creates a new exit `tutorial`.
+等待建置完成，不要執行指令
+再次，即使它很慢。這構建了世界並將其連線到 Limbo
+並建立一個新的退出`tutorial`。
 
-If you are a superuser (User `#1`), use the `quell` command to play
-the tutorial as intended.
-
-
-## Comments
-
-The tutorial world is intended to be explored and analyzed.  It will help you
-learn how to accomplish some more advanced effects and might give some good
-ideas along the way.
-
-It's suggested you play it through (as a normal user, NOT as Superuser!) and
-explore it a bit, then come back here and start looking into the (heavily
-documented) build/source code to find out how things tick - that's the
-"tutorial" in Tutorial world after all.
-
-Please report bugs in the tutorial to the Evennia issue tracker.
+如果您是超級使用者（使用者`#1`），請使用`quell`指令來玩
+教學按預期進行。
 
 
+(comments)=
+## 評論
 
+教學世界旨在探索和分析。  它會幫助你
+學習如何實現一些更高階的效果，並可能帶來一些好處
+一路上的想法。
 
+建議您通關（作為普通使用者，NOT 作為超級使用者！）並且
+探索一下，然後回到這裡並開始研究（大量
+記錄）建立/原始程式碼以瞭解事情如何發生 - 這就是
+畢竟教學世界裡的「教學」。
 
-
-**Spoilers below - don't read on unless you already played the
-tutorial game**
+請將教學中的錯誤回報給Evennia問題追蹤器。
 
 
 
 
 
 
+**以下有劇透 - 除非您已經玩過，否則請勿繼續閱讀
+教學遊戲**
 
-## Tutorial World Room map
+
+
+
+
+
+
+(tutorial-world-room-map)=
+## 教學世界房間地圖
 
          ?
          |
@@ -83,32 +87,33 @@ tutorial game**
         +----------+          +--------+    +---------------------+
 
 
-## Hints/Notes:
+(hintsnotes)=
+## 提示/註釋：
 
-* o-- connections to/from Limbo
-* intro/outro areas are rooms that automatically sets/cleans the
-  Character of any settings assigned to it during the
-  tutorial game.
-* The Cliff is a good place to get an overview of the surroundings.
-* The Bridge may seem like a big room, but it is really only one room
-  with custom move commands to make it take longer to cross. You can
-  also fall off the bridge if you are unlucky or take your time to
-  take in the view too long.
-* In the Castle areas an aggressive mob is patrolling. It implements
-  rudimentary AI but packs quite a punch unless you have
-  found yourself a weapon that can harm it. Combat is only
-  possible once you find a weapon.
-* The Antechamber features a puzzle for finding the correct Grave
-  chamber.
-* The Cell  is your reward if you fail in various ways. Finding a
-  way out of it is a small puzzle of its own.
-* The Tomb  is a nice place to find a weapon that can hurt the
-  castle guardian. This is the goal of the tutorial.
-  Explore on, or take the exit to finish the tutorial.
-* ?  - look into the code if you cannot find this bonus area!
+* o-- 往返 Limbo 的連線
+* 開頭/結尾區域是自動設定/清理的房間
+期間分配給它的任何設定的字元
+  教學遊戲。
+* 懸崖是俯瞰周圍環境的好地方。
+* 大橋看似一個大房間，但其實只有一個房間
+使用自訂移動指令可以延長穿越時間。你可以
+  如果你運氣不好或慢慢來，也會從橋上掉下來
+  觀察時間太長。
+* 在城堡地區，一群好鬥的暴民正在巡邏。它實現了
+基本的 AI 但很有用，除非你有
+  為自己找到了可以傷害它的武器。戰鬥只是
+  一旦你找到武器就有可能。
+* 前廳設有一個尋找正確墳墓的謎題
+室。
+* 如果你以各種方式失敗，細胞就是你的獎勵。尋找一個
+解決這個問題的方法本身就是一個小難題。
+* 墳墓是尋找可以傷害敵人的武器的好地方
+城堡守護者。這是本教學的目標。
+  繼續探索，或退出以完成教學。
+* ？  - 如果您找不到此獎勵區域，請檢視程式碼！
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/tutorials/tutorial_world/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\tutorials\tutorial_world\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

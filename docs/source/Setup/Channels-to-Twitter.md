@@ -1,30 +1,34 @@
-# Connect Evennia to Twitter
+(connect-evennia-to-twitter)=
+# 將 Evennia 連線到 Twitter
 
 
-[Twitter](https://en.wikipedia.org/wiki/twitter) is an online social networking service that enables users to send and read short messages called "tweets". Following is a short tutorial explaining how to enable users to send tweets from inside Evennia.
+[Twitter](https://en.wikipedia.org/wiki/twitter) 是一種線上社交網路服務，使使用者能夠傳送和閱讀稱為「推文」的短訊息。以下是一個簡短的教程，說明如何使使用者能夠從 Evennia 內部傳送推文。
 
-## Configuring Twitter
+(configuring-twitter)=
+## 設定 Twitter
 
-You must first have a Twitter account. Log in and register an App at the [Twitter Dev Site](https://apps.twitter.com/). Make sure you enable access to "write" tweets!
+您首先必須有一個 Twitter 帳戶。在 [Twitter 開發網站](https://apps.twitter.com/) 登入並註冊應用程式。確保您啟用「寫入」推文的存取許可權！
 
-To tweet from Evennia you will need both the "API Token" and the "API secret" strings as well as the "Access Token" and "Access Secret" strings.
+要從 Evennia 發推文，您將需要“API 令牌”和“API 秘密”字串以及“訪問令牌”和“訪問秘密”字串。
 
-Twitter changed their requirements to require a Mobile number on the Twitter account to register new apps with write access.  If you're unable to do this, please see [this Dev post](https://dev.twitter.com/notifications/new-apps-registration) which describes how to get around it.
+Twitter 更改了要求，要求 Twitter 帳戶上有手機號碼才能註冊具有寫入許可權的新應用程式。  如果您無法執行此操作，請參閱[此開發帖子](https://dev.twitter.com/notifications/new-apps-registration)，其中描述如何解決此問題。
 
-To use Twitter you must install the [Twitter](https://pypi.python.org/pypi/twitter) Python module:
+要使用 Twitter，您必須安裝 [Twitter](https://pypi.python.org/pypi/twitter) Python 模組：
 
 ```
 pip install python-twitter
 ```
 
-## Setting up Twitter, step by step
+(setting-up-twitter-step-by-step)=
+## 逐步設定 Twitter
 
-### A basic tweet command
+(a-basic-tweet-command)=
+### 基本推文指令
 
-Evennia doesn't have a `tweet` command out of the box so you need to write your own little [Command](../Components/Commands.md) in order to tweet. If you are unsure about how commands work and how to add them, it can be an idea to go through the [Adding a Command Tutorial](../Howtos/Beginner-Tutorial/Part1/Beginner-Tutorial-Adding-Commands.md) before continuing.
+Evennia 沒有開箱即用的 `tweet` 指令，因此您需要編寫自己的小 [指令](../Components/Commands.md) 才能發推文。如果您不確定指令如何運作以及如何新增它們，最好在繼續之前先閱讀[新增指令教學](../Howtos/Beginner-Tutorial/Part1/Beginner-Tutorial-Adding-Commands.md)。
 
-You can create the command in a separate command module (something like `mygame/commands/tweet.py`) or together with your other custom commands, as you prefer. 
-This is how it can look: 
+您可以根據需要在單獨的指令模組（例如 `mygame/commands/tweet.py`）中或與其他自定義指令一起建立指令。 
+它看起來是這樣的：
 
 ```python
 # in mygame/commands.tweet.py, for example
@@ -75,25 +79,26 @@ class CmdTweet(Command):
         caller.msg(f"You tweeted:\n{tweet}")
 ```
 
-Be sure to substitute your own actual API/Access keys and secrets in the appropriate places. 
+請務必在適當的位置替換您自己的實際 API/存取金鑰和機密。
 
-We default to limiting tweet access to players with `Developers`-level access *or* to those players that have the permission "tweet" 
+我們預設推文存取許可權制為具有 `Developers` 級別存取許可權的玩家*或*具有「推文」許可權的玩家
 
-To allow allow individual characters to tweet, set the `tweet` permission with 
+若要允許單一字元發推文，請設定 `tweet` 許可權
 
     perm/player playername = tweet
     
-You may change the [lock](../Components/Locks.md) as you feel is appropriate. Change the overall permission to `Players` if you want everyone to be able to tweet.
+您可以根據需要更改[lock](../Components/Locks.md)。如果您希望每個人都能夠發推文，請將整體許可權變更為 `Players`。
 
-Now add this command to your default command set (e.g in `mygame/commands/defalt_cmdsets.py`) and `reload` the server. From now on those with access can simply use `tweet <message>` to see the tweet posted from the game's Twitter account. 
+現在將此指令新增至您的預設指令集（`mygame/commands/defalt_cmdsets.py` 中的e.g）和`reload` 伺服器。從現在開始，擁有存取許可權的人只需使用 `tweet <message>` 即可檢視遊戲 Twitter 帳戶發布的推文。
 
-### Next Steps
+(next-steps)=
+### 下一步
 
-This shows only a basic tweet setup, other things to do could be:
+這僅顯示了基本的推文設定，其他要做的事情可能是：
 
-* Auto-Adding the character name to the tweet
-* More error-checking of postings
-* Changing locks to make tweeting open to more people
-* Echo your tweets to an in-game channel
+* 自動將角色名稱新增至推文中
+* 對帖子進行更多錯誤檢查
+* 改變鎖定，讓推文向更多人開放
+* 將您的推文回顯到遊戲內頻道
 
-Rather than using an explicit command you can set up a Script to send automatic tweets, for example to post updated game stats. See the [Tweeting Game Stats tutorial](../Howtos/Web-Tweeting-Game-Stats.md) for help.
+您可以設定 Script 來傳送自動推文，例如發布更新的遊戲統計資料，而不是使用明確指令。請參閱[推文遊戲統計教學](../Howtos/Web-Tweeting-Game-Stats.md) 尋求協助。

@@ -1,22 +1,25 @@
-# Custom gameime
+(custom-gameime)=
+# 自訂遊戲模式
 
-Contrib by vlgeoff, 2017 - based on Griatch's core original
+Contrib 由 vlgeoff，2017 年 - 基於 Griatch 的核心原創
 
-This reimplements the `evennia.utils.gametime` module but with a _custom_
-calendar (unusual number of days per week/month/year etc) for your game world.
-Like the original, it allows for scheduling events to happen at given
-in-game times, but now taking this custom calendar into account.
+這重新實現了 `evennia.utils.gametime` 模組，但帶有 _custom_
+您的遊戲世界的日曆（每週/每月/每年的異常天數等）。
+與原始版本一樣，它允許安排事件在給定的時間發生
+遊戲中的時間，但現在考慮到這個自訂日曆。
 
-## Installation
+(installation)=
+## 安裝
 
-Import and use this in the same way as you would the normal
-`evennia.utils.gametime` module.
+以與正常情況相同的方式匯入和使用它
+`evennia.utils.gametime` 模組。
 
-Customize the calendar by adding a `TIME_UNITS` dict to your settings (see
-example below).
+透過在您的設定中新增 `TIME_UNITS` 字典來自訂行事曆（請參閱
+下面的例子）。
 
 
-## Usage:
+(usage)=
+## 用法：
 
 ```python
     from evennia.contrib.base_systems import custom_gametime
@@ -28,9 +31,9 @@ example below).
 
 ```
 
-The calendar can be customized by adding the `TIME_UNITS` dictionary to your
-settings file. This maps unit names to their length, expressed in the smallest
-unit. Here's the default as an example:
+可以透過將 `TIME_UNITS` 字典新增至您的日曆中來自訂日曆
+設定檔。這將單位名稱對映到其長度，以最小的形式表示
+單位。以下是預設值的範例：
 
     TIME_UNITS = {
         "sec": 1,
@@ -43,12 +46,12 @@ unit. Here's the default as an example:
         "yr": 60 * 60 * 24 * 7 * 4 * 12,
         "year": 60 * 60 * 24 * 7 * 4 * 12, }
 
-When using a custom calendar, these time unit names are used as kwargs to
-the converter functions in this module. Even if your calendar uses other names
-for months/weeks etc the system needs the default names internally.
+使用自訂日曆時，這些時間單位名稱會用作 kwargs
+轉換器在此模組中起作用。即使您的日曆使用其他名稱
+對於幾個月/幾週等，系統內部需要預設名稱。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/base_systems/custom_gametime/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\base_systems\custom_gametime\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

@@ -1,22 +1,24 @@
-# Extending the REST API
+(extending-the-rest-api)=
+# 延長 REST API
 
 ```{sidebar}
-Concepts like _worn_ or _carried_ aren't built into core Evennia, but it's a common thing to add. This guide uses a `.db.worn` attribute to identify gear, but will explain how to reference your own mechanic too.
+像 _worn_ 或 _carried_ 這樣的概念並沒有內建在核心 Evennia 中，但這是一個常見的新增內容。本指南使用 `.db.worn` attribute 來識別裝備，但也會解釋如何引用您自己的機械師。
 ```
-By default, the Evennia [REST API](../Components/Web-API.md) provides endpoints for the standard entities.  One such endpoint is `/api/characters/`, returning information about Characters. In this tutorial, we'll extend it by adding an `inventory` action to the `/characters` endpoint, showing all objects being _worn_ and _carried_ by a character.
+預設情況下，Evennia [REST API](../Components/Web-API.md) 提供標準實體的端點。  其中一個端點是 `/api/characters/`，傳回有關角色的資訊。在本教學中，我們將透過向 `/characters` 端點新增 `inventory` 操作來擴充套件它，顯示角色_磨損_和_攜帶_的所有物件。
 
-## Creating your own viewset
+(creating-your-own-viewset)=
+## 建立您自己的檢視集
 
-```{sidebar} Views and templates
-A *view* is the python code that tells django what data to put on a page, while a *template* tells django how to display that data. For more in-depth information, you can read the django [docs for views](https://docs.djangoproject.com/en/4.1/topics/http/views/) and [docs for templates](https://docs.djangoproject.com/en/4.1/topics/templates/).
+```{sidebar} 檢視和模板
+*檢視* 是告訴 django 在頁面上放置哪些資料的 python 程式碼，而 *模板* 告訴 django 如何顯示該資料。如需更深入的資訊，您可以閱讀 django [檢視檔案](https://docs.djangoproject.com/en/4.1/topics/http/views/) 和 [範本檔案](https://docs.djangoproject.com/en/4.1/topics/templates/)。
 ```
-The first thing you'll need to do is define your own `views.py` module. 
+您需要做的第一件事是定義您自己的 `views.py` 模組。
 
-Create a blank file: `mygame/web/api/views.py`
+建立一個空白檔案：`mygame/web/api/views.py`
 
-The default REST API endpoints are controlled by classes in `evennia/web/api/views.py` - you could copy that entire file and use it, but we're going to focus on changing the minimum.
+預設 REST API 端點由 `evennia/web/api/views.py` 中的類別控制 - 您可以複製整個檔案並使用它，但我們將專注於更改最小值。
 
-To start, we'll reimplement the default [CharacterViewSet](CharacterViewSet) that handles requests from the `characters/` endpoint. This is a child of the `objects` endpoint that can only access characters.
+首先，我們將重新實作處理來自 `characters/` 端點的請求的預設 [CharacterViewSet](CharacterViewSet)。這是 `objects` 端點的子端點，只能存取字元。
 
 ```python
 # in mygame/web/api/views.py
@@ -40,16 +42,17 @@ class CharacterViewSet(ObjectDBViewSet):
     queryset = DefaultCharacter.objects.all_family()
 ```
 
-## Setting up the urls
+(setting-up-the-urls)=
+## 設定 url
 
-Now that we have a viewset of our own, we can create our own urls module and change the `characters` endpoint path to point to ours.
+現在我們有了自己的檢視集，我們可以建立自己的 urls 模組並更改 `characters` 端點路徑以指向我們的端點路徑。
 
 ```{sidebar}
-Evennia's [Game website](../Components/Website.md) page demonstrates how to use the `urls.py` module for the main website - if you haven't gone over that page yet, now is a good time.
+Evennia 的 [遊戲網站](../Components/Website.md) 頁面示範如何使用主網站的 `urls.py` 模組 - 如果您還沒有瀏覽該頁面，現在是個好時機。
 ```
-The API routing is more complicated than the website or webclient routing, so you need to copy the entire module from evennia into your game instead of patching on changes. Copy the file from `evennia/web/api/urls.py` to your folder, `mygame/web/api/urls.py` and open it in your editor.
+API 路由比網站或 webclient 路由更複雜，因此您需要將整個模組從 evennia 複製到您的遊戲中，而不是修補變更。將檔案從 `evennia/web/api/urls.py` 複製到您的資料夾 `mygame/web/api/urls.py` 並在編輯器中開啟它。
 
-Import your new views module, then find and update the `characters` path to use your own viewset.
+匯入新的檢視模組，然後尋找並更新 `characters` 路徑以使用您自己的檢視集。
 
 ```python
 # mygame/web/api/urls.py
@@ -95,9 +98,9 @@ urlpatterns += [
 ]
 ```
 
-We've almost got it pointing at our new view now. The last step is to add your own API urls - `web.api.urls` - to your web root url module. Otherwise it will continue pointing to the default API router and we'll never see our changes.
+現在我們幾乎已經得到它指向我們的新觀點了。最後一步是將您自己的 API url - `web.api.urls` - 新增到您的 Web 根 url 模組。否則它將繼續指向預設的 API 路由器，我們將永遠不會看到我們的變更。
 
-Open `mygame/web/urls.py` in your editor and add a new path for "api/", pointing to `web.api.urls`. The final file should look something like this:
+在編輯器中開啟 `mygame/web/urls.py` 並為「api/」新增路徑，指向 `web.api.urls`。最終檔案應如下所示：
 
 ```python
 # mygame/web/urls.py
@@ -124,28 +127,29 @@ urlpatterns = [
 urlpatterns = urlpatterns + evennia_default_urlpatterns
 ```
 
-Restart your evennia game - `evennia reboot` from the command line for a full restart of the game AND portal - and try to get `/api/characters/` again. If it works exactly like before, you're ready to move on to the next step!
+重新啟動您的 evennia 遊戲 - 從指令列 `evennia reboot` 完全重新啟動遊戲 AND portal - 並再次嘗試獲取 `/api/characters/`。如果它的工作原理與以前完全一樣，那麼您就可以繼續下一步了！
 
-## Adding a new detail
+(adding-a-new-detail)=
+## 新增細節
 
-Head back over to your character view class - it's time to start adding our inventory.
+返回您的角色檢視類別 - 是時候開始新增我們的庫存了。
 
-The usual "page" in a REST API is called an *endpoint* and is what you typically access. e.g. `/api/characters/` is the "characters" endpoint, and `/api/characters/:id` is the endpoint for individual characters.
+REST API 中常見的「頁面」稱為*端點*，是您通常造訪的內容。 e.g。 `/api/characters/` 是「字元」端點，`/api/characters/:id` 是單一字元的端點。
 
-```{sidebar} What is that colon?
-The `:` in an API path means that it's a *variable* - you don't directly access that exact path. Instead, you'd take your character ID (e.g. 1) and use that instead: `/api/characters/1`
+```{sidebar} 那個冒號是什麼？
+API 路徑中的 `:` 意味著它是一個*變數* - 您不能直接訪問該確切路徑。相反，您可以使用您的角色 ID (e.g.1) 並使用它：`/api/characters/1`
 ```
 
-However, an endpoint can also have one or more *detail* views, which function like a sub-point. We'll be adding *inventory* as a detail to our character endpoint, which will look like `/api/characters/:id/inventory`
+然而，端點也可以有一個或多個「詳細」檢視，其功能類似於子點。我們將新增 *inventory* 作為我們的角色端點的詳細資訊，它看起來像 `/api/characters/:id/inventory`
 
-With the django REST framework, adding a new detail is as simple as adding a decorated method to the view set class - the `@action` decorator. Since checking your inventory is just data retrieval, we'll only want to permit the `GET` method, and we're adding this action as an API detail, so our decorator will look like this:
+使用 django REST 框架，新增新細節就像在檢視集合類別中新增裝飾方法一樣簡單 - `@action` 裝飾器。由於檢查您的庫存只是資料檢索，因此我們只想允許 `GET` 方法，並且我們將此操作新增為 API 詳細資訊，因此我們的裝飾器將如下所示：
 ```python
 @action(detail=True, methods=["get"])
 ```
 
-> There are situations where you might want a detail or endpoint that isn't just data retrieval: for example, *buy* or *sell* on an auction-house listing. In those cases, you would use *put* or *post* instead. For further reading on what you can do with `@action` and ViewSets, visit [the django REST framework documentation](https://www.django-rest-framework.org/api-guide/viewsets/)
+> 在某些情況下，您可能需要的詳細資訊或端點不僅僅是資料檢索：例如，拍賣行清單中的「購買」或「出售」。在這些情況下，您可以使用 *put* 或 *post* 來代替。若要進一步瞭解 `@action` 和 ViewSets 的用途，請造訪 [django REST 框架檔案](https://www.django-rest-framework.org/api-guide/viewsets/)
 
-When adding a function as a detail action, the name of our function will be the same as the detail. Since we want an `inventory` action we'll define an `inventory` function.
+當新增函式作為詳細資訊操作時，函式的名稱將與詳細資訊相同。由於我們想要 `inventory` 操作，因此我們將定義一個 `inventory` 函式。
 
 ```python
 """
@@ -177,18 +181,19 @@ class CharacterViewSet(ObjectDBViewSet):
         return Response("your inventory", status=status.HTTP_200_OK )
 ```
 
-Get your character's ID - it's the same as your dbref but without the # - and then `evennia reboot` again. Now you should be able to call your new characters action: `/api/characters/1/inventory` (assuming you're looking at character #1) and it'll return the string "your inventory"
+獲得你的角色的 ID - 它與你的 dbref 相同，但沒有 # - 然後再次 `evennia reboot` 。現在您應該能夠呼叫新角色操作：`/api/characters/1/inventory`（假設您正在檢視角色#1），它將返回字串“您的庫存”
 
-## Creating a Serializer
+(creating-a-serializer)=
+## 建立序列化器
 
-A simple string isn't very useful, though. What we want is the character's actual inventory - and for that, we need to set up our own *serializer*.
+不過，簡單的字串並不是很有用。我們想要的是角色的實際庫存 - 為此，我們需要設定我們自己的*序列化器*。
 
-```{sidebar} Django serializers
-You can get a more in-depth look at django serializers in [the django REST framework serializer docs](https://www.django-rest-framework.org/api-guide/serializers/).
+```{sidebar} Django 序列化器
+您可以在 [django REST 框架序列化器檔案](https://www.django-rest-framework.org/api-guide/serializers/) 中更深入地瞭解 django 序列化器。
 ```
-Generally speaking, a *serializer* turns a set of data into a specially formatted string that can be sent in a data stream - usually JSON. Django REST serializers are special classes and functions which take python objects and convert them into API-ready formats. So, just like for the viewset, django and evennia have done a lot of the heavy lifting for us already.
+一般來說，*序列化器*將一組資料轉換為可以在資料流中傳送的特殊格式的字串 - 通常是JSON。 Django REST 序列化器是特殊的類別和函式，它們接受 python 物件並將其轉換為 API- 就緒格式。因此，就像檢視集一樣，django 和 evennia 已經為我們完成了許多繁重的工作。
 
-Instead of writing our own serializer, we'll inherit from evennia's pre-existing serializers and extend them for our own purpose. To do that, create a new file `mygame/web/api/serializers.py` and start by adding in the imports you'll need.
+我們不會編寫自己的序列化程式，而是繼承 evennia 預先存在的序列化程式並出於我們自己的目的擴充套件它們。為此，請建立一個新檔案 `mygame/web/api/serializers.py` 並首先新增您需要的匯入。
 
 ```python
 # the base serializing library for the framework
@@ -201,7 +206,7 @@ from evennia.web.api.serializers import TypeclassSerializerMixin, SimpleObjectDB
 from evennia.objects.objects import DefaultObject
 ```
 
-Next, we'll be defining our own serializer class. Since it's for retrieving inventory data, we'll name it appropriately.
+接下來，我們將定義我們自己的序列化器類別。由於它用於檢索庫存資料，因此我們將對其進行適當的命名。
 
 ```python
 class InventorySerializer(TypeclassSerializerMixin, serializers.ModelSerializer):
@@ -223,9 +228,9 @@ class InventorySerializer(TypeclassSerializerMixin, serializers.ModelSerializer)
         ]
         read_only_fields = ["id"]
 ```
-The `Meta` class defines which fields will be used in the final serialized string. The `id` field is from the base ModelSerializer, but you'll notice that the two others - `worn` and `carried` - are defined as properties to `SerializerMethodField`. That tells the framework to look for matching method names in the form `get_X` when serializing.
+`Meta` 類別定義了最終序列化字串中將使用哪些欄位。 `id` 欄位來自基礎 ModelSerializer，但您會注意到其他兩個 - `worn` 和 `carried` - 定義為 `SerializerMethodField` 的屬性。這告訴框架在序列化時尋找 `get_X` 形式的匹配方法名稱。
 
-Which is why our next step is to add those methods! We defined the properties `worn` and `carried`, so the methods we'll add are `get_worn` and `get_carried`. They'll be static methods - that is, they don't include `self` - since they don't need to reference the serializer class itself.
+這就是為什麼我們的下一步是新增這些方法！我們定義了屬性 `worn` 和 `carried`，因此我們將新增的方法是 `get_worn` 和 `get_carried`。它們將是靜態方法 - 也就是說，它們不包含 `self` - 因為它們不需要引用序列化器類別本身。
 
 ```python
     # these methods filter the character's contents based on the `worn` attribute
@@ -244,13 +249,13 @@ Which is why our next step is to add those methods! We defined the properties `w
         return SimpleObjectDBSerializer(carried, many=True).data
 ```
 
-For this guide, we're assuming that whether an object is being worn or not is stored in the `worn` db attribute and filtering based on that attribute. This can easily be done differently to match your own game's mechanics: filtering based on a tag, calling a custom method on your character that returns the right list, etc.
+對於本指南，我們假設物件是否被磨損儲存在 `worn` 資料庫 attribute 中，並基於該 attribute 進行過濾。這可以很容易地以不同的方式完成，以匹配您自己的遊戲機制：根據 tag 進行過濾，在您的角色上呼叫返回正確列表的自訂方法等。
 
-If you want to add in more details - grouping carried items by typing, or dividing up armor vs weapons, you'd just need to add or change the properties, fields, and methods.
+如果您想新增更多詳細資訊 - 透過輸入將攜帶的物品分組，或分割盔甲與武器，您只需要新增或變更屬性、欄位和方法。
 
-> Remember: `worn = serializers.SerializerMethodField()` is how the API knows to use `get_worn`, and `Meta.fields` is the list of fields that will actually make it into the final JSON.
+> 請記住：`worn = serializers.SerializerMethodField()` 是 API 知道如何使用 `get_worn`，`Meta.fields` 是實際將其放入最終 JSON 的欄位清單。
 
-Your final file should look like this:
+您的最終檔案應如下所示：
 
 ```python
 # mygame/web/api/serializers.py
@@ -299,15 +304,16 @@ class InventorySerializer(TypeclassSerializerMixin, serializers.ModelSerializer)
         return SimpleObjectDBSerializer(carried, many=True).data
 ```
 
-## Using your serializer
+(using-your-serializer)=
+## 使用你的序列化器
 
-Now let's go back to our views file, `mygame/web/api/views.py`. Add our new serializer with the rest of the imports:
+現在讓我們回到我們的檢視檔案，`mygame/web/api/views.py`。新增我們的新序列化器和其餘的匯入：
 
 ```python
 from .serializers import InventorySerializer
 ```
 
-Then, update our `inventory` detail to use our serializer.
+然後，更新我們的 `inventory` 詳細資訊以使用我們的序列化器。
 ```python
     @action(detail=True, methods=["get"])
     def inventory(self, request, pk=None):
@@ -315,7 +321,7 @@ Then, update our `inventory` detail to use our serializer.
         return Response( InventorySerializer(obj).data, status=status.HTTP_200_OK )
 ```
 
-Your views file should now look like this:
+您的檢視檔案現在應如下所示：
 
 ```python
 """
@@ -348,17 +354,18 @@ class CharacterViewSet(ObjectDBViewSet):
         return Response( InventorySerializer(obj).data, status=status.HTTP_200_OK ) # <--- MODIFIED
 ```
 
-That'll use our new serializer to get our character's inventory. Except... not quite.
+這將使用我們新的序列化器來獲取角色的庫存。除了……不完全是。
 
-Go ahead and try it: `evennia reboot` and then `/api/characters/1/inventory` like before. Instead of returning the string "your inventory", you should get an error saying you don't have permission. Don't worry - that means it's successfully referencing the new serializer. We just haven't given it permission to access the objects yet.
+繼續嘗試：`evennia reboot`，然後像以前一樣`/api/characters/1/inventory`。您應該收到一條錯誤訊息，指出您沒有許可權，而不是返回字串「您的庫存」。別擔心 - 這意味著它已成功引用新的序列化程式。我們只是還沒有授予它存取物件的許可權。
 
-## Customizing API permissions
+(customizing-api-permissions)=
+## 自訂API許可權
 
-Evennia comes with its own custom API permissions class, connecting the API permissions to the in-game permission hierarchy and locks system. Since we're trying to access the object's data now, we need to pass the `has_object_permission` check as well as the general permission check - and that default permission class hardcodes actions into the object permission checks.
+Evennia 附帶自己的自訂 API 許可權類，將 API 許可權連線到遊戲內許可權層次結構並鎖定係統。由於我們現在嘗試存取物件的資料，因此我們需要透過 `has_object_permission` 檢查以及常規許可權檢查 - 並且預設許可權類別將操作硬編碼到物件許可權檢查中。
 
-Since we've added a new action - `inventory` - to our characters endpoint, we need to use our own custom permissions on our characters endpoint as well. Create one more module file: `mygame/web/api/permissions.py`
+由於我們為角色端點新增了一個新操作 - `inventory`，因此我們還需要在角色端點上使用我們自己的自訂許可權。再建立一個模組檔：`mygame/web/api/permissions.py`
 
-Like with the previous classes, we'll be inheriting from the original and extending it to take advantage of all the work Evennia already does for us.
+與前面的類別一樣，我們將從原始類別繼承並擴充套件它，以利用 Evennia 已經為我們完成的所有工作。
 
 ```python
 # mygame/web/api/permissions.py
@@ -379,9 +386,9 @@ class CharacterPermission(EvenniaPermission):
         return super().has_object_permission(request, view, obj)
 ```
 
-That's the whole permission class! For our final step, we need to use it in our characters view by importing it and setting the `permission_classes` property.
+這就是整個許可權類別！對於我們的最後一步，我們需要透過匯入它並設定 `permission_classes` 屬性來在角色檢視中使用它。
 
-Once you've done that, your final `views.py` should look like this:
+完成後，最終的 `views.py` 應如下：
 
 ```python
 """
@@ -417,14 +424,15 @@ class CharacterViewSet(ObjectDBViewSet):
         return Response( InventorySerializer(obj).data, status=status.HTTP_200_OK )
 ```
 
-One last `evennia reboot` - now you should be able to get `/api/characters/1/inventory` and see everything your character has, neatly divided into "worn" and "carried".
+最後`evennia reboot` - 現在你應該能夠獲得`/api/characters/1/inventory`並看到你的角色擁有的一切，整齊地分為「磨損」和「攜帶」。
 
-## Next Steps
+(next-steps)=
+## 下一步
 
-```{sidebar} Django REST Framework
-For a more in-depth look at the django REST framework, you can go through [their tutorial](https://www.django-rest-framework.org/tutorial/1-serialization/) or straight to [the django REST framework API docs](https://www.django-rest-framework.org/api-guide/requests/).
+```{sidebar} Django REST 框架
+要更深入地瞭解 django REST 框架，您可以閱讀[他們的教學](https://www.django-rest-framework.org/tutorial/1-serialization/) 或直接訪問[django REST 框架 API 檔案](https://www.django-rest-framework.org/api-guide/requests/)。
 ```
-That's it! You've learned how to customize your own REST endpoint for Evennia, add new endpoint details, and serialize data from your game's objects for the REST API. With those tools, you can take any in-game data you want and make it available - or even modifiable - with the API.
+就是這樣！您已經瞭解如何為 Evennia 自訂您自己的 REST 端點、新增新的端點詳細資訊以及為 REST API 序列化來自遊戲物件的資料。藉助這些工具，您可以獲得所需的任何遊戲內資料，並使用 API 使其可用，甚至可以修改。
 
-If you want a challenge, try taking what you learned and implementing a new `desc` detail that will let you `GET` the existing character desc _or_ `PUT` a new desc. (Tip: check out how evennia's REST permissions module works, and the `set_attribute` methods in the default evennia REST API views.)
+如果您想要挑戰，請嘗試利用您學到的知識並實施新的 `desc` 細節，這將使您 `GET` 現有字元 desc _或_ `PUT` 一個新 desc。 （提示：檢視 evennia 的 REST 許可權模組如何運作，以及預設 evennia REST API 檢視中的 `set_attribute` 方法。）
 

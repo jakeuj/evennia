@@ -3,6 +3,7 @@ Update dynamically generated doc pages based on github sources.
 
 """
 
+import os
 from datetime import datetime
 from os.path import abspath, dirname
 from os.path import join as pathjoin
@@ -14,6 +15,18 @@ DOCSRCDIR = pathjoin(DOCDIR, "source")
 EVENNIADIR = pathjoin(ROOTDIR, "evennia")
 
 
+def _target_contains_cjk(targetfile):
+    """Return ``True`` if the existing target contains CJK characters."""
+
+    if not os.path.exists(targetfile):
+        return False
+
+    with open(targetfile, encoding="utf-8") as fil:
+        txt = fil.read()
+
+    return any("\u4e00" <= char <= "\u9fff" for char in txt)
+
+
 def update_code_style():
     """
     Plain CODING_STYLE.md copy
@@ -22,10 +35,14 @@ def update_code_style():
     sourcefile = pathjoin(ROOTDIR, "CODING_STYLE.md")
     targetfile = pathjoin(DOCSRCDIR, "Coding", "Evennia-Code-Style.md")
 
-    with open(sourcefile) as fil:
+    if _target_contains_cjk(targetfile):
+        print("  -- Preserved localized Evennia-Code-Style.md")
+        return
+
+    with open(sourcefile, encoding="utf-8") as fil:
         txt = fil.read()
 
-    with open(targetfile, "w") as fil:
+    with open(targetfile, "w", encoding="utf-8") as fil:
         fil.write(txt)
 
     print("  -- Updated Evennia-Code-Style.md")
@@ -40,10 +57,14 @@ def update_changelog():
     sourcefile = pathjoin(ROOTDIR, "CHANGELOG.md")
     targetfile = pathjoin(DOCSRCDIR, "Coding", "Changelog.md")
 
-    with open(sourcefile) as fil:
+    if _target_contains_cjk(targetfile):
+        print("  -- Preserved localized Changelog.md")
+        return
+
+    with open(sourcefile, encoding="utf-8") as fil:
         txt = fil.read()
 
-    with open(targetfile, "w") as fil:
+    with open(targetfile, "w", encoding="utf-8") as fil:
         fil.write(txt)
 
     print("  -- Updated Changelog.md")
@@ -58,7 +79,11 @@ def update_default_settings():
     sourcefile = pathjoin(EVENNIADIR, "settings_default.py")
     targetfile = pathjoin(DOCSRCDIR, "Setup", "Settings-Default.md")
 
-    with open(sourcefile) as fil:
+    if _target_contains_cjk(targetfile):
+        print("  -- Preserved localized Settings-Default.md")
+        return
+
+    with open(sourcefile, encoding="utf-8") as fil:
         txt = fil.read()
 
     txt = f"""
@@ -83,10 +108,11 @@ if settings.SERVERNAME == "Evennia":
 {txt}
 ```
 """
-    with open(targetfile, "w") as fil:
+    with open(targetfile, "w", encoding="utf-8") as fil:
         fil.write(txt)
 
     print("  -- Updated Settings-Default.md")
+
 
 def update_index():
     """
@@ -96,11 +122,11 @@ def update_index():
     indexfile = pathjoin(DOCSRCDIR, "index.md")
     versionfile = pathjoin(EVENNIADIR, "VERSION.txt")
 
-    with open(indexfile) as f:
+    with open(indexfile, encoding="utf-8") as f:
         srcdata = f.read()
 
     # replace the version number
-    with open(versionfile) as f:
+    with open(versionfile, encoding="utf-8") as f:
         version = f.read().strip()
 
     pattern = r"Evennia version is \d+\.\d+\.\d+\."
@@ -116,10 +142,11 @@ def update_index():
 
     srcdata = re_sub(pattern, replacement, srcdata)
 
-    with open(indexfile, "w") as f:
+    with open(indexfile, "w", encoding="utf-8") as f:
         f.write(srcdata)
 
     print("  -- Updated index.md")
+
 
 def update_dynamic_pages():
     """

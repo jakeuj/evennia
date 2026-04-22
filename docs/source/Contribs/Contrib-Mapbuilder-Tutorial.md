@@ -1,27 +1,28 @@
-# Creating rooms from an ascii map
+(creating-rooms-from-an-ascii-map)=
+# 從 ASCII 對映建立房間
 
-This tutorial describes the creation of an in-game map display based on a pre-drawn map.  It goes with the [Mapbuilder contrib](./Contrib-Mapbuilder.md).   It also details how to use the [Batch code processor](../Components/Batch-Code-Processor.md) for advanced building. 
+本教學描述了基於預先繪製的地圖建立遊戲內地圖顯示。  它與[Mapbuilder contrib](./Contrib-Mapbuilder.md)一起使用。   它還詳細介紹如何使用[批次程式碼處理器](../Components/Batch-Code-Processor.md) 進行進階建置。
 
-Evennia does not require its rooms to be positioned in a "logical" way. Your exits could be named
-anything. You could make an exit "west" that leads to a room described to be in the far north. You
-could have rooms inside one another, exits leading back to the same room or describing spatial
-geometries impossible in the real world.
+Evennia 不要求其房間以「邏輯」方式定位。您的出口可以被命名
+任何東西。你可以從「西」出口通往一個被描述為位於遙遠北方的房間。你
+可以有一個房間在另一個房間內，出口通往同一個房間或描述空間
+現實世界中不可能的幾何形狀。
 
-That said, most games *do* organize their rooms in a logical fashion, if nothing else to retain the
-sanity of their players. And when they do, the game becomes possible to map. This tutorial will give
-an example of a simple but flexible in-game map system to further help player's to navigate. We will
+也就是說，大多數遊戲*確實*以邏輯方式組織房間，如果沒有其他方法來保留房間
+他們球員的理智。當他們這樣做時，遊戲就可以繪製地圖了。本教學將給出
+一個簡單但靈活的遊戲內地圖系統範例，可進一步幫助玩家導航。我們將
 
-To simplify development and error-checking we'll break down the work into bite-size chunks, each
-building on what came before. For this we'll make extensive use of the [Batch code processor](Batch-
-Code-Processor), so you may want to familiarize yourself with that.
+為了簡化開發和錯誤檢查，我們將把工作分解為小塊，每個塊
+建立在之前的基礎上。為此，我們將廣泛使用[批次程式碼處理器](Batch-
+Code-Processor)，因此您可能需要熟悉一下。
 
-1. **Planning the map** - Here we'll come up with a small example map to use for the rest of the
-tutorial.
-2. **Making a map object** - This will showcase how to make a static in-game "map" object a
-Character could pick up and look at.
-3. **Building the map areas** - Here we'll actually create the small example area according to the
-map we designed before.
-4. **Map code** - This will link the map to the location so our output looks something like this:
+1. **規劃地圖** - 在這裡我們將提供一個小範例地圖以用於其餘部分
+教學。
+2. **製作地圖物件** - 這將展示如何製作靜態遊戲內「地圖」物件
+人物可以拿起來看。
+3. **構建地圖區域** - 這裡我們實際上將根據
+我們之前設計的地圖。
+4. **地圖程式碼** - 這會將地圖連結到該位置，因此我們的輸出如下所示：
 
     ```
     crossroads(#3)
@@ -34,26 +35,27 @@ map we designed before.
     Exits: north(#8), east(#9), south(#10), west(#11)
     ```
 
-We will henceforth assume your game folder is name named `mygame` and that you haven't modified the
-dkefault commands. We will also not be using [Colors](../Concepts/Colors.md) for our map since they
-don't show in the documentation wiki.
+今後我們將假設您的遊戲資料夾名稱為 `mygame` 並且您尚未修改
+dkefault 指令。我們也不會在我們的地圖中使用[顏色](../Concepts/Colors.md)，因為它們
+不顯示在檔案 wiki 中。
 
-## Planning the Map
+(planning-the-map)=
+## 規劃地圖
 
-Let's begin with the fun part! Maps in MUDs come in many different [shapes and
-sizes](http://journal.imaginary-realities.com/volume-05/issue-01/modern-interface-modern-
-mud/index.html). Some appear as just boxes connected by lines. Others have complex graphics that are
-external to the game itself.
+讓我們從有趣的部分開始吧！ MUDs 中的地圖有許多不同的[形狀和
+尺寸](http://journal.imaginary-realities.com/volume-05/issue-01/modern-interface-modern-
+mud/index.html)。有些看起來只是由線連線的盒子。其他人則有複雜的圖形
+遊戲本身的外部。
 
-Our map will be in-game text but that doesn't mean we're restricted to the normal alphabet! If
-you've ever selected the [Wingdings font](https://en.wikipedia.org/wiki/Wingdings) in Microsoft Word
-you will know there are a multitude of other characters around to use. When creating your game with
-Evennia you have access to the [UTF-8 character encoding](https://en.wikipedia.org/wiki/UTF-8) which
-put at your disposal [thousands of letters, number and geometric shapes](https://mcdlr.com/utf-8/#1).
+我們的地圖將是遊戲中的文字，但這並不意味著我們僅限於普通字母表！如果
+您曾在 Microsoft Word 中選擇過 [Wingdings 字型](https://en.wikipedia.org/wiki/Wingdings)
+您會知道還有許多其他字元可供使用。建立遊戲時
+Evennia 您有權存取 [UTF-8 字元編碼](https://en.wikipedia.org/wiki/UTF-8)
+供您使用[數千個字母、數字和幾何形狀](https://mcdlr.com/utf-8/#1)。
 
-For this exercise, we've copy-and-pasted from the pallet of special characters used over at 
-[Dwarf Fortress](https://dwarffortresswiki.org/index.php/Character_table) to create what is hopefully
-a pleasing and easy to understood landscape:
+對於本練習，我們從以下位置使用的特殊字元託盤複製並貼上
+[矮人要塞](https://dwarffortresswiki.org/index.php/Character_table)創造希望的東西
+令人愉悅且易於理解的景觀：
 
 ```
 ≈≈↑↑↑↑↑∩∩
@@ -67,38 +69,39 @@ a pleasing and easy to understood landscape:
 ≈≈↑↑▲↑↑∩∩
 ≈≈↑↑↑↑↑∩∩
 ```
-There are many considerations when making a game map depending on the play style and requirements
-you intend to implement. Here we will display a 5x5 character map of the area surrounding the
-account. This means making sure to account for 2 characters around every visitable location. Good
-planning at this stage can solve many problems before they happen.
+根據遊戲風格和要求，製作遊戲地圖時需要考慮許多因素
+你打算實施。在這裡，我們將顯示 5x5 周圍區域的字元圖
+帳戶。這意味著確保每個可訪問位置周圍都有 2 個字元。好
+這個階段的計劃可以在許多問題發生之前解決它們。
 
-## Creating a Map Object
+(creating-a-map-object)=
+## 建立地圖物件
 
-In this section we will try to create an actual "map" object that an account can pick up and look
-at.
+在本節中，我們將嘗試建立一個帳戶可以擷取並檢視的實際「地圖」物件
+在。
 
-Evennia offers a range of [default commands](../Components/Default-Commands.md) for 
-[creating objects and rooms in-game](../Howtos/Beginner-Tutorial/Part1/Beginner-Tutorial-Building-Quickstart.md). While readily accessible, these commands are made to do very
-specific, restricted things and will thus not offer as much flexibility to experiment (for an
-advanced exception see [the FuncParser](../Components/FuncParser.md)). Additionally, entering long
-descriptions and properties over and over in the game client can become tedious; especially when
-testing and you may want to delete and recreate things over and over.
+Evennia 提供一系列[預設指令](../Components/Default-Commands.md)
+[在遊戲中創造物件和房間](../Howtos/Beginner-Tutorial/Part1/Beginner-Tutorial-Building-Quickstart.md)。雖然易於訪問，但這些指令的用途非常廣泛
+具體的、受限制的事物，因此不會提供盡可能多的實驗彈性（對於
+進階異常請參閱[FuncParser](../Components/FuncParser.md))。此外，輸入長
+遊戲使用者端中一遍又一遍的描述和屬性可能會變得乏味；尤其是當
+測試時，您可能想要一遍又一遍地刪除和重新建立內容。
 
-To overcome this, Evennia offers [batch processors](../Components/Batch-Processors.md) that work as input-files
-created out-of-game. In this tutorial we'll be using the more powerful of the two available batch
-processors, the [Batch Code Processor ](../Components/Batch-Code-Processor.md), called with the `@batchcode` command.
-This is a very powerful tool. It allows you to craft Python files to act as blueprints of your
-entire game world. These files have access to use Evennia's Python API directly. Batchcode allows
-for easy editing and creation in whatever text editor you prefer, avoiding having to manually build
-the world line-by-line inside the game.
+為了克服這個問題，Evennia 提供了作為輸入檔的[批次處理器](../Components/Batch-Processors.md)
+遊戲外建立的。在本教學中，我們將使用兩個可用批次中更強大的一個
+處理器，[批次程式碼處理器](../Components/Batch-Code-Processor.md)，使用 `@batchcode` 指令呼叫。
+這是一個非常強大的工具。它允許您製作 Python 檔案作為您的藍圖
+整個遊戲世界。這些檔案可以直接使用Evennia的Python API。批次程式碼允許
+可以在您喜歡的任何文字編輯器中輕鬆編輯和建立，避免手動構建
+遊戲內的世界線。
 
-> Important warning: `@batchcode`'s power is only rivaled by the `@py` command. Batchcode is so
-powerful it should be reserved only for the [superuser](../Concepts/Building-Permissions.md). Think carefully
-before you let others (such as `Developer`- level staff) run `@batchcode` on their own - make sure
-you are okay with them running *arbitrary Python code* on your server.
+> 重要警告：`@batchcode` 的威力只能與 `@py` 指令相提並論。批次碼是這樣的
+功能強大，應該僅為[超級使用者](../Concepts/Building-Permissions.md)保留。仔細想想
+在讓其他人（例如 `Developer`-級別的員工）自己執行 `@batchcode` 之前 - 確保
+你可以接受他們在你的伺服器上執行*任意Python程式碼*。
 
-While a simple example, the map object it serves as good way to try out `@batchcode`. Go to
-`mygame/world` and create a new file there named `batchcode_map.py`:
+雖然是一個簡單的範例，但地圖物件是嘗試 `@batchcode` 的好方法。前往
+`mygame/world` 並在其中建立一個名為 `batchcode_map.py` 的新檔案：
 
 ```Python
 # mygame/world/batchcode_map.py
@@ -130,25 +133,26 @@ map.db.desc = """
 caller.msg("A map appears out of thin air and falls to the ground.")
 ```
 
-Log into your game project as the superuser and run the command 
+以超級使用者登入您的遊戲專案並執行指令
 
 ```
 @batchcode batchcode_map
 ```
 
-This will load your `batchcode_map.py` file and execute the code (Evennia will look in your `world/`
-folder automatically so you don't need to specify it).
+這將載入您的 `batchcode_map.py` 檔案並執行程式碼（Evennia 將在您的 `world/` 中查詢
+自動資料夾，因此您無需指定它）。
 
-A new map object should have appeared on the ground. You can view the map by using `look map`. Let's
-take it with the `get map` command. We'll need it in case we get lost!
+地面上應該會出現一個新的地圖物件。您可以使用`look map`檢視地圖。讓我們
+使用 `get map` 指令獲取它。萬一我們迷路了，我們就需要它！
 
-## Building the map areas
+(building-the-map-areas)=
+## 建構地圖區域
 
-We've just used batchcode to create an object useful for our adventures. But the locations on that
-map does not actually exist yet - we're all mapped up with nowhere to go! Let's use batchcode to
-build a game area based on our map. We have five areas outlined: a castle, a cottage, a campsite, a
-coastal beach and the crossroads which connects them. Create a new batchcode file for this in
-`mygame/world`, named `batchcode_world.py`.
+我們剛剛使用批次程式碼建立了一個對我們的冒險有用的物件。但那上面的位置
+地圖實際上還不存在——我們都被繪製好了無處可去！讓我們使用批次程式碼
+根據我們的地圖建構一個遊戲區域。我們概述了五個區域：城堡、小屋、露營地、
+沿海海灘和連線它們的十字路口。為此建立一個新的批次程式碼檔案
+`mygame/world`，名為`batchcode_world.py`。
 
 ```Python
 # mygame/world/batchcode_world.py
@@ -223,25 +227,26 @@ limbo_exit = create_object(exits.Exit, key="enter world",
 
 ```
 
-Apply this new batch code with `@batchcode batchcode_world`. If there are no errors in the code we
-now have a nice mini-world to explore. Remember that if you get lost you can look at the map we
-created!
+使用 `@batchcode batchcode_world` 應用這個新的批次程式碼。如果程式碼沒有錯誤我們
+現在有一個漂亮的迷你世界可供探索。請記住，如果您迷路了，可以檢視我們的地圖
+建立了！
 
-## In-game minimap
+(in-game-minimap)=
+## 遊戲內小地圖
 
-Now we have a landscape and matching map, but what we really want is a mini-map that displays
-whenever we move to a room or use the `look` command.
+現在我們有了一個風景和匹配的地圖，但我們真正想要的是一個顯示的迷你地圖
+每當我們移動到一個房間或使用`look`指令時。
 
-We *could* manually enter a part of the map into the description of every room like we did our map
-object description. But some MUDs have tens of thousands of rooms! Besides, if we ever changed our
-map we would have to potentially alter a lot of those room descriptions manually to match the
-change. So instead we will make one central module to hold our map. Rooms will reference this
-central location on creation and the map changes will thus come into effect when next running our
-batchcode.
+我們 *可以* 手動將地圖的一部分輸入到每個房間的描述中，就像我們製作地圖一樣
+物件描述。但有些MUDs有幾萬個房間！此外，如果我們改變了我們的
+在地圖上，我們可能必須手動更改許多房間描述以匹配
+改變。因此，我們將製作一個中央模組來儲存我們的地圖。房間會參考這個
+建立時的中心位置和地圖更改將在下次執行我們的時生效
+批次程式碼。
 
-To make our mini-map we need to be able to cut our full map into parts. To do this we need to put it
-in a format which allows us to do that easily. Luckily, python allows us to treat strings as lists
-of characters allowing us to pick out the characters we need.
+為了製作我們的迷你地圖，我們需要能夠將完整地圖切割成多個部分。為此，我們需要將其
+以一種允許我們輕鬆做到這一點的格式。幸運的是，Python 允許我們將字串視為列表
+字元允許我們挑選出我們需要的字元。
 
 `mygame/world/map_module.py`
 ```Python
@@ -292,8 +297,8 @@ def return_minimap(x, y, radius = 2):
     return map
 ```
 
-With our map_module set up, let's replace our hardcoded map in `mygame/world/batchcode_map.py` with
-a reference to our map module. Make sure to import our map_module!
+設定完 map_module 後，讓我們將 `mygame/world/batchcode_map.py` 中的硬編碼地圖替換為
+對我們的地圖模組的引用。確保匯入我們的map_module！
 
 ```python
 # mygame/world/batchcode_map.py
@@ -309,22 +314,22 @@ map.db.desc = map_module.return_map()
 caller.msg("A map appears out of thin air and falls to the ground.")
 ```
 
-Log into Evennia as the superuser and run this batchcode. If everything worked our new map should
-look exactly the same as the old map - you can use `@delete` to delete the old one (use a number to
-pick which to delete).
+以超級使用者登入 Evennia 並執行此批次程式碼。如果一切正常，我們的新地圖應該
+看起來和舊地圖一模一樣 - 你可以使用 `@delete` 刪除舊地圖（使用數字來刪除舊地圖）
+選擇要刪除的）。
 
-Now, lets turn our attention towards our game's rooms. Let's use the `return_minimap` method we
-created above in order to include a minimap in our room descriptions. This is a little more
-complicated.
+現在，讓我們將注意力轉向我們的遊戲房間。讓我們使用 `return_minimap` 方法
+上面建立的目的是為了在我們的房間描述中包含小地圖。這個有點多
+複雜。
 
-By itself we would have to settle for either the map being *above* the description with
-`room.db.desc = map_string + description_string`, or the map going *below* by reversing their order.
-Both options are rather unsatisfactory - we would like to have the map next to the text! For this
-solution we'll explore the utilities that ship with Evennia. Tucked away in `evennia\evennia\utils`
-is a little module called [EvTable](github:evennia.utils.evtable) . This is an advanced ASCII table
-creator for you to utilize in your game. We'll use it by creating a basic table with 1 row and two
-columns (one for our map and one for our text) whilst also hiding the borders. Open the batchfile
-again
+就其本身而言，我們必須滿足於地圖「高於」描述
+`room.db.desc = map_string + description_string`，或透過顛倒順序來*下面*的地圖。
+這兩個選項都不太令人滿意——我們希望在文字旁邊有地圖！為此
+在解決方案中，我們將探索 Evennia 附帶的實用程式。藏在`evennia\evennia\utils`中
+是一個名為 [EvTable](github:evennia.utils.evtable) 的小模組。這是一個高階ASCII表
+建立者供您在遊戲中使用。我們將透過建立一個包含 1 行和 2 行的基本表來使用它
+列（一列用於我們的地圖，一列用於我們的文字），同時也隱藏了邊框。開啟批次檔案
+再次
 
 ```python
 # mygame\world\batchcode_world.py
@@ -390,21 +395,22 @@ west.db.desc = evtable.EvTable(map_module.return_minimap(2,5),
 west.db.desc.reformat_column(1, width=70)
 ```
 
-Before we run our new batchcode, if you are anything like me you would have something like 100 maps
-lying around and 3-4 different versions of our rooms extending from limbo. Let's wipe it all and
-start with a clean slate. In Command Prompt you can run `evennia flush` to clear the database and
-start anew. It won't reset dbref values however, so if you are at #100 it will start from there.
-Alternatively you can navigate to `mygame/server` and delete the `evennia.db3` file. Now in  Command
-Prompt use `evennia migrate` to have a completely freshly made database.
+在我們執行新的批次程式碼之前，如果您像我一樣，您將擁有大約 100 張地圖
+周圍有 3-4 個不同版本的房間，從地獄邊緣延伸出來。讓我們把它全部擦掉
+從頭開始。在指令提示字元中，您可以執行 `evennia flush` 來清除資料庫並
+重新開始。但是，它不會重設 dbref 值，因此如果您位於 #100，它將從那裡開始。
+或者，您可以導航至 `mygame/server` 並刪除 `evennia.db3` 檔案。現在指揮
+提示使用`evennia migrate`擁有一個全新製作的資料庫。
 
-Log in to evennia and run `@batchcode batchcode_world` and you'll have a little world to explore.
+登入evennia並執行`@batchcode batchcode_world`，您將有一個小世界可供探索。
 
-## Conclusions
+(conclusions)=
+## 結論
 
-You should now have a mapped little world and a basic understanding of batchcode, EvTable and how
-easily new game defining features can be added to Evennia.
+現在您應該有一個對映的小世界，並對批次程式碼、EvTable 以及如何進行基本瞭解
+可以輕鬆地將新的遊戲定義功能新增到Evennia。
 
-You can easily build from this tutorial by expanding the map and creating more rooms to explore. Why
-not add more features to your game by trying other tutorials: [Add weather to your world](Weather-
-Tutorial), [fill your world with NPC's](../Howtos/Tutorial-NPC-Reacting.md) or 
-[implement a combat system](../Howtos/Turn-based-Combat-System.md).
+您可以透過擴充套件地圖並建立更多房間來探索，輕鬆地根據本教學進行構建。為什麼
+不要透過嘗試其他教學來為您的遊戲新增更多功能：[為您的世界新增天氣](Weather-
+Tutorial)、[用 NPC 填充您的世界](../Howtos/Tutorial-NPC-Reacting.md) 或
+[實施戰鬥系統](../Howtos/Turn-based-Combat-System.md)。

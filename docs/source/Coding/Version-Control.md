@@ -1,206 +1,217 @@
-# Coding using Version Control
+(coding-using-version-control)=
+# 使用版本控制進行編碼
 
-[Version control](https://en.wikipedia.org/wiki/Version_control) allows you to track changes to your code. You can save 'snapshots' of your progress which means you can roll back undo things easily. Version control also allows you to easily back up your code to an online _repository_ such as Github. It also allows you to collaborate with others on the same code without clashing or worry about who changed what. 
+[版本控制](https://en.wikipedia.org/wiki/Version_control) 允許您追蹤程式碼的變更。您可以儲存進度的“快照”，這意味著您可以輕鬆地回滾撤消操作。版本控制還可讓您輕鬆地將程式碼備份到線上_儲存庫_，例如 Github。它還允許您與其他人就同一程式碼進行協作，而不會發生衝突或擔心誰更改了什麼。
 
-```{sidebar} Do it!
-It's _strongly_ recommended that you [put your game folder under version control](#putting-your-game-dir-under-version-control). Using git is is also the way to contribue to Evennia itself.
+```{sidebar} 做吧！
+_強烈_建議您[將您的遊戲資料夾置於版本控制之下](#putting-your-game-dir-under-version-control)。使用 git 也是為 Evennia 本身做出貢獻的方式。
 ```
 
-Evennia uses the most commonly used version control system, [Git](https://git-scm.com/) .  For additional help on using Git, please refer to the [Official GitHub documentation](https://help.github.com/articles/set-up-git#platform-all).
+Evennia 使用最常用的版本控制系統 [Git](https://git-scm.com/) 。  有關使用 Git 的其他協助，請參閱[官方 GitHub 檔案](https://help.github.com/articles/set-up-git#platform-all)。
 
-## Setting up Git
+(setting-up-git)=
+## 設定 Git
 
 - **Fedora Linux**
 
         yum install git-core
 
-- **Debian Linux** _(Ubuntu, Linux Mint, etc.)_
+- **Debian Linux** _（Ubuntu、Linux Mint 等）_
 
         apt-get install git
 
-- **Windows**: It is recommended to use [Git for Windows](https://gitforwindows.org/).
-- **Mac**:  Mac platforms offer two methods for installation, one via MacPorts, which you can find out about [here](https://git-scm.com/book/en/Getting-Started-Installing-Git#Installing-on-Mac), or you can use the [Git OSX Installer](https://sourceforge.net/projects/git-osx-installer/).
+- **Windows**：建議使用[Git for Windows](https://gitforwindows.org/)。
+- **Mac**：Mac 平臺提供兩種安裝方法，一種透過 MacPorts，您可以在[此處](https://git-scm.com/book/en/Getting-Started-Installing-Git#Installing-on-Mac)找到該方法，或者您可以使用 [Git OSX 安裝程式](https://sourceforge.net/projects/git-osx-installer/)。
 
-> You can find expanded instructions for installation [here](https://git-scm.com/book/en/Getting-Started-Installing-Git).
+> 您可以在[此處](https://git-scm.com/book/en/Getting-Started-Installing-Git)找到詳細的安裝說明。
 
-```{sidebar} Git user nickname
-If you ever make your code available online (or contribute to Evennia), your name will be visible to those reading the code-commit history. So if you are not comfortable with using your real, full name online, put a nickname (or your github handler) here.
+```{sidebar} Git 使用者暱稱
+如果您曾經線上上提供程式碼（或為 Evennia 做出貢獻），那麼閱讀程式碼提交歷史記錄的人將可以看到您的名字。因此，如果您不習慣在網路上使用真實的全名，請在此輸入暱稱（或您的 github 處理程式）。
 ```
-To avoid a common issue later, you will need to set a couple of settings; first you will need to tell Git your username, followed by your e-mail address, so that when you commit code later you will be properly credited. 
+為了避免以後出現常見問題，您需要設定一些設定；首先，您需要告訴 Git 您的使用者名稱，然後是您的電子郵件地址，這樣當您稍後提交程式碼時，您就會得到正確的認可。
 
 
-1. Set the default name for git to use when you commit:
+1. 設定提交時使用的 git 預設名稱：
 
         git config --global user.name "Your Name Here"
 
-2. Set the default email for git to use when you commit:
+2. 設定 git 在提交時使用的預設電子郵件：
 
         git config --global user.email "your_email@example.com"
 
-> To get a running start with Git, here's [a good YouTube talk about it](https://www.youtube.com/watch?v=1ffBJ4sVUb4#t=1m58s). It's a bit long but it will help you understand the underlying ideas behind GIT (which in turn makes it a lot more intuitive to use).
+> 要開始使用 Git，這裡有 [關於它的 YouTube 的精彩討論](https://www.youtube.com/watch?v=1ffBJ4sVUb4#t=1m58s)。它有點長，但它將幫助您理解 GIT 背後的基本思想（這反過來又使其使用起來更加直觀）。
 
-## Common Git commands 
+(common-git-commands)=
+## 常用 Git 指令
 
-```{sidebar} Git repository
-This is just a fancy name for the folder you have designated to be under version control. We will make your `mygame` game folder into such a repository. The Evennia code  is also in a (separate) git repository.
+```{sidebar} Git 儲存庫
+這只是您指定受版本控制的資料夾的一個奇特名稱。我們會將您的 `mygame` 遊戲資料夾放入這樣的儲存庫中。 Evennia 程式碼也在（單獨的）git 儲存庫中。
 ```
-Git can be controlled via a GUI. But it's often easier to use the base terminal/console commands, since it makes it clear if something goes wrong. 
+Git 可以透過GUI 進行控制。但使用基本終端機/控制檯指令通常更容易，因為它可以清楚地表明是否出現問題。
 
-All these actions need to be done from inside the _git repository_ . 
+所有這些操作都需要從 _git 儲存庫_ 內部完成。
 
-Git may seem daunting at first. But when working with git, you'll be using the same 2-3 commands 99% of the time. And you can make git _aliases_ to have them be even easier to remember.  
+Git 乍看之下似乎令人畏懼。但在使用 git 時，99% 的時間您都會使用相同的 2-3 個指令。您可以設定 git _aliases_ 讓它們更容易記住。
 
 
+(git-init)=
 ### `git init`
 
-This initializes a folder/directory on your drive as a 'git repository'
+這會將磁碟機上的資料夾/目錄初始化為“git 儲存庫”
 
     git init .
 
-The `.` means to apply to the current directory. If you are inside `mygame`, this makes your game dir into a git repository. That's all there is to it, really. You only need to do this once.
+`.` 表示應用於目前目錄。如果您位於 `mygame` 內，這會使您的遊戲目錄變成 git 儲存庫。真的，這就是全部。您只需執行一次此操作。
 
-### `git add` 
+(git-add)=
+### `git add`
 
     git add <file> 
 
-This tells Git to start to _track_ the file under version control. You need to do this when you create a new file. You can also add all files in your current directory: 
+這告訴 Git 開始_追蹤_版本控制下的檔案。建立新檔案時需要執行此操作。您也可以新增目前目錄中的所有檔案：
 
     git add . 
 
-Or 
+或者
 
     git add *
 
-All files in the current directory are now tracked by Git. You only need to do this once for every file you want to track. 
+目前目錄中的所有檔案現在都由 Git 追蹤。您只需為要追蹤的每個檔案執行一次此操作。
 
+(git-commit)=
 ### `git commit`
 
     git commit -a -m "This is the initial commit"
 
-This _commits_ your changes. It stores a snapshot of all (`-a`) your code at the current time, adding a message `-m` so you know what you did. Later you can _check out_ your code the way it was at a given time.  The message is mandatory and you will thank yourself later if write clear and descriptive log messages. If you don't add `-m`, a text editor opens for you to write the message instead.
+這將_提交_您的更改。它儲存目前所有程式碼 (`-a`) 的快照，新增一則訊息 `-m`，以便您知道自己做了什麼。稍後您可以按照給定時間的方式「檢查」您的程式碼。  該訊息是強制性的，如果編寫清晰且描述性的日誌訊息，您稍後會感謝自己。如果您不新增 `-m`，則會開啟一個文字編輯器供您撰寫訊息。
 
-The `git commit` is something you'll be using all the time, so it can be useful to make a _git alias_ for it: 
+`git commit` 是你會一直使用的東西，所以為它建立一個 _git 別名_ 會很有用：
 
     git config --global alias.cma 'commit -a -m'
 
-After you've run this, you can commit much simpler, like this: 
+執行後，您可以更簡單地提交，如下所示：
 
     git cma "This is the initial commit"
 
-Much easier to remember! 
+更容易記住！
 
-### `git status`, `git diff` and `git log`
+(git-status-git-diff-and-git-log)=
+### `git status`、`git diff` 和 `git log`
 
 
     git status -s 
 
-This gives a short (`-s`) of the files that changes since your last `git commit`. 
+這給出了自上次 `git commit` 以來更改的檔案的一小部分 (`-s`)。
 
     git diff --word-diff`
 
-This shows exactly what changed in each file since you last made a `git commit`. The `--word-diff`  option means it will mark if a single word changed on a line. 
+這準確地顯示了自您上次建立 `git commit` 以來每個檔案中發生的更改。 `--word-diff` 選項意味著它將標記一行中是否有單字發生更改。
 
     git log
 
-This shows the log of all `commits` done. Each log will show you who made the change, the  commit-message and a unique _hash_ (like `ba214f12ab12e123...`) that uniquely describes that commit. 
+This shows the log of all `commits` done.每個日誌都會向您顯示誰進行了更改、提交訊息和唯一描述該提交的唯一 _hash_ （如 `ba214f12ab12e123...`）。
 
-You can make the `log` command more succinct with some more options: 
+您可以使用更多選項使 `log` 指令更加簡潔：
 
     ls=log --pretty=format:%C(green)%h\ %C(yellow)[%ad]%Cred%d\ %Creset%s%Cblue\ [%an] --decorate --date=relative
 
-This adds coloration and another fancy effects (use `git help log` to see what they mean).
+這會增加色彩和其他奇特的效果（使用 `git help log` 看看它們的意思）。
 
-Let's add aliases: 
+讓我們加入別名：
 
     git config --global alias.st 'status -s'
     git config --global alias.df 'diff --word-diff'
     git config --global alias.ls 'log --pretty=format:%C(green)%h\ %C(yellow)[%ad]%Cred%d\ %Creset%s%Cblue\ [%an] --decorate --date=relative'
 
-You can now use the much shorter
+您現在可以使用更短的
 
     git st    # short status
     git dif   # diff with word-marking
     git ls    # log with pretty formatting
 
-for these useful functions.
+對於這些有用的功能。
 
-### `git branch`, `checkout` and `merge`
+(git-branch-checkout-and-merge)=
+### `git branch`、`checkout` 和 `merge`
 
-Git allows you to work with _branches_. These are separate development paths your code may take, completely separate from each other. You can later _merge_ the code from a branch back into another branch. Evennia's `main` and `develop` branches are examples of this.
+Git 允許您使用_分支_。這些是您的程式碼可能採用的單獨的開發路徑，彼此完全獨立。您稍後可以將程式碼從一個分支_合併_回另一個分支。 Evennia 的 `main` 和 `develop` 分支就是這樣的例子。
 
     git branch -b branchaname 
 
-This creates a new branch, exactly identical to the branch you were on.  It also moves you to that branch.
+這將建立一個新分支，與您所在的分支完全相同。  它還會將您移至該分支。
 
     git branch -D branchname 
 
-Deletes a branch.
+刪除一個分支。
 
     git branch 
 
-Shows all your branches, marking which one you are currently on.
+顯示您的所有分支，標記您目前所在的分支。
 
     git checkout branchname 
 
-This checks out another branch. As long as you are in a branch all `git commit`s will commit the code to that branch only.
+這會檢查另一個分支。只要您位於一個分支中，所有 `git commit`s 就會只將程式碼提交到該分支。
 
     git checkout .
 
-This checks out your _current branch_ and has the effect of throwing away all your changes since your last commit. This is like undoing what you did since the last save point.
+這會檢查您的_當前分支_，並具有丟棄自上次提交以來的所有更改的效果。這就像是撤銷自上次儲存點以來所做的操作。
 
     git checkout b2342bc21c124
 
-This checks out a particular _commit_, identified by the hash you find with `git log`. This open a 'temporary branch' where the  code is as it was when you made this commit. As an example, you can use this to check where a bug was introduced. Check out an existing branch to go back to your normal timeline, or use `git branch -b newbranch` to break this code off into a new branch you can continue working from. 
+這會檢查一個特定的_commit_，由您用 `git log` 找到的雜湊值標識。這將開啟一個“臨時分支”，其中的程式碼與您進行此提交時的程式碼相同。例如，您可以使用它來檢查引入錯誤的位置。檢視現有分支以返回正常時間線，或使用 `git branch -b newbranch` 將此程式碼分解到可以繼續工作的新分支。
 
     git merge branchname
 
-This _merges_ the code from `branchname` into the branch you are currently in. Doing so may lead to _merge conflicts_ if the same code changed in different ways in the two branches. See [how to resolve merge conflicts in git](https://phoenixnap.com/kb/how-to-resolve-merge-conflicts-in-git) for more help.
+這會將 `branchname` 中的程式碼合併到您目前所在的分支中。如果相同的程式碼在兩個分支中以不同的方式更改，這樣做可能會導致合併衝突。請參閱[如何解決 git 中的合併衝突](https://phoenixnap.com/kb/how-to-resolve-merge-conflicts-in-git) 以獲得更多協助。
 
-### `git glone`, `git push` and `git pull`
+(git-glone-git-push-and-git-pull)=
+### `git glone`、`git push` 和 `git pull`
 
-All of these other commands have dealt with code only sitting in your local repository-folder. These commands instead allows you to exchange code with a _remote_ repository - usually one that is online (like on github). 
+所有這些其他指令只處理位於本機儲存庫資料夾中的程式碼。相反，這些指令允許您與 _remote_ 儲存庫交換程式碼 - 通常是線上儲存庫（例如在 github 上）。
 
-> How you actually set up a remote repository is described [in the next section](#pushing-your-code-online).
+> [下一節](#pushing-your-code-online) 描述如何實際設定遠端儲存庫。
 
     git clone repository/path
 
-This copies the remote repository to your current location. If you used the [Git installation instructions](../Setup/Installation-Git.md) to install Evennia, this is what you used to get your local copy of the Evennia repository. 
+這會將遠端儲存庫複製到您的目前位置。如果您使用 [Git 安裝說明](../Setup/Installation-Git.md) 安裝 Evennia，則這就是您用來取得 Evennia 儲存庫的本機副本的方法。
 
     git pull
 
-Once you cloned or otherwise set up  a remote repository, using `git pull` will re-sync the remote with what you have locally. If what you download clashes with local changes, git will force you to `git commit` your changes before you can continue with `git pull`.
+複製或以其他方式設定遠端儲存庫後，使用 `git pull` 會將遠端儲存庫與本機儲存庫重新同步。如果您下載的內容與本機變更發生衝突，git 將強制您進行 `git commit` 更改，然後才能繼續 `git pull`。
 
     git push 
 
-This uploads your local changes _of your current branch_ to the same-named branch on the remote repository. To be able to do this you must have write-permissions to the remote repository.
+這會將您目前分支的本機變更上傳到遠端儲存庫上的同名分支。為了能夠執行此操作，您必須具有遠端儲存庫的寫入許可權。
 
-### Other git commands 
+(other-git-commands)=
+### 其他 git 指令
 
-There are _many_ other git commands. Read up on them online: 
+還有很多其他 git 指令。線上閱讀它們：
 
     git reflog 
 
-Shows hashes of individual git actions. This allows you to go back in the git event history itself. 
+顯示各個 git 操作的雜湊值。這允許您傳回 git 事件歷史記錄本身。
 
 
     git reset 
     
-Force reset a branch to an earlier commit. This could throw away some history, so be careful.
+強制將分支重置為較早的提交。這可能會丟失一些歷史記錄，所以要小心。
 
     git grep -n -I -i <query>
 
-Quickly search for a phrase/text in all files tracked by git. Very useful to quickly find where things are. Set up an alias `git gr` with
+在 git 追蹤的所有檔案中快速搜尋短語/文字。對於快速找到東西在哪裡非常有用。設定別名 `git gr`
 
 ```
 git config --global alias.gr 'grep -n -I -i'
 ```
 
-## Putting your game dir under version control
+(putting-your-game-dir-under-version-control)=
+## 將您的遊戲目錄置於版本控制之下
 
-This makes use  of the git commands listed in the previous section.
+這利用了上一節中列出的 git 指令。
 
-```{sidebar} git aliases
-If you set up the git aliases for commands suggested in the previous section, you can use them instead!
+```{sidebar} git 別名
+如果您為上一節中建議的指令設定了 git 別名，則可以使用它們！
 ```
 
     cd mygame 
@@ -209,133 +220,138 @@ If you set up the git aliases for commands suggested in the previous section, yo
     git commit -a -m "Initial commit"
 
     
-Your game-dir is now tracked by git.
+您的遊戲目錄現在由 git 追蹤。
 
-You will notice that some files are not covered by your git version control, notably your secret-settings file (`mygame/server/conf/secret_settings.py`) and your sqlite3 database file `mygame/server/evennia.db3`. This is intentional and controlled from the file  `mygame/.gitignore`. 
+您會注意到有些檔案沒有被 git 版本控制覆蓋，特別是您的秘密設定檔 (`mygame/server/conf/secret_settings.py`) 和 sqlite3 資料庫檔案 `mygame/server/evennia.db3`。這是故意的，並由檔案 `mygame/.gitignore` 控制。
 
 ```{warning}
-You should *never* put your sqlite3 database file into git by removing its entry
-in `.gitignore`. GIT is for backing up your code, not your database. That way
-lies madness and a good chance you'll confuse yourself. Make one mistake or local change and after a few commits and reverts you will have lost track of what is in your database or not. If you want to backup your SQlite3 database, do so by simply copying the database file to a safe location.
+你不應該*永遠*透過刪除它的條目將你的 sqlite3 資料庫檔案放入 git 中
+在`.gitignore`中。 GIT 用於備份您的程式碼，而不是您的資料庫。那樣
+謊言是瘋狂的，你很可能會困惑自己。犯一個錯誤或進行本地更改，經過幾次提交和恢復後，您將無法追蹤資料庫中是否存在內容。如果您想備份 SQlite3 資料庫，只需將資料庫檔案複製到安全位置即可。
 ```
 
-### Pushing your code online
+(pushing-your-code-online)=
+### 線上推送您的程式碼
 
-So far your code is only located on your private machine. A good idea is to back it up online. The easiest way to do this is to `git push` it to your own remote repository on GitHub. So for this you need a (free) Github account.
+到目前為止，您的程式碼僅位於您的私人電腦上。一個好主意是線上備份。最簡單的方法是將其 `git push` 到您自己的遠端儲存庫 GitHub 上。因此，為此您需要一個（免費）Github 帳戶。
 
-If you don't want your code to be publicly visible, Github also allows you set up a _private_ repository, only visible to you.
+如果您不希望您的程式碼公開可見，Github 還允許您設定一個僅對您可見的_private_ 儲存庫。
 
-Create a new, empty repository on Github. [Github explains how here](https://help.github.com/articles/create-a-repo/) . _Don't_ allow it to add a README, license etc, that will just clash with what we upload later.
+在 Github 上建立一個新的空白儲存庫。 [Github 在這裡解釋瞭如何](https://help.github.com/articles/create-a-repo/) 。 _不允許_允許它新增README、許可證等，這只會與我們稍後上傳的內容衝突。
 
-```{sidebar} Origin
-We label the remote repository 'origin'. This is the git default and means we won't need to specify it explicitly later.
+```{sidebar} 起源
+我們將遠端儲存庫標記為“origin”。這是 git 預設值，表示我們稍後不需要明確指定它。
 ```
 
-Make sure you are in your local game dir (previously initialized as a git repo).
+確保您位於本機遊戲目錄（先前已初始化為 git 儲存庫）。
 
     git remote add origin <github URL>
 
-This tells Git that there is a remote repository at `<github URL>`. See the  github docs as to which URL to use. Verify that the remote works with `git remote -v`
+這告訴 Git 在 `<github URL>` 處有一個遠端儲存庫。請參閱 github 檔案以瞭解要使用哪個 URL。驗證遙控器是否可與 `git remote -v` 搭配使用
 
-Now we push to the remote (labeled 'origin' which is the default):
+現在我們推送到遠端（預設標記為“origin”）：
 
     git push
 
-Depending on how you set up your authentication with github, you may be asked to enter your github username and password. If you set up SSH authentication, this command will just work.
+根據您設定 github 身份驗證的方式，可能會要求您輸入 github 使用者名稱和密碼。如果您設定了 SSH 身份驗證，則此指令將起作用。
 
-You use `git push` to upload your local changes so the remote repository is in sync with your local one. If you edited a file online using the Github editor (or a collaborator pushed code), you use `git pull` to sync in the other direction.
+您使用 `git push` 上傳本機更改，以便遠端儲存庫與本機儲存庫同步。如果您使用 Github 編輯器（或協作者推送的程式碼）線上編輯檔案，則可以使用 `git pull` 在另一個方向同步。
 
-## Contributing to Evennia 
+(contributing-to-evennia)=
+## 貢獻於Evennia
 
-If you want to help contributing to Evennia you must do so by _forking_ - making your own remote copy of the Evennia repository on Github. So for this, you need a (free) Github account. Doing so is a completely separate process from [putting your game dir under version control](#putting-your-game-dir-under-version-control) (which you should also do!).
+如果您想為 Evennia 做出貢獻，您必須透過_forking_ 來實現 - 在 Github 上製作您自己的 Evennia 儲存庫的遠端副本。為此，您需要一個（免費）Github 帳戶。這樣做與[將你的遊戲目錄置於版本控制之下](#putting-your-game-dir-under-version-control)（你也應該這樣做！）是一個完全獨立的過程。
 
-At the top right of [the evennia github page](https://github.com/evennia/evennia), click the "Fork" button:
+在[evennia github頁面](https://github.com/evennia/evennia)的右上角，點選「Fork」按鈕：
 
-![fork button](../_static/images/fork_button.png)
+![叉子按鈕](../_static/images/fork_button.png)
 
-This will create a new online fork Evennia under your github account. 
+這將在您的 github 帳戶下建立一個新的線上分支 Evennia。
 
-The fork only exists online as of yet. In a terminal, `cd` to  the folder you wish to develop in. This folder should _not_ be your game dir, nor the place you cloned Evennia into if you used the [Git installation](../Setup/Installation-Git.md).
+此分叉目前僅存在於網路上。在終端機中，`cd` 到您想要開發的資料夾。此資料夾不應是您的遊戲目錄，也不應是您克隆 Evennia 的位置（如果您使用 [Git 安裝](../Setup/Installation-Git.md)）。
 
-From this directory run the following command:
+從該目錄執行以下指令：
 
     git clone https://github.com/yourusername/evennia.git evennia
 
-This will download your fork to your computer. It creates a new folder `evennia/` at your current location. If you installed Evennia using the [Git installation](../Setup/Installation-Git.md), this folder will be identical in content to the `evennia` folder you cloned during that installation. The difference is that this repo is connected to your remote fork and not to the 'original' _upstream_ Evennia.
+這會將您的 fork 下載到您的電腦上。它會在您目前的位置建立一個新資料夾 `evennia/`。如果您使用 [Git 安裝](../Setup/Installation-Git.md) 安裝了 Evennia，則此資料夾的內容將與您在安裝期間複製的 `evennia` 資料夾相同。不同之處在於，此儲存庫連線到您的遠端分支，而不是連線到「原始」_upstream_ Evennia。
 
-When we cloned our fork, git automatically set up a 'remote repository' labeled `origin` pointing to it. So if we do `git pull` and `git push`, we'll push to our fork. 
+當我們克隆我們的 fork 時，git 自動設定一個標記為 `origin` 的「遠端儲存庫」指向它。因此，如果我們執行 `git pull` 和 `git push`，我們就會推動分叉。
 
-We now want to add a second remote repository linked to the original Evennia repo. We will label this remote repository `upstream`: 
+我們現在想要新增連結到原始 Evennia 儲存庫的第二個遠端儲存庫。我們將這個遠端儲存庫標記為`upstream`：
 
     cd evennia
     git remote add upstream https://github.com/evennia/evennia.git
 
-If you also want to access Evennia's `develop` branch (the bleeding edge development) do the following:
+如果您還想訪問 Evennia 的 `develop` 分支（前沿開發），請執行以下操作：
 
     git fetch upstream develop
     git checkout develop
 
-Use
+使用
 
     git checkout main
     git checkout develop
 
-to switch between the branches. 
+在分支之間切換。
 
-To pull the latest from upstream Evennia, just checkout the branch you want and do 
+要從上游 Evennia 提取最新版本，只需簽出您想要的分支並執行以下操作
 
     git pull upstream
 
-```{sidebar} Pushing to upstream
-You can't do `git push upstream` unless you have write-access to the upstream Evennia repository. So there is no risk of you accidentally pushing your own code into the main, public repository.
+```{sidebar} 推上游
+除非您對上游 Evennia 儲存庫具有寫入存取許可權，否則您無法執行 `git push upstream`。因此，您不存在意外將自己的程式碼推送到主公共儲存庫的風險。
 ```
 
-### Fixing an Evennia bug or feature
+(fixing-an-evennia-bug-or-feature)=
+### 修復 Evennia 錯誤或功能
 
-This should be done in your fork of Evennia. You should _always_ do this in a _separate git branch_ based off the Evennia branch you want to improve. 
+這應該在您的 Evennia 分叉中完成。您應該_始終_在基於您想要改進的 Evennia 分支的_單獨的 git 分支_中執行此操作。
 
     git checkout main (or develop)
     git branch -b myfixbranch
 
-Now fix whatever needs fixing. Abide by the [Evennia code style](./Evennia-Code-Style.md). You can `git commit` commit your changes along the way as normal.
+現在修復任何需要修復的地方。遵守[Evennia程式碼風格](./Evennia-Code-Style.md)。您可以像平常一樣 `git commit` 提交更改。
 
-Upstream Evennia is not standing still, so you want to make sure that your work is up-to-date with upstream changes. Make sure to first commit your `myfixbranch` changes, then
+上游 Evennia 並沒有停滯不前，因此您需要確保您的工作與上游變更保持同步。確保首先提交您的 `myfixbranch` 更改，然後
 
     git checkout main (or develop)
     git pull upstream 
     git checkout myfixbranch
     git merge main (or develop)
 
-Up to this point your `myfixbranch` branch only exists on your local computer. No
-one else can see it.  
+到目前為止，您的 `myfixbranch` 分支僅存在於您的本機電腦上。否
+別人可以看到它。
 
     git push
 
-This will automatically create a matching `myfixbranch` in your forked version of Evennia and push to it. On github you will be able to see appear it in the `branches` dropdown. You can keep pushing to your remote `myfixbranch` as much as you like.
+這將自動在 Evennia 的分叉版本中建立匹配的 `myfixbranch` 並推送到它。在 github 上，您將能夠看到它出現在 `branches` 下拉清單中。您可以根據需要繼續推送到遠端 `myfixbranch`。
 
-Once you feel you have something to share, you need to [create a pull request](https://github.com/evennia/evennia/pulls) (PR): 
-This is a formal request for upstream Evennia to adopt and pull your code into the main repository.  
-1. Click `New pull request`
-2.  Choose `compare across forks`
-3. Select your fork from dropdown list of `head repository` repos. Pick the right branch to `compare`.
-4. On the Evennia side (to the left) make sure to pick the right `base` branch: If you want to contribute a change to the `develop` branch, you must pick `develop` as the `base`.
-5. Then click `Create pull request` and fill in as much information as you can in the form.
-6. Optional: Once you saved your PR, you can go into your code (on github) and add some per-line comments; this can help reviewers by explaining complex code or decisions you made. 
+一旦您覺得有東西可以分享，您需要[建立拉取請求](https://github.com/evennia/evennia/pulls) (PR)：
+這是上游 Evennia 採用並將您的程式碼拉入主儲存庫的正式請求。
+1. 點選`New pull request`
+2.  選擇`compare across forks`
+3. 從 `head repository` 儲存庫的下拉清單中選擇您的分叉。選擇正確的分支到`compare`。
+4. 在 Evennia 一側（左側），請確保選擇正確的 `base` 分支：如果您想對 `develop` 分支做出更改，則必須選擇 `develop` 作為 `base`。
+5. 然後點選`Create pull request`並在表格中填寫盡可能多的資訊。
+6. 可選：儲存 PR 後，您可以進入程式碼（在 github 上）並新增一些每行註解；這可以透過解釋複雜的程式碼或您所做的決定來幫助審閱者。
 
-Now you just need to wait for your code to be reviewed. Expect to get feedback and be asked to make changes, add more documentation etc. Getting as PR merged can take a few iterations. 
+現在您只需要等待您的程式碼被審核。期望獲得回饋並被要求進行更改、新增更多檔案等。獲得 PR 合併可能需要幾次迭代。
 
-```{sidebar} Not all PRs can merge
-While most PRs get merged, Evennia can't **guarantee** that your PR code will be deemed suitable to merge into upstream Evennia. For this reason it's a good idea to check in with the community _before_ you spend a lot of time on a large piece of code (fixing bugs is always a safe bet though!)
+```{sidebar} 並非所有 PR 都可以合併
+雖然大多數 PR 都會合併，但 Evennia 無法**保證**您的 PR 程式碼將被視為適合合併到上游 Evennia 中。因此，在您花費大量時間編寫大段程式碼之前，最好先與社群聯絡（儘管修復錯誤始終是安全的選擇！）
 ```
 
 
-## Troubleshooting
+(troubleshooting)=
+## 故障排除
 
-### Getting 403: Forbidden access
+(getting-403-forbidden-access)=
+### 取得 403：禁止訪問
 
-Some users have experienced this on `git push` to their remote repository. They are not asked for username/password (and don't have a ssh key set up). 
+一些使用者在其遠端儲存庫的 `git push` 上遇到過這種情況。他們不會被要求提供使用者名稱/密碼（並且沒有設定 ssh 金鑰）。
 
-Some users have reported that the workaround is to create a file `.netrc` under your home directory and add your github credentials there:
+一些使用者報告，解決方法是在您的主目錄下建立一個檔案 `.netrc` 並在其中新增您的 github 憑證：
 
 ```bash
 machine github.com

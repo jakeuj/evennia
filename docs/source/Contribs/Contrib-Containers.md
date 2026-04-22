@@ -1,11 +1,13 @@
-# Containers
-Contribution by InspectorCaracal (2023)
+(containers)=
+# 貨櫃
+貢獻者InspectorCaracal (2023)
 
-Adds the ability to put objects into other container objects by providing a container typeclass and extending certain base commands.
+透過提供容器 typeclass 並擴充套件某些基本指令，增加將物件放入其他容器物件的能力。
 
-## Installation
+(installation)=
+## 安裝
 
-To install, import and add the `ContainerCmdSet` to `CharacterCmdSet` in your `default_cmdsets.py` file:
+要安裝、匯入 `ContainerCmdSet` 並將其新增至 `default_cmdsets.py` 檔案中的 `CharacterCmdSet`：
 
 ```python
 from evennia.contrib.game_systems.containers import ContainerCmdSet
@@ -18,43 +20,47 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(ContainerCmdSet)
 ```
 
-This will replace the default `look` and `get` commands with the container-friendly versions provided by the contrib as well as add a new `put` command.
+這會將預設的 `look` 和 `get` 指令替換為 contrib 提供的容器友善版本，並新增新的 `put` 指令。
 
-## Usage
+(usage)=
+## 用法
 
-The contrib includes a `ContribContainer` typeclass which has all of the set-up necessary to be used as a container. To use, all you need to do is create an object in-game with that typeclass - it will automatically inherit anything you implemented in your base Object typeclass as well.
+contrib 包括 `ContribContainer` typeclass，它具有用作容器所需的所有設定。使用時，您需要做的就是在遊戲中建立一個帶有 typeclass 的物件 - 它也會自動繼承您在基礎物件 typeclass 中實現的任何內容。
 
     create bag:game_systems.containers.ContribContainer
 
-The contrib's `ContribContainer` comes with a capacity limit of a maximum number of items it can hold. This can be changed per individual object.
+contrib 的 `ContribContainer` 具有其可容納的最大物品數量的容量限制。這可以針對每個單獨的物件進行更改。
 
-In code:
+在程式碼中：
 ```py
 obj.capacity = 5
 ```
-In game:
+遊戲中：
 
     set box/capacity = 5
 
-You can also make any other objects usable as containers by setting the `get_from` lock type on it.
+您也可以透過設定 `get_from` lock 型別來使任何其他物件可用作容器。
 
     lock mysterious box = get_from:true()
 
-## Extending
+(extending)=
+## 延伸
 
-The `ContribContainer` class is intended to be usable as-is, but you can also inherit from it for your own container classes to extend its functionality. Aside from having the container lock pre-set on object creation, it comes with three main additions:
+`ContribContainer` 類別旨在按原樣使用，但您也可以為自己的容器類別繼承它以擴充套件其功能。除了在物件建立時預先設定容器 lock 之外，它還具有三個主要附加功能：
 
-### `capacity` property
+(capacity-property)=
+### `capacity`屬性
 
-`ContribContainer.capacity` is an `AttributeProperty` - meaning you can access it in code with `obj.capacity` and also set it in game with `set obj/capacity = 5` - which represents the capacity of the container as an integer. You can override this with a more complex representation of capacity on your own container classes.
+`ContribContainer.capacity` 是一個 `AttributeProperty` - 意味著您可以在程式碼中使用 `obj.capacity` 存取它，也可以在遊戲中使用 `set obj/capacity = 5` 設定它 - 它將容器的容量表示為整數。您可以使用自己的容器類別上更複雜的容量表示來覆蓋它。
 
-### `at_pre_get_from` and `at_pre_put_in` methods
+(at_pre_get_from-and-at_pre_put_in-methods)=
+### `at_pre_get_from` 和 `at_pre_put_in` 方法
 
-These two methods on `ContribContainer` are called as extra checks when attempting to either get an object from, or put an object in, a container. The contrib's `ContribContainer.at_pre_get_from` doesn't do any additional validation by default, while `ContribContainer.at_pre_put_in` does a simple capacity check.
+當嘗試從容器取得物件或將物件放入容器時，`ContribContainer` 上的這兩個方法將被呼叫作為額外檢查。預設情況下，contrib 的 `ContribContainer.at_pre_get_from` 不執行任何附加驗證，而 `ContribContainer.at_pre_put_in` 執行簡單的容量檢查。
 
-You can override these methods on your own child class to do any additional capacity or access checks.
+您可以在自己的子類別上重寫這些方法以執行任何其他容量或存取檢查。
 
 ----
 
-<small>This document page is generated from `evennia/contrib/game_systems/containers/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\game_systems\containers\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

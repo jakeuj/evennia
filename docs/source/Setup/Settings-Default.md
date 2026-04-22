@@ -1,11 +1,12 @@
 
-# Evennia Default settings file
+(evennia-default-settings-file)=
+# Evennia 預設設定檔案
 
-Master file is located at `evennia/evennia/settings_default.py`. Read
-its comments to see what each setting does and copy only what you want
-to change into `mygame/server/conf/settings.py`.
+主檔案位於`evennia/evennia/settings_default.py`。閱讀
+其註釋可檢視每個設定的作用並僅複製您想要的內容
+更改為`mygame/server/conf/settings.py`。
 
-Example of accessing settings:
+存取設定的範例：
 
 ```
 from django.conf import settings
@@ -559,6 +560,10 @@ CMDSET_ACCOUNT = "commands.default_cmdsets.AccountCmdSet"
 
 # Location to search for cmdsets if full path not given
 CMDSET_PATHS = ["commands", "evennia", "evennia.contrib"]
+# Max number of merged cmdsets to keep cached. When full, the least recently used
+# entry is evicted. Increase if your game has many unique rooms/objects; decrease
+# to save memory.
+CMDSET_MERGE_CACHE_MAXSIZE = 1000
 # Fallbacks for cmdset paths that fail to load. Note that if you change the path for your
 # default cmdsets, you will also need to copy CMDSET_FALLBACKS after your change in your
 # settings file for it to detect the change.

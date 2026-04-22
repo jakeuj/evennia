@@ -1,18 +1,19 @@
-# Guest Logins
+(guest-logins)=
+# 訪客登入
 
 
-Evennia supports *guest logins* out of the box. A guest login is an anonymous, low-access account and can be useful if you want users to have a chance to try out your game without committing to creating a real account. 
+Evennia 支援開箱即用的*來賓登入*。訪客登入是一種匿名、低訪問許可權的帳戶，如果您希望使用者有機會嘗試您的遊戲而無需建立真實帳戶，那麼訪客登入會很有用。
 
-Guest accounts are turned off by default. To activate, add this to your `game/settings.py` file:
+預設情況下，訪客帳戶處於關閉狀態。要啟用，請將其新增到您的 `game/settings.py` 檔案中：
 
     GUEST_ENABLED = True
 
-Henceforth users can use `connect guest` (in the default command set) to login with a guest account. You may need to change your [Connection Screen](../Components/Connection-Screen.md) to inform them of this possibility. Guest accounts work differently from normal accounts - they are automatically *deleted* whenever the user logs off or the server resets (but not during a reload). They are literally re- usable throw-away accounts.
+從此使用者可以使用`connect guest`（在預設指令集中）以訪客帳號登入。您可能需要更改您的[連線畫面](../Components/Connection-Screen.md)以告知他們這種可能性。來賓帳戶的工作方式與普通帳戶不同 - 每當使用者登出或伺服器重設（但不會在重新載入期間）時，它們都會自動「刪除」。它們實際上是可重複使用的一次性帳戶。
 
-You can add a few more variables to your `settings.py` file to customize your guests:
+您可以在 `settings.py` 檔案中新增更多變數來自訂您的客人：
 
-- `BASE_GUEST_TYPECLASS` - the python-path to the default [typeclass](../Components/Typeclasses.md) for guests. Defaults to `"typeclasses.accounts.Guest"`.
-- `PERMISSION_GUEST_DEFAULT` - [permission level](../Components/Locks.md) for guest accounts. Defaults to `"Guest"`, which is the lowest permission level in the hierarchy (below `Player`).
-- `GUEST_START_LOCATION` - the `#dbref` to the starting location newly logged-in guests should appear at. Defaults to `"#2` (Limbo).
-- `GUEST_HOME` - guest home locations. Defaults to Limbo as well.
-- `GUEST_LIST` - this is a list holding the possible guest names to use when entering the game. The length of this list also sets how many guests may log in at the same time. By default this is a list of nine names from `"Guest1"` to `"Guest9"`.
+- `BASE_GUEST_TYPECLASS` - 訪客預設 [typeclass](../Components/Typeclasses.md) 的 python 路徑。預設為`"typeclasses.accounts.Guest"`。
+- `PERMISSION_GUEST_DEFAULT` - 來賓帳戶的[許可權等級](../Components/Locks.md)。預設為 `"Guest"`，這是層次結構中的最低許可權等級（低於 `Player`）。
+- `GUEST_START_LOCATION` - 新登入訪客應出現的起始位置的 `#dbref`。預設為 `"#2` (Limbo)。
+- `GUEST_HOME` - 賓客之家位置。也預設為 Limbo。
+- `GUEST_LIST` - 這是一個包含進入遊戲時可能使用的客人姓名的清單。此清單的長度也設定了可以同時登入的訪客數量。預設情況下，這是從 `"Guest1"` 到 `"Guest9"` 的九個名稱的清單。

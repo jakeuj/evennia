@@ -1,145 +1,152 @@
-# Where do I begin? 
+(where-do-i-begin)=
+# 我該從哪裡開始呢？
 
-The good news is that following this Starting tutorial is a great way to begin making an Evennia game. 
+好訊息是，遵循此入門教學是開始製作 Evennia 遊戲的好方法。
 
-The bad news is that everyone's different and when it comes to starting your own game there is no 
-one-size-fits-all answer. Instead we will ask a series of questions 
-to help you figure this out for yourself. It will also help you evaluate your own skills and maybe 
-put some more realistic limits on how fast you can achieve your goals. 
+壞訊息是每個人都是不同的，當談到開始自己的遊戲時，沒有
+一刀切的答案。相反，我們會問一系列問題
+幫助您自己解決這個問題。它還將幫助您評估自己的技能，也許
+對實現目標的速度設定一些更現實的限制。
 
-> The questions in this lesson do not really apply to our tutorial game since we know we are doing it 
-> to learn Evennia. If you just want to follow along with the technical bits you can skip this lesson and 
-> come back later when you feel ready to take on making your own game.
+> 本課中的問題並不真正適用於我們的教學遊戲，因為我們知道我們正在這樣做
+> 學習Evennia。如果您只想瞭解技術部分，您可以跳過本課程並
+> 當您準備好開始製作自己的遊戲時，請稍後再回來。
 
-## What is your motivation for doing this?
+(what-is-your-motivation-for-doing-this)=
+## 您這樣做的動機是什麼？
 
-So you want to make a game. First you need to make a few things clear to yourself.
+所以你想製作一款遊戲。首先，您需要向自己明確一些事情。
 
-Making a multiplayer online game is a _big_ undertaking. You will (if you are like most of us) be
-doing it as a hobby, without getting paid. And you’ll be doing it for a long time.
+製作多人線上遊戲是一項艱鉅的任務。你將會（如果你像我們大多數人一樣）
+將其作為一種愛好，而不收取任何報酬。而且你會這樣做很長一段時間。
 
-So the very first thing you should ask yourself (and your team, if you have any) is 
-_why am I doing this_? Do some soul-searching here. Here are some possible answers:
+因此，您應該問自己（以及您的團隊，如果有的話）的第一件事是
+_我為什麼要這樣做_？在這裡做一些自我反省。以下是一些可能的答案：
 
-- I want to earn recognition and fame from my online community and/or among my friends.
-- I want to build the game so I can play and enjoy it myself.
-- I want to build the same game I already play but without the bad people.
-- I want to create a game so that I can control it and be the head honcho.
-- A friend or online acquaintance talked me into working on it.
-- I work on this because I’m paid to (wow!)
-- I only build this for my own benefit or to see if I can pull it off.
-- I want to create something to give back to the community I love.
-- I want to use this project as a stepping-stone towards other projects (like a career in game design
-or programming).
-- I am interested in coding or server and network architectures, making a MUD just seems to be a good
-way to teach myself.
-- I want to build a commercial game and earn money.
-- I want to fulfill a life-long dream of game making.
+- 我想從我的線上社群和/或我的朋友中獲得認可和聲譽。
+- 我想開發這款遊戲，這樣我就可以自己玩並享受它的樂趣。
+- 我想開發一個我已經玩過的遊戲，但沒有壞人。
+- 我想建立一個遊戲，這樣我就可以控制它並成為大佬。
+- 一位朋友或網路熟人說服我參與其中。
+- 我從事這項工作是因為我得到報酬（哇！）
+- 我構建這個只是為了我自己的利益，或者看看我是否能成功。
+- 我想創造一些東西來回饋我所愛的社群。
+- 我想用這個專案作為其他專案的墊腳石（例如遊戲設計的職業生涯）
+或程式設計）。
+- 我對編碼或伺服器和網路架構感興趣，製作 MUD 似乎是一個不錯的選擇
+方式來教我自己。
+- 我想製作一款商業遊戲並賺錢。
+- 我想實現一生的遊戲製作夢想。
 
-There are many other possibilities. How “solid” your answer is for a long-term development project
-is up to you. The important point is that you ask yourself the question.
+還有很多其他的可能性。對於長期開發專案，您的答案有多“可靠”
+由你決定。重要的是你要問自己這個問題。
 
-**Help someone else instead** - Maybe you should _not_ start a new project - maybe you're better off
-helping someone else or improve on something that already exists. Or maybe you find you are more of a 
-game engine developer than a game designer. 
+**幫助別人** - 也許你不應該開始一個新專案 - 也許你的情況會更好
+幫助別人或改進已經存在的東西。或者也許你發現自己更像一個
+遊戲引擎開發人員而不是遊戲設計師。
 
-**Driven by emotion** - Some answers may suggest that you are driven by emotions of revenge or disconcert. Be careful with that and
-check so that's not your _only_ driving force. Those emotions may have abated later when the project 
-most needs your enthusiasm and motivation.
+**受情緒驅動** - 一些答案可能表明您受到報復或不安情緒的驅動。小心一點且
+檢查一下，確保這不是你唯一的驅動力。當專案完成後，這些情緒可能會減弱
+最需要你的熱情和動力。
 
-**Going commercial** - If your aim is to earn money, your design goals will likely be very different from 
-those of a person who only creates as a hobby or for their own benefit. You may also have a much stricter
-timeline for release. 
+**商業化** - 如果您的目標是賺錢，您的設計目標可能會與
+那些僅僅出於愛好或為了自己的利益而創作的人。您可能還有更嚴格的要求
+釋出時間表。
 
-Whichever your motivation, you should at least have it clear in your own mind. It’s worth to make
-sure your eventual team is on the same page too.
+無論你的動機是什麼，你至少應該要清楚自己的想法。值得一做
+確保您最終的團隊也達成共識。
 
-## What are your skills?
+(what-are-your-skills)=
+## 你有什麼技能？
 
-Once you have your motivations straight you need to take a stock of your own skills and the skills
-available in your team, if you have any.
+一旦你明確了你的動機，你就需要盤點一下你自己的技能和技能
+您的團隊中可以使用（如果有的話）。
 
-Your game will have two principal components and you will need skills to cater for both:
+您的遊戲將包含兩個主要組成部分，您需要具備同時滿足這兩個組成部分的技能：
 
-- The game engine / code base - Evennia in this case. 
-- The assets created for using the game engine (“the game world”)
+- 遊戲引擎/程式庫 - 在本例中為 Evennia。
+- 為使用遊戲引擎而建立的資產（「遊戲世界」）
 
-###  The game engine
+(the-game-engine)=
+### 遊戲引擎
 
-The game engine is maintained and modified by programmers (coders). It represents the infrastructure
-that runs the game - the network code, the protocol support, the handling of commands, scripting and
-data storage.
+遊戲引擎由程式設計師（編碼員）維護和修改。它代表了基礎設施
+執行遊戲的 - 網路程式碼、協定支援、指令處理、指令碼和
+資料儲存。
 
-If you are just evaluating Evennia, it's worth to do the following:
+如果您只是評估 Evennia，則值得執行以下操作：
 
-- Hang out in the community/forums/chat. Expect to need to ask a lot of “stupid” questions as you start 
-developing (hint: no question is stupid). Is this a community in which you would feel comfortable doing so?
-- Keep tabs on the manual (you're already here).
-- How's your Python skills? What are the skills in your team? Do you or your team already know it or are 
-you willing to learn? Learning the language as you go is not too unusual with Evennia devs, but expect it 
-to add development time. You will also be worse at predicting how 'hard' something is to do. 
-- If you don’t know Python, you should have gotten a few tastes from the first part of this tutorial. But 
-expect to have to refer to external online tutorials - there are many details of Python that will not be 
-covered.
+- 在社群/論壇/聊天中閒逛。一開始預計需要問很多「愚蠢」的問題
+正在開發（提示：沒有問題是愚蠢的）。這是一個您願意這樣做的社群嗎？
+- 密切注意手冊（您已經在這裡）。
+- 你的 Python 技能怎麼樣？你的團隊有哪些技能？您或您的團隊是否已經知道或正在
+你願意學習嗎？對於 Evennia 開發者來說，隨心所欲地學習語言並不少見，但還是要期待它
+增加開發時間。你也會更不善於預測某件事有多「難」。
+- 如果您不瞭解 Python，您應該已經從本教學的第一部分中獲得了一些經驗。但
+預計必須參考外部線上教學——Python的許多細節不會
+覆蓋。
 
-### Asset creation
+(asset-creation)=
+### 資產創造
 
-Compared to the level of work needed to produce professional graphics for an MMORPG, detailed text
-assets for a mud are cheap to create. This is one of the many reasons muds are so well suited for a
-small team.
+與製作專業圖形所需的工作水準相比，MMORPG、詳細的文字
+泥漿資產的建立成本低廉。這是泥漿非常適合用於生產的眾多原因之一。
+小團隊。
 
-This is not to say that making “professional” text content is easy though. Knowing how to write
-imaginative and grammatically correct prose is only the minimal starting requirement. A good asset-
-creator (traditionally called a “builder”) must also be able to utilize the tools of the game engine
-to its fullest in order to script events, make quests, triggers and interactive, interesting
-environments.
+但這並不是說製作「專業」文字內容很容易。知道如何寫作
+富有想像力且文法正確的散文只是最低的起始要求。好資產——
+創作者（傳統上稱為「建構者」）也必須能夠利用遊戲引擎的工具
+充分發揮script事件、任務、觸發器和互動性，有趣
+環境。
 
-Assuming you are not coding all alone, your team’s in-house builders will be the first ones to actually 
-“use” your game framework and build tools. They will stumble on all the bugs. This means that you 
-need people who are just not “artsy” or “good with words”. Assuming coders and builders are not the 
-same people (common for early testing), builders need to be able to collaborate well and give clear 
-and concise feedback. 
+假設您不是獨自編碼，那麼您團隊的內部建構者將是第一個實際編寫程式碼的人
+「使用」你的遊戲框架和建構工具。他們會偶然發現所有的錯誤。這意味著你
+需要的是不“有藝術氣質”或“善於言辭”的人。假設編碼員和建構者不是
+同一個人（早期測試常見），建構者需要能夠良好協作並給予明確的訊息
+和簡潔的回饋。
 
-If you know your builders are not tech-savvy, you may need to spend more time making easier 
-build-tools and commands for them. 
+如果您知道您的建造者不精通技術，您可能需要花費更多時間來變得更容易
+建置工具和指令。
 
-## So, where do I begin, then?
+(so-where-do-i-begin-then)=
+## 那麼，我該從哪裡開始呢？
 
-Right, after all this soul-searching and skill-inventory-checking, let’s go back to the original
-question. And maybe you’ll find that you have a better feeling for the answer yourself already:
+好吧，經過一番自我反省和技能盤點之後，我們還是回到最初吧
+問題。也許你會發現你自己已經對答案有了更好的感覺：
 
-- Keep following this tutorial and spend the time 
-  to really understand what is happening in the examples. Not only will this give you a better idea
-  of how parts hang together, it may also give you ideas for what is possible. Maybe something 
-  is easier than you expected! 
-- Introduce yourself in the IRC/Discord chat and don't be shy to ask questions as you go through
-  the tutorial. Don't get hung up on trying to resolve something that a seasoned Evennia dev may 
-  clear up for you in five minutes. Also, not all errors are your faults - it's possible the 
-  tutorial is unclear or has bugs, asking will quickly bring those problems to light, if so.
-- If Python is new to you, you should complement the tutorial with third-party Python references 
-  so you can read, understand and replicate example code without being completely in the dark.
+- 繼續關注本教學並花時間
+真正理解範例中發生的事情。這不僅會給你一個更好的主意
+  瞭解各個部分如何組合在一起，它還可能為您提供有關可能性的想法。也許有什麼
+  比你想像的更簡單！
+- 在 IRC/Discord 聊天中介紹自己，並且在進行過程中不要害羞地提出問題
+教學。不要沉迷於嘗試解決經驗豐富的 Evennia 開發人員可能會遇到的問題
+  五分鐘內為您清理乾淨。另外，並不是所有的錯誤都是你的錯──有可能是
+  教學不清楚或有錯誤，如果是這樣，詢問將很快讓這些問題暴露出來。
+- 如果您不熟悉 Python，您應該使用第三方 Python 參考來補充本教學課程
+這樣您就可以閱讀、理解和複製範例程式碼，而不必完全處於黑暗之中。
   
-Once you are out of the starting tutorial, you'll be off to do your own thing.
+完成起始教學後，您就可以開始做自己的事情了。
   
-- The starting tutorial cannot cover everything. Skim through the [Evennia docs](../../../index.md).
-  Even if you don't read everything, it gives you a feeling for what's available should you need
-  to look for something later. Make sure to use the search function.
-- You can now start by expanding on the tutorial-game we will have created. In the last part there 
-  there will be a list of possible future projects you could take on. Working on your own, without help
-  from a tutorial is the next step.
+- 入門教學無法涵蓋所有內容。瀏覽[Evennia檔案](../../../index.md)。
+即使您沒有閱讀所有內容，它也會讓您瞭解您需要的內容
+  稍後再尋找一些東西。確保使用搜尋功能。
+- 現在您可以開始擴充套件我們將建立的教學遊戲。在最後一部分有
+將會列出您未來可能承擔的專案。獨自工作，無需幫助
+  下一步是教學。
 
-As for your builders, they can start getting familiar with Evennia's default build commands ... but
-keep in mind that your game is not yet built! Don't set your builders off on creating large zone projects.
-If they build anything at all, it should be small test areas to agree on a homogenous form, mood
-and literary style. 
+至於你的建構者，他們可以開始熟悉 Evennia 的預設建置指令...但是
+請記住，您的遊戲尚未構建！不要讓您的建築商開始建立大型區域專案。
+如果他們要建造任何東西，那應該是小測試區域，以就同質的形式、情緒達成一致
+和文學風格。
 
-## Conclusions
+(conclusions)=
+## 結論
 
-Remember that what kills a hobby game project will usually be your own lack of
-motivation. So do whatever you can to keep that motivation burning strong! Even if it means
-deviating from what you read in a tutorial like this one. Just get that game out there, whichever way
-works best for you.
+請記住，扼殺愛好遊戲專案的通常是您自己缺乏
+動機。因此，請盡一切努力保持這種強烈的動力！即使這意味著
+與您在此類教學中讀到的內容有所不同。不管怎樣，只要把遊戲推出去就好了
+最適合您。
 
-In the next lesson we'll go through some of the technical questions you need to consider. This should 
-hopefully help you figure out more about the game you want to make. In the lesson following that we'll 
-then try to answer those questions for the sake of creating our little tutorial game.
+在下一課中，我們將討論您需要考慮的一些技術問題。這應該
+希望能幫助您更瞭解您想要製作的遊戲。在接下來的課程中，我們將
+然後嘗試回答這些問題，以便建立我們的小教學遊戲。

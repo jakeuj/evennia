@@ -1,22 +1,23 @@
-# Configuring HAProxy
+(configuring-haproxy)=
+# 設定HAProxy
 
-A modern public-facing website should these days be served via encrypted
-connections. So `https:` rather than `http:` for the website and
-`wss:` rather than vs `ws:` for websocket connections used by webclient.
+如今，面向公眾的現代網站應該透過加密提供服務
+連線。所以網站的`https:`而不是`http:`
+對於 webclient 使用的 websocket 連線，`wss:` 而不是 `ws:`。
 
-The reason is security - not only does it make sure a user ends up at the right
-site (rather than a spoof that hijacked the original's address), it stops an
-evil middleman from snooping on data (like passwords) being sent across the
-wire.
+原因是安全性 - 它不僅確保使用者最終處於正確的位置
+網站（而不是劫持原始地址的欺騙），它會阻止
+邪惡的中間人窺探透過網路傳送的資料（如密碼）
+電線。
 
-Evennia itself does not implement https/wss connections. This is something best
-handled by dedicated tools able to keep up-to-date with the latest security
-practices.
+Evennia本身不實現https/wss連線。這是最好的事情
+由能夠保持最新安全性的專用工具處理
+做法。
 
-So what we'll do is install _proxy_ between Evennia and the outgoing ports of
-your server.  Essentially, Evennia will think it's only running locally (on
-localhost, IP 127.0.0.1) while the proxy will transparently map that to the
-"real" outgoing ports and handle HTTPS/WSS for us.
+所以我們要做的就是在 Evennia 和 的傳出連線埠之間安裝 _proxy_
+你的伺服器。  本質上，Evennia 會認為它只在本地執行（在
+localhost, IP 127.0.0.1)，而代理程式將透明地將其對應到
+「真正的」傳出連線埠並為我們處理HTTPS/WSS。
 
              Evennia
                 |
@@ -30,114 +31,116 @@ localhost, IP 127.0.0.1) while the proxy will transparently map that to the
                 |
              Internet
 
-These instructions assume you run a server with Unix/Linux (very common if you
-use remote hosting) and that you have root access to that server.
+這些說明假設您執行一個使用 Unix/Linux 的伺服器（如果您
+使用遠端託管）並且您擁有該伺服器的 root 存取許可權。
 
-The pieces we'll need:
+我們需要的零件：
 
-- [HAProxy](https://www.haproxy.org/) - an open-source proxy program that is
-  easy to set up and use.
-- [LetsEncrypt](https://letsencrypt.org/getting-started/) for providing the User
-  Certificate needed to establish an encrypted connection. In particular we'll
-  use the excellent [Certbot](https://certbot.eff.org/instructions) program,
-  which automates the whole certificate setup process with LetsEncrypt.
-- `cron` - this comes with all Linux/Unix systems and allows to automate tasks
-  in the OS.
+- [HAProxy](https://www.haproxy.org/) - 一個開源代理程式
+易於設定和使用。
+- [LetsEncrypt](https://letsencrypt.org/getting-started/) 用於提供使用者
+建立加密連線所需的憑證。特別是我們將
+  使用優秀的[Certbot](https://certbot.eff.org/instructions)程式，
+  它使用 LetsEncrypt 自動執行整個證書設定過程。
+- `cron` - 所有 Linux/Unix 系統都附帶此選項，並允許自動執行任務
+在OS中。
 
-Before starting you also need the following information and setup:
+在開始之前，您還需要以下資訊和設定：
 
-- (optional) The host name of your game. This is
-  something you must previously have purchased from a _domain registrar_ and set
-  up with DNS to point to the IP of your server. For the benefit of this
-  manual, we'll assume your host name is `my.awesomegame.com`.
-- If you don't have a domain name or haven't set it up yet, you must at least
-  know the IP address of your server. Find this with `ifconfig` or similar from
-  inside the server. If you use a hosting service like DigitalOcean you can also
-  find the droplet's IP address in the control panel. Use this as the host name
-  everywhere.
-- You must open port 80 in your firewall. This is used by Certbot below to
-  auto-renew certificates.  So you can't really run another webserver alongside
-  this setup without tweaking.
-- You must open port 443 (HTTPS) in your firewall. This will be the external
-  webserver port.
-- Make sure port 4001 (internal webserver port) is _not_ open in your firewall
-  (it usually will be closed by default unless you explicitly opened it
-  previously).
-- Open port 4002 in firewall (we'll use the same number for both internal-
-  and external ports, the proxy will only show the safe one serving wss).
+- （可選）您的遊戲的主機名稱。這是
+您之前必須從_網域註冊商_購買並設定的東西
+  用DNS指向您伺服器的IP。為了這個利益
+  手冊中，我們假設您的主機名稱是 `my.awesomegame.com`。
+- 如果您沒有域名或尚未設定域名，您至少必須
+知道您伺服器的 IP 地址。使用 `ifconfig` 或類似的指令查詢此內容
+  伺服器內部。如果您使用像 DigitalOcean 這樣的託管服務，您也可以
+  在控制檯中找到 Droplet 的 IP 位址。使用它作為主機名
+  無處不在。
+- 您必須在防火牆中開啟連線埠 80。 This is used by Certbot below to
+自動續訂證書。  So you can't really run another webserver alongside
+  此設定無需調整。
+- You must open port 443 (HTTPS) in your firewall.這將是外部
+webserver 連線埠。
+- 確保連線埠 4001（內部 webserver 連線埠）在防火牆中_未_開啟
+（它通常會預設關閉，除非你明確開啟它
+  以前）。
+- 在防火牆中開啟連線埠 4002（我們將為內部連線埠使用相同的連線埠號碼）
+和外部埠，代理將僅顯示服務 wss 的安全埠）。
 
-## Getting certificates
+(getting-certificates)=
+## 取得證書
 
-Certificates guarantee that you are you. Easiest is to get this with
-[Letsencrypt](https://letsencrypt.org/getting-started/) and the
-[Certbot](https://certbot.eff.org/instructions) program. Certbot has a lot of
-install instructions for various operating systems. Here's for Debian/Ubuntu:
+證書保證您就是您。最簡單的方法是用
+[讓加密](https://letsencrypt.org/getting-started/) 和
+[Certbot](https://certbot.eff.org/instructions) 程式。 Certbot 有很多
+各種作業系統的安裝說明。這是 Debian/Ubuntu 的：
 
     sudo apt install certbot
 
-Make sure to stop Evennia and that no port-80 using service is running, then
+確保停止 Evennia 並且沒有使用連線埠 80 的服務正在執行，然後
 
     sudo certbot certonly --standalone
 
-You will get some questions you need to answer, such as an email to send
-certificate errors to and the host name (or IP, supposedly) to use with this
-certificate. After this, the certificates will end up in
-`/etc/letsencrypt/live/<yourhostname>/*pem` (example from Ubuntu). The
-critical files for our purposes are `fullchain.pem` and `privkey.pem`.
+您將收到一些需要回答的問題，例如要傳送的電子郵件
+證書錯誤以及與此一起使用的主機名稱（或 IP，據說）
+證書。之後，證書將最終出現在
+`/etc/letsencrypt/live/<yourhostname>/*pem`（來自 Ubuntu 的範例）。的
+對於我們的目的來說，關鍵檔案是 `fullchain.pem` 和 `privkey.pem`。
 
-Certbot sets up a cron-job/systemd job to regularly renew the certificate. To
-check this works, try
+Certbot 設定 cron-job/systemd 作業來定期更新憑證。至
+檢查這個是否有效，嘗試
 
 ```
 sudo certbot renew --dry-run
 
 ```
 
-The certificate is only valid for 3 months at a time, so make sure this test
-works (it requires port 80 to be open). Look up Certbot's page for more help.
+該證書一次只有3個月的有效期，因此請務必進行此測試
+有效（需要開啟 80 埠）。請查閱 Certbot 頁面以取得更多協助。
 
-We are not quite done. HAProxy expects these two files to be _one_ file. More
-specifically we are going to
-1. copy `privkey.pem` and copy it to a new file named `<yourhostname>.pem` (like
-   `my.awesomegame.com.pem`)
-2. Append the contents of `fullchain.pem` to the end of this new file. No empty
-   lines are needed.
+我們還沒有完全完成。 HAProxy 期望這兩個檔案是_一個_檔。更多
+具體來說我們要去
+1. 複製 `privkey.pem` 並將其複製到名為 `<yourhostname>.pem` 的新檔案（例如
+`my.awesomegame.com.pem`）
+2. 將 `fullchain.pem` 的內容追加到這個新檔案的最後。無空
+需要線路。
 
-We could do this by copy&pasting in a text editor, but here's how to do it with
-shell commands (replace the example paths with your own):
+我們可以透過在文字編輯器中複製和貼上來做到這一點，但以下是如何做到這一點
+shell 指令（將範例路徑替換為您自己的路徑）：
 
     cd /etc/letsencrypt/live/my.awesomegame.com/
     sudo cp privkey.pem my.awesomegame.com.pem
     sudo cat fullchain.pem >> my.awesomegame.com.pem
 
-The new `my.awesomegame.com.pem` file (or whatever you named it) is what we will
-point to in the HAProxy config below.
+新的 `my.awesomegame.com.pem` 檔案（或任何你命名的檔案）就是我們想要的
+指向下面的 HAProxy 設定。
 
-There is a problem here though - Certbot will (re)generate `fullchain.pem` for
-us automatically a few days before before the 3-month certificate runs out.
-But HAProxy will not see this because it is looking at the combined file that
-will still have the old `fullchain.pem` appended to it.
+但這裡有一個問題 - Certbot 將（重新）產生 `fullchain.pem`
+在 3 個月的證書到期前幾天自動向我們傳送。
+但是HAProxy不會看到這個，因為它正在檢視合併的檔案
+仍會附加舊的`fullchain.pem`。
 
-We'll set up an automated task to rebuild the `.pem` file regularly by
-using the `cron` program of Unix/Linux.
+我們將設定一個自動化任務來定期重建 `.pem` 檔案
+使用Unix/Linux的`cron`程式。
 
     crontab -e
 
-An editor will open to the  crontab file. Add the following at the bottom (all
-on one line, and change the paths to your own!):
+編輯器將開啟 crontab 檔案。在底部新增以下內容（全部
+在一行上，並將路徑更改為您自己的路徑！）：
 
     0 5 * * * cd /etc/letsencrypt/live/my.awesomegame.com/ &&
         cp privkey.pem my.awesomegame.com.pem &&
         cat fullchain.pem >> my.awesomegame.com.pem
 
-Save and close the editor. Every night at 05:00 (5 AM), the
-`my.awesomegame.com.pem` will now be rebuilt for you. Since Certbot updates
-the `fullchain.pem` file a few days before the certificate runs out, this should
-be enough time to make sure HaProxy never sees an outdated certificate.
+儲存並關閉編輯器。每天晚上 05:00 (5 AM)，
+現在將為您重建`my.awesomegame.com.pem`。自從 Certbot 更新以來
+`fullchain.pem` 檔案在證書到期前幾天，這應該
+有足夠的時間來確保 HaProxy 永遠不會看到過時的證書。
 
-## Installing and configuring HAProxy
+(installing-and-configuring-haproxy)=
+## 安裝與設定HAProxy
 
-Installing HaProxy is usually as simple as:
+安裝 HaProxy 通常很簡單：
 
     # Debian derivatives (Ubuntu, Mint etc)
     sudo apt install haproxy
@@ -145,20 +148,20 @@ Installing HaProxy is usually as simple as:
     # Redhat derivatives (dnf instead of yum for very recent Fedora distros)
     sudo yum install haproxy
 
-Configuration of HAProxy is done in a single file. This can be located wherever
-you like, for now put in your game dir and name it `haproxy.cfg`.
+HAProxy 的設定是在單一檔案中完成的。這可以位於任何地方
+你喜歡，現在放入你的遊戲目錄並將其命名為`haproxy.cfg`。
 
-Here is an example tested on Centos7 and Ubuntu. Make sure to change the file to
-put in your own values.
+這是在 Centos7 和 Ubuntu 上測試的範例。確保將檔案更改為
+放入自己的價值觀。
 
-We use the `my.awesomegame.com` example here and here are the ports
+我們在這裡使用 `my.awesomegame.com` 範例，這是埠
 
-- `443` is the standard SSL port
-- `4001` is the standard Evennia webserver port (firewall closed!)
-- `4002` is the default Evennia websocket port (we use the same number for
-  the outgoing wss port, so this should be open in firewall).
-- `4000` is the default Telnet port for Evennia, and we proxy through HAProxy
-  so `7000` can used for Secure Telnet connections instead.
+- `443` 是標準 SSL 埠
+- `4001` 是標準 Evennia webserver 連線埠（防火牆關閉！）
+- `4002` 是預設的 Evennia websocket 連線埠（我們使用相同的數字
+傳出 wss 埠，因此應在防火牆中開啟）。
+- `4000` 是 Evennia 的預設 Telnet 埠，我們透過 HAProxy 進行代理
+因此 `7000` 可以用於安全 Telnet 連線。
 
 ```shell
 # base stuff to set up haproxy
@@ -199,55 +202,56 @@ listen evennia-secure-telnet
 
 ```
 
-## Putting it all together
+(putting-it-all-together)=
+## 把它們放在一起
 
-Get back to the Evennia game dir and edit mygame/server/conf/settings.py. Add:
+返回Evennia遊戲目錄並編輯mygame/server/conf/settings.py。新增：
 
     WEBSERVER_INTERFACES = ['127.0.0.1']
     WEBSOCKET_CLIENT_INTERFACE = '127.0.0.1'
 
-and
+和
 
     WEBSOCKET_CLIENT_URL="wss://my.awesomegame.com:4002/"
 
-Make sure to reboot (stop + start) evennia completely:
+確保完全重新啟動（停止+啟動）evennia：
 
     evennia reboot
 
 
-Finally you start the proxy:
+最後啟動代理：
 
 ```
 sudo haproxy -f /path/to/the/above/haproxy.cfg
 
 ```
 
-Make sure you can connect to your game from your browser and that you end up
-with an `https://` page and can use the websocket webclient.
+確保您可以從瀏覽器連線到您的遊戲並且最終
+具有 `https://` 頁面並且可以使用 websocket webclient。
 
-Once everything works you may want to start the proxy automatically and in the
-background. Stop the proxy with `Ctrl-C` and make sure to uncomment the line `#
-daemon` in the config file.
+一旦一切正常，您可能希望自動啟動代理並在
+背景。使用 `Ctrl-C` 停止代理並確保取消註解行 `#
+設定檔中的守護程式`。
 
-If you have no other proxies running on your server, you can copy your
-haproxy.conf file to the system-wide settings:
+如果您的伺服器上沒有執行其他代理，您可以複製您的
+haproxy.conf 檔案到系統範圍的設定：
 
     sudo cp /path/to/the/above/haproxy.cfg /etc/haproxy/
 
-The proxy will now start on reload and you can control it with
+代理現在將在重新載入時啟動，您可以使用以下指令控制它
 
     sudo service haproxy start|stop|restart|status
 
-If you don't want to copy stuff into `/etc/` you can also run the haproxy purely
-out of your current location by running it with `cron` on server restart. Open
-the crontab again:
+如果您不想將內容複製到 `/etc/` 您也可以純粹執行 haproxy
+透過在伺服器重新啟動時使用 `cron` 執行它來退出當前位置。開啟
+再次執行 crontab：
 
     sudo crontab -e
 
-Add a new line to the end of the file:
+在檔案末尾新增行：
 
     @reboot haproxy -f /path/to/the/above/haproxy.cfg
 
-Save the file and haproxy should start up automatically when you reboot the
-server. Next just restart the proxy manually a last time - with `daemon`
-uncommented in the config file, it will now start as a background process.
+儲存檔案，當您重新啟動時 haproxy 應該會自動啟動
+伺服器。接下來只需最後一次手動重新啟動代理程式 - 使用 `daemon`
+在設定檔中取消註釋，它現在將作為後臺程式啟動。

@@ -1,53 +1,55 @@
-# Implementing a game rule system
+(implementing-a-game-rule-system)=
+# 實施遊戲規則系統
 
 
-The simplest way to create an online roleplaying game (at least from a code perspective) is to
-simply grab a paperback RPG rule book, get a staff of game masters together and start to run scenes
-with whomever logs in. Game masters can roll their dice in front of their computers and tell the
-players the results. This is only one step away from a traditional tabletop game and puts heavy
-demands on the staff - it is unlikely staff will be able to keep up around the clock even if they
-are very dedicated.
+建立線上角色扮演遊戲的最簡單方法（至少從程式碼角度來看）是
+只要拿一本平裝本RPG規則書，召集一群遊戲高手並開始執行場景
+與任何登入者一起。遊戲大師可以在計算機前擲骰子並告訴玩家
+玩家的結果。這與傳統的桌上遊戲僅一步之遙，並且投入了大量的精力
+對員工的要求－員工不太可能全天候工作，即使他們
+非常敬業。
 
-Many games, even the most roleplay-dedicated, thus tend to allow for players to mediate themselves
-to some extent. A common way to do this is to introduce *coded systems* - that is, to let the
-computer do some of the heavy lifting. A basic thing is to add an online dice-roller so everyone can
-make rolls and make sure no one is cheating. Somewhere at this level you find the most bare-bones
-roleplaying MUSHes.
+因此，許多遊戲，甚至是最專注於角色扮演的遊戲，都傾向於允許玩家自行調解
+在某種程度上。做到這一點的一種常見方法是引入*編碼系統* - 也就是說，讓
+計算機承擔一些繁重的工作。最基本的事情是增加一個線上擲骰子，這樣每個人都可以
+製作麵包卷並確保沒有人作弊。在這個關卡的某個地方，您會發現最簡單的內容
+角色扮演MUSHes。
 
-The advantage of a coded system is that as long as the rules are fair the computer is too - it makes
-no judgement calls and holds no personal grudges (and cannot be accused of holding any). Also, the
-computer doesn't need to sleep and can always be online regardless of when a player logs on. The
-drawback is that a coded system is not flexible and won't adapt to the unprogrammed actions human
-players may come up with in role play. For this reason many roleplay-heavy MUDs do a hybrid
-variation - they use coded systems for things like combat and skill progression but leave role play
-to be mostly freeform, overseen by staff game masters.
+編碼系統的優點是，只要規則是公平的，電腦也是公平的——它使得
+沒有任何判斷力，也沒有個人恩怨（也不能被指控持有任何個人恩怨）。另外，
+計算機不需要睡眠，無論玩家何時登入，都可以始終線上。的
+缺點是編碼系統不靈活，無法適應人類未程式設計的行為
+玩家可能會在角色扮演中想出。基於這個原因，許多角色扮演重的MUDs會混合使用
+變化 - 他們使用編碼系統進行戰鬥和技能進步等，但保留角色扮演
+大部分是自由形式，由工作人員遊戲大師監督。
 
-Finally, on the other end of the scale are less- or no-roleplay games, where game mechanics (and
-thus player fairness) is the most important aspect. In such games the only events with in-game value
-are those resulting from code. Such games are very common and include everything from hack-and-slash
-MUDs to various tactical simulations.
+最後，天平的另一端是角色扮演較少或沒有的遊戲，其中游戲機制（和
+因此玩家公平性）是最重要的方面。在此類遊戲中，唯一具有遊戲內價值的事件
+是由程式碼產生的結果。此類遊戲非常常見，包括砍殺等各種遊戲
+MUDs各種戰術模擬。
 
-So your first decision needs to be just what type of system you are aiming for. This page will try
-to give some ideas for how to organize the "coded" part of your system, however big that may be.
+因此，您的第一個決定需要確定您的目標是什麼型別的系統。此頁面將嘗試
+給出一些關於如何組織系統的「編碼」部分的想法，無論它有多大。
 
-## Overall system infrastructure
+(overall-system-infrastructure)=
+## 整體系統基礎架構
 
-We strongly recommend that you code your rule system as stand-alone as possible. That is, don't
-spread your skill check code, race bonus calculation, die modifiers or what have you all over your
-game.
+我們強烈建議您盡可能獨立編碼規則系統。也就是說，不要
+傳播你的技能檢定程式碼、種族獎金計算、骰子修改器或你擁有的東西
+遊戲。
 
-- Put everything you would need to look up in a rule book into a module in `mygame/world`. Hide away
-as much as you can.  Think of it as a black box (or maybe the code representation of an all-knowing
-game master). The rest of your game will ask this black box questions and get answers back. Exactly
-how it arrives at those results should not need to be known outside the box.  Doing it this way
-makes it easier to change and update things in one place later.
-- Store only the minimum stuff you need with each game object. That is, if your Characters need
-values for Health, a list of skills etc, store those things on the Character - don't store how to
-roll or change them.
-- Next is to determine just how you want to store things on your Objects and Characters. You can
-choose to either store things as individual [Attributes](../Components/Attributes.md), like `character.db.STR=34` and
-`character.db.Hunting_skill=20`. But you could also use some custom storage method, like a dictionary `character.db.skills = {"Hunting":34, "Fishing":20, ...}`. A much more fancy solution is to look at the [Trait handler contrib](../Contribs/Contrib-Traits.md). Finally you could even go with a [custom django model](../Concepts/Models.md). Which is the better depends on your game and the complexity of your system.
-- Make a clear [API](https://en.wikipedia.org/wiki/Application_programming_interface) into your rules. That is, make methods/functions that you feed with, say, your Character and which skill you want to check. That is, you want something similar to this:
+- 將您需要在規則手冊中查詢的所有內容放入 `mygame/world` 中的模組中。躲起來
+盡你所能。  將其視為一個黑盒子（或可能是全知的程式碼表示）
+遊戲大師）。遊戲的其餘部分將詢問這個黑盒子問題並獲得答案。正是如此
+不需要在盒子外面知道它是如何得出這些結果的。  這樣做
+讓以後更容易在一個地方更改和更新內容。
+- 僅儲存每個遊戲物件所需的最少內容。也就是說，如果你的角色需要
+健康值、技能清單等，將這些東西儲存在角色上 - 不要儲存如何
+滾動或更改它們。
+- 接下來是確定您希望如何在物件和角色上儲存內容。你可以
+選擇將事物儲存為單獨的[屬性](../Components/Attributes.md)，例如`character.db.STR=34` 和
+`character.db.Hunting_skill=20`。但您也可以使用一些自訂儲存方法，例如字典 `character.db.skills = {"Hunting":34, "Fishing":20,...}`。一個更奇特的解決方案是檢視 [Trait handler contrib](../Contribs/Contrib-Traits.md)。最後你甚至可以使用[自訂 django 型號](../Concepts/Models.md)。哪個更好取決於您的遊戲和系統的複雜性。
+- 在您的規則中明確[API](https://en.wikipedia.org/wiki/Application_programming_interface)。也就是說，建立您提供的方法/函式，例如您的角色和您想要檢查的技能。也就是說，您想要類似的東西：
 
     ```python
         from world import rules
@@ -55,39 +57,42 @@ choose to either store things as individual [Attributes](../Components/Attribute
         result = rules.roll_challenge(character1, character2, "swords")
     ```
 
-You might need to make these functions more or less complex depending on your game. For example the properties of the room might matter to the outcome of a roll (if the room is dark, burning etc). Establishing just what you need to send into your game mechanic module is a great way to also get a feel for what you need to add to your engine.
+您可能需要根據您的遊戲使這些函式變得或多或少複雜。例如，房間的屬性可能會對擲骰子的結果產生影響（如果房間是黑暗的、燃燒的等）。確定需要傳送到遊戲機制模組中的內容是瞭解需要新增到引擎中的內容的好方法。
 
-## Coded systems
+(coded-systems)=
+## 編碼系統
 
-Inspired by tabletop role playing games, most game systems mimic some sort of die mechanic. To this end Evennia offers a full [dice roller contribution](../Contribs/Contrib-Dice.md). For custom implementations, Python offers many ways to randomize a result using its in-built `random` module. No matter how it's implemented, we will in this text refer to the action of determining an outcome as a "roll".
+受桌上角色扮演遊戲的啟發，大多數遊戲系統都會模仿某種骰子機制。為此Evennia提供了完整的[骰子貢獻](../Contribs/Contrib-Dice.md)。對於自訂實現，Python 提供了多種使用其內建 `random` 模組來隨機化結果的方法。不管它是如何實現的，我們在本文中將確定結果的動作稱為「擲骰」。
 
-In a freeform system, the result of the roll is just compared with values and people (or the game
-master) just agree on what it means. In a coded system the result now needs to be processed somehow. There are many things that may happen as a result of rule enforcement:
+在自由形式的系統中，擲骰的結果只是與價值觀和人（或遊戲）進行比較
+大師）只是同意它的意思。在編碼系統中，現在需要以某種方式處理結果。規則執行可能會發生很多事情：
 
-- Health may be added or deducted. This can effect the character in various ways.
-- Experience may need to be added, and if a level-based system is used, the player might need to be informed they have increased a level.
-- Room-wide effects need to be reported to the room, possibly affecting everyone in the room.
+- 健康值可以增加或減少。這可以透過多種方式影響角色。
+- 可能需要新增經驗，並且如果使用基於級別的系統，則可能需要通知玩家他們已經提高了等級。
+- 房間範圍內的影響需要報告給房間，可能會影響房間中的每個人。
 
-There are also a slew of other things that fall under "Coded systems", including things like
-weather, NPC artificial intelligence and game economy. Basically everything about the world that a Game master would control in a tabletop role playing game can be mimicked to some level by coded systems.
+還有許多其他東西屬於“編碼系統”，包括諸如
+天氣、NPC人工智慧和遊戲經濟。基本上，遊戲大師在桌上角色扮演遊戲中控制的世界的一切都可以透過編碼系統在某種程度上進行模仿。
 
 
-## Example of Rule module
+(example-of-rule-module)=
+## 規則模組範例
 
-Here is a simple example of a rule module. This is what we assume about our simple example game:
-- Characters have only four numerical values:
-    - Their `level`, which starts at 1.
-    - A skill `combat`, which determines how good they are at hitting things. Starts between 5 and 10.
-    - Their Strength, `STR`, which determine how much damage they do. Starts between 1 and 10.
-    - Their Health points, `HP`, which starts at 100.
-- When a Character reaches `HP = 0`, they are presumed "defeated". Their HP is reset and they get a failure message (as a stand-in for death code).
-- Abilities are stored as simple Attributes on the Character.
-- "Rolls" are done by rolling a 100-sided die. If the result is below the `combat` value, it's a success and damage is rolled. Damage is rolled as a six-sided die + the value of `STR` (for this example we ignore weapons and assume `STR` is all that matters).
-- Every successful `attack` roll gives 1-3 experience points (`XP`). Every time the number of `XP` reaches `(level + 1) ** 2`, the Character levels up. When leveling up, the Character's `combat` value goes up by 2 points and `STR` by one (this is a stand-in for a real progression system).
+這是規則模組的一個簡單範例。這是我們對簡單範例遊戲的假設：
+- 字元只有四個數值：
+    - 他們的`level`，從1開始。
+    - 技能`combat`，決定了他們擊打物體的能力。從 5 點到 10 點開始。
+    - 他們的力量，`STR`，決定了他們造成的傷害有多大。從 1 到 10 之間開始。
+    - 他們的生命值`HP`，從 100 開始。
+- 當角色達到`HP = 0`時，他們被視為「失敗」。他們的 HP 被重置，並且他們收到一條失敗訊息（作為死亡程式碼的替代）。
+- 能力作為角色的簡單屬性儲存。
+- 「滾」是透過滾動 100 面的骰子來完成的。如果結果低於 `combat` 值，則成功並滾動傷害。傷害以六面骰 + `STR` 的值進行滾動（在本例中，我們忽略武器並假設 `STR` 是最重要的）。
+- 每次成功的 `attack` 擲骰都會獲得 1-3 點經驗值 (`XP`)。每當`XP`的數量達到`(level + 1) ** 2`時，角色就會升級。升級時，角色的 `combat` 值增加 2 點，`STR` 增加 1 點（這是真實進度系統的替代）。
 
-### Character
+(character)=
+### 特點
 
-The Character typeclass is simple. It goes in `mygame/typeclasses/characters.py`. There is already an empty `Character` class there that Evennia will look to and use.
+字元 typeclass 很簡單。它進入`mygame/typeclasses/characters.py`。那裡已經有一個空的 `Character` 類，Evennia 將查詢並使用該類。
 
 ```python
 from random import randint
@@ -107,20 +112,21 @@ class Character(DefaultCharacter):
         self.db.combat = randint(5, 10)
 ```
 
-`@reload` the server to load up the new code. Doing `examine self` will however *not* show the new
-Attributes on yourself. This is because the `at_object_creation` hook is only called on *new*
-Characters. Your Character was already created and will thus not have them. To force a reload, use
-the following command:
+`@reload` 伺服器載入新程式碼。然而，執行 `examine self` 將*不會*顯示新的
+對自己的屬性。這是因為 `at_object_creation` 鉤子僅在 *new* 上呼叫
+人物。您的角色已經建立，因此不會擁有它們。若要強制重新載入，請使用
+以下指令：
 
 ```
 @typeclass/force/reset self
 ```
 
-The `examine self` command will now show the new Attributes.
+`examine self` 指令現在將顯示新屬性。
 
-### Rule module
+(rule-module)=
+### 規則模組
 
-This is a module `mygame/world/rules.py`.
+這是一個模組`mygame/world/rules.py`。
 
 ```python
 from random import randint
@@ -194,16 +200,16 @@ def roll_challenge(character1, character2, skillname):
         raise RunTimeError(f"Skillname {skillname} not found.")
 ```
 
-These few functions implement the entirety of our simple rule system.  We have a function to check
-the "defeat" condition and reset the `HP` back to 100 again. We define a generic "skill" function.
-Multiple skills could all be added with the same signature; our `SKILLS` dictionary makes it easy to
-look up the skills regardless of what their actual functions are called. Finally, the access
-function `roll_challenge` just picks the skill and gets the result.
+這幾個函式實作了我們整個簡單的規則系統。  我們有一個函式可以檢查
+「失敗」條件並將`HP`再次重回100。我們定義一個通用的「技能」函式。
+多個技能都可以用同一個簽名新增；我們的 `SKILLS` 字典可以輕鬆
+尋找技能，無論其實際功能為何。最後，訪問
+函式 `roll_challenge` 只是選擇技能並獲得結果。
 
-In this example, the skill function actually does a lot - it not only rolls results, it also informs
-everyone of their results via `character.msg()` calls.
+在這個例子中，技能函式實際上做了很多事情 - 它不僅滾動結果，還通知
+每個人的結果都是透過 `character.msg()` 電話獲得的。
 
-Here is an example of usage in a game command:
+以下是遊戲指令中的用法範例：
 
 ```python
 from evennia import Command
@@ -232,8 +238,8 @@ class CmdAttack(Command):
             rules.roll_challenge(caller, target, "combat")
 ```
 
-Note how simple the command becomes and how generic you can make it.  It becomes simple to offer any
-number of Combat commands by just extending this functionality - you can easily roll challenges and
-pick different skills to check. And if you ever decided to, say, change how to determine hit chance,
-you don't have to change every command, but need only change the single `roll_hit` function inside
-your `rules` module.
+請注意該指令變得多麼簡單以及您可以使其變得多麼通用。  提供任何服務都變得簡單
+只需擴充套件此功能即可增加戰鬥指令的數量 - 您可以輕鬆地進行挑戰並
+選擇不同的技能來檢查。如果你決定改變決定命中率的方式
+您不必更改每個指令，而只需更改其中的單個 `roll_hit` 函式
+你的`rules`模組。

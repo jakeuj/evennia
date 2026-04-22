@@ -1,21 +1,23 @@
-# Non-Player-Characters
+(non-player-characters)=
+# 非玩家角色
 
-```{sidebar} vNPCs
-You should usually avoid creating hundreds of NPC objects to populate your 'busy town' - in a text game so many NPCs will just spam the screen and annoy your players. Since this is a text game, you can usually get away with using _vNPcs_ - virtual NPCs. vNPCs are only described in text - a room could be described as a bustling street, farmers can be described shouting to each other. Using room descriptions for this works well, but the tutorial lesson about [EvAdventure Rooms](./Beginner-Tutorial-Rooms.md) has a section called [adding life to a room](./Beginner-Tutorial-Rooms.md#adding-life-to-a-room) that can be used for making vNPCs appear to do things in the background.
+```{sidebar} vNPC
+您通常應該避免建立數百個 NPC 物件來填充您的「繁忙城鎮」 - 在文字遊戲中，這麼多 NPCs 只會在螢幕上傳送垃圾郵件並惹惱您的玩家。由於這是一個文字遊戲，您通常可以使用_vNPcs_ - 虛擬NPCs。 vNPC僅以文字描述——房間可以被描述為熙熙攘攘的街道，農民可以被描述為互相喊叫。為此使用房間描述效果很好，但有關 [EvAdventure 房間](./Beginner-Tutorial-Rooms.md) 的教學課程中有一個名為 [向房間新增生命](./Beginner-Tutorial-Rooms.md#adding-life-to-a-room) 的部分，可用於使 vNPC 看起來在後臺執行操作。
 ```
 
-_Non-Player-Characters_, or NPCs, is the common term for all active agents that are _not_ controlled by players. NPCs could be anything from merchants and quest givers, to monsters and bosses.  They could also be 'flavor' - townsfolk doing their chores, farmers tending their fields - there to make the world feel "more alive". 
+_非玩家角色_，或 NPCs，是所有不受玩家控制的活躍代理的通用術語。 NPCs 可以是任何東西，從商人和任務提供者，到怪物和老闆。 他們也可以是「風味」角色，例如做家務的城鎮居民、耕作的農夫，讓世界感覺「更有活力」。
 
-In this lesson we will create the base class of _EvAdventure_ NPCs based on the _Knave_ ruleset. According to the _Knave_ rules, NPCs have some simplified stats compared to the [PC characters](./Beginner-Tutorial-Characters.md) we designed earlier. 
+在本課中，我們將基於 _Knave_ 規則集建立 _EvAdventure_ NPCs 的基底類別。根據_Knave_規則，與我們之前設計的[PC字元](./Beginner-Tutorial-Characters.md)相比，NPCs有一些簡化的統計資料。
 
 <div style="clear: right;"></div>
 
-## The NPC base class
+(the-npc-base-class)=
+## NPC基類
 
 ```{sidebar}
-See [evennia/contrib/tutorials/evadventure/npcs.py](evennia.contrib.tutorials.evadventure.npcs) for a ready-made example of an npc module.
+有關 npc 模組的現成範例，請參閱 [evennia/contrib/tutorials/evadventure/npcs.py](evennia.contrib.tutorials.evadventure.npcs)。
 ```
-> Create a new module `evadventure/npcs.py`.
+> 建立一個新模組`evadventure/npcs.py`。
 
 ```{code-block} python
 :linenos: 
@@ -90,20 +92,21 @@ class EvAdventureMob(EvAdventureNPC):
 
 ```
 
-- **Line 9**: By use of _multiple inheritance_ we use the `LinvingMixin` we created in the [Character lesson](./Beginner-Tutorial-Characters.md). This includes a lot of useful methods, such as showing our 'hurt level', methods to use to heal, hooks to call when getting attacked, hurt and so on. We can re-use all of those in upcoming NPC subclasses.
-- **Line 12**: The `is_pc` is a quick and convenient way to check if this is, well, a PC or not. We will use it in the upcoming [Combat base lesson](./Beginner-Tutorial-Combat-Base.md).
-- **Line 13**: The NPC is simplified in that all stats are just based on the `Hit dice` number (see **Lines 25-51**). We store `armor` and a `weapon` as direct [Attributes](../../../Components/Attributes.md) on the class rather than bother implementing a full equipment system. 
-- **Lines 17, 18**: The `morale` and `allegiance` are _Knave_ properties determining how likely the NPC is to flee in a combat situation and if they are hostile or friendly.
-- **Line 19**: The `is_idle` Attribute is a useful property. It should be available on all NPCs and will be used to disable AI entirely. 
-- **Line 59**: We make sure to tag NPCs. We may want to group different NPCs together later, for example to have all NPCs with the same tag respond if one of them is attacked.
+- **第 9 行**：透過使用_多重繼承_，我們使用我們在[角色課程](./Beginner-Tutorial-Characters.md)中建立的`LinvingMixin`。這包括許多有用的方法，例如顯示我們的「傷害等級」、用於治療的方法、受到攻擊、傷害時呼叫的鉤子等等。我們可以在即將到來的 NPC 子類別中重複使用所有這些。
+- **第 12 行**：`is_pc` 是一種快速便捷的方法來檢查這是否是 PC。我們將在接下來的[戰鬥基礎課程](./Beginner-Tutorial-Combat-Base.md)中使用它。
+- **第 13 行**：NPC 被簡化，因為所有統計資料僅基於 `Hit dice` 數字（請參閱 **第 25-51 行**）。我們將 `armor` 和 `weapon` 作為直接[屬性](../../../Components/Attributes.md) 儲存在班級上，而不是費心實現完整的裝備系統。
+- **第 17、18 行**：`morale` 和 `allegiance` 是 _Knave_ 屬性，決定 NPC 在戰鬥情況下逃跑的可能性以及他們是敵對還是友好。
+- **第 19 行**：`is_idle` Attribute 是一個有用的屬性。它應該在所有 NPCs 上可用，並將用於完全停用 AI。
+- **第 59 行**：我們確保 tag NPCs。我們可能希望稍後將不同的 NPCs 分組在一起，例如，如果其中一個受到攻擊，則讓所有具有相同 tag 的 NPCs 做出回應。
 
-We make an empty subclass `EvAdventureMob`. A 'mob' (short for 'mobile') is a common MUD term for NPCs that can move around on their own. We will in the future use this class to represent enemies in the game. We will get back to this class [in the lesson about adding AI][Beginner-Tutoroal-AI]. 
+我們建立一個空子類別`EvAdventureMob`。 「暴民」（「移動」的縮寫）是一個常見的 MUD 術語，表示可以自行移動的 NPCs。我們將來將使用這個類別來代表遊戲中的敵人。我們將回到這堂課[在關於新增AI的課程中][Beginner-Tutoroal-AI]。
 
-## Testing 
+(testing)=
+## 測試
 
-> Create a new module `evadventure/tests/test_npcs.py`
+> 建立一個新模組`evadventure/tests/test_npcs.py`
 
-Not so much to test yet, but we will be using the same module to test other aspects of NPCs in the future, so let's create it now. 
+還沒有太多需要測試的內容，但我們將來將使用相同的模組來測試 NPCs 的其他方面，所以讓我們現在建立它。
 
 ```python 
 # in evadventure/tests/test_npcs.py
@@ -132,11 +135,12 @@ class TestNPCBase(EvenniaTest):
 
 ```
 
-Nothing special here. Note how the `create_object` helper function takes `attributes` as a keyword. This is a list of tuples we use to set different values than the default ones to Attributes. We then check a few of the properties to make sure they return what we expect.
+這裡沒什麼特別的。請注意 `create_object` 輔助函式如何將 `attributes` 作為關鍵字。這是一個元組列表，我們用來為屬性設定與預設值不同的值。然後我們檢查一些屬性以確保它們傳回我們期望的結果。
 
 
-## Conclusions 
+(conclusions)=
+## 結論
 
-In _Knave_, an NPC is a simplified version of a Player Character. In other games and rule systems, they may be all but identical. 
+在_Knave_中，NPC是玩家角色的簡化版本。在其他遊戲和規則系統中，它們可能幾乎完全相同。
 
-With the NPC class in place, we have enough to create a 'test dummy'. Since it has no AI yet, it won't fight back, but it will be enough to have something to hit when we test our combat in the upcoming lessons.
+NPC 類別就位後，我們就足以建立一個「測試虛擬物件」。由於它還沒有AI，所以它不會反擊，但當我們在接下來的課程中測試我們的戰鬥時，有東西可以擊中就足夠了。

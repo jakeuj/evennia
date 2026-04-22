@@ -1,5 +1,6 @@
-# In-game Commands
+(in-game-commands)=
+# 遊戲內指令
 
 ```{warning}
-This part of the Beginner tutorial is still being developed.
+初學者教學的這一部分仍在開發中。
 ```

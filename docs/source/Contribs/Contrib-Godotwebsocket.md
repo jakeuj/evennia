@@ -1,15 +1,17 @@
+(godot-websocket)=
 # Godot Websocket
 
-Contribution by ChrisLR, 2022
+貢獻者 ChrisLR, 2022
 
-This contrib allows you to connect a Godot Client directly to your mud,
-and display regular text with color in Godot's RichTextLabel using BBCode.
-You can use Godot to provide advanced functionality with proper Evennia support.
+這個contrib允許你將Godot用戶端直接連線到你的mud，
+並使用 BBCode 以 Godot RichTextLabel 的顏色顯示常規文字。
+您可以使用 Godot 提供具有適當 Evennia 支援的進階功能。
 
 
-## Installation
+(installation)=
+## 安裝
 
-You need to add the following settings in your `settings.py` and restart evennia.
+您需要在 `settings.py` 中新增以下設定並重新啟動 evennia。
 
 ```python
 PORTAL_SERVICES_PLUGIN_MODULES.append('evennia.contrib.base_systems.godotwebsocket.webclient')
@@ -17,49 +19,50 @@ GODOT_CLIENT_WEBSOCKET_PORT = 4008
 GODOT_CLIENT_WEBSOCKET_CLIENT_INTERFACE = "127.0.0.1"
 ```
 
-This will make evennia listen on the port 4008 for Godot.
-You can change the port and interface as you want.
+這將使 evennia 監聽 Godot 的連線埠 4008。
+您可以根據需要變更連線埠和介面。
 
 
-## Usage
+(usage)=
+## 用法
 
-The tl;dr of it is to connect using a Godot Websocket using the port defined above.
-It will let you transfer data from Evennia to Godot, allowing you
-to get styled text in a RichTextLabel with bbcode enabled or to handle
-the extra data given from Evennia as needed.
+簡而言之，它是使用上面定義的連線埠使用 Godot Websocket 進行連線。
+它可以讓你將資料從 Evennia 傳輸到 Godot，讓你
+在啟用 bbcode 的情況下取得 RichTextLabel 中的樣式文字或處理
+根據需要從 Evennia 給出的額外資料。
 
 
-This section assumes you have basic knowledge on how to use Godot.
-You can read the following url for more details on Godot Websockets
-and to implement a minimal client or look at the full example at the bottom of this page.
+本節假設您具有如何使用 Godot 的基本知識。
+您可以閱讀以下網址以瞭解有關 Godot Websockets 的更多詳細資訊
+並實現一個最小的用戶端或檢視本頁底部的完整範例。
 
 https://docs.godotengine.org/en/stable/tutorials/networking/websocket.html
 
-The rest of this document will be for Godot 4.
-Note that some of the code shown here is partially taken from official Godot Documentation
+本文件的其餘部分將針對 Godot 4。
+請注意，此處顯示的部分程式碼部分取自官方 Godot 文件
 
-A very basic setup in godot would require
+godot 中的一個非常基本的設定需要
 
-- One RichTextLabel Node to display the Evennia Output, ensure bbcode is enabled on it.
-- One Node for your websocket client code with a new Script attached.
-- One TextEdit Node to enter commands
-- One Button Node to press and send the commands
-- Controls for the layout, in this example I have used
-  Panel
+- 一個 RichTextLabel 節點顯示 Evennia 輸出，確保在其上啟用 bbcode。
+- 您的 websocket 使用者端程式碼的一個節點，附加了新的 Script。
+- 1個TextEdit節點輸入指令
+- 一鍵節點按下並傳送指令
+- 佈局控制元件，在本例中我使用了
+面板
    VBoxContainer
      RichTextLabel
      HBoxContainer
        TextEdit
        Button
 
-I will not go over how layout works but the documentation for them is easily accessible in the godot docs.
+我不會詳細介紹佈局的工作原理，但可以在 godot 檔案中輕鬆存取它們的檔案。
 
 
-Open up the script for your client code.
+開啟您的用戶端程式碼的script。
 
-We need to define the url leading to your mud, use the same values you have used in your Evennia Settings.
-Next we write some basic code to get a connection going.
-This will connect when the Scene is ready, poll and print the data when we receive it and close when the scene exits.
+我們需要定義通往您的 mud 的 url，使用您在 Evennia 設定中使用的相同值。
+接下來我們編寫一些基本程式碼來建立連線。
+當場景準備好時，它將連線，當我們收到資料時輪詢並列印資料，當場景退出時關閉。
 ```
 extends Node
 
@@ -91,11 +94,11 @@ func _exit_tree():
 
 ```
 
-At this point, you can start your evennia server, run godot and it should print a default reply.
-After that you need to properly handle the data sent by evennia.
-To do this, we will add a new function to dispatch the messages properly.
+此時，您可以啟動 evennia 伺服器，執行 godot，它應該會列印預設回應。
+之後你需要妥善處理evennia傳送的資料。
+為此，我們將新增一個新函式來正確傳送訊息。
 
-Here is an example
+這是一個例子
 ```
 func _handle_data(data):
 	print(data)  # Print for debugging
@@ -109,19 +112,19 @@ func write_to_rtb(msg):
 	output_label.append_text(msg)
 ```
 
-The first element is the type, it will be `text` if it is a message
-It can be anything you would provide to the Evennia `msg` function.
-The second element will be the data related to the type of message, in this case it is a list of text to display.
-Since it is parsed BBCode, we can add that directly to a RichTextLabel by calling its append_text method.
+第一個元素是型別，如果是訊息則為`text`
+它可以是您提供給 Evennia `msg` 函式的任何內容。
+第二個元素是與訊息型別相關的資料，在本例中它是要顯示的文字清單。
+由於它被解析為 BBCode，我們可以透過呼叫它的 append_text 方法將其直接新增到 RichTextLabel 中。
 
-If you want anything better than fancy text in Godot, you will have
-to leverage Evennia's OOB to send extra data.
+如果你想要比 Godot 中花哨的文字更好的東西，你將會有
+利用Evennia的OOB傳送額外的資料。
 
-You can [read more on OOB here](https://www.evennia.com/docs/latest/OOB.html#oob).
+您可以[在此閱讀有關 OOB 的更多資訊](https://www.evennia.com/docs/latest/OOB.html#oob)。
 
 
-Now to send data, we connect the Button pressed Signal to a method,
-read the label input and send it via the websocket, then clear the label.
+現在要傳送資料，我們將按鈕按下訊號連線到一個方法，
+讀取標籤輸入並透過 websocket 傳送它，然後清除標籤。
 ```
 func _on_button_pressed():
 	var msg = text_edit.text
@@ -133,13 +136,15 @@ func _on_button_pressed():
 
 
 
-## Known Issues
+(known-issues)=
+## 已知問題
 
-- Sending SaverDicts and similar objects straight from Evennia .DB will cause issues,
-  cast them to dict() or list() before doing so.
+- 直接從 Evennia.DB 傳送 SaverDicts 和類似物件會導致問題，
+在此之前將它們轉換為 dict() 或 list() 。
 
 
-## Full Example Script
+(full-example-script)=
+## 完整範例Script
 ```
 extends Node
 
@@ -196,5 +201,5 @@ func _exit_tree():
 
 ----
 
-<small>This document page is generated from `evennia/contrib/base_systems/godotwebsocket/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\base_systems\godotwebsocket\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

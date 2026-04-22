@@ -1,4 +1,5 @@
-# Return custom errors on missing Exits
+(return-custom-errors-on-missing-exits)=
+# 傳回缺少退出時的自訂錯誤
 
 
     > north
@@ -6,28 +7,28 @@
     > out 
      But you are already outside ...? 
      
-Evennia allows for exits to have any name. The command "kitchen" is a valid exit name as well as "jump out the window" or "north". An exit actually consists of two parts: an [Exit Object](../Components/Objects.md) and
-an [Exit Command](../Components/Commands.md) stored on said exit object. The command has the same key and aliases as the
-exit-object, which is why you can see the exit in the room and just write its name to traverse it.
+Evennia 允許出口具有任何名稱。指令“kitchen”以及“jump out of the window”或“north”都是有效的出口名稱。退出實際上由兩部分組成：[退出物件](../Components/Objects.md) 和
+儲存在所述退出物件上的[退出指令](../Components/Commands.md)。該指令與以下指令具有相同的金鑰和別名
+exit-object，這就是為什麼你可以看到房間裡的出口，只需寫下它的名字就可以遍歷它。
 
-So if you try to enter the name of a non-existing exit, Evennia treats is the same way as if you were trying to  use a non-existing command:
+因此，如果您嘗試輸入不存在的退出的名稱，Evennia 的處理方式與您嘗試使用不存在的指令相同：
 
      > jump out the window
      Command 'jump out the window' is not available. Type "help" for help.
 
-Many games don't need this type of freedom. They define only the cardinal directions as valid exit names ( Evennia's `tunnel` command also offers this functionality). In this case, the error starts to look less logical:
+許多遊戲不需要這種自由。它們僅將基本方向定義為有效的出口名稱（Evennia 的 `tunnel` 指令也提供此功能）。在這種情況下，錯誤開始看起來不那麼合乎邏輯：
 
      > west
      Command 'west' is not available. Maybe you meant "set" or "reset"?
 
-Since we for our particular game *know* that west is an exit direction, it would be better if the error message just told us that we couldn't go there.
+由於我們對於我們的特定遊戲“知道”西是出口方向，因此如果錯誤訊息只是告訴我們不能去那裡，那就更好了。
     
      > west 
      You cannot move west.
 
-The way to do this is to give Evennia an _alternative_ Command to use when no Exit-Command is found in the room. See [Adding Commands](Beginner-Tutorial/Part1/Beginner-Tutorial-Adding-Commands.md) for more info about the  process of adding new Commands to Evennia.
+做到這一點的方法是給 Evennia 一個_alternative_ Command，以便在房間中找不到退出指令時使用。有關將新指令新增到 Evennia 的過程的詳細資訊，請參閱[新增指令](Beginner-Tutorial/Part1/Beginner-Tutorial-Adding-Commands.md)。
 
-In this example we will just echo an error message, but you could do everything (maybe you lose health if you bump into a wall?)
+在這個例子中，我們只會回顯一條錯誤訊息，但你可以做任何事情（如果你撞到牆上，也許你會失去健康？）
 
 ```python
 # for example in a file mygame/commands/movecommands.py
@@ -72,7 +73,7 @@ class MovementFailCmdSet(CmdSet):
         self.add(CmdExitErrorSouth()) 
 ```
 
-We pack our commands in a new little cmdset; if we add this to our  `CharacterCmdSet`, we can just add more errors to `MovementFailCmdSet`  later without having to change code in two places.
+我們將指令打包在一個新的小cmdset中；如果我們將其新增至 `CharacterCmdSet` 中，則稍後可以將更多錯誤新增至 `MovementFailCmdSet` 中，而無需在兩個位置變更程式碼。
 
 ```python
 # in mygame/commands/default_cmdsets.py
@@ -88,16 +89,17 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(movecommands.MovementFailCmdSet)
 ```
 
-`reload` the server. What happens henceforth is that if you are in a room with an Exitobject (let's say it's "north"), the proper Exit-command will _overload_ your error command (also named "north"). But if you enter a direction without having a matching exit for it, you will fall back to your default error commands:
+`reload` 伺服器。今後發生的情況是，如果您在一個帶有 Exit 物件的房間中（假設它是“北”），正確的退出指令將_overload_您的錯誤指令（也稱為“北”）。但是，如果您輸入方向而沒有符合的出口，您將退回到預設的錯誤指令：
 
      > east
      You cannot move east.
 
-Further expansions by the exit system (including manipulating the way the Exit command itself is created) can be done by modifying the [Exit typeclass](../Components/Typeclasses.md) directly.
+退出系統的進一步擴充套件（包括操作 Exit 指令本身的建立方式）可以透過直接修改 [Exit typeclass](../Components/Typeclasses.md) 來完成。
 
-## Why not a single command?
+(why-not-a-single-command)=
+## 為什麼不是一個指令？
 
-So why didn't we create a single error command above? Something like this:
+那為什麼我們不在上面建立一個錯誤指令呢？像這樣的東西：
 
 ```python
 class CmdExitError(default_cmds.MuxCommand):
@@ -110,8 +112,8 @@ class CmdExitError(default_cmds.MuxCommand):
     #[...]
 ```
 
-This would *not* work the way we want. Understanding why is important.
+這*不會*按照我們想要的方式工作。瞭解原因很重要。
 
-Evennia's [command system](../Components/Commands.md) compares commands by key and/or aliases. If _any_ key or alias match, the two commands are considered _identical_. When the cmdsets merge, priority will then decide which of these 'identical' commandss replace which.
+Evennia 的[指令系統](../Components/Commands.md) 按鍵和/或別名比較指令。如果_任何_鍵或別名匹配，則這兩個指令被視為_相同_。當 cmdsets 合併時，優先順序將決定這些「相同」指令中的哪個指令取代哪個指令。
 
-So the above example would work fine as long as there were _no Exits at all_ in the room. But when we enter a room with an exit "north", its Exit-command (which has a higher priority) will override the single `CmdExitError` with its alias 'north'. So the `CmdExitError` will be gone and while "north" will work, we'll again get the normal  "Command not recognized" error for the other directions.
+因此，只要房間裡沒有出口，上面的例子就可以正常運作。但當我們進入一個出口為「北」的房間時，它的退出指令（具有更高的優先順序）將覆蓋單一`CmdExitError`及其別名「北」。因此 `CmdExitError` 將消失，而「向北」將起作用，我們將再次收到其他方向的正常「指令無法識別」錯誤。

@@ -1,46 +1,49 @@
-# Permissions
+(permissions)=
+# 許可權
 
-A *permission* is simply a text string stored in the handler `permissions` on `Objects` and `Accounts`. Think of it as a specialized sort of [Tag](./Tags.md) - one specifically dedicated to access checking. They are thus often tightly coupled to [Locks](./Locks.md). Permission strings are not case-sensitive, so "Builder" is the same as "builder" etc.
+*許可權* 只是儲存在 `Objects` 和 `Accounts` 上的處理程式 `permissions` 中的文字字串。將其視為一種特殊的 [Tag](./Tags.md) - 專門用於訪問檢查。因此它們經常與[鎖](./Locks.md)緊密耦合。許可權字串不區分大小寫，因此“Builder”與“builder”等相同。
 
-Permissions are used as a convenient way to structure access levels and hierarchies. It is set by the `perm` command and checked by the `PermissionHandler.check` method as well as by the specially the `perm()` and `pperm()` [lock functions](./Locks.md).
+許可權被用作建構存取層級和層次結構的便捷方法。它由 `perm` 指令設定，並由 `PermissionHandler.check` 方法以及特殊的 `perm()` 和 `pperm()` [lock 函式](./Locks.md) 檢查。
 
-All new accounts are given a default set of permissions defined by `settings.PERMISSION_ACCOUNT_DEFAULT`.
+所有新帳戶都會獲得一組由 `settings.PERMISSION_ACCOUNT_DEFAULT` 定義的預設許可權。
 
-## The super user
+(the-super-user)=
+## 超級使用者
 
-There are strictly speaking two types of users in Evennia, the *super user* and everyone else. The
-superuser is the first user you create, object `#1`. This is the all-powerful server-owner account.
-Technically the superuser not only has access to everything, it *bypasses* the permission checks
-entirely. 
+嚴格來說Evennia中有兩種型別的使用者，*超級使用者*和其他人。的
+超級使用者是您建立的第一個使用者，物件`#1`。這是全能的伺服器擁有者帳戶。
+從技術上講，超級使用者不僅可以存取所有內容，還可以「繞過」許可權檢查
+完全。
 
-This makes the superuser impossible to lock out, but makes it unsuitable to actually play-
-test the game's locks and restrictions with (see `quell` below). Usually there is no need to have
-but one superuser.
+這使得超級使用者不可能lock出局，但卻不適合實際玩-
+測試遊戲的鎖定和限制（請參閱下面的`quell`）。通常不需要有
+但有一個超級使用者。
 
-## Working with Permissions
+(working-with-permissions)=
+## 使用許可權
 
-In-game, you use the `perm` command to add and remove permissions
+在遊戲中，您可以使用`perm`指令新增和刪除許可權
 
      > perm/account Tommy = Builders
      > perm/account/del Tommy = Builders
 
-Note the use of the `/account` switch. It means you assign the permission to the [Accounts](./Accounts.md) Tommy instead of any [Character](./Objects.md) that also happens to be named "Tommy". If you don't want to use `/account`, you can also prefix the name with `*` to indicate an Account is sought: 
+請注意 `/account` 開關的使用。這意味著您將許可權分配給[帳戶](./Accounts.md) Tommy，而不是任何恰好名為「Tommy」的[角色](./Objects.md)。如果您不想使用 `/account`，您也可以在名稱前加上 `*` 字首以指示正在尋找帳戶：
 
     > perm *Tommy = Builders
     
-There can be reasons for putting permissions on Objects (especially NPCS), but for granting powers to players, you should usually put the permission on the `Account` - this guarantees that they are kept, *regardless* of which Character they are currently puppeting. 
+在物件上放置許可權可能有原因（尤其是 NPCS），但為了向玩家授予權力，您通常應該在 `Account` 上放置許可權 - 這保證了它們被保留，*無論*他們目前正在操縱哪個角色。
 
-This is especially important to remember when assigning permissions from the *hierarchy tree* (see below), as an Account's permissions will overrule that of its character. So to be sure to avoid confusion you should generally put hierarchy permissions on the Account, not on their Characters/puppets.
+從「層次結構樹」（見下文）分配許可權時，記住這一點尤其重要，因為帳戶的許可權將推翻其角色的許可權。因此，為了避免混淆，您通常應該將層次結構許可權放在帳戶上，而不是放在他們的角色/人偶上。
 
-If you _do_ want to start using the permissions on your _puppet_, you use `quell`
+如果您_確實_想要開始使用_puppet_上的許可權，請使用 `quell`
 
     > quell 
     > unquell   
 
-This drops to the permissions on the puppeted object, and then back to your Account-permissions again. Quelling is useful if you want to try something "as" someone else. It's also useful for superusers since this makes them susceptible to locks (so they can test things).
+這會下降到傀儡物件的許可權，然後再次返回您的帳戶許可權。如果你想「像」別人一樣嘗試某件事，壓制是有用的。它對於超級使用者也很有用，因為這使他們容易受到鎖定的影響（因此他們可以測試事物）。
 
-In code, you add/remove Permissions via the `PermissionHandler`, which sits on all
-typeclassed entities as the property `.permissions`:
+在程式碼中，您可以透過 `PermissionHandler` 新增/刪除許可權，該許可權位於所有許可權上
+將實體型別分類為屬性 `.permissions`：
 
 ```python
     account.permissions.add("Builders")
@@ -49,11 +52,12 @@ typeclassed entities as the property `.permissions`:
     obj.permissions.remove("Blacksmith")
 ```
 
-### The permission hierarchy
+(the-permission-hierarchy)=
+### 許可權層次結構
 
-Selected permission strings can be organized in a *permission hierarchy* by editing the tuple
-`settings.PERMISSION_HIERARCHY`.  Evennia's default permission hierarchy is as follows
-(in increasing order of power):
+可以透過編輯元組將選定的許可權字串組織在*許可權層次結構*中
+`settings.PERMISSION_HIERARCHY`。  Evennia的預設許可權層次如下
+（依功率遞增順序）：
 
      Guest            # temporary account, only used if GUEST_ENABLED=True (lowest)
      Player           # can chat and send tells (default level)
@@ -62,19 +66,21 @@ Selected permission strings can be organized in a *permission hierarchy* by edit
      Admin            # can administrate accounts
      Developer        # like superuser but affected by locks (highest)
 
-(Besides being case-insensitive, hierarchical permissions also understand the plural form, so you could use `Developers` and `Developer` interchangeably).
+（除了不區分大小寫之外，分層許可權還瞭解複數形式，因此您可以互換使用 `Developers` 和 `Developer`）。
 
-When checking a hierarchical permission (using one of the methods to follow), you will pass checks for your level *and  below*. That is, if you have the "Admin" hierarchical permission, you will also pass checks asking for "Builder", "Helper" and so on.
+檢查分層許可權時（使用遵循的方法之一），您將透過您的等級*及以下*的檢查。也就是說，如果您擁有「Admin」分層許可權，您還將透過要求「Builder」、「Helper」等的檢查。
 
-By contrast, if you check for a non-hierarchical permission, like "Blacksmith" you must have *exactly* that permission to pass.
+相比之下，如果您檢查非分層許可權，例如“鐵匠”，您必須“完全”擁有該許可權才能透過。
 
-### Checking permissions
+(checking-permissions)=
+### 檢查許可權
 
-It's important to note that you check for the permission of a *puppeted* [Object](./Objects.md) (like a Character), the check will always first use the permissions of any `Account` connected to that Object before checking for permissions on the Object. In the case of hierarchical permissions (Admins, Builders etc), the Account permission will always be used (this stops an Account from escalating their permission by puppeting a high-level Character). If the permission looked for is not in the hierarchy, an exact match is required, first on the Account and if not found there (or if no Account is connected), then on the Object itself.
+需要注意的是，當您檢查*傀儡* [物件](./Objects.md)（如角色）的許可權時，檢查將始終首先使用連線到該物件的任何 `Account` 的許可權，然後再檢查該物件的許可權。在分層許可權（管理員、建構者等）的情況下，將始終使用帳戶許可權（這會阻止帳戶透過傀儡高階角色來升級其許可權）。如果要尋找的許可權不在層次結構中，則需要精確匹配，首先在帳戶上，如果在那裡找不到（或者如果沒有連線帳戶），則在物件本身上進行精確匹配。
 
-### Checking with obj.permissions.check()
+(checking-with-objpermissionscheck)=
+### 用 obj.permissions.check() 檢查
 
-The simplest way to check if an entity has a permission is to check its _PermissionHandler_, stored as `.permissions`  on all typeclassed entities.
+檢查實體是否具有許可權的最簡單方法是檢查其 _PermissionHandler_，在所有型別分類實體上儲存為 `.permissions`。
 
     if obj.permissions.check("Builder"):
         # allow builder to do stuff
@@ -85,8 +91,8 @@ The simplest way to check if an entity has a permission is to check its _Permiss
     if obj.permissions.check("Blacksmith", "Warrior", require_all=True):
         # only for those that are both blacksmiths AND warriors
 
-Using the `.check` method is the way to go, it will take hierarchical
-permissions into account, check accounts/sessions etc.
+使用 `.check` 方法是可行的方法，它將採取分層
+許可權進入帳戶，檢查帳戶/sessions等。
 
 ```{warning}
 
@@ -97,24 +103,25 @@ permissions into account, check accounts/sessions etc.
 
 ```
 
-### Lock funcs
+(lock-funcs)=
+### Lock 函式
 
-While the `PermissionHandler` offers a simple way to check perms, [Lock
-strings](./Locks.md) offers a mini-language for describing how something is accessed.
-The `perm()` _lock function_ is the main tool for using Permissions in locks.
+雖然 `PermissionHandler` 提供了一種檢查許可權的簡單方法，[Lock
+strings](./Locks.md) 提供了一種迷你語言來描述如何存取某些內容。
+`perm()` _lock 函式_ 是使用鎖定中許可權的主要工具。
 
-Let's say we have a `red_key` object. We also have red chests that we want to
-unlock with this key.
+假設我們有一個 `red_key` 物件。我們也有想要的紅色寶箱
+用這把鑰匙解鎖。
 
     perm red_key = unlocks_red_chests
 
-This gives the `red_key` object the permission "unlocks_red_chests". Next we
-lock our red chests:
+這為 `red_key` 物件授予了許可權「unlocks_red_chests」。接下來我們
+lock我們的紅色寶箱：
 
     lock red chest = unlock:perm(unlocks_red_chests)
 
-When trying to unlock the red chest with this key, the chest Typeclass could
-then take the key and do an access check:
+當嘗試用這把鑰匙解鎖紅色寶箱時，寶箱Typeclass可能會
+然後拿走鑰匙並進行訪問檢查：
 
 ```python
 # in some typeclass file where chest is defined
@@ -134,17 +141,18 @@ class TreasureChest(Object):
 
 ```
 
-There are several variations to the default `perm` lockfunc:
+預設 `perm` lockfunc 有多種變體：
 
-- `perm_above` - requires a hierarchical permission *higher* than the one
-  provided. Example: `"edit: perm_above(Player)"`
-- `pperm` - looks *only* for permissions on `Accounts`, never at any puppeted
-  objects (regardless of hierarchical perm or not).
-- `pperm_above` - like `perm_above`, but for Accounts only.
+- `perm_above` - 需要比一級許可權「更高」的層級許可權
+假如。例：`"edit: perm_above(Player)"`
+- `pperm` - *只*查詢 `Accounts` 上的許可權，從不尋找任何傀儡
+物件（無論是否分層燙髮）。
+- `pperm_above` - 類似於 `perm_above`，但僅適用於帳戶。
 
-### Some examples
+(some-examples)=
+### 一些例子
 
-Adding permissions and checking with locks
+新增許可權並檢查鎖
 
 ```python
     account.permissions.add("Builder")
@@ -153,7 +161,7 @@ Adding permissions and checking with locks
     account.access(obj1, "enter") # this returns True!
 ```
 
-An example of a puppet with a connected account:
+具有連線帳戶的木偶範例：
 
 ```python
     account.permissions.add("Player")
@@ -167,13 +175,14 @@ An example of a puppet with a connected account:
 ```
 
 
-## Quelling
+(quelling)=
+## 鎮壓
 
-The `quell` command can be used to enforce the `perm()` lockfunc to ignore
-permissions on the Account and instead use the permissions on the Character
-only. This can be used e.g. by staff to test out things with a lower permission
-level. Return to the normal operation with `unquell`.  Note that quelling will
-use the smallest of any hierarchical permission on the Account or Character, so
-one cannot escalate one's Account permission by quelling to a high-permission
-Character. Also the superuser can quell their powers this way, making them
-affectable by locks.
+`quell` 指令可用於強制忽略 `perm()` lockfunc
+帳戶上的許可權，而是使用角色上的許可權
+僅。這個可以用e.g。由工作人員以較低許可權測試事物
+水平。使用`unquell`返回正常操作。  請注意，平息將
+使用帳戶或角色的任何分層許可權中最小的一個，因此
+無法透過平息到高許可權來升級自己的帳戶許可權
+性格。超級使用者也可以透過這種方式取消他們的權力，使他們
+受鎖影響。

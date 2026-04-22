@@ -1,4 +1,5 @@
-# Help System
+(help-system)=
+# 幫助系統
 
 
 ```shell
@@ -35,37 +36,39 @@ Suggestions:
 -----------------------------------------------------------------------------
 ```
 
-Evennia has an extensive help system covering both command-help and regular free-form help documentation. It supports subtopics and if failing to find a match it will provide suggestsions, first from alternative topics and then by finding mentions of the search term in help entries.
+Evennia 擁有廣泛的幫助系統，涵蓋指令幫助和常規自由格式幫助檔案。它支援子主題，如果找不到匹配項，它將首先從替代主題中提供建議，然後透過在幫助條目中查詢搜尋字詞的提及來提供建議。
 
-The help system is accessed in-game by use of the `help` command:
+在遊戲中使用 `help` 指令存取幫助系統：
 
     help <topic>
 
-Sub-topics are accessed as `help <topic>/<subtopic>/...`.
+子主題以 `help <topic>/<subtopic>/...` 的形式存取。
 
-## Working with three types of help entries
+(working-with-three-types-of-help-entries)=
+## 使用三種型別的說明條目
 
-There are three ways to generate help entries: 
+產生幫助條目的方法有以下三種：
 
-- In the database 
-- As Python modules
-- From Command doc strings
+- 在資料庫中
+- 作為 Python 模組
+- 來自指令檔案字串
 
-### Database-stored help entries
+(database-stored-help-entries)=
+### 資料庫儲存的幫助條目
 
-Creating a new help entry from in-game is done with
+從遊戲中建立新的幫助條目是透過
 
     sethelp <topic>[;aliases] [,category] [,lockstring] = <text>
 
-For example
+例如
 
     sethelp The Gods;pantheon, Lore = In the beginning all was dark ...
 
-This will create a new help entry in the database. Use the `/edit` switch to open the EvEditor for more convenient in-game writing (but note that devs can also create help entries outside the game using their regular code editor, see below).
+這將在資料庫中建立一個新的幫助條目。使用 `/edit` 開關開啟 EvEditor 以便更方便地在遊戲中編寫（但請注意，開發人員也可以使用常規程式碼編輯器在遊戲外建立說明條目，請參見下文）。
 
-The [HelpEntry](evennia.help.models.HelpEntry) stores database help. It is _not_ a Typeclassed entity and can't be extended using the typeclass mechanism.
+[HelpEntry](evennia.help.models.HelpEntry) 儲存資料庫協助。它_不是_型別分類實體，並且不能使用 typeclass 機制進行擴充。
 
-Here's how to create a database-help entry in code: 
+以下是如何在程式碼中建立資料庫幫助條目：
 ```python
 from evennia import create_help_entry
 entry = create_help_entry("emote",
@@ -73,27 +76,28 @@ entry = create_help_entry("emote",
                 category="Roleplaying", locks="view:all()")
 ```
 
-### File-stored help entries
+(file-stored-help-entries)=
+### 檔案儲存的說明條目
 
 ```{versionadded} 1.0
 ```
 
-File-help entries are created by the game development team outside of the game. The help entries are defined in normal Python modules (`.py` file ending) containing a `dict` to represent each entry. They require a server `reload` before any changes apply.
+檔案幫助條目由遊戲開發團隊在遊戲之外建立。幫助條目在普通 Python 模組（`.py` 檔案結尾）中定義，包含 `dict` 來表示每個條目。在應用任何變更之前，它們需要伺服器 `reload`。
 
-- Evennia will look through all modules given by
-  `settings.FILE_HELP_ENTRY_MODULES`. This should be a list of python-paths for
-  Evennia to import.
-- If this module contains a top-level variable `HELP_ENTRY_DICTS`, this will be
-  imported and must be a `list` of help-entry dicts.
-- If no `HELP_ENTRY_DICTS` list is found, _every_ top-level variable in the
-  module that is a `dict` will be read as a help entry. The variable-names will
-  be ignored in this case.
+- Evennia 將檢視由以下給出的所有模組
+`settings.FILE_HELP_ENTRY_MODULES`。這應該是 python 路徑列表
+  Evennia 匯入。
+- 如果該模組包含頂級變數`HELP_ENTRY_DICTS`，則這將是
+已匯入，並且必須是 `list` 的幫助輸入字典。
+- 如果沒有找到 `HELP_ENTRY_DICTS` 列表，則_every_中的頂級變數
+`dict` 的模組將被讀取為幫助條目。變數名稱將
+  在這種情況下可以忽略。
 
-If you add multiple modules to be read, same-keyed help entries added later in
-the list will override coming before.
+如果您新增多個要閱讀的模組，則稍後新增相同按鍵的說明條目
+該列表將覆蓋先前的列表。
 
-Each entry dict must define keys to match that needed by all help entries.
-Here's an example of a help module:
+每個條目字典必須定義鍵以符合所有幫助條目所需的鍵。
+這是幫助模組的範例：
 
 ```python
 
@@ -132,13 +136,14 @@ HELP_ENTRY_DICTS = [
 
 ```
 
-The help entry text will be dedented and will retain paragraphs. You should try
-to keep your strings a reasonable width (it will look better). Just reload the
-server and the file-based help entries will be available to view.
+幫助條目文字將減少縮排並保留段落。你應該嘗試
+保持字串合理的寬度（看起來會更好）。只需重新載入
+伺服器和基於檔案的幫助條目將可供檢視。
 
-### Command-help entries 
+(command-help-entries)=
+### 指令幫助條目
 
-The `__docstring__` of  [Command classes](./Commands.md) are automatically extracted into a help entry. You set `help_category` directly on the class. 
+[指令類別](./Commands.md) 的 `__docstring__` 會自動擷取到說明條目中。您直接在類上設定`help_category`。
 
 ```python
 from evennia import Command
@@ -164,25 +169,26 @@ class MyCommand(Command):
     # ...
 ```
 
-When you update your code, the command's help will follow. The idea is that the command docs are easier to maintain and keep up-to-date if the developer can change them at the same time as they do the code.
+當您更新程式碼時，指令的幫助將隨之而來。這個想法是，如果開發人員可以在編寫程式碼的同時更改指令文件，那麼指令文件就更容易維護並保持最新。
 
-### Locking help entries
+(locking-help-entries)=
+### 鎖定幫助條目
 
-The default `help` command gather all available commands and help entries
-together so they can be searched or listed. By setting locks on the command/help
-entry one can limit who can read help about it.
+預設`help`指令收集所有可用指令和說明條目
+在一起，以便可以搜尋或列出它們。透過在指令/幫助上設定鎖定
+條目可以限制誰可以閱讀有關它的幫助。
 
-- Commands failing the normal `cmd`-lock will be removed before even getting
-  to the help command. In this case the other two lock types below are ignored.
-- The `view` access type determines if the command/help entry should be visible in
-  the main help index. If not given, it is assumed everyone can view.
-- The `read` access type determines if the command/help entry can be actually read.
-  If a `read` lock is given and `view` is not, the `read`-lock is assumed to
-  apply to `view`-access as well (so if you can't read the help entry it will
-  also not show up in the index). If `read`-lock is not given, it's assume
-  everyone can read the help entry.
+- 未透過正常 `cmd`-lock 的指令將在獲得之前被刪除
+到幫助指令。在這種情況下，下面的其他兩個 lock 型別將被忽略。
+- `view` 存取型別決定指令/幫助條目是否應在以下位置可見
+主要幫助索引。如果沒有給出，則假設每個人都可以檢視。
+- `read` 存取型別決定是否可以實際讀取指令/幫助條目。
+如果給出了 `read` lock 而未給出 `view`，則假定 `read`-lock
+  也適用於`view`-訪問（因此，如果您無法閱讀幫助條目，它將
+  也沒有出現在索引中）。如果未給出`read`-lock，則假設
+  每個人都可以閱讀幫助條目。
 
-For Commands you set the help-related locks the same way you would any lock:
+對於指令，您可以像設定任何 lock 一樣設定與幫助相關的鎖定：
 
 ```python
 class MyCommand(Command):
@@ -196,8 +202,8 @@ class MyCommand(Command):
 
 ```
 
-Db-help entries and File-Help entries work the same way (except the `cmd`-type
-lock is not used. A file-help example:
+Db-help 條目和 File-Help 條目的運作方式相同（`cmd` 型別除外）
+lock 未使用。檔案幫助範例：
 
 ```python
 help_entry = {
@@ -213,24 +219,26 @@ help_entry = {
    the new 'read' lock-type to control access to the entry itself.
 ```
 
-### Customizing the look of the help system
+(customizing-the-look-of-the-help-system)=
+### 自訂幫助系統的外觀
 
-This is done almost exclusively by overriding the `help` command [evennia.commands.default.help.CmdHelp](evennia.commands.default.help.CmdHelp).
+這幾乎完全是透過覆蓋 `help` 指令 [evennia.commands.default.help.CmdHelp](evennia.commands.default.help.CmdHelp) 來完成的。
 
-Since the available commands may vary from moment to moment, `help` is responsible for collating the three sources of help-entries (commands/db/file) together and search through them on the fly. It also does all the formatting of the output.
+由於可用的指令可能隨時變化，`help` 負責將幫助條目的三個來源（指令/資料庫/檔案）整理在一起並動態搜尋它們。它還對輸出進行所有格式化。
 
-To make it easier to tweak the look, the parts of the code that changes the visual presentation and entity searching has been broken out into separate methods on the command class. Override these in your version of `help` to change the display or tweak as you please. See the api link above for details. 
+為了更容易調整外觀，更改視覺呈現和實體搜尋的程式碼部分已分解為指令類別上的單獨方法。在您的 `help` 版本中覆寫這些內容，以根據需要變更顯示或調整。有關詳細資訊，請參閱上面的 api 連結。
 
-## Subtopics
+(subtopics)=
+## 副主題
 
 ```{versionadded} 1.0
 ```
 
-Rather than making a very long help entry, the `text` may also be broken up into _subtopics_. A list of the next level of subtopics are shown below the main help text and allows the user to read more about some particular detail that wouldn't fit in the main text. 
+`text` 也可以分為_子主題_，而不是製作很長的幫助條目。下一層子主題的清單顯示在主要幫助文字下方，並允許使用者閱讀有關主要文字中不適合的某些特定細節的更多資訊。
 
-Subtopics use a markup slightly similar to markdown headings. The top level heading must be named `# subtopics` (non case-sensitive) and the following headers must be sub-headings to this (so `## subtopic name` etc). All headings are non-case sensitive (the help command will format them). The topics can be nested at most to a depth of 5 (which is probably too many levels already). The parser uses fuzzy matching to find the subtopic, so one does not have to type it all out exactly.
+子主題使用與 Markdown 標題稍微相似的標記。頂級標題必須命名為 `# subtopics`（不區分大小寫），且以下標題必須是該標題的子標題（例如 `## subtopic name` 等）。所有標題都不區分大小寫（幫助指令將格式化它們）。主題最多可以巢狀 5 層（這可能已經太多了）。解析器使用模糊匹配來尋找副主題，因此不必完全準確地輸入所有內容。
 
-Below is an example of a `text` with sub topics.
+以下是帶有子主題的 `text` 的範例。
 
 ```
 The theatre is the heart of the city, here you can find ...
@@ -277,37 +285,42 @@ He always keeps an eye on the door and ...
 ```
 
 
-## Technical notes
+(technical-notes)=
+## 技術說明
 
-#### Help-entry clashes 
+(help-entry-clashes)=
+#### 幫助輸入衝突
 
-Should you have clashing help-entries (of the same name) between the three types of available entries, the priority is 
+如果三種型別的可用條目之間存在衝突的說明條目（同名），則優先順序是
 
     Command-auto-help > Db-help > File-help
     
-The `sethelp` command (which only deals with creating db-based help entries) will warn you if a new help entry might shadow/be shadowed by a same/similar-named command or file-based help entry.
+如果新的說明條目可能被相同/相似名稱的指令或基於檔案的說明條目隱藏/被隱藏，`sethelp` 指令（僅處理建立基於資料庫的說明條目）將警告您。
 
-#### The Help Entry container
+(the-help-entry-container)=
+#### 幫助條目容器
 
-All help entries (no matter the source) are parsed into an object with the following properties:
+所有幫助條目（無論來源）都被解析為具有以下屬性的物件：
 
-- `key` - This is the main topic-name. For Commands, this is literally the command's `key`.
-- `aliases` - Alternate names for the help entry. This can be useful if the main name is hard to remember.
-- `help_category` - The general grouping of the entry. This is optional. If not given it will use the default category given by `settings.COMMAND_DEFAULT_HELP_CATEGORY` for Commands and
-  `settings.DEFAULT_HELP_CATEGORY` for file+db help entries.
-- `locks` - Lock string (for commands) or LockHandler (all help entries). This defines who may read this entry. See the next section.
-- `tags` - This is not used by default, but could be used to further organize help entries.
-- `text` - The actual help entry text. This will be dedented and stripped of extra space at beginning and end.
+- `key` - 這是主要主題名稱。對於指令，這實際上是指令的`key`。
+- `aliases` - Alternate names for the help entry.如果主要名稱很難記住，這可能很有用。
+- `help_category` - 條目的一般分組。這是可選的。如果沒有給出，它將使用 `settings.COMMAND_DEFAULT_HELP_CATEGORY` 給出的預設類別作為指令和
+`settings.DEFAULT_HELP_CATEGORY` 用於檔案+資料庫幫助條目。
+- `locks` - Lock 字串（對於指令）或 LockHandler（所有幫助條目）。這定義了誰可以閱讀此條目。請參閱下一節。
+- `tags` - 預設不使用，但可用於進一步組織幫助條目。
+- `text` - 實際的幫助條目文字。這將在開頭和結尾處縮排並去除多餘的空間。
 
-#### Help pagination
+(help-pagination)=
+#### 幫助分頁
 
-A `text` that scrolls off the screen will automatically be paginated by the [EvMore](./EvMore.md) pager (you can control this with `settings.HELP_MORE_ENABLED=False`). If you use EvMore and want to control exactly where the pager should break the page, mark the break with the control character `\f`.
+滾出螢幕的 `text` 將自動由 [EvMore](./EvMore.md) 尋呼機分頁（您可以使用 `settings.HELP_MORE_ENABLED=False` 控制它）。如果您使用 EvMore 並希望準確控制分頁器應在何處分頁，請使用控製字元 `\f` 標記分頁。
 
-#### Search engine
+(search-engine)=
+#### 搜尋引擎
 
-Since it needs to search so different types of data, the help system has to collect all possibilities in memory before searching through the entire set. It uses the [Lunr](https://github.com/yeraydiazdiaz/lunr.py) search engine to search through the main bulk of help entries. Lunr is a mature engine used for web-pages and produces much more sensible results than previous solutions.
+由於需要搜尋如此不同型別的資料，因此幫助系統必須在搜尋整個資料集之前收集記憶體中的所有可能性。它使用 [Lunr](https://github.com/yeraydiazdiaz/lunr.py) 搜尋引擎來搜尋主要的幫助條目。 Lunr 是一個用於網頁的成熟引擎，比以前的解決方案產生更合理的結果。
 
-Once the main entry has been found, subtopics are then searched with simple `==`, `startswith` and `in` matching (there are so relatively few of them at that point).
+一旦找到主條目，就會使用簡單的 `==`、`startswith` 和 `in` 匹配來搜尋子主題（此時它們相對較少）。
 
 ```{versionchanged} 1.0
   Replaced the old bag-of-words algorithm with lunr package.

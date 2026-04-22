@@ -1,27 +1,29 @@
-# Adding Command Cooldowns
+(adding-command-cooldowns)=
+# 新增指令冷卻時間
 
     > hit goblin with sword 
     You strike goblin with the sword. It dodges! 
     > hit goblin with sword 
     You are off-balance and can't attack again yet.
 
-Some types of games want to limit how often a command can be run. If a
-character casts the spell *Firestorm*, you might not want them to spam that
-command over and over. In an advanced combat system, a massive swing may
-offer a chance of lots of damage at the cost of not being able to re-do it for
-a while. 
+某些型別的遊戲想要限制指令執行的頻率。如果一個
+角色施展咒語 *Firestorm*，您可能不希望他們傳送垃圾郵件
+一遍又一遍地指揮。在先進的戰鬥系統中，大幅度的擺動可能會
+提供大量損壞的機會，但代價是無法重做
+一會兒。
 
-Such effects are called *command cooldowns*.
+此類效果稱為「指令冷卻時間」。
 
 ```{sidebar}
-The [Cooldown contrib](../Contribs/Contrib-Cooldowns.md) is a ready-made solution for command cooldowns. It is based on this howto and implements a [handler](Tutorial-Peristent-Handler) on the object to conveniently manage and store the cooldowns.
+[冷卻contrib](../Contribs/Contrib-Cooldowns.md)是指令冷卻的現成解決方案。它基於這個howto並在物件上實作了一個[handler](Tutorial-Peristent-Handler)來方便地管理和儲存冷卻時間。
 ```
-This howto exemplifies a very resource-efficient way to do cooldowns. A more
-'active' way is to use asynchronous delays as in the [Command-Duration howto](./Howto-Command-Duration.md#blocking-commands) suggests.  The two howto's might be useful to combine if you want to echo some message to the user after the cooldown ends.
+本指南舉例說明瞭一種非常節省資源的冷卻方式。一個更多
+「主動」方式是使用非同步延遲，如 [Command-Duration howto](./Howto-Command-Duration.md#blocking-commands) 中建議的那樣。  如果您想在冷卻結束後向使用者回顯一些訊息，那麼將這兩個指南結合起來可能會很有用。
 
-## An efficient cooldown
+(an-efficient-cooldown)=
+## 高效率的冷卻時間
 
-The idea is that when a [Command](../Components/Commands.md) runs, we store the time it runs. When it next runs, we check again the current time. The command is only allowed to run if enough time passed since now and the previous run. This is a _very_ efficient implementation that only checks on-demand.
+這個想法是，當 [Command](../Components/Commands.md) 執行時，我們儲存它執行的時間。當它下次執行時，我們再次檢查當前時間。只有在自現在和上次執行以來經過了足夠的時間後，才允許執行該指令。這是一個非常有效率的實現，僅按需檢查。
 
 ```python
 # in, say, mygame/commands/spells.py
@@ -58,26 +60,28 @@ class CmdSpellFirestorm(default_cmds.MuxCommand):
         self.caller.db.firestorm_last_cast = now
 ```
 
-We specify `rate_of_fire` and then just check for an [Attribute](../Components/Attributes.md) `firestorm_last_cast` on the `caller.` It is either `None` (because the spell was never cast before) or an timestamp representing the last time the spell was cast. 
+我們指定 `rate_of_fire`，然後檢查 `caller.` 上的 [Attribute](../Components/Attributes.md) `firestorm_last_cast` 它是 `None` （因為該法術以前從未施展過）或表示該法術上次施展時間的時間戳。
 
-### Non-Persistent cooldown
+(non-persistent-cooldown)=
+### 非持續冷卻時間
 
-The above implementation will survive a reload. If you don't want that, you can just switch to let `firestorm_last_cast` be a [NAtrribute](../Components/Attributes.md#in-memory-attributes-nattributes) instead. For example: 
+上述實作將在重新載入後繼續存在。如果您不希望這樣，您可以改為讓 `firestorm_last_cast` 成為 [NAtrribute](../Components/Attributes.md#in-memory-attributes-nattributes)。例如：
 
 ```python
         last_cast = caller.ndb.firestorm_last_cast
         # ... 
         self.caller.ndb.firestorm_last_cast = now 
 ```
-That is, use `.ndb` instead of `.db`. Since a `NAttribute`s are purely in-memory, they can be faster to read and write to than an `Attribute`. So this can be more optimal if your intervals are short and need to change often. The drawback is that they'll reset if the server reloads. 
+即，使用 `.ndb` 而不是 `.db`。由於 `NAttribute`s 純粹位於記憶體中，因此它們的讀取和寫入速度比 `Attribute` 更快。因此，如果您的間隔很短並且需要經常改變，那麼這可能是更理想的選擇。缺點是如果伺服器重新載入，它們會重置。
 
-## Make a cooldown-aware command parent
+(make-a-cooldown-aware-command-parent)=
+## 建立一個冷卻感知指令父級
 
-If you have many different spells or other commands with cooldowns, you don't
-want to have to add this code every time. Instead you can make a "cooldown
-command mixin" class. A _mixin_ is a class that you can 'add' to another class
-(via multiple inheritance) to give it some special ability. Here's an example
-with persistent storage:
+如果你有許多不同的法術或其他有冷卻時間的指令，你就不需要
+想要每次都新增此程式碼。相反，你可以進行“冷卻”
+指令 mixin”類別。_mixin_ 是一個可以“新增”到另一個類別的類
+（透過多重繼承）賦予它一些特殊的能力。這是一個例子
+具有永續性儲存：
 
 ```python
 # in, for example, mygame/commands/mixins.py
@@ -106,13 +110,13 @@ class CooldownCommandMixin:
         )
 ```
 
-This is meant to be mixed into a Command, so we assume `self.caller` exists.
-We allow for setting what Attribute key/category to use to store the cooldown.
+這意味著要混合到指令中，因此我們假設 `self.caller` 存在。
+我們允許設定使用 Attribute 鍵/類別來儲存冷卻時間。
 
-It also uses an Attribute-category to make sure what it stores is not mixed up
-with other Attributes on the caller.
+它還使用 Attribute-類別來確保它儲存的內容不會混淆
+與呼叫者的其他屬性。
 
-Here's how it's used:
+它的使用方法如下：
 
 ```python
 # in, say, mygame/commands/spells.py
@@ -140,15 +144,16 @@ class CmdSpellFirestorm(
 
 ```
 
-So the same as before, we have just hidden away the cooldown checks and you can
-reuse this mixin for all your cooldowns.
+所以和以前一樣，我們剛剛隱藏了冷卻時間檢查，你可以
+在所有冷卻時間中重複使用此 mixin。
 
-### Command crossover
+(command-crossover)=
+### 指令交叉
 
-This example of cooldown-checking also works *between* commands. For example,
-you can have all fire-related spells store the cooldown with the same
-`cooldown_storage_key` (like `fire_spell_last_used`). That would mean casting
-of *Firestorm* would block all other fire-related spells for a while.
+這個冷卻檢查範例也適用於*之間*指令。例如，
+你可以讓所有與火焰相關的法術儲存相同的冷卻時間
+`cooldown_storage_key`（如`fire_spell_last_used`）。這意味著鑄造
+*火焰風暴*會在一段時間內阻擋所有其他與火焰相關的法術。
 
-Similarly, when you take that big sword swing, other types of attacks could
-be blocked before you can recover your balance.
+同樣，當你揮出大劍時，其他型別的攻擊也可能會發生。
+在您恢復餘額之前被封鎖。

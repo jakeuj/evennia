@@ -1,43 +1,47 @@
-# DebugPy VSCode debugger integration
+(debugpy-vscode-debugger-integration)=
+# DebugPy VSCode 偵錯程式整合
 
-Contribution by electroglyph, 2025
+Electroglyph 的貢獻，2025 年
 
-This registers an in-game command `debugpy` which starts the debugpy debugger and listens on port 5678.
-For now this is only available for Visual Studio Code (VS Code).
+這會註冊一個遊戲內指令 `debugpy`，該指令啟動 debugpy 偵錯器並偵聽連線埠 5678。
+目前，這僅適用於 Visual Studio Code (VS Code)。
 
-If you are a JetBrains PyCharm user and would like to use this, make some noise at:
+如果您是 JetBrains PyCharm 使用者並且想要使用此功能，請在以下位置發出聲音：
 https://youtrack.jetbrains.com/issue/PY-63403/Support-debugpy
 
 
-Credit for this goes to Moony on the Evennia Discord getting-help channel, thx Moony!
+這要歸功於 Evennia Discord 取得幫助頻道上的 Moony，謝謝 Moony！
 
 
-## Installation
+(installation)=
+## 安裝
 
-This requires VS Code and debugpy, so make sure you're using VS Code.
+這需要 VS 程式碼和 debugpy，因此請確保您使用的是 VS 程式碼。
 
-From the venv where you installed Evennia run:
+從安裝 Evennia 的 venv 執行：
 
 `pip install debugpy`
 
-### Enable the command in Evennia
+(enable-the-command-in-evennia)=
+### 啟用Evennia中的指令
 
-In your Evennia mygame folder, open up `/commands/default_cmdsets.py`
+在您的 Evennia mygame 資料夾中，開啟 `/commands/default_cmdsets.py`
 
-add `from evennia.contrib.utils.debugpy import CmdDebugPy` somewhere near the top.
+在頂部附近的某個位置新增`from evennia.contrib.utils.debugpy import CmdDebugPy`。
 
-in `CharacterCmdSet.at_cmdset_creation` add this under `super().at_cmdset_creation()`:
+在 `CharacterCmdSet.at_cmdset_creation` 的 `super().at_cmdset_creation()` 下加入以下內容：
 
 `self.add(CmdDebugPy)`
 
 
-### Add "remote attach" option to VS Code debugger
+(add-remote-attach-option-to-vs-code-debugger)=
+### 將“遠端連線”選項新增至VS程式碼偵錯器
 
-Start VS Code and open your launch.json like this:
+啟動VS程式碼並開啟你的launch.json，如下所示：
 
-![screenshot](./vscode.png)
+![截圖](./vscode.png)
 
-Add this to your configuration:
+將其新增至您的設定：
 
 ```json
         {
@@ -58,9 +62,9 @@ Add this to your configuration:
         },
 ```
 
-Use `127.0.0.1` for the host if you are running Evennia from the same machine you'll be debugging from.  Otherwise, if you want to debug a remote server, change host (and possibly remoteRoot mapping) as necessary.
+如果您從要偵錯的同一臺電腦上執行 Evennia，請使用 `127.0.0.1` 作為主機。  否則，如果您想除錯遠端伺服器，請根據需要更改主機（可能還有遠端根對映）。
 
-Afterwards it should look something like this:
+之後它應該看起來像這樣：
 
 ```json
 {
@@ -96,26 +100,27 @@ Afterwards it should look something like this:
 }
 ```
 
-(notice the comma between the curly braces)
+（注意大括號之間的逗號）
 
-## Usage
+(usage)=
+## 用法
 
-Set a breakpoint in VS Code where you want the debugger to stop at.
+在 VS 程式碼中您希望偵錯器停止的位置設定斷點。
 
-In Evennia run `debugpy` command.
+在Evennia中執行`debugpy`指令。
 
-You should see "Waiting for debugger attach..."
+您應該會看到“正在等待偵錯程式連線...”
 
-Back in VS Code attach the debugger:
+傳回 VS 程式碼附加偵錯器：
 
-![screenshot](./attach.png)
+![截圖](./attach.png)
 
-Back in Evennia you should see "Debugger attached."
+返回Evennia，您應該看到「已連線偵錯器」。
 
-Now trigger the breakpoint you set and you'll be using a nice graphical debugger.
+現在觸發您設定的斷點，您將使用一個漂亮的圖形偵錯器。
 
 
 ----
 
-<small>This document page is generated from `evennia/contrib/utils/debugpy/README.md`. Changes to this
-file will be overwritten, so edit that file rather than this one.</small>
+<small>此檔案頁面是從`evennia\contrib\utils\debugpy\README.md`產生的。對此的更改
+檔案將被覆蓋，因此請編輯該檔案而不是此檔案。 </small>

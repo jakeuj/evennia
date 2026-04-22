@@ -1,4 +1,5 @@
-# Commands that take time to finish
+(commands-that-take-time-to-finish)=
+# 需要時間才能完成的指令
 
     > craft fine sword 
     You start crafting a fine sword. 
@@ -8,28 +9,29 @@
     You create the pommel of the sword. 
     You finish crafting a Fine Sword.
 
-In some types of games a command should not start and finish immediately.
+在某些型別的遊戲中，指令不應立即開始和結束。
 
-Loading a crossbow might take a bit of time to do - time you don't have when
-the enemy comes rushing at you. Crafting that armour will not be immediate
-either. For some types of games the very act of moving or changing pose all
-comes with a certain time associated with it. 
+裝載十字弓可能需要一些時間 - 你沒有時間
+敵人向你衝來。製作盔甲不會立即完成
+要麼。對於某些型別的遊戲來說，移動或改變姿勢的行為本身就是
+伴隨著與之相關的特定時間。
 
-There are two main suitable ways to introduce a 'delay' in a [Command](../Components/Commands.md)'s execution:
+有兩種主要的合適方法可以在[指令](../Components/Commands.md)的執行中引入「延遲」：
 
-- Using `yield` in the Command's `func` method. 
-- Using the  `evennia.utils.delay` utility function.
+- 在指令的 `func` 方法中使用 `yield`。
+- 使用 `evennia.utils.delay` 實用函式。
 
-We'll simplify both below.
+我們將在下面簡化兩者。
 
-## Pause commands with `yield`
+(pause-commands-with-yield)=
+## 使用 `yield` 暫停指令
 
-The `yield` keyword is a reserved word in Python. It's used to create [generators](https://realpython.com/introduction-to-python-generators/), which are interesting in their own right. For the purpose of this howto though, we just need to know that Evennia will use it to 'pause' the execution of the command for a certain time.
+`yield` 關鍵字是 Python 中的保留字。它用於建立[生成器](https://realpython.com/introduction-to-python-generators/)，它們本身就很有趣。不過，出於本指南的目的，我們只需要知道 Evennia 將使用它來「暫停」指令的執行一段時間。
 
-```{sidebar} This only works in Command.func!
+```{sidebar} 這只適用於 Command.func！
 
-This `yield` functionality will *only* work in the `func` method of
-Commands. It works because Evennia has especially catered for it as a convenient shortcut. Trying to  use it elsewhere will not work. If you want the same functionality  elsewhere you should look up the [interactive decorator](../Concepts/Async-Process.md#the-interactive-decorator).
+此 `yield` 功能*僅*在 `func` 方法中工作
+指令。它之所以有效，是因為 Evennia 特別將其作為方便的快捷方式。嘗試在其他地方使用它是行不通的。如果您想在其他地方獲得相同的功能，您應該尋找[互動式裝飾器](../Concepts/Async-Process.md#the-interactive-decorator)。
 ```
 
 ```{code-block} python
@@ -54,21 +56,22 @@ class CmdTest(Command):
         self.msg("Afterwards.")
 ```
 
-- **Line 15** : This is the important line.  The `yield 10` tells Evennia to "pause" the command
-and to wait for 10 seconds to execute the rest.  If you add this command and
-run it, you'll see the first message, then, after a pause of ten seconds, the
-next message.  You can use `yield` several times in your command.
+- **第 15 行**：這是重要的一行。  `yield 10` 告訴 Evennia「暫停」該指令
+並等待 10 秒來執行其餘的操作。  如果新增此指令並且
+執行它，您將看到第一條訊息，然後，停頓十秒後，
+下一則訊息。  您可以在指令中多次使用 `yield`。
 
-This syntax will not "freeze" all commands.  While the command is "pausing", you can execute other commands (or even call the same command again).  And other players aren't frozen either.
+此語法不會“凍結”所有指令。  當指令「暫停」時，您可以執行其他指令（甚至再次呼叫相同指令）。  其他玩家也沒有被凍結。
 
-> Using `yield` is non-persistent. If you `reload` the game while a command is "paused", that pause state is lost and it will _not_ resume after the server has  reloaded. 
+> 使用 `yield` 是非永續性的。如果您在指令「暫停」時`reload`遊戲，則暫停狀態將會遺失，並且在伺服器重新載入後不會恢復。
 
-## Pause commands with `utils.delay`
+(pause-commands-with-utilsdelay)=
+## 使用 `utils.delay` 暫停指令
 
-The `yield` syntax is easy to read, easy to understand, easy to use.  But it's non-persistent and not that flexible if you want more advanced options. 
+`yield` 文法易於閱讀、易於理解、易於使用。  但如果您想要更高階的選項，它是非永續性的並且不那麼靈活。
 
-The `evennia.utils.delay` represents is a more powerful way to introduce delays. Unlike `yield`, it  
-can be made persistent and also works outside of `Command.func`.  It's however a little more cumbersome to write since unlike `yield` it will not actually stop at the line it's called. 
+`evennia.utils.delay` 代表的是一種更強大的引入延遲的方式。與`yield`不同，它
+可以持久化並且也可以在 `Command.func` 之外工作。  然而，寫起來有點麻煩，因為與 `yield` 不同，它實際上不會停在它被呼叫的行處。
 
 ```{code-block} python
 :linenos:
@@ -107,32 +110,32 @@ class CmdEcho(default_cmds.MuxCommand):
     
 ```
 
-Import this new echo command into the default command set and reload the server. You will find that it will take 10 seconds before you see your shout coming back. 
+將此新的 echo 指令匯入到預設指令集中並重新載入伺服器。你會發現過了10秒你才會看到你的喊聲回來。
 
-- **Line 14**: We add a new method `echo`. This is a _callback_ - a method/function we will call after a certain time. 
-- **Line 30**: Here we use `utils.delay` to tell Evennia "Please wait for 10 seconds, then call "`self.echo`". Note how we pass `self.echo` and _not_ `self.echo()`!  If we did the latter, `echo` would fire _immediately_. Instead we let Evennia do this call for us ten seconds later.
+- **第 14 行**：我們新增一個新方法 `echo`。這是一個_回撥_ - 我們將在一段時間後呼叫的方法/函式。
+- **第 30 行**：這裡我們使用 `utils.delay` 告訴 Evennia：「請等待 10 秒，然後呼叫 `self.echo`。」請注意，我們傳入的是 `self.echo`，而不是 `self.echo()`！如果使用後者，`echo` 就會立刻觸發。相反地，我們讓 Evennia 在十秒後替我們執行這次呼叫。
 
-You will also find that this is a *non-blocking* effect; you can issue other commands in the interim and the game will go on as usual. The echo will come back to you in its own time.
+你還會發現，這是一個*非阻塞*的效果；您可以在此期間發出其他指令，遊戲將照常進行。迴聲會在適當的時間回到你身邊。
 
-The call signature for `utils.delay` is: 
+`utils.delay` 的呼叫簽名是：
 
 ```python
 utils.delay(timedelay, callback, persistent=False, *args, **kwargs) 
 ```
 
-```{sidebar} *args and **kwargs 
+```{sidebar} *args 和 **kwargs
 
-These are used to indicate any number of arguments or keyword-arguments should be picked up here. In code they are treated as a `tuple` and a `dict` respectively. 
+這些用於指示應在此選取任意數量的引數或關鍵字引數。在程式碼中，它們分別被視為 `tuple` 和 `dict`。
 
-`*args` and `**kwargs` are used in many places in Evennia. [See an online tutorial here](https://realpython.com/python-kwargs-and-args).
+Evennia中很多地方都使用了`*args`和`**kwargs`。 [請參閱此處的線上教學](https://realpython.com/python-kwargs-and-args)。
 ```
-If you set `persistent=True`, this delay will survive a `reload`. If you pass `*args` and/or `**kwargs`, they will be passed on into the `callback`. So this way you can pass more complex arguments to the delayed function. 
+如果您設定`persistent=True`，則此延遲將持續`reload`。如果您傳遞 `*args` 和/或 `**kwargs`，它們將傳遞到 `callback` 中。這樣你就可以將更複雜的引數傳遞給延遲函式。
 
-It's important to remember that the `delay()` call will not "pause" at that point when it is
-called (the way `yield` does in the previous section). The lines after the `delay()` call will
-actually execute *right away*. What you must do is to tell it which function to call *after the time
-has passed* (its "callback"). This may sound strange at first, but it is normal practice in
-asynchronous systems. You can also link such calls together:
+重要的是要記住 `delay()` 呼叫不會在此時“暫停”
+呼叫（如上一節 `yield` 的方式）。 `delay()` 呼叫之後的行將
+實際上*立即執行*。你必須做的是告訴它在時間之後要呼叫哪個函式
+已經過去*（它的“回撥”）。乍聽之下這可能很奇怪，但這是正常做法
+非同步系統。您也可以將此類呼叫連結在一起：
 
 ```{code-block}
 :linenos:
@@ -176,13 +179,13 @@ class CmdEcho(default_cmds.MuxCommand):
         self.caller.msg(f"... {self.args.lower()} ...")
 ```
 
-The above version will have the echoes arrive one after another, each separated by a two second
-delay.
+上面的版本將讓迴聲一個接一個地到達，每個迴聲相隔兩秒
+延遲。
 
-- **Line 19**: This sets off the chain, telling Evennia to wait 2 seconds before calling `self.echo1`.
-- **Line 22**: This is called after 2 seconds. It tells Evennia to wait another 2 seconds before calling `self.echo2`.
-- **Line 28**: This is called after yet another 2 seonds (4s total). It tells Evennia to wait another 2 seconds before calling, `self.echo3`.
-- **Line34** Called after another 2 seconds (6s total). This ends  the delay-chain.
+- **第 19 行**：這會啟動鏈，告訴 Evennia 在呼叫 `self.echo1` 之前等待 2 秒。
+- **第 22 行**：2 秒後呼叫。它告訴 Evennia 在呼叫 `self.echo2` 之前再等待 2 秒。
+- **第 28 行**：再過 2 秒（總共 4 秒）後呼叫。它告訴 Evennia 在呼叫 `self.echo3` 之前再等待 2 秒。
+- **第 34 行** 再過 2 秒（總共 6 秒）後呼叫。這結束了延遲鏈。
 
 ```
 > echo Hello!
@@ -191,26 +194,27 @@ delay.
 ... hello! ...
 ```
 
-```{warning} What about time.sleep?
+```{warning} 那time.sleep呢？
 
-You may be aware of the `time.sleep` function coming with Python. Doing `time.sleep(10) pauses Python for 10 seconds. **Do not use this**, it will not work with Evennia. If you use it, you will block the _entire server_ (everyone!) for ten seconds! 
+您可能知道 Python 附帶的 `time.sleep` 函式。執行 `time.sleep(10) 會使 Python 暫停 10 秒。 **不要使用這個**，它不能與 Evennia 一起使用。如果您使用它，您將阻止_整個伺服器_（所有人！）十秒鐘！
 
-If you want specifics, `utils.delay` is a thin wrapper around a [Twisted Deferred](https://docs.twisted.org/en/twisted-22.1.0/core/howto/defer.html). This is an [asynchronous concept](../Concepts/Async-Process.md).
+如果您需要具體資訊，`utils.delay` 是 [Twisted Deferred](https://docs.twisted.org/en/twisted-22.1.0/core/howto/defer.html) 的薄包裝。這是一個[非同步概念](../Concepts/Async-Process.md)。
 ```
 
-## Making a blocking command
+(making-a-blocking-command)=
+## 制定阻塞指令
 
-Both `yield` or `utils.delay()` pauses the command but allows the user to use other commands while the first one waits to finish. 
+`yield` 或 `utils.delay()` 都會暫停指令，但允許使用者在第一個指令等待完成時使用其他指令。
 
-In some cases you want to instead have that command 'block' other commands from running. An example is crafting a helmet: most likely you should not be able to start crafting a shield at the same time. Or even walk out of the smithy. 
+在某些情況下，您希望讓該指令「阻止」其他指令執行。一個例子是製作頭盔：很可能您不應該能夠同時開始製作盾牌。或甚至走出鐵匠鋪。
 
-The simplest way of implementing blocking is to use the technique covered in the [How to implement a Command Cooldown](./Howto-Command-Cooldown.md) tutorial. In that tutorial we cooldowns are implemented by comparing the current time with the last time the command was used. This is the best approach if you can get away with it. It could work well for our crafting example ... _if_ you don't want to automatically update the player on their progress. 
+實現阻塞最簡單的方法是使用[如何實現指令冷卻](./Howto-Command-Cooldown.md) 教學中介紹的技術。在該教學中，我們透過將當前時間與上次使用該指令的時間進行比較來實現冷卻時間。如果你能逃脫懲罰的話，這是最好的方法。它可以很好地用於我們的製作範例......_如果_您不想自動更新玩家的進度。
 
-In short: 
-    - If you are fine with the player making an active input to check their status, compare timestamps as done in the Command-cooldown tutorial. On-demand is by far the most efficent.
-    - If you want Evennia to tell the user their status without them taking a further action, you need to use `yield` , `delay` (or some other active time-keeping method).
+簡而言之：
+    - 如果您同意玩家主動輸入以檢查其狀態，請按照指令冷卻教學中的方式比較時間戳記。按需是迄今為止最有效的。
+    - 如果您希望 Evennia 告訴使用者他們的狀態而不需要他們採取進一步的操作，您需要使用 `yield` 、 `delay` （或其他一些主動計時方法）。
 
-Here is an example where we will use `utils.delay` to tell the player when the cooldown has passed:
+這是一個範例，我們將使用 `utils.delay` 告訴玩家冷卻時間已過：
 
 ```python
 from evennia import utils, default_cmds
@@ -252,20 +256,21 @@ class CmdBigSwing(default_cmds.MuxCommand):
         self.caller.msg("You regain your balance.")
 ```    
 
-Note how, after the cooldown, the user will get a message telling them they are now ready for
-another swing.
+請注意，冷卻後，使用者將收到一條訊息，告訴他們現在已準備好
+另一個揮桿。
 
-By storing the `off_balance` flag on the character (rather than on, say, the Command instance
-itself) it can be accessed by other Commands too. Other attacks may also not work when you are off balance. You could also have an enemy Command check your `off_balance` status to gain bonuses, to take another example.
+透過將 `off_balance` 標誌儲存在角色上（而不是在指令例項上）
+本身）它也可以被其他指令存取。當你失去平衡時，其他攻擊也可能不起作用。舉另一個例子，你還可以讓敵人指揮部檢查你的 `off_balance` 狀態以獲得獎勵。
 
-## Make a Command possible to Abort
+(make-a-command-possible-to-abort)=
+## 使指令可以中止
 
-One can imagine that you will want to abort a long-running command before it has a time to finish.
-If you are in the middle of crafting your armor you will probably want to stop doing that when a
-monster enters your smithy.
+人們可以想像，您希望在長時間執行的指令完成之前中止它。
+如果你正在製作你的盔甲，你可能會想停止這樣做，當
+怪物進入你的鐵匠鋪。
 
-You can implement this in the same way as you do the "blocking" command above, just in reverse.
-Below is an example of a crafting command that can be aborted by starting a fight:
+您可以按照與上面的“阻止”指令相同的方式來實現此操作，只是相反。
+以下是一個可以透過開始戰鬥來中止的製作指令的範例：
 
 ```python
 from evennia import utils, default_cmds
@@ -358,6 +363,6 @@ class CmdAttack(default_cmds.MuxCommand):
         # [...]
 ```
 
-The above code creates a delayed crafting command that will gradually create the armour. If the
-`attack` command is issued during this process it will set a flag that causes the crafting to be
-quietly canceled next time it tries to update.
+上面的程式碼建立了一個延遲的製作指令，它將逐漸建立盔甲。如果
+`attack`指令在此過程中發出，它將設定一個標誌，導致製作
+下次嘗試更新時悄悄取消。

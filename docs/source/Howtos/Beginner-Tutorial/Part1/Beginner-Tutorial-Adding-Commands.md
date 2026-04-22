@@ -1,25 +1,27 @@
-# Adding custom commands
+(adding-custom-commands)=
+# 新增自訂指令
 
-In this lesson we'll learn how to create our own Evennia [Commands](../../../Components/Commands.md) If you are new to Python you'll also learn some more basics about how to manipulate strings and get information out of Evennia.
+在本課中，我們將學習如何建立自己的 Evennia [指令](../../../Components/Commands.md) 如果您是 Python 新手，您還將學習一些有關如何操作字串並從 Evennia 中獲取資訊的更多基礎知識。
 
-A Command is something that handles the input from a user and causes a result to happen.
-An example is `look`, which examines your current location and tells you what it looks like and what is in it.
+指令是處理使用者輸入並導致結果發生的東西。
+例如 `look`，它會檢查您目前的位置並告訴您它的外觀以及其中的內容。
 
-```{sidebar} Commands are not typeclassed
+```{sidebar} 指令沒有型別分類
 
-If you just came from the previous lesson, you might want to know that Commands and CommandSets are not `typeclassed`. That is, instances of them are not saved to the database. They are "just" normal Python classes.
+如果您剛學完上一課，您可能想知道指令和 CommandSets 不是 `typeclassed`。也就是說，它們的例項不會儲存到資料庫中。它們「只是」普通的 Python 類別。
 ```
 
-In Evennia, a Command is a Python _class_. If you are unsure about what a class is, review the
-[previous lesson about it](./Beginner-Tutorial-Python-classes-and-objects.md)! A Command inherits from `evennia.Command` or from one of the alternative command- classes, such as `MuxCommand` which is what most default commands use. 
+在 Evennia 中，指令是 Python _class_。如果您不確定什麼是類，請檢視
+[上一課關於它](./Beginner-Tutorial-Python-classes-and-objects.md)！指令繼承自 `evennia.Command` 或替代指令類別之一，例如 `MuxCommand`，這是大多數預設指令使用的。
 
-All Commands are grouped in another class called a _Command Set_. Think of a Command Set as a bag holding many different commands. One CmdSet could for example hold all commands for combat, another for building etc. 
+所有指令都分組在另一個稱為「指令集」的類別中。將指令集視為包含許多不同指令的袋子。例如，一個 CmdSet 可以儲存所有戰鬥指令，另一個用於建築等。
 
-Command-Sets are then associated with objects, for example with your Character. Doing so makes the commands in that cmdset available to the object. By default, Evennia groups all character-commands into one big cmdset called the `CharacterCmdSet`. It sits on `DefaultCharacter` (and thus, through inheritance, on `typeclasses.characters.Character`). 
+然後指令集與物件相關聯，例如與您的角色相關聯。這樣做會使 cmdset 中的指令可供該物件使用。預設情況下，Evennia 將所有字元指令分組為一個大的 cmdset，稱為 `CharacterCmdSet`。它位於 `DefaultCharacter`（因此，透過繼承，位於 `typeclasses.characters.Character`）。
 
-## Creating a custom command
+(creating-a-custom-command)=
+## 建立自訂指令
 
-Open `mygame/commands/command.py`. This file already has stuff filled in for you.
+開啟`mygame/commands/command.py`。該檔案已為您填寫了內容。
 
 ```python
 """
@@ -39,13 +41,13 @@ class Command(BaseCommand):
 # ...
 ```
 
-Ignoring the docstrings (which you can read if you want), this is the only really active code in the module.
+忽略檔案字串（如果需要，您可以閱讀），這是模組中唯一真正活躍的程式碼。
 
-We can see that we import `Command` from `evennia` and use the `from ... import ... as ...` form to rename it to `BaseCommand`. This is so we can let our child class also be named `Command` to make it easier to reference.  The class itself doesn't do anything, it just has `pass`. So in the same way as `Object` and `Character` in the previous lessons, this class is identical to its parent.
+我們可以看到，我們從`evennia`匯入`Command`，並使用`from... import... as...`形式將其重新命名為`BaseCommand`。這樣我們就可以讓我們的子類別也命名為`Command`，以方便引用。  類別本身不執行任何操作，它只具有`pass`。因此，與前面課程的 `Object` 和 `Character` 相同，該類別與其父類相同。
 
-> The commented out `default_cmds` gives us access to Evennia's default commands for easy overriding. We'll try that a little later.
+> 註解掉的 `default_cmds` 使我們能夠存取 Evennia 的預設指令，以便於覆蓋。我們稍後會嘗試一下。
 
-We could modify this module directly, but let's work in a separate module just for the heck of it. Open a new file `mygame/commands/mycommands.py` and add the following code:
+我們可以直接修改這個模組，但是讓我們在一個單獨的模組中工作只是為了它。開啟一個新檔案`mygame/commands/mycommands.py`並新增以下程式碼：
 
 ```python
 # in mygame/commands/mycommands.py
@@ -57,9 +59,9 @@ class CmdEcho(Command):
 
 ```
 
-This is the simplest form of command you can imagine. It just gives itself a name, "echo". This is what you will use to call this command later.
+這是您能想像到的最簡單的指令形式。它只是給自己起了一個名字，「echo」。這是您稍後將用來呼叫此指令的內容。
 
-Next we need to put this in a CmdSet. It will be a one-command CmdSet for now! Change your file as such:
+接下來我們需要將其放入 CmdSet 中。現在這將是一個單一指令CmdSet！更改您的檔案如下：
 
 
 ```python
@@ -79,21 +81,21 @@ class MyCmdSet(CmdSet):
 
 ```
 
-Our `MyCmdSet` class must have an `at_cmdset_creation` method, named exactly like this - this is what Evennia will be looking for when setting up the cmdset later, so if you didn't set it up, it will use the parent's version, which is empty. Inside we add the command class to the cmdset by `self.add()`. If you wanted to add more commands to this CmdSet you could just add more lines of `self.add` after this.
+我們的 `MyCmdSet` 類別必須有一個 `at_cmdset_creation` 方法，其命名與此完全相同 - 這是 Evennia 稍後在設定 cmdset 時將要查詢的內容，因此，如果您沒有設定它，它將使用父級的版本，該版本為空。裡面我們透過`self.add()`將指令類別加入到cmdset中。如果您想為 CmdSet 新增更多指令，您可以在此之後新增更多 `self.add` 行。
 
-Finally, let's add this command to ourselves so we can try it out. In-game you can experiment with `py` again:
+最後，讓我們自己加入這個指令，以便我們可以嘗試一下。在遊戲中你可以再嘗試`py`：
 
     > py me.cmdset.add("commands.mycommands.MyCmdSet")
 
-The `me.cmdset` is the store of all cmdsets stored on us. By giving the path to our CmdSet class, it will be added. 
+`me.cmdset` 是我們儲存的所有 cmdsets 的儲存。透過提供 CmdSet 類別的路徑，它將被新增。
 
-Now try
+現在嘗試
 
     > echo
     Command "echo" has no defined `func()`. Available properties ...
     ...(lots of stuff)...
 
-`echo` works! You should be getting a long list of outputs. Your `echo` function is not really "doing" anything yet and the default function is then to show all useful resources available to you when you use your Command. Let's look at some of those listed:
+`echo` 有效！您應該會得到一長串輸出。您的 `echo` 函式還沒有真正「執行」任何操作，預設函式是在您使用指令時顯示所有可用的有用資源。讓我們看看其中列出的一些：
 
 ```
 Command "echo" has no defined `func()` method. Available properties on this command are:
@@ -112,14 +114,14 @@ Command "echo" has no defined `func()` method. Available properties on this comm
      self.help_category (<class 'str'>): "general"
      self.cmdset (... a long list of commands ...)
 ```
-These are all properties you can access with `.` on the Command instance, such as `.key`, `.args` and so on. Evennia makes these available to you and they will be different every time a command is run. The most important ones we will make use of now are:
+這些都是您可以在指令例項上使用 `.` 存取的所有屬性，例如 `.key`、`.args` 等。 Evennia 使這些可供您使用，並且每次執行指令時它們都會不同。我們現在將使用的最重要的是：
 
- - `caller` - this is 'you', the person calling the command.
- - `args` - this is all arguments to the command. Now it's empty, but if you tried `echo foo bar` you'd find that this would be `" foo bar"` (including the extra space  between `echo` and `foo` that you may want to strip away).
- - `obj` - this is object on which this Command (and CmdSet) "sits". So you, in this case.
- - `raw_string` is not commonly used, but it's the completely unmodified input from the user. It even includes the line break used to send to the command to the server (that's why the end-quotes appear on the next line).
+ - `caller` - 這是“你”，呼叫指令的人。
+ - `args` - 這是指令的所有引數。現在它是空的，但如果您嘗試 `echo foo bar`，您會發現這將是 `" foo bar"`（包括您可能想要刪除的 `echo` 和 `foo` 之間的額外空格）。
+ - `obj` - 這是此指令（和 CmdSet）「所在」的物件。所以，在這種情況下，你。
+ - `raw_string` 不常用，但它是使用者完全未修改的輸入。它甚至包括用於將指令傳送到伺服器的換行符（這就是為什麼結束引號出現在下一行的原因）。
 
-The reason our command doesn't do anything yet is because it's missing a `func` method. This is what Evennia looks for to figure out what a Command actually does. Modify your `CmdEcho` class:
+我們的指令尚未執行任何操作的原因是它缺少 `func` 方法。這就是 Evennia 尋找的內容來找出指令的實際作用。修改你的`CmdEcho`類：
 
 ```python
 # in mygame/commands/mycommands.py
@@ -141,27 +143,27 @@ class CmdEcho(Command):
 # ...
 ```
 
-First we added a docstring. This is always a good thing to do in general, but for a Command class, it will also automatically become the in-game help entry! 
+首先我們加入了一個文件字串。一般來說，這總是一件好事，但對於 Command 類別來說，它也會自動成為遊戲中的幫助條目！
 
-```{sidebar} Use Command.msg 
-In a Command class, the `self.msg()` acts as a convenient shortcut for `self.caller.msg()`. Not only is it shorter, it also has some advantages because the command can include more metadata with the message. So using `self.msg()` is usually better. For this tutorial though, `self.caller.msg()` is more explicit in showing what is going on.
+```{sidebar} 使用指令.msg
+在 Command 類別中，`self.msg()` 充當 `self.caller.msg()` 的便捷快捷方式。它不僅更短，而且還具有一些優點，因為該指令可以在訊息中包含更多元資料。所以使用 `self.msg()` 通常會更好。但對於本教學來說，`self.caller.msg()` 更明確地顯示了正在發生的情況。
 ```
 
-Next we add the `func` method. It has one active line where it makes use of some of those variables the Command class offers to us. If you did the [basic Python tutorial](./Beginner-Tutorial-Python-basic-introduction.md), you will recognize `.msg` - this will send a message to the object it is attached to us - in this case `self.caller`, that is, us. We grab `self.args` and includes that in the message.
+接下來我們加入 `func` 方法。它有一個活動行，它使用 Command 類別向我們提供的一些變數。如果您完成了[基礎Python教學](./Beginner-Tutorial-Python-basic-introduction.md)，您將識別`.msg` - 這將向它附加到我們的物件傳送一條訊息 - 在本例中為`self.caller`，即我們。我們抓取 `self.args` 並將其包含在訊息中。
 
-Since we haven't changed `MyCmdSet`, that will work as before. Reload and re-add this command to ourselves to try out the new version:
+由於我們沒有更改 `MyCmdSet`，因此它將像以前一樣工作。重新載入並重新新增此指令給我們自己來嘗試新版本：
 
     > reload
     > py self.cmdset.add("commands.mycommands.MyCmdSet")
     > echo
     Echo: ''
 
-Try to pass an argument:
+嘗試傳遞一個引數：
 
     > echo Woo Tang!
     Echo: ' Woo Tang!'
 
-Note that there is an extra space before `Woo`. That is because self.args contains _everything_ after the command name, including spaces. Let's remove that extra space with a small tweak:
+請注意，`Woo` 之前有一個額外的空格。這是因為 self.args 包含指令名稱後的_所有內容_，包括空格。讓我們透過一個小調整來刪除多餘的空間：
 
 ```python
 # in mygame/commands/mycommands.py
@@ -183,43 +185,45 @@ class CmdEcho(Command):
 # ...
 ```
 
-The only difference is that we called `.strip()` on `self.args`. This is a helper method available on all strings - it strips out all whitespace before and after the string. Now the Command-argument will no longer have any space in front of it.
+唯一的差異是我們在 `self.args` 上呼叫了 `.strip()`。這是一個可用於所有字串的輔助方法 - 它刪除字串前後的所有空格。現在指令引數前面將不再有任何空格。
 
     > reload
     > py self.cmdset.add("commands.mycommands.MyCmdSet")
     > echo Woo Tang!
     Echo: 'Woo Tang!'
 
-Don't forget to look at the help for the echo command:
+不要忘記檢視 echo 指令的幫助：
 
     > help echo
 
-You will get the docstring you put in your Command-class! 
+您將獲得放入 Command 類別中的檔案字串！
 
-### Making our cmdset persistent
+(making-our-cmdset-persistent)=
+### 讓我們的cmdset持久
 
-It's getting a little annoying to have to re-add our cmdset every time we reload, right? It's simple enough to make `echo` a _persistent_ change though:
+每次重新載入時都必須重新新增cmdset，這有點煩人，對吧？不過，將 `echo` 改為 _persistent_ 就夠簡單了：
 
     > py self.cmdset.add("commands.mycommands.MyCmdSet", persistent=True)
 
-Now you can `reload` as much as you want and your code changes will be available directly without needing to re-add the MyCmdSet again. 
+現在您可以根據需要`reload`，並且您的程式碼變更將直接可用，而無需再次重新新增MyCmdSet。
 
-We will add this cmdset in another way, so remove it manually: 
+我們將以另一種方式新增這個cmdset，所以手動刪除它：
 
     > py self.cmdset.remove("commands.mycommands.MyCmdSet")
 
-### Add the echo command to the default cmdset 
+(add-the-echo-command-to-the-default-cmdset)=
+### 新增echo指令預設cmdset
 
-Above we added the `echo` command to ourselves. It will _only_ be available to us and noone else in the game. But all commands in Evennia are part of command-sets, including the normal `look` and `py` commands we have been using all the while. You can easily extend the default command set with your `echo` command - this way _everyone_ in the game will have access to it! 
+上面我們給自己加了`echo`指令。它_僅_對我們可用，而遊戲中的其他人無法使用。但是 Evennia 中的所有指令都是指令集的一部分，包括我們一直在使用的普通 `look` 和 `py` 指令。您可以使用 `echo` 指令輕鬆擴充套件預設指令集 - 這樣遊戲中的_每個人_都可以存取它！
 
-In `mygame/commands/` you'll find an existing module named `default_cmdsets.py` Open it and you'll find four empty cmdset-classes: 
+在 `mygame/commands/` 中，您會發現一個名為 `default_cmdsets.py` 的現有模組，開啟它，您會發現四個空的 cmdset 類別：
 
-- `CharacterCmdSet` - this sits on all Characters (this is the one we usually want to modify)
-- `AccountCmdSet` - this sits on all Accounts (shared between Characters, like `logout` etc)
-- `UnloggedCmdSet` - commands available _before_ you login, like the commands for creating your password and connecting to the game.
-- `SessionCmdSet` - commands unique to your Session (your particular client connection). This is unused by default.
+- `CharacterCmdSet` - 這適用於所有角色（這是我們通常要修改的角色）
+- `AccountCmdSet` - 這位於所有帳戶上（在角色之間共享，例如 `logout` 等）
+- `UnloggedCmdSet` - 登入前可用的指令，例如建立密碼和連線遊戲的指令。
+- `SessionCmdSet` - 您的Session（您的特定使用者端連線）獨有的指令。預設未使用此功能。
 
-Tweak this file as follows:
+如下調整該檔案：
 
 ```python
 # in mygame/commands/default_cmdsets.py 
@@ -250,37 +254,38 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
 # ... 
 ```
 
-```{sidebar} super() and overriding defaults
-The `super()` Python keyword means that the _parent_ is called. In this case, the parent adds all default commands to this cmdset.  
+```{sidebar} super() 和覆蓋預設值
+`super()` Python 關鍵字意味著 _parent_ 被呼叫。在這種情況下，父級將所有預設指令新增至此cmdset。
 
-Coincidentally, this is also how you replace default commands in Evennia!jj To replace e.g. the command `get`, you just give your replacement command the `key` 'get' and add it here - since it's added after `super()`, it will replace the default version of `get`.
+巧合的是，這也是你將 Evennia!jj 中的預設指令替換為 e.g 的方法。指令 `get`，您只需為替換指令提供 `key` 'get' 並將其新增到此處 - 因為它是在 `super()` 之後新增的，所以它將替換預設版本的 `get`。
 ```
-This works the same way as when you added `CmdEcho` to your `MyCmdSet`. The only difference cmdsets are automatically added to all Characters/Accounts etc so you don't have to do so manually. We must also make sure to import the `CmdEcho` from your `mycommands` module in order for this module to know about it. The period ''`.`'' in  `from . import mycommands` means that we are telling Python that `mycommands.py` sits in the same directory as this current module. We want to import the entire module. Further down we access `mycommands.CmdEcho` to add it to the character cmdset.
+這與將 `CmdEcho` 新增到 `MyCmdSet` 的方式相同。唯一的差異 cmdsets 會自動新增到所有角色/帳戶等中，因此您無需手動執行此操作。我們還必須確保從 `mycommands` 模組匯入 `CmdEcho`，以便該模組瞭解它。 `from. import mycommands` 中的句點「`.`」表示我們告訴 Python `mycommands.py` 與目前模組位於同一目錄中。我們想要匯入整個模組。再往下，我們訪問 `mycommands.CmdEcho` 將其新增到字元 cmdset。
 
-Just `reload` the server and your `echo` command will be available again. There is no limit to how many cmdsets a given Command can be a part of. 
+只需 `reload` 伺服器和您的 `echo` 指令將再次可用。給定指令可以包含多少個 cmdsets 沒有限制。
 
-To remove, you just comment out or delete the `self.add()` line. Keep it like this for now though - we'll expand on it below. 
-### Figuring out who to hit
+要刪除，只需註解掉或刪除 `self.add()` 行即可。不過現在就保持這樣——我們將在下面對其進行擴充套件。
+(figuring-out-who-to-hit)=
+### 弄清楚該打誰
 
-Let's try something a little more exciting than just echo. Let's make a `hit` command, for punching someone in the face! This is how we want it to work:
+讓我們嘗試一些比 echo 更令人興奮的東西。讓我們建立一個 `hit` 指令，用於打某人的臉！這就是我們希望它能運作的方式：
 
     > hit <target>
     You hit <target> with full force!
 
-Not only that, we want the `<target>` to see
+不僅如此，我們還希望`<target>`看到
 
     You got hit by <hitter> with full force!
 
-Here, `<hitter>` would be the one using the `hit` command and `<target>` is the one doing the punching; so if your name was `Anna`, and you hit someone named `Bob`, this would look like this: 
+這裡，`<hitter>`是使用`hit`指令的人，`<target>`是進行打孔的人；因此，如果您的名字是 `Anna`，並且您擊中了名為 `Bob` 的人，則結果將如下所示：
 
     > hit bob
     You hit Bob with full force!
 
-And Bob would see
+鮑伯會看到
 
     You got hit by by Anna with full force!
 
-Still in `mygame/commands/mycommands.py`, add a new class, between `CmdEcho` and `MyCmdSet`.
+仍在 `mygame/commands/mycommands.py` 中，新增一個新類，位於 `CmdEcho` 和 `MyCmdSet` 之間。
 
 ```{code-block} python
 :linenos:
@@ -313,49 +318,49 @@ class CmdHit(Command):
 # ...
 ```
 
-A lot of things to dissect here:
-- **Line 5**: The normal `class` header. We inherit from `Command` which we imported at the top of this file.
-- **Lines 6-12**: The docstring and help-entry for the command. You could expand on this as much as you wanted.
-- **Line 13**: We want to write `hit` to use this command.
-- **Line 16**: We strip the whitespace from the argument like before. Since we don't want to have to do `self.args.strip()` over and over, we store the stripped version in a _local variable_ `args`. Note that we don't modify `self.args` by doing this, `self.args` will still have the whitespace and is not the same as `args` in this example.
+這裡有很多東西要剖析：
+- **第 5 行**：正常的 `class` 標頭。我們繼承了在此檔案頂部匯入的`Command`。
+- **第 6-12 行**：指令的文件字串和說明條目。您可以根據需要對此進行擴充。
+- **第13行**：我們想寫`hit`來使用這個指令。
+- **第 16 行**：我們像以前一樣從引數中刪除空格。由於我們不想一遍又一遍地執行 `self.args.strip()`，因此我們將剝離的版本儲存在_區域性變數_ `args` 中。請注意，我們不會透過這樣做來修改 `self.args`，`self.args` 仍然會有空格，並且與本範例中的 `args` 不同。
 
-```{sidebar} if-statements
-The full form of the if statement is
+```{sidebar} if 語句
+if 語句的完整形式是
 	
-	if condition:
-	    ...
-	elif othercondition:
-	    ...
-	else:
-	    ...
+如果條件：
+	    …
+	elif 其他條件：
+	    …
+	其他：
+	    …
 
-There can be any number of `elifs` to mark when different branches of the code should run. If `else` is provided, it will run if none of the other conditions were truthy. 
+可以有任意數量的 `elifs` 來標記程式碼的不同分支何時應執行。如果提供了 `else`，則在其他條件都不為真時它將執行。
 ```
 
-- **Line 17** has our first _conditional_, an `if` statement. This is written on the form `if <condition>:` and only if that condition is 'truthy' will the indented code block under the `if` statement run. To learn what is truthy in Python it's usually easier to learn what is "falsy":
-    - `False` - this is a reserved boolean word in Python. The opposite is `True`.
-    - `None` - another reserved word. This represents nothing, a null-result or value.
-    - `0` or `0.0`
-    - The empty strings `""`, `''`, or empty triple-strings like `""""""`,  `''''''`
-    - Empty _iterables_ we haven't used yet, like empty lists `[]`, empty tuples `()` and empty dicts `{}`.
-    - Everything else is "truthy".
+- **第 17 行**有我們的第一個_條件_，一個 `if` 語句。它以 `if <condition>:` 的形式編寫，只有當條件為「true」時，`if` 語句下的縮排程式碼區塊才會運作。要了解 Python 中什麼是真實的，通常更容易瞭解什麼是「虛假」：
+    - `False` - 這是 Python 中的保留布林詞。相反的是`True`。
+    - `None` - 另一個保留字。這代表什麼也沒有，一個空結果或值。
+    - `0` 或 `0.0`
+    - 空字串 `""`、`''` 或空三字串，例如 `""""""`、`''''''`
+    - 我們還沒有使用空_iterables_，例如空列表`[]`、空元組`()`和空字典`{}`。
+    - 其他一切都是「真實的」。
 
     The conditional on **Line 16**'s condition is `not args`. The `not` _inverses_ the result, so if `args` is the empty string (falsy), the whole conditional becomes truthy. Let's continue in the code:
-```{sidebar} Errors in your code
+```{sidebar} 您的程式碼中的錯誤
 
-With longer code snippets to try, it gets more and more likely you'll
-make an error and get a `traceback` when you reload. This will either appear
-directly in-game or in your log (view it with `evennia -l` in a terminal).
+透過嘗試更長的程式碼片段，您將越來越有可能
+重新載入時出錯並收到 `traceback`。這將出現
+直接在遊戲中或在日誌中（在終端中使用 `evennia -l` 檢視）。
 
-Don't panic - tracebacks are your friends! They are to be read bottom-up and usually describe exactly where your problem is. Refer to [The Python introduction lesson](./Beginner-Tutorial-Python-basic-introduction.md) for more hints. If you get stuck, reach out to the Evennia community for help.
+不要驚慌－回溯是你的朋友！它們應該自下而上地閱讀，並且通常準確地描述了您的問題所在。更多提示請參考[Python入門課](./Beginner-Tutorial-Python-basic-introduction.md)。如果您遇到困難，請向 Evennia 社群尋求協助。
 ```
-- **Lines 16-17**: This code will only run if the `if` statement is truthy, in this case if `args` is the empty string.
-- **Line 19**: `return` is a reserved Python word that exits `func` immediately.
-- **Line 20**: We use `self.caller.search` to look for the target in the current location.
-- **Lines 21-22**: A feature of `.search` is that it will already inform `self.caller` if it couldn't find the target. In that case, `target` will be `None` and we should just directly `return`.
-- **Lines 23-24**: At this point we have a suitable target and can send our punching strings to each.
+- **第 16-17 行**：僅當 `if` 語句為真時，此程式碼才會執行，在本例中，如果 `args` 為空字串。
+- **第 19 行**：`return` 是一個保留的 Python 字，立即退出 `func`。
+- **第20行**：我們使用`self.caller.search`在目前位置找出目標。
+- **第21-22行**：`.search`的一個特點是，如果它找不到目標，它會通知`self.caller`。在這種情況下，`target` 將是 `None`，我們應該直接`return`。
+- **第23-24行**：此時我們有了一個合適的目標，並且可以向​​每個目標傳送我們的打孔字串。
 
-Finally we must also add this to a CmdSet. Let's add it to `MyCmdSet`.
+最後我們還必須將其新增到CmdSet。讓我們將其新增到`MyCmdSet`。
 
 ```python
 # in mygame/commands/mycommands.py
@@ -369,7 +374,7 @@ class MyCmdSet(CmdSet):
 
 ```
 
-Note that since we did `py self.cmdset.remove("commands.mycommands.MyCmdSet")` earlier, this cmdset is no longer available on our Character. Instead we will add these commands directly to our default cmdset.
+請注意，由於我們之前執行了 `py self.cmdset.remove("commands.mycommands.MyCmdSet")`，因此該 cmdset 在我們的角色上不再可用。相反，我們將這些指令直接新增到我們的預設cmdset。
 
 ```python
 # in mygame/commands/default_cmdsets.py 
@@ -399,9 +404,9 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
 # ... 
 ```
 
-We changed from adding the individual `echo` command to adding the entire `MyCmdSet` in one go! This will add all commands in that cmdset to the `CharacterCmdSet` and is a practical way to add a lot of command in one go. Once you explore Evennia further, you'll find that [Evennia contribs](../../../Contribs/Contribs-Overview.md) all distribute their new commands in cmdsets, so you can easily add them to your game like this.
+我們從新增單一 `echo` 指令更改為一次性新增整個 `MyCmdSet`！這會將 cmdset 中的所有指令新增到 `CharacterCmdSet` 中，並且是一次性新增大量指令的實用方法。一旦你進一步探索Evennia，你會發現[Evennia contribs](../../../Contribs/Contribs-Overview.md)都在cmdsets中分發了他們的新指令，所以你可以像這樣輕鬆地將它們新增到你的遊戲中。
 
-Next we reload to let Evennia know of these code changes and try it out:
+接下來我們重新載入，讓Evennia知道這些程式碼更改並嘗試：
 
     > reload
     hit
@@ -410,17 +415,18 @@ Next we reload to let Evennia know of these code changes and try it out:
     You hit YourName with full force!
     You got hit by YourName with full force!
 
-Lacking a target, we hit ourselves. If you have one of the dragons still around from the previous lesson you could try to hit it (if you dare):
+缺乏目標，我們就打擊了自己。如果你還有上一課中的一條龍，你可以嘗試擊中它（如果你敢的話）：
 
     hit smaug
     You hit Smaug with full force!
 
-You won't see the second string. Only Smaug sees that (and is not amused).
+您將看不到第二根字串。只有史矛革看到了這一點（而且不覺得好笑）。
 
 
-## Summary
+(summary)=
+## 概括
 
-In this lesson we learned how to create our own Command, add it to a CmdSet and then to ourselves. We also upset a dragon.
+在本課中，我們學習如何建立自己的指令，將其新增到 CmdSet，然後新增到我們自己。我們還惹惱了一條龍。
 
-In the next lesson we'll learn how to hit Smaug with different weapons. We'll also
-get into how we replace and extend Evennia's default Commands.
+在下一課中，我們將學習如何使用不同的武器攻擊史矛革。我們也會
+瞭解我們如何替換和擴充套件 Evennia 的預設指令。

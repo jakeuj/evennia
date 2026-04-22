@@ -3,6 +3,8 @@ Convert contribs' README files to proper documentation pages along with
 an index.
 
 """
+
+import os
 from collections import defaultdict
 from glob import glob
 from os.path import abspath, dirname
@@ -102,6 +104,7 @@ Contribs-Guidelines.md
 ```"""
 
 CATEGORY = """
+<a id="{category}"></a>
 ## {category}
 
 _{category_desc}_
@@ -141,6 +144,18 @@ will be overwritten.</small>
 """
 
 
+def _target_contains_cjk(targetfile):
+    """Return ``True`` if the existing target contains CJK characters."""
+
+    if not os.path.exists(targetfile):
+        return False
+
+    with open(targetfile, encoding="utf-8") as fil:
+        txt = fil.read()
+
+    return any("\u4e00" <= char <= "\u9fff" for char in txt)
+
+
 def build_table(datalist, ncols):
     """Build a Markdown table-grid for compact display"""
 
@@ -160,6 +175,7 @@ def readmes2docs(directory=_SOURCE_DIR):
     """
 
     ncount = 0
+    preserved = 0
     index = []
     category_index = []
     categories = defaultdict(list)
@@ -185,7 +201,7 @@ def readmes2docs(directory=_SOURCE_DIR):
         )
         outfile = pathjoin(_OUT_DIR, filename)
 
-        with open(file_path) as fil:
+        with open(file_path, encoding="utf-8") as fil:
             data = fil.read()
 
         clean_file_path = f"evennia{sep}contrib{file_path[len(directory):]}"
@@ -197,8 +213,11 @@ def readmes2docs(directory=_SOURCE_DIR):
         except IndexError:
             blurb = name
 
-        with open(outfile, "w") as fil:
-            fil.write(data)
+        if _target_contains_cjk(outfile):
+            preserved += 1
+        else:
+            with open(outfile, "w", encoding="utf-8") as fil:
+                fil.write(data)
 
         categories[category].append((name, credits, blurb, filename, pypath))
         ncount += 1
@@ -240,10 +259,13 @@ def readmes2docs(directory=_SOURCE_DIR):
         header=header, categories="\n".join(category_sections), footer=INDEX_FOOTER
     )
 
-    with open(_OUT_INDEX_FILE, "w") as fil:
-        fil.write(text)
+    if _target_contains_cjk(_OUT_INDEX_FILE):
+        preserved += 1
+    else:
+        with open(_OUT_INDEX_FILE, "w", encoding="utf-8") as fil:
+            fil.write(text)
 
-    print(f"  -- Converted Contrib READMEs to {ncount} doc pages + index.")
+    print(f"  -- Converted Contrib READMEs to {ncount} doc pages + index ({preserved} preserved).")
 
 
 if __name__ == "__main__":
