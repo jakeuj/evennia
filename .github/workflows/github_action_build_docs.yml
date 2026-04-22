@@ -29,6 +29,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      EVGAMEDIR: ${{ github.workspace }}/../gamedir
 
     steps:
       - name: Checkout repository
@@ -56,8 +58,9 @@ jobs:
 
       - name: Set up Evennia game dir
         run: |
+          cd "$GITHUB_WORKSPACE/.."
           evennia --init gamedir
-          cd gamedir
+          cd "$EVGAMEDIR"
           evennia migrate
 
       - name: Build docs
