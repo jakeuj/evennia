@@ -1,47 +1,46 @@
-# How To Contribute And Get Help
+# 如何貢獻並取得協助
 
-## Getting Help 
+## 取得協助
 
-If you cannot find what you are looking for in the documentation, here's where to go next:
+如果你在文件裡找不到需要的答案，接下來可以去這些地方：
 
-- [The Discussions forums][forum] are great for getting help, starting longer-form discussions, showing off your work or get some input on what you are working on. This is also the place to follow Evennia development.
--  [The Discord server][chat] has a very helpful `#getting-help` channel for both big and small Evennia problems. It allows for more direct discussion. You can also track both the evennia code changes and the discussion forum from discord. 
+- [Discussion 論壇][forum] 很適合拿來求助、展開較長篇的討論、分享你的作品，或針對你正在做的東西獲得回饋。這裡也是追蹤 Evennia 開發動態的好地方。
+- [Discord 伺服器][chat] 裡有很有幫助的 `#getting-help` channel，不管是大問題還是小問題都很適合去問。這裡的互動會更即時；你也可以直接在 Discord 追蹤 Evennia 的程式碼更新與 Discussion forum 的討論。
 
-## Giving Help 
+## 如何幫忙
 
-In general, being active and helpful in the [discssion forums][forum] or [discord chat][chat] is already a big help!
+一般來說，只要你願意在 [Discussion 論壇][forum] 或 [Discord chat][chat] 中保持活躍並幫助別人，就已經是很大的幫忙了。
 
-If you want to spread the word, consider writing about Evennia on your blog or in your favorite (relevant) forum. Write a review somewhere (good or bad, we like feedback either way). Rate it on listings. Talk about it to your friends ... that kind of thing. 
+如果你想幫 Evennia 擴散出去，也可以考慮在你的部落格或常去的相關論壇寫文章介紹它。寫篇評論也很好，不管好壞我們都很歡迎。你也可以替它評分、分享給朋友，或做任何能讓更多人知道它的事。
 
-### Help with Documentation
+### 協助文件
 
-Evennia is highly dependent on good-quality documentation! 
+Evennia 非常仰賴高品質的文件！
 
-- [Reporting a Documentation issue][issues] is the easiest way to help out. The more eyes we get on things, the better - if we don't know about the problems, we can't fix them! Even reporting typos is a great help.
-- [Contributing directly to the docs](./Contributing-Docs.md) is also possible; you just need a text editor. You can fix issues or even propose a new tutorial! 
+- [回報文件問題][issues] 是最簡單的協助方式。越多人幫忙發現問題越好，因為如果我們不知道問題存在，就沒辦法修。就算只是回報 typo，也非常有幫助。
+- 你也可以[直接貢獻文件](./Contributing-Docs.md)；你只需要一個文字編輯器。你可以修正問題，甚至提出新的教學文章。
 
-### Helping with code
+### 協助程式碼
 
-Even if you don't feel confident with tackling a bug or feature, just correcting typos, adjusting formatting or simply *using* the thing and reporting when stuff doesn't make sense helps us a lot!
+就算你對自己處理 bug 或新功能還沒有信心，單純修 typo、調整格式，或只是*實際去使用* Evennia 並回報哪些地方讓人看不懂，也都對我們很有幫助！
 
-- [Reporting a code issue or bug][issues] is the easiest way to help out. Don't assume we are aware of a problem - if it's not written down in an issue, the problem will most likely be forgotten. Do this even if you plan to make a _Pull Request_ and fix the issue yourself. 
-- [Make a feature request][issues] if you want to see a new Evennia feature. You can also bring it up with the community first so you are sure it's something that would be interesting to be included with Evennia core.
-- [Make a Pull Request](Coding/Version-Control.md#contributing-to-evennia) (PR) to fix bugs or new features. Make sure to follow the [Evennia Code-Style guide](Coding/Evennia-Code-Style.md). 
-- [The Guide for making an Evennia contrib](Contribs/Contribs-Guidelines.md) outlines how you do to make your own Evennia [contrib](Contribs/Contribs-Overview.md) to distribute with Evennia.
+- [回報程式碼問題或 bug][issues] 是最簡單的協助方式。不要假設我們已經知道這個問題；如果它沒有被寫成 issue，最後通常就會被忘記。就算你打算自己送出 _Pull Request_ 來修，也請先回報。
+- 如果你希望 Evennia 有新的功能，可以[提出功能需求][issues]。你也可以先拿到社群裡討論，確認那是不是適合進入 Evennia core 的方向。
+- 你可以送出 [Pull Request](Coding/Version-Control.md#contributing-to-evennia)（PR）來修 bug 或加入新功能。記得遵循 [Evennia Code-Style guide](Coding/Evennia-Code-Style.md)。
+- [撰寫 Evennia contrib 的指南](Contribs/Contribs-Guidelines.md) 會說明如何製作你自己的 Evennia [contrib](Contribs/Contribs-Overview.md)，並隨 Evennia 一起發布。
 
-### Helping with Donations
+### 以捐款支持
 
-Evennia is a free and open-source project. Any monetary donations you want to offer are _completely voluntary_. While highly appreciated, we don't expect you to donate and don't hide any secret features behind a donation-paywall. Just see it as a way of showing appreciation by dropping a few coins in the cup.
+Evennia 是一個 free and open-source 專案。任何你願意提供的金錢贊助都_完全出於自願_。我們非常感謝，但不會期待每個人都捐款，也不會把任何祕密功能鎖在贊助牆後面。把它當成一種「往杯子裡投幾枚硬幣」的支持方式就好。
 
-- [Become an Evennia patron][patron]  which donates a (usually small) sum every month to show continued support. 
-- [Make a one-time donation][paypal] if a monthly donation is not your thing. This is a PayPal link but you don't need PayPal yourself to use it.
+- [Become an Evennia patron][patron]，每個月固定贊助一筆（通常不大的）金額，持續表達你的支持。
+- [一次性捐款][paypal]，如果你不想設定每月贊助，這會更適合你。連結是 PayPal，但你不必自己有 PayPal 帳號也能使用。
 
 
 [patron]: https://www.patreon.com/griatch
 [donate]: https://www.paypal.com/donate?token=zbU72YdRqPgsbpTw3M_4vR-5QJ7XvUhL9W6JlnPJw70M9LOqY1xD7xKGx0V1jLFSthY3xAztQpSsqW9n
 [forking]: Coding/Version-Control#forking-evennia
 [pullrequest]: https://github.com/evennia/evennia/pulls
-[issues]: https://github.com/evennia/evennia/issues
 [patch]: https://secure.wikimedia.org/wikipedia/en/wiki/Patch_%28computing%29
 [codestyle]:: Evennia-Code-Style
 

@@ -1,5 +1,5 @@
-# Unimplemented
+# 尚未完成
 
-_Sorry, but this page has not been written yet._
+_抱歉，這一頁目前還沒有撰寫完成。_
 
-Go back or return to the [front page](./index.md).
+你可以返回上一頁，或回到[首頁](./index.md)。

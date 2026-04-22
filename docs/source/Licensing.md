@@ -1,29 +1,21 @@
-# Licensing Q&A
+# 授權 Q&A
 
+Evennia 採用相當寬鬆友善的 [BSD](https://en.wikipedia.org/wiki/BSD_license)（3-clause）授權。你可以在 Evennia repo 根目錄中的 [LICENSE.txt](https://github.com/evennia/evennia/blob/main/LICENSE.txt) 找到完整授權條文，而且它不長！
 
-Evennia is licensed under the very friendly [BSD](https://en.wikipedia.org/wiki/BSD_license) (3-clause) license.  You can find the license as [LICENSE.txt](https://github.com/evennia/evennia/blob/main/LICENSE.txt) in the Evennia repository's root. It's not long!
+**Q：如果我用 Evennia 來製作遊戲，授權允許我怎麼使用它？**
 
-**Q: When creating a game using Evennia, what does the license permit me to do with it?**
+**A：** 那是你自己的遊戲世界，你想怎麼處理都可以！你可以自己留著、不公開，也可以改用你自己選擇的其他授權重新散布；甚至拿去賣、賺大錢，我們也沒有意見。
 
-**A:** It's your own game world to do with as you please! Keep it to yourself or re-distribute it
-under another license of your choice - or sell it and become filthy rich for all we care.
+**Q：如果我修改了 Evennia 函式庫本身，授權怎麼規定？**
 
-**Q: I have modified the Evennia library itself, what does the license say about that?**
+**A：** 我們的授權允許你對修改後的 Evennia 做任何事，包括重新散布或販售，只要你在散布內容中一併附上 `LICENSE.txt` 裡的授權與版權資訊即可。
 
-**A:** Our license allows you to do whatever you want with your modified Evennia, including
-re-distributing or selling it, as long as you include our license and copyright info found in
-`LICENSE.txt` along with your distribution.
+……當然，如果你修了 bug，或加了什麼很酷的新功能，我們還是會*溫柔地鼓勵*你把這些改動分享出來，讓它們有機會回到 Evennia core，讓更多人受益。授權並*沒有*要求你一定要這麼做，但如果你願意，我們會非常感激。
 
-... Of course, if you fix bugs or add some new snazzy feature we *softly nudge* you to make those
-changes available so they can be added to the core Evennia package for everyone's benefit. The
-license doesn't *require* you to do it, but that doesn't mean we won't still greatly appreciate it
-if you do!
+**Q：我可以把 Evennia 伺服器套件和我自訂的遊戲實作一起重新散布嗎？**
 
-**Q: Can I re-distribute the Evennia server package along with my custom game implementation?**
+**A：** 當然可以。只要記得把 `LICENSE.txt` 一起附上。
 
-**A:** Sure. As long as the text in `LICENSE.txt` is included.
+**Q：那 Contributions 呢？**
 
-**Q: What about Contributions?**
-
-The contributions in `evennia/evennia/contrib` are considered to be released under the same license
-as Evennia itself, unless the individual contributor has specifically defined otherwise.
+位於 `evennia/evennia/contrib` 裡的 contributions，除非個別貢獻者另外明確指定，否則都視為採用和 Evennia 本體相同的授權。

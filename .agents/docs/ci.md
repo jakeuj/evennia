@@ -4,7 +4,7 @@
 
 ### Test Suite (`github_action_test_suite.yml`)
 
-Triggers on push/PR to `main` or `develop` (skips docs-only changes).
+Triggers on push to `develop` and PRs targeting `main` or `develop` (skips docs-only changes). Pushes to `main` no longer trigger the test suite in this fork.
 
 **Matrix**: Python 3.12, 3.13, 3.14 across three database jobs:
 

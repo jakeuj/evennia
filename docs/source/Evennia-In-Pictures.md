@@ -1,122 +1,122 @@
-# Evennia in pictures 
+# Evennia 圖解
 
 ```{sidebar}
-This is _not_ an exhaustive overview. Think of it as a snapshot of some interesting things to start looking into.
+這_不是_一份鉅細靡遺的總覽。你可以把它當成一組值得優先認識的重點快照。
 ```
 
-This article tries to give a high-level overview of the Evennia server and some of its moving parts. It should hopefully give a better understanding of how everything hangs together. 
+這篇文章試著從高層次介紹 Evennia 伺服器，以及它由哪些主要部分組成。希望能幫助你更快理解整體架構是如何串在一起的。
 
 <div style="clear: right;"></div>
 
-## The two main Evennia pieces
-![evennia portal and server][image1]
+## Evennia 的兩大組件
+![Evennia 的 Portal 與 Server][image1]
 
-What you see in this figure is the part of Evennia that you download from us. It will _not_ start a game on its own. We'll soon create the missing 'jigsaw puzzle piece'. But first, let's see what we have.
+這張圖裡顯示的是你從 Evennia 下載下來的主體部分。它本身_還不能_單獨啟動一個完整遊戲。接下來我們很快就會補上那塊缺少的「拼圖」，不過在那之前，先看看目前手上有哪些東西。
 
-First, you'll notice that Evennia has two main components - the [Portal and Server](Components/Portal-And-Server.md). These are separate processes. 
+首先你會發現，Evennia 主要由兩個部分組成，也就是 [Portal 與 Server](Components/Portal-And-Server.md)。它們是彼此分開的程序。
 
-The Portal tracks all connections to the outside world and understands Telnet protocols, websockets, SSH and so on. It knows nothing about the database or the game state. Data sent between the Portal and the Server is protocol-agnostic, meaning the Server sends/receives the same data regardless of how the user is connected. Hiding behind the Portal also means that the Server can be completely rebooted without anyone getting disconnected.
+Portal 負責追蹤所有對外連線，也理解 Telnet protocol、websocket、SSH 等連線方式。它完全不碰資料庫，也不知道遊戲狀態。Portal 和 Server 之間傳遞的資料與連線協定無關，意思是無論玩家透過哪種方式連進來，Server 收發的都是同一種資料。因為有 Portal 作為外層保護，所以就算 Server 完整重開，玩家也不會因此斷線。
 
-The Server is the main “mud driver” and handles everything related to the game world and its database. It's asynchronous and uses [Twisted](http://twistedmatrix.com/trac/). 
+Server 則是主要的「mud driver」，負責處理與遊戲世界及其資料庫有關的一切。它是非同步的，底層使用 [Twisted](http://twistedmatrix.com/trac/)。
 
-In the same process of the Server is also the Evennia [Web Server](Components/Webserver.md) . This serves the game’s website. 
+在 Server 的同一個程序裡，也包含了 Evennia 的 [Web Server](Components/Webserver.md)。它負責提供遊戲網站。
 <div style="clear: right;"></div>
 
-### Initializing the game folder
+### 初始化遊戲目錄
 
-![creating the game folder][image2]
+![建立遊戲目錄][image2]
 
-After [installing evennia](Setup/Installation.md) you will have the `evennia` command available. Using this you create a game directory (let's call it `mygame`). This is the darker grey piece in this figure. It was missing previously. This is where you will create your dream game!
+當你[安裝好 Evennia](Setup/Installation.md) 之後，就會有 `evennia` 這個指令可以使用。你會用它建立一個遊戲目錄（這裡假設叫做 `mygame`）。圖中較深灰色的那一塊就是它，也是剛剛還缺著的部分。你的夢想遊戲，就是在這裡誕生。
 
-During initialization, Evennia will create Python module templates in `mygame/` and link up all configurations to make mygame a fully functioning, if empty, game, ready to start extending.
+在初始化過程中，Evennia 會在 `mygame/` 裡建立 Python module 範本，並串好所有必要設定，讓 `mygame` 變成一個已經完整可運作、雖然還是空白、但可以立刻開始擴充的遊戲。
 
-As part of the intialization, you'll create the database and then start the server. From this point on, your new game is up and running and you can connect to your new game with telnet on localhost:4000 or by pointing your browser to http://localhost:4001.
+初始化的一部分也包含建立資料庫，然後啟動伺服器。從這一刻起，你的新遊戲就已經運轉起來了。你可以用 telnet 連到 localhost:4000，或直接在瀏覽器打開 http://localhost:4001 來連進遊戲。
 
-Now, our new mygame world needs Characters, locations, items and more! 
+現在，這個新的 `mygame` 世界還需要 Characters、地點、物品，以及更多內容。
 
-## The database 
+## 資料庫
 
 ![image3][image3]
 
-Evennia is fully persistent and abstracts its database in Python using [Django](https://www.djangoproject.com/). The database tables are few and generic, each represented by a single Python class. As seen in this figure, the example `ObjectDB` Python class represents one database table. The properties on the class are the columns (fields) of the table. Each row is an instance of the class (one entity in the game).
+Evennia 是完全持久化的系統，並透過 [Django](https://www.djangoproject.com/) 在 Python 中抽象化它的資料庫。資料表數量不多，而且設計得很通用；每一張表都由一個 Python class 代表。就像圖中所示，範例裡的 `ObjectDB` Python class 對應一張資料表。class 上的屬性就是那張表的欄位（fields），而每一列資料都是這個 class 的一個 instance，也就是遊戲中的一個實體。
 
-Among the example columns shown is the key (name) of the `ObjectDB` entity as well as a [Foreign key](https://en.wikipedia.org/wiki/Foreign_key)-relationship for its current “location”. 
+圖中示範的欄位裡，包含了這個 `ObjectDB` 實體的 key（名稱），以及它目前「location」的 [Foreign key](https://en.wikipedia.org/wiki/Foreign_key) 關聯。
 
-From the figure we can see that _Trigger_ is in the _Dungeon_, carrying his trusty crossbow _Old Betsy_!
+從圖上可以看出，_Trigger_ 正待在 _Dungeon_ 裡，身上還帶著他信賴的十字弓 _Old Betsy_！
 
-The `db_typeclass_path` is an important field. This is a python-style path and tells Evennia which subclass of `ObjectDB` is actually representing this entity. This is the core of Evennia's [Typeclass system](Components/Typeclasses.md), which allows you to work with database entities using normal Python.
+`db_typeclass_path` 是個很重要的欄位。它是一個 Python 風格的路徑，用來告訴 Evennia：實際上是哪個 `ObjectDB` subclass 正在代表這個實體。這正是 Evennia [Typeclass system](Components/Typeclasses.md) 的核心，讓你能用一般 Python 方式操作資料庫中的遊戲實體。
 
-### From database to Python
+### 從資料庫到 Python
 
 ![image4][image4]
 
-Here we see the (somewhat simplified) Python class inheritance tree that you as an Evennia developer will see, along with the three instanced entities.
+在這張圖裡，你可以看到一棵稍微簡化過的 Python class inheritance tree，也就是身為 Evennia 開發者時會接觸到的結構，旁邊還搭配了三個實際存在的實體。
 
-[Objects](Components/Objects.md) represent stuff you will actually see in-game and its child classes implement all the handlers, helper code and the hook methods that Evennia makes use of. In your `mygame/` folder you just import these and overload the things you want to modify. In this way, the `Crossbow` is modified to do the stuff only crossbows can do and `CastleRoom` adds whatever it is that is special about rooms in the castle.
+[Objects](Components/Objects.md) 代表的是你在遊戲裡實際會看到的東西，而它的子類別則實作了 Evennia 會用到的各種 handler、helper code 與 hook method。在你的 `mygame/` 目錄裡，你只要匯入它們，再 override 你想修改的部分即可。於是 `Crossbow` 就能被改造成只會十字弓才有的行為，而 `CastleRoom` 也能加入城堡房間特有的功能。
 
-When creating a new entity in-game, a new row will automatically be created in the database table and then `Trigger` will appear in-game! If we, in code, search the database for Trigger, we will get an instance of the [Character](Components/Objects.md#characters) class back - a Python object we can work with normally.
+當你在遊戲裡建立一個新實體時，資料庫表中就會自動新增一列，接著 `Trigger` 就會在遊戲中出現！如果我們在程式裡查詢資料庫中的 Trigger，得到的會是一個 [Character](Components/Objects.md#characters) class 的 instance，也就是一個可以正常操作的 Python 物件。
 
-Looking at this you may think that you will be making a lot of classes for every different object in the game. Your exact layout is up to you but Evennia also offers other ways to customize each individual object. Read on. 
+看到這裡，你可能會以為自己得為遊戲中的每一種物件都建立一個 class。實際結構當然由你決定，但 Evennia 也提供了其他方法，讓你可以針對單一物件做客製化。繼續看下去。
 
 ### Attributes
 
 ![image5][image5]
 
-The [Attribute](Components/Attributes.md) is another class directly tied to the database behind the scenes. Each `Attribute` basically has a key, a value and a ForeignKey relation to another `ObjectDB`. 
+除了前面那些之外，[Attribute](Components/Attributes.md) 也是另一個在幕後直接連到資料庫的 class。每個 `Attribute` 基本上都有一個 key、一個 value，以及一個指向其他 `ObjectDB` 的 ForeignKey 關聯。
 
-An `Attribute` serializes Python constructs into the database, meaning you can store basically any valid Python, like the dictionary of skills in this image. The “strength” and “skills” Attributes will henceforth be reachable directly from the _Trigger_ object. This (and a few other resources) allow you to create individualized entities while only needing to create classes for those that really behave fundamentally different.
+`Attribute` 會把 Python 結構序列化後存進資料庫，意思是你幾乎可以存任何合法的 Python 內容，例如圖中那份技能 dictionary。此後，「strength」與「skills」這些 Attributes 就能直接從 _Trigger_ 物件上取得。這個機制（以及其他幾種資源）讓你可以打造高度個別化的實體，同時只為那些行為本質上真的不同的東西建立 class。
 
 <div style="clear: right;"></div>
 
-## Controlling the action
+## 控制遊戲行為
 
 ![image6][image6]
 
-_Trigger_ is most likely played by a human. This human connects to the game via one or more [Sessions](Components/Sessions.md), one for each client they connect with.
+_Trigger_ 多半是由一位真人玩家控制。這位玩家會透過一個或多個 [Sessions](Components/Sessions.md) 連上遊戲，每開一個 client，就會對應一個 Session。
 
-Their account on `mygame` is represented by a [Account](Components/Accounts.md) entity. The `AccountDB` holds the password and other account info but has no existence in the game world. Through the `Account` entity, `Sessions` can control (“puppet”) one or more `Object` entities in-game.
+他在 `mygame` 裡的帳號，會由一個 [Account](Components/Accounts.md) 實體表示。`AccountDB` 會保存密碼與其他帳號資訊，但它本身不直接存在於遊戲世界中。透過 `Account` 實體，`Sessions` 就能控制（也就是「puppet」）一個或多個遊戲內的 `Object` 實體。
 
-In this figure, a user is connected to the game with three `Session`s simultaneously. They are logged in to their player `Account` named _Richard_. Through these `Session`s they are simultaneously puppeting the in-game entities _Trigger_ and _Sir Hiss_. Evennia can be configured to allow or disallow a range of different [Connection Styles](Concepts/Connection-Styles.md) like this.
+在這張圖裡，某位使用者同時用三個 `Session` 連進遊戲。他登入的是名為 _Richard_ 的玩家 `Account`。透過這些 `Session`，他同時在操作遊戲內的 _Trigger_ 與 _Sir Hiss_ 兩個實體。Evennia 可以設定是否允許這類不同形式的 [Connection Styles](Concepts/Connection-Styles.md)。
 
 ### Commands
 
 ![image7][image7]
 
-For users to be able to control their game entities and actually play the game, they need to be able to send [Commands](Components/Commands.md). 
+要讓玩家真的能控制自己的遊戲角色並開始玩，他們就必須能送出 [Commands](Components/Commands.md)。
 
-A `Command` can be made to represent anything a user can input actively to the game, such as the `look` command, `get`, `quit`, `emote` and so on.
+`Command` 可以代表玩家主動輸入到遊戲裡的任何內容，例如 `look`、`get`、`quit`、`emote` 等等。
 
-Each `Command` handles both argument parsing and execution. Since each Command is described with a normal Python class, it means that you can implement parsing once and then just have the rest of your commands inherit the effect. In the above figure, the `DIKUCommand` parent class implements parsing of all the syntax common for all DIKU-style commands so `CmdLook` and others won’t have to.
+每個 `Command` 都同時負責參數 parsing 與實際執行。由於每個 Command 都是一般 Python class，所以你可以只實作一次 parsing 邏輯，再讓其他指令去繼承成果。上圖中的 `DIKUCommand` 父類別就實作了所有 DIKU-style 指令共用的語法解析，於是 `CmdLook` 等其他指令就不必重寫。
 
-### Command Sets 
+### Command Sets
 
 ![image8][image8]
 
-All Evennia Commands are are always joined together in `CommandSet`s. These are containers that can hold many `Command` instances. A given `Command` class can contribute instances to any number of `CommandSet`s. These sets are always associated with game entities.
+所有 Evennia Commands 都一定會被收納進 `CommandSet` 裡。`CommandSet` 是能容納多個 `Command` instance 的容器。某個特定的 `Command` class 可以把 instance 提供給任意多個 `CommandSet`，而這些 set 會永遠綁定在遊戲實體上。
 
-In this figure, _Trigger_ has received a `CommandSet` with a bunch of useful commands that he (and by extension his controlling `Account`/Player) can now use.
+在這張圖裡，_Trigger_ 取得了一個包含許多實用指令的 `CommandSet`，所以他本人（以及背後控制他的 `Account`/Player）現在都可以使用這些指令。
 
 ![image9][image9]
 
-_Trigger_’s `CommandSet` is only available to himself. In this figure we put a `CommandSet` with three commands on the Dungeon room. The room itself has no use for commands but we configure this set to affect those _inside it_ instead. Note that we let these be _different versions_ of these commands (hence the different color)! We’ll explain why below.
+_Trigger_ 的 `CommandSet` 只對他自己可用。在這張圖裡，我們又把一個含有三個指令的 `CommandSet` 放到了 Dungeon 房間上。房間本身其實不需要用指令，但我們可以把這組 set 設定成影響_房間裡面的人_。請注意，這裡的指令是這些命令的_另一個版本_（所以顏色不同）！下面會解釋原因。
 
 <div style="clear: right;"></div>
 
-### Merging Command Sets
+### 合併 Command Sets
 
 ![image10][image10]
 
-Multiple `CommandSet`s can be dynamically (and temporarily) merged together in a similar fashion as [Set Theory](https://en.wikipedia.org/wiki/Set_theory), except the merge priority can be customized. In this figure we see a _Union_-type merger where the Commands from Dungeon of the same name temporarily override the commands from Trigger. While in the Dungeon, Trigger will be using this version of those commands. When Trigger leaves, his own `CommandSet` will be restored unharmed.
+多個 `CommandSet` 可以像 [Set Theory](https://en.wikipedia.org/wiki/Set_theory) 那樣被動態地、暫時地合併，只是 Evennia 允許你自訂合併優先權。在這張圖裡，我們看到的是一種 _Union_ 型的合併：來自 Dungeon、名稱相同的 Commands 會暫時覆蓋 Trigger 原本的指令。當 Trigger 待在 Dungeon 裡時，他使用的就是這一版指令；等他離開後，自己的 `CommandSet` 就會完整恢復。
 
-Why would we want to do this? Consider for example that the dungeon is in darkness. We can then let the Dungeon’s version of the `look` command show only the contents of the room if Trigger is carrying a light source. You might also not be able to easily get things in the room without light - you might even be fumbling randomly in your inventory!
+為什麼要這樣做？例如，假設地城一片漆黑，那我們就可以讓 Dungeon 版本的 `look` 指令只在 Trigger 身上有光源時，才顯示房間內容。沒有光時，你甚至可能沒辦法順利撿起地上的東西，還可能在背包裡亂翻一通！
 
-Any number of Command Sets can be merged on the fly. This allows you to implement multiple overlapping states (like combat in a darkened room while intoxicated) without needing huge if statements for every possible combination. The merger is non-destructive, so you can remove cmdsets to get back previous states as needed.
+任意數量的 Command Sets 都可以在執行時即時合併。這讓你能實作多種彼此重疊的狀態（例如在昏暗房間裡戰鬥，而且角色還喝醉了），卻不必為每一種可能組合都寫出巨大的 if 判斷。這種合併是非破壞性的，所以你只要移除 cmdset，就能在需要時回到先前的狀態。
 
-## Now go and explore! 
+## 現在就去探索吧！
 
-This is by no means a full list of Evennia features. But it should give you a bunch of interesting concepts to read more about. 
+這當然遠遠不是 Evennia 功能的完整清單，但它應該已經提供你一批值得繼續往下深挖的有趣概念。
 
-You can find a lot more detail in the  [Core Components](Components/Components-Overview.md) and [Core Concepts](Concepts/Concepts-Overview.md) sections of this manual.  If you haven't read it already, you should also check out the [Evennia Introduction](./Evennia-Introduction.md). 
+你可以在本手冊的 [Core Components](Components/Components-Overview.md) 與 [Core Concepts](Concepts/Concepts-Overview.md) 章節中找到更多細節。如果你還沒讀過，也很建議先看看 [Evennia 簡介](./Evennia-Introduction.md)。
 
 [image1]: https://2.bp.blogspot.com/-0-oir21e76k/W3kaUuGrg3I/AAAAAAAAJLU/qlQWmXlAiGUz_eKG_oYYVRf0yP6KVDdmQCEwYBhgL/s1600/Evennia_illustrated_fig1.png
 [image2]: https://4.bp.blogspot.com/-TuLk-PIVyK8/W3kaUi-e-MI/AAAAAAAAJLc/DA9oMA6m5ooObZlf0Ao6ywW1jHqsPQZAQCEwYBhgL/s1600/Evennia_illustrated_fig2.png
