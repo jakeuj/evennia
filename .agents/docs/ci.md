@@ -18,7 +18,7 @@ Triggers on push/PR to `main` or `develop` (skips docs-only changes).
 
 ### Doc Build (`github_action_build_docs.yml`)
 
-Triggers on push/PR to `main`/`develop` when `docs/` or `evennia/contrib/` changes. Builds with Sphinx via `make release` in `docs/`. Requires a full game dir init + migrations before building.
+Triggers on push/PR to `main` when `docs/`, `evennia/`, or the workflow itself changes, and can also be started manually via `workflow_dispatch`. Builds the single-version site with Sphinx via `make local` in `docs/`, uploads a GitHub Pages artifact for every run, and deploys on `main` pushes only. Requires a full game dir init + migrations before building.
 
 ### Other Workflows
 

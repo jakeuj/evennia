@@ -7,10 +7,10 @@
 import os
 import re
 import sys
-from collections import namedtuple
 
 # from recommonmark.transform import AutoStructify
 from contextlib import chdir
+from pathlib import Path
 
 # -- Project information -----------------------------------------------------
 
@@ -56,41 +56,71 @@ templates_path = ["_templates"]
 html_static_path = ["_static"]
 
 
-# -- Multiversion sidebar ----------------------------------------------
+# -- Docs site routing ---------------------------------------------------
 
-# used to fill in versioning.html links for versions that are not actually built.
-# These are also read from the deploy.py script. These are also the names of
-# the folders built in the gh-pages evennia branch, under docs/.
-# See docs/deploy.py for more details on how to add to this during a major release.
+# This fork publishes a single-version documentation site directly at the
+# custom domain root. We keep the "latest" label for parity with Evennia's
+# upstream docs, but legacy/multiversion links are intentionally disabled.
 latest_version = "latest"
-legacy_versions = ["6.x", "5.x", "4.x", "3.x", "2.x", "1.x", "0.x"]
-legacy_branches = ["v6.0.0", "v5.0.0", "v4.0.0", "v3.0.0", "v2.0.0", "v1.0.0", "v0.9.5"]
+legacy_versions = []
+legacy_branches = []
 
-DOCS_BASE = "https://www.evennia.com/docs/"
+DOCS_BASE = os.environ.get("EVENNIA_DOCS_BASE", "https://evennia.jakeuj.com/").rstrip("/") + "/"
+UPSTREAM_DOCS_BASE = "https://www.evennia.com/docs/latest/"
+DOCS_SOURCE_ROOT = Path(__file__).resolve().parent
 
 
-def add_legacy_versions_to_html_page_context(app, pagename, templatename, context, doctree):
-    # Add "latest" (main) version
-    context["versions"] = [
-        {"release": "latest", "name": "main", "url": f"{DOCS_BASE}latest/index.html"}
-    ]
-    # Add legacy versions
-    LVersion = namedtuple("legacy_version", ["release", "name", "url", "branch"])
-    context["legacy_versions"] = [
-        LVersion(
-            release=branch,  # e.g. v5.0.0
-            name=vers,  # e.g. 5.x
-            url=f"{DOCS_BASE}{vers}/index.html",  # absolute path!
-            branch=branch,
-        )
-        for vers, branch in zip(legacy_versions, legacy_branches)
-    ]
+def _source_path_from_official_docs_url(url):
+    """Return the local source file corresponding to an upstream docs URL."""
+
+    if not url.startswith(UPSTREAM_DOCS_BASE):
+        return None
+
+    relative_path = url[len(UPSTREAM_DOCS_BASE) :].split("?", 1)[0]
+    relative_path, _, _anchor = relative_path.partition("#")
+    relative_path = relative_path.rstrip("/")
+
+    if not relative_path or relative_path == "index.html":
+        return DOCS_SOURCE_ROOT / "index.md"
+
+    if relative_path.endswith(".html"):
+        relative_path = relative_path[: -len(".html")]
+
+    return DOCS_SOURCE_ROOT / f"{relative_path}.md"
+
+
+def _remap_official_docs_url(url):
+    """Point upstream docs URLs to this fork when the target page exists locally."""
+
+    source_path = _source_path_from_official_docs_url(url)
+    if source_path is None or not source_path.exists():
+        return url
+
+    relative_path = url[len(UPSTREAM_DOCS_BASE) :].lstrip("/")
+    relative_path, _, anchor = relative_path.partition("#")
+
+    if not relative_path or relative_path == "index.html":
+        target_url = DOCS_BASE
+    else:
+        target_url = DOCS_BASE + relative_path
+
+    if anchor:
+        target_url = f"{target_url}#{anchor}"
+    return target_url
+
+
+def add_doc_versions_to_html_page_context(app, pagename, templatename, context, doctree):
+    """Populate the sidebar with the single latest docs release."""
+
+    context["versions"] = [{"release": latest_version, "label": "current", "url": DOCS_BASE}]
+    context["legacy_versions"] = []
     context["current_is_legacy"] = False
 
 
 # -- Options for HTML output -------------------------------------------------
 
 html_theme = "nature"
+html_baseurl = DOCS_BASE
 
 # Custom extras for sidebar
 html_sidebars = {
@@ -206,6 +236,8 @@ def url_resolver(app, docname, source):
         docdepth = docname.count("/") + 1
         relative_path = "../".join("" for _ in range(docdepth))
 
+        if url.startswith(UPSTREAM_DOCS_BASE):
+            return _remap_official_docs_url(url)
         if url.endswith(_choose_issue):
             # github:issue shortcut
             return _github_issue_choose
@@ -378,7 +410,7 @@ def setup(app):
     app.connect("autodoc-skip-member", autodoc_skip_member)
     app.connect("autodoc-process-docstring", autodoc_post_process_docstring)
     app.connect("source-read", url_resolver)
-    app.connect("html-page-context", add_legacy_versions_to_html_page_context)
+    app.connect("html-page-context", add_doc_versions_to_html_page_context)
 
     # build toctree file
     sys.path.insert(1, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))

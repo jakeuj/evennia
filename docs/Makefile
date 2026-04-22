@@ -38,9 +38,9 @@ help:
 	@echo "  $(cblue)quickstrict$(cnorm) to build like 'quick' but abort immediately on any error"
 	@echo "  $(cblue)local$(cnorm)       to build local html docs of the current branch (no multiversion)."
 	@echo "  $(cblue)localupdate$(cnorm) to build local html docs (only update changes)"
-	@echo "  $(cblue)mv-local$(cnorm)    to build multiversion html docs, without deploying (req: local git commit first)"
-	@echo "  $(cblue)deploy$(cnorm)      to deploy previously built multiversion docs online (req: commit and github push access)"
-	@echo "  $(cblue)release$(cnorm)     to build + deploy multiversion docs online (req: commit and github push access)"
+	@echo "  $(cblue)mv-local$(cnorm)    to build multiversion html docs locally (upstream-only compatibility path)"
+	@echo "  $(cblue)deploy$(cnorm)      to print the GitHub Pages deploy guidance for this fork"
+	@echo "  $(cblue)release$(cnorm)     to build the single-version release candidate for GitHub Pages"
 
 
 .PHONY: help Makefile
@@ -156,14 +156,14 @@ mv-local:
 	@echo "Documentation built (multiversion + autodocs)."
 	@echo "To see result, open evennia/docs/build/html/<version>/index.html in a browser."
 
-# note - don't run deploy/release manually, the result will clash with the
-# result of the github actions! 
+# GitHub Pages deployment is handled by .github/workflows/github_action_build_docs.yml
+# in this fork. Keep the target as a guard rail so local contributors don't
+# accidentally try the old gh-pages push flow.
 deploy:
-	make _multiversion-deploy
-	@echo "Documentation deployed."
+	@echo "Deployment is handled by GitHub Pages Actions for this fork."
+	@echo "Set the custom domain to evennia.jakeuj.com in repo settings after the workflow deploys."
 
-# build and prepare the docs for release
+# build the single-version release candidate used by GitHub Pages
 release:
 	make local
-	make deploy
-	@echo "Release complete."
+	@echo "Release build complete. Push to main to deploy via GitHub Pages."

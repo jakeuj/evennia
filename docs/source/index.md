@@ -24,7 +24,7 @@ This is the manual of [Evennia](https://www.evennia.com), the open source Python
 
 - [Core components](Components/Components-Overview.md) - the core building blocks of Evennia
 - [Core Concepts](Concepts/Concepts-Overview.md) - larger-scale concepts and features
-- [API](./Evennia-API.md) - the full API-reference, generated from source
+- [API Reference (English)](./Evennia-API.md) - the full auto-generated API reference remains in English for now
 
 ## Contributions and Info
 

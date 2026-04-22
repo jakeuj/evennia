@@ -1,4 +1,6 @@
-# API Summary
+# API Summary (English)
+
+> The API reference in this fork is still auto-generated from Evennia source docstrings and remains in English for now.
 
 [evennia](api/evennia-api.md) - library source tree
 - [evennia.accounts](evennia.accounts) - the out-of-character entities representing players

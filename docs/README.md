@@ -5,7 +5,7 @@ Documentation for the Evennia MUD creation system.
 > WARNING: This system is still WIP and many things are bound to change!
 > Contributing is still primarily to be done in the wiki.
 
-The live documentation is available at `https://www.evennia.com/docs/latest/index.html/`.
+The live documentation for this fork is available at `https://evennia.jakeuj.com/`.
 
 # Editing the docs
 
@@ -127,37 +127,22 @@ of your alternative game dir. For example:
 
 ## Building for release
 
-The full Evennia documentation also tracks documentation from older Evennia
-versions. This is done by pulling documentation from Evennia's old release
-branches and building them all so readers can choose which one to view. Only
-specific official Evennia branches will be built so you can't use this to
-build your own testing branch.
+This fork publishes a single-version documentation site to GitHub Pages instead
+of using the upstream multi-version `gh-pages` flow.
 
-- All local changes must have been committed to git first, since the versioned
-docs are built by looking at the git tree.
-
-- To build for local checking, run (`mv` stands for "multi-version"):
-
-    ```
-    make mv-local
-    ```
-
-- The different versions will be found under `evennia/docs/build/versions/`.
-- If you have git-push access to the Evennia `gh-pages` branch on `github`, you
-can now deploy.
-
-    ```
-    make deploy
-    ```
-
-- If you know what you are doing you can also do build + deploy in one step:
+- Build the release candidate locally with:
 
     ```
     make release
     ```
 
-- After deployment finishes, the updated live documentation will be
-available at `https://evennia.github.io/evennia/`.
+- `make release` runs the same single-version doc build used by the GitHub
+  Pages workflow and writes the rendered site to `evennia/docs/build/html/`.
+- Deployment is handled by `.github/workflows/github_action_build_docs.yml`
+  after pushing to the `main` branch.
+- Configure the repository's GitHub Pages custom domain as
+  `evennia.jakeuj.com`, then create the DNS record
+  `evennia.jakeuj.com -> jakeuj.github.io`.
 
 # Editing syntax
 
