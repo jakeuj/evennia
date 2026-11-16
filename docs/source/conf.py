@@ -38,7 +38,6 @@ extensions = [
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.viewcode",
     "sphinx.ext.todo",
-    "sphinx.ext.githubpages",
     "myst_parser",
 ]
 
@@ -58,14 +57,15 @@ html_static_path = ["_static"]
 
 # -- Docs site routing ---------------------------------------------------
 
-# This fork publishes a single-version documentation site directly at the
-# custom domain root. We keep the "latest" label for parity with Evennia's
+# This fork publishes a single-version documentation site at
+# https://jakeuj.com/evennia/ (the GitHub Pages project path under the user
+# site's custom domain; this repo has no custom domain of its own). We keep the "latest" label for parity with Evennia's
 # upstream docs, but legacy/multiversion links are intentionally disabled.
 latest_version = "latest"
 legacy_versions = []
 legacy_branches = []
 
-DOCS_BASE = os.environ.get("EVENNIA_DOCS_BASE", "https://evennia.jakeuj.com/").rstrip("/") + "/"
+DOCS_BASE = os.environ.get("EVENNIA_DOCS_BASE", "https://jakeuj.com/evennia/").rstrip("/") + "/"
 UPSTREAM_DOCS_BASE = "https://www.evennia.com/docs/latest/"
 DOCS_SOURCE_ROOT = Path(__file__).resolve().parent
 

@@ -5,7 +5,8 @@ Documentation for the Evennia MUD creation system.
 > WARNING: This system is still WIP and many things are bound to change!
 > Contributing is still primarily to be done in the wiki.
 
-The live documentation for this fork is available at `https://evennia.jakeuj.com/`.
+The live documentation for this fork is available at `https://jakeuj.com/evennia/`.
+The site is machine-translated and every page carries `noindex`.
 
 # Editing the docs
 
@@ -140,9 +141,10 @@ of using the upstream multi-version `gh-pages` flow.
   Pages workflow and writes the rendered site to `evennia/docs/build/html/`.
 - Deployment is handled by `.github/workflows/github_action_build_docs.yml`
   after pushing to the `main` branch.
-- Configure the repository's GitHub Pages custom domain as
-  `evennia.jakeuj.com`, then create the DNS record
-  `evennia.jakeuj.com -> jakeuj.github.io`.
+- The site is served at `https://jakeuj.com/evennia/` through the custom
+  domain of the user site `jakeuj.github.io`. Do not set a custom domain on
+  this repository and do not add a DNS record for it; the old host
+  `evennia.jakeuj.com` only 301-redirects here.
 
 # Editing syntax
 

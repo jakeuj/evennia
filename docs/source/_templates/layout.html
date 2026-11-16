@@ -1,0 +1,7 @@
+{#- The zh-TW pages are machine-translated and the API pages duplicate the
+    upstream docs, so keep the whole site out of search results. -#}
+{% extends "!layout.html" %}
+{%- block extrahead %}
+{{ super() }}
+<meta name="robots" content="noindex, follow">
+{%- endblock %}

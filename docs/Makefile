@@ -161,7 +161,7 @@ mv-local:
 # accidentally try the old gh-pages push flow.
 deploy:
 	@echo "Deployment is handled by GitHub Pages Actions for this fork."
-	@echo "Set the custom domain to evennia.jakeuj.com in repo settings after the workflow deploys."
+	@echo "The site is served at https://jakeuj.com/evennia/ (no custom domain on this repo)."
 
 # build the single-version release candidate used by GitHub Pages
 release:

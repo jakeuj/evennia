@@ -38,6 +38,20 @@ class TestDocsConf(unittest.TestCase):
 
         cls.conf = _load_conf_module()
 
+    def test_site_is_served_under_jakeuj_com(self):
+        """Canonical URLs use the project path; no CNAME file is generated."""
+
+        self.assertEqual(self.conf.html_baseurl, "https://jakeuj.com/evennia/")
+        self.assertNotIn("sphinx.ext.githubpages", self.conf.extensions)
+
+    def test_layout_marks_every_page_noindex(self):
+        """The machine-translated site stays out of search results."""
+
+        layout = (CONF_PATH.parent / "_templates" / "layout.html").read_text(encoding="utf-8")
+        self.assertIn('{% extends "!layout.html" %}', layout)
+        self.assertIn("{{ super() }}", layout)
+        self.assertIn('<meta name="robots" content="noindex, follow">', layout)
+
     def test_version_context_uses_single_latest_release(self):
         """The version sidebar should only expose the latest docs root."""
 
@@ -53,13 +67,13 @@ class TestDocsConf(unittest.TestCase):
 
         self.assertEqual(
             context["versions"],
-            [{"release": "latest", "label": "current", "url": "https://evennia.jakeuj.com/"}],
+            [{"release": "latest", "label": "current", "url": "https://jakeuj.com/evennia/"}],
         )
         self.assertEqual(context["legacy_versions"], [])
         self.assertFalse(context["current_is_legacy"])
 
     def test_url_resolver_rewrites_existing_official_docs_links(self):
-        """Known local docs pages should point to the custom domain."""
+        """Known local docs pages should point to this fork's docs site."""
 
         source = [
             "[docs](https://www.evennia.com/docs/latest/Coding/Setting-up-PyCharm.html#requirements)"
@@ -69,7 +83,7 @@ class TestDocsConf(unittest.TestCase):
 
         self.assertEqual(
             source[0],
-            "[docs](https://evennia.jakeuj.com/Coding/Setting-up-PyCharm.html#requirements)",
+            "[docs](https://jakeuj.com/evennia/Coding/Setting-up-PyCharm.html#requirements)",
         )
 
     def test_url_resolver_keeps_missing_official_docs_links_external(self):
